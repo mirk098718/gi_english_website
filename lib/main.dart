@@ -1,23 +1,18 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/testPages/SfCanlendarExamplePage.dart';
-import 'package:gi_english_website/testPages/StackRatioTestPage.dart';
-import 'package:gi_english_website/testPages/StretchTestPage.dart';
-import 'package:gi_english_website/cafePages/CafeAboutPage.dart';
-import 'package:gi_english_website/cafePages/cafeMainPage.dart';
-import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/MainGatePage.dart';
-import 'package:gi_english_website/pages/SchoolMainPage.dart';
-import 'package:gi_english_website/pages/SchoolProgramPage.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scrollBehavior: MyCustomScrollBehavior(),
       title: 'Gleam Island Homepage',
       theme: ThemeData(
         // This is the theme of your application.
@@ -34,4 +29,16 @@ class MyApp extends StatelessWidget {
       home: MainGatePage(),
     );
   }
+}
+
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  //alt+insert를 누르면, 여러 메뉴가 나온다.
+  //Object a = 1;
+  //Object b = MaterialApp();
+
+  @override
+  Set<PointerDeviceKind> get dragDevices =>{
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.touch,
+  };
 }
