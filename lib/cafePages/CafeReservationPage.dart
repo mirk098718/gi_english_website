@@ -20,7 +20,7 @@ class CafeReservationPage extends StatefulWidget {
 }
 
 class _CafeReservationPageState extends State<CafeReservationPage> {
-
+  late CafeReservationPageService s;
   Visitor visitor = Visitor.init();
   MyGroupValue periodMyGroupValue = MyGroupValue("");
   MyGroupValue programMyGroupValue = MyGroupValue("program1");
@@ -30,6 +30,10 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
   final childAgeController = TextEditingController();
   final parentContactController = TextEditingController();
 
+  @override
+  void initState() {
+    s = CafeReservationPageService(this);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,20 +110,20 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
               ),
             ),
             child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              weekdayPeriodRadio(),
-              SizedBox(
-                height: 20,
-              ),
-              saturdayPeriodRadio(),
-              SizedBox(
-                height: 20,
-              ),
-              sundayPeriodRadio(),
-            ],
-              ),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                weekdayPeriodRadio(),
+                SizedBox(
+                  height: 20,
+                ),
+                saturdayPeriodRadio(),
+                SizedBox(
+                  height: 20,
+                ),
+                sundayPeriodRadio(),
+              ],
+            ),
           ),
           textBoxGroup(),
           Text("정기권 구매 고객님의 경우, 예약신청 버튼을 누르면 예약이 완료됩니다."),
@@ -147,79 +151,21 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
     );
   }
 
-  Widget submitButton(){
+  Widget submitButton() {
     return Container(
       width: 150,
       height: 50,
       child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            primary: Palette.mainLime,
-            onPrimary: Palette.black,
-          ),
-          child: Text(
-            "예약신청",
-            style: TextStyle(fontFamily: "Jalnan"),
-          ),
-          onPressed: () {
-            String childName = childNameController.text;
-            String childAge = childAgeController.text;
-            String parentName = parentNameController.text;
-            String parentNumber = parentContactController.text;
-
-            if(childName != null && childAge != null && parentName != null && parentNumber != null){
-              // todo: make else work here
-              // todo: make a visitor instance with above information and save it using shared preferences.
-              
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                      content: Container(
-                        width: 250,
-                        height: 260,
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.all(30),
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: 50,
-                            ),
-                            Text(
-                              "예약이 완료되었습니다.",
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(
-                              height: 60,
-                            ),
-                            Container(
-                              width: 150,
-                              height: 50,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  primary: Palette.mainLime,
-                                  onPrimary: Palette.black,
-                                ),
-                                onPressed: () {
-                                  MenuUtil.pop(context);
-                                },
-                                child: Text(
-                                  "확인",
-                                  style: TextStyle(fontFamily: "Jalnan"),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ));
-                },
-              );
-            }
-            else{
-              SnackbarUtil.showSnackBar("정보를 입력해주세요.", context);
-            }
-
-
-          }),
+        style: ElevatedButton.styleFrom(
+          primary: Palette.mainLime,
+          onPrimary: Palette.black,
+        ),
+        child: Text(
+          "예약신청",
+          style: TextStyle(fontFamily: "Jalnan"),
+        ),
+        onPressed: s.submit,
+      ),
     );
   }
 
@@ -229,6 +175,7 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
       visitor.programPeriod = periodMyGroupValue.value;
       SnackbarUtil.showSnackBar("${periodMyGroupValue.value} 선택", context);
     }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -270,6 +217,7 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
       visitor.programPeriod = periodMyGroupValue.value;
       SnackbarUtil.showSnackBar("${periodMyGroupValue.value} 선택", context);
     }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -284,31 +232,36 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
           "satPeriod1",
           periodMyGroupValue,
           setState,
-          label: "10:30 ~ 12:30 ",onChanged: onChanged,
+          label: "10:30 ~ 12:30 ",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "satPeriod2",
           periodMyGroupValue,
           setState,
-          label: "12:30 ~ 14:30",onChanged: onChanged,
+          label: "12:30 ~ 14:30",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "satPeriod3",
           periodMyGroupValue,
           setState,
-          label: "14:30 ~ 16:30",onChanged: onChanged,
+          label: "14:30 ~ 16:30",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "satPeriod4",
           periodMyGroupValue,
           setState,
-          label: "16:30 ~ 18:30",onChanged: onChanged,
+          label: "16:30 ~ 18:30",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "satPeriod5",
           periodMyGroupValue,
           setState,
-          label: "18:30 ~ 20:30",onChanged: onChanged,
+          label: "18:30 ~ 20:30",
+          onChanged: onChanged,
         ),
       ],
     );
@@ -320,6 +273,7 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
       visitor.programPeriod = periodMyGroupValue.value;
       SnackbarUtil.showSnackBar("${periodMyGroupValue.value} 선택", context);
     }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -334,32 +288,35 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
           "sunPeriod1",
           periodMyGroupValue,
           setState,
-          label: "11:00 ~ 13:00",onChanged: onChanged,
+          label: "11:00 ~ 13:00",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "sunPeriod2",
           periodMyGroupValue,
           setState,
-          label: "13:00 ~ 15:00",onChanged: onChanged,
+          label: "13:00 ~ 15:00",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "sunPeriod3",
           periodMyGroupValue,
           setState,
-          label: "15:00 ~ 17:00",onChanged: onChanged,
+          label: "15:00 ~ 17:00",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "sunPeriod34",
           periodMyGroupValue,
           setState,
-          label: "17:00 ~ 19:00",onChanged: onChanged,
+          label: "17:00 ~ 19:00",
+          onChanged: onChanged,
         ),
       ],
     );
   }
 
   Widget programRadio() {
-
     void onChanged(MyGroupValue myGroupValue) {
       programMyGroupValue = myGroupValue;
       visitor.program = programMyGroupValue.value;
@@ -569,9 +526,7 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
                       style:
                           TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
-                    onPressed: () {
-                      MenuUtil.push(context, CafeReservationPage());
-                    },
+                    onPressed: s.moveCafeReservationPage,
                     style: ElevatedButton.styleFrom(
                       primary: Palette.mainLime,
                       onPrimary: Palette.black,
@@ -635,9 +590,7 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
                       style:
                           TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
-                    onPressed: () {
-                      MenuUtil.push(context, CafeReservationPage());
-                    },
+                    onPressed: s.moveCafeReservationPage,
                     style: ElevatedButton.styleFrom(
                       primary: Palette.mainLime,
                       onPrimary: Palette.black,
@@ -651,6 +604,80 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
       ),
     );
   }
+}
 
+class CafeReservationPageService {
+  _CafeReservationPageState state;
 
+  CafeReservationPageService(this.state);
+
+  void submit() {
+    var context = state.context;
+    String childName = state.childNameController.text;
+    String childAge = state.childAgeController.text;
+    String parentName = state.parentNameController.text;
+    String parentNumber = state.parentContactController.text;
+
+    if (childName.isNotEmpty &&
+        (!childAge.isEmpty) &&
+        parentName != "" &&
+        parentNumber != "") {
+      // todo: make else work here
+      // todo: make a visitor instance with above information and save it using shared preferences.
+
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+              content: Container(
+            width: 250,
+            height: 260,
+            alignment: Alignment.center,
+            padding: EdgeInsets.all(30),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 50,
+                ),
+                Text(
+                  "예약이 완료되었습니다.",
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(
+                  height: 60,
+                ),
+                Container(
+                  width: 150,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Palette.mainLime,
+                      onPrimary: Palette.black,
+                    ),
+                    onPressed: backPage,
+                    child: Text(
+                      "확인",
+                      style: TextStyle(fontFamily: "Jalnan"),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ));
+        },
+      );
+    } else {
+      SnackbarUtil.showSnackBar("정보를 입력해주세요.", context);
+    }
+  }
+
+  void moveCafeReservationPage() {
+    var context = state.context;
+    MenuUtil.push(context, CafeReservationPage());
+  }
+
+  void backPage() {
+    var context = state.context;
+    MenuUtil.pop(context);
+  }
 }
