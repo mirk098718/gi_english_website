@@ -6,6 +6,10 @@ class BehaviorColor {
   static const Color colorOnClick = Palette.mainLightPurple;
   static const Color colorOnDefault = Palette.white;
   static const Color colorOnHover = Palette.mainMediumPurple;
+
+  static const Color colorOnClickCafe = Palette.mainLime;
+  static const Color colorOnDefaultCafe = Palette.white;
+  static const Color colorOnHoverCafe = Palette.lightLime;
 }
 
 class ButtonState {
