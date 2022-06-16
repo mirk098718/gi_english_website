@@ -41,8 +41,8 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
       body: Stack(
         children: [
           Positioned(top: 102, bottom: 0, left: 0, right: 0, child: widget.content),
-          Positioned(top: 0, left: 0, right: 0, child: appBar1(context)),
           Positioned(top: 51, left: 0, right: 0, child: appBar2(context)),
+          Positioned(top: 0, left: 0, right: 0, child: appBar1(context))
 
         ],
       ),
@@ -50,13 +50,11 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
   }
 
 
-
   Widget appBar1(BuildContext context) {
     return Stack(children: [
       Container(
         height: widget.height,
-        padding: EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
-        color: Colors.purple,
+        color: Palette.mainPurple,
       ),
       Container(
         padding: EdgeInsets.only(top: 10),
@@ -80,8 +78,8 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
 
       Container(
         height: widget.height,
-        padding: EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
-        color:  Colors.purple,
+        padding: EdgeInsets.only(left: 5, right: 5),
+        color: Palette.mainPurple,
       ),
       SizedBox(width: 30,),
       Container(
@@ -94,7 +92,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
             children: [
               InkWell(
                 child: Container(
-                    margin: EdgeInsets.only(left: 20, top: 10, bottom: 5),
+                    margin: EdgeInsets.only(left: 10, top: 10, bottom: 5),
                     width:30, height: 30, child: Image.asset("assets/loginButton.png")),
                 onTap: () {
                   showDialog(
@@ -135,14 +133,14 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                       });
                 },
               ),
-              SizedBox(width: 40,),
+              SizedBox(width: 30),
               InkWell(
                 onTap: (){MenuUtil.push(context, SchoolAboutPage());},
                 child: Container(
                     height: widget.height,
                     alignment: Alignment.center,
                     child: Text("About Gi어학원",style: TextStyle(color: Palette.white, fontWeight: FontWeight.bold),),),),
-              SizedBox(width: 40),
+              SizedBox(width: 30),
               InkWell(
                   onTap: (){MenuUtil.push(context, SchoolProgramPage());},
                   child:
@@ -150,7 +148,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                     height: widget.height,
                     alignment: Alignment.center,
                     child: Text("Program",style: TextStyle(color: Palette.white, fontWeight: FontWeight.bold),),),),
-              SizedBox(width: 40),
+              SizedBox(width: 30),
               InkWell(
                 onTap: (){MenuUtil.push(context, SchoolCurriculumElePage());},
                 child:
@@ -158,7 +156,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                        height: widget.height,
                        alignment: Alignment.center,
                        child: Text("Curriculum",style: TextStyle(color: Palette.white, fontWeight: FontWeight.bold),)),),
-              SizedBox(width: 40),
+              SizedBox(width: 30),
               InkWell(
                   onTap: (){MenuUtil.push(context, SchoolCommunityNoticePage());},
                   child:

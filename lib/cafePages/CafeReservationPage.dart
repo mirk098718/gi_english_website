@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/cafePages/CafeAboutPage.dart';
+import 'package:gi_english_website/class/Visitor.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/util/SnackbarUtil.dart';
 import 'package:gi_english_website/widget/EasyRadio.dart';
 import 'package:gi_english_website/widget/MobileCafeLayout.dart';
 import 'package:gi_english_website/widget/WebCafeLayout.dart';
@@ -18,8 +20,10 @@ class CafeReservationPage extends StatefulWidget {
 }
 
 class _CafeReservationPageState extends State<CafeReservationPage> {
-  MyGroupValue myGroupValue = MyGroupValue("");
-  MyGroupValue myGroupValue2 = MyGroupValue("program1");
+
+  Visitor visitor = Visitor.init();
+  MyGroupValue periodMyGroupValue = MyGroupValue("");
+  MyGroupValue programMyGroupValue = MyGroupValue("program1");
 
   final childNameController = TextEditingController();
   final parentNameController = TextEditingController();
@@ -157,58 +161,74 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
             style: TextStyle(fontFamily: "Jalnan"),
           ),
           onPressed: () {
-            // String childName = childNameController.text;
-            // double childAge = double.parse(childAgeController.text);
-            // String parentName = parentNameController.text;
+            String childName = childNameController.text;
+            String childAge = childAgeController.text;
+            String parentName = parentNameController.text;
+            String parentNumber = parentContactController.text;
 
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                    content: Container(
-                      width: 250,
-                      height: 260,
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.all(30),
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: 50,
-                          ),
-                          Text(
-                            "예약이 완료되었습니다.",
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(
-                            height: 60,
-                          ),
-                          Container(
-                            width: 150,
-                            height: 50,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: Palette.mainLime,
-                                onPrimary: Palette.black,
-                              ),
-                              onPressed: () {
-                                MenuUtil.pop(context);
-                              },
-                              child: Text(
-                                "확인",
-                                style: TextStyle(fontFamily: "Jalnan"),
-                              ),
+            if(childName != null && childAge != null && parentName != null && parentNumber != null){
+              // todo: make else work here
+              // todo: make a visitor instance with above information and save it using shared preferences.
+              
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                      content: Container(
+                        width: 250,
+                        height: 260,
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.all(30),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 50,
                             ),
-                          )
-                        ],
-                      ),
-                    ));
-              },
-            );
+                            Text(
+                              "예약이 완료되었습니다.",
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              height: 60,
+                            ),
+                            Container(
+                              width: 150,
+                              height: 50,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary: Palette.mainLime,
+                                  onPrimary: Palette.black,
+                                ),
+                                onPressed: () {
+                                  MenuUtil.pop(context);
+                                },
+                                child: Text(
+                                  "확인",
+                                  style: TextStyle(fontFamily: "Jalnan"),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ));
+                },
+              );
+            }
+            else{
+              SnackbarUtil.showSnackBar("정보를 입력해주세요.", context);
+            }
+
+
           }),
     );
   }
 
   Widget weekdayPeriodRadio() {
+    void onChanged(MyGroupValue myGroupValue) {
+      periodMyGroupValue = myGroupValue;
+      visitor.programPeriod = periodMyGroupValue.value;
+      SnackbarUtil.showSnackBar("${periodMyGroupValue.value} 선택", context);
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -221,27 +241,35 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
         ),
         EasyRadio(
           "period1",
-          myGroupValue,
+          periodMyGroupValue,
           setState,
           label: "14:30 ~ 16:30",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "period2",
-          myGroupValue,
+          periodMyGroupValue,
           setState,
           label: "16:30 ~ 18:30",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "period3",
-          myGroupValue,
+          periodMyGroupValue,
           setState,
           label: "18:30 ~ 20:30",
+          onChanged: onChanged,
         ),
       ],
     );
   }
 
   Widget saturdayPeriodRadio() {
+    void onChanged(MyGroupValue myGroupValue) {
+      periodMyGroupValue = myGroupValue;
+      visitor.programPeriod = periodMyGroupValue.value;
+      SnackbarUtil.showSnackBar("${periodMyGroupValue.value} 선택", context);
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -254,39 +282,44 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
         ),
         EasyRadio(
           "satPeriod1",
-          myGroupValue,
+          periodMyGroupValue,
           setState,
-          label: "10:30 ~ 12:30 ",
+          label: "10:30 ~ 12:30 ",onChanged: onChanged,
         ),
         EasyRadio(
           "satPeriod2",
-          myGroupValue,
+          periodMyGroupValue,
           setState,
-          label: "12:30 ~ 14:30",
+          label: "12:30 ~ 14:30",onChanged: onChanged,
         ),
         EasyRadio(
           "satPeriod3",
-          myGroupValue,
+          periodMyGroupValue,
           setState,
-          label: "14:30 ~ 16:30",
+          label: "14:30 ~ 16:30",onChanged: onChanged,
         ),
         EasyRadio(
           "satPeriod4",
-          myGroupValue,
+          periodMyGroupValue,
           setState,
-          label: "16:30 ~ 18:30",
+          label: "16:30 ~ 18:30",onChanged: onChanged,
         ),
         EasyRadio(
           "satPeriod5",
-          myGroupValue,
+          periodMyGroupValue,
           setState,
-          label: "18:30 ~ 20:30",
+          label: "18:30 ~ 20:30",onChanged: onChanged,
         ),
       ],
     );
   }
 
   Widget sundayPeriodRadio() {
+    void onChanged(MyGroupValue myGroupValue) {
+      periodMyGroupValue = myGroupValue;
+      visitor.programPeriod = periodMyGroupValue.value;
+      SnackbarUtil.showSnackBar("${periodMyGroupValue.value} 선택", context);
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -299,33 +332,40 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
         ),
         EasyRadio(
           "sunPeriod1",
-          myGroupValue,
+          periodMyGroupValue,
           setState,
-          label: "11:00 ~ 13:00",
+          label: "11:00 ~ 13:00",onChanged: onChanged,
         ),
         EasyRadio(
           "sunPeriod2",
-          myGroupValue,
+          periodMyGroupValue,
           setState,
-          label: "13:00 ~ 15:00",
+          label: "13:00 ~ 15:00",onChanged: onChanged,
         ),
         EasyRadio(
           "sunPeriod3",
-          myGroupValue,
+          periodMyGroupValue,
           setState,
-          label: "15:00 ~ 17:00",
+          label: "15:00 ~ 17:00",onChanged: onChanged,
         ),
         EasyRadio(
           "sunPeriod34",
-          myGroupValue,
+          periodMyGroupValue,
           setState,
-          label: "17:00 ~ 19:00",
+          label: "17:00 ~ 19:00",onChanged: onChanged,
         ),
       ],
     );
   }
 
   Widget programRadio() {
+
+    void onChanged(MyGroupValue myGroupValue) {
+      programMyGroupValue = myGroupValue;
+      visitor.program = programMyGroupValue.value;
+      SnackbarUtil.showSnackBar("${programMyGroupValue.value} 선택", context);
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -338,27 +378,31 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
         ),
         EasyRadio(
           "program1",
-          myGroupValue2,
+          programMyGroupValue,
           setState,
           label: "Storytelling",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "program2",
-          myGroupValue2,
+          programMyGroupValue,
           setState,
           label: "Creative Art",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "program3",
-          myGroupValue2,
+          programMyGroupValue,
           setState,
           label: "Visual Contents",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "program4",
-          myGroupValue,
+          programMyGroupValue,
           setState,
           label: "Physical Activities",
+          onChanged: onChanged,
         ),
       ],
     );
@@ -550,7 +594,7 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
         color: Colors.white,
         child: Column(
           children: [
-            mobileMainImage(),
+            // mobileMainImage(),
             leftBox(),
             content(),
             SizedBox(height: 51, child: MyWidget.mobileCafeFooter())

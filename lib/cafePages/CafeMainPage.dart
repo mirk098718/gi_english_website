@@ -19,36 +19,32 @@ class CafeMainPage extends StatefulWidget {
 class _CafeMainPageState extends State<CafeMainPage> {
   @override
   Widget build(BuildContext context) {
-
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     Size size = mediaQueryData.size;
     double width = size.width;
-    if(width>768){
+    if (width > 768) {
       return desktopUi();
-    }
-    else{
+    } else {
       return mobileUi();
     }
   }
 
   Widget desktopUi() {
-    return WebCafeLayout( content: scrollView());
+    return WebCafeLayout(content: scrollView());
   }
 
   Widget mobileUi() {
-    return MobileCafeLayout( content: mobileScrollView());
+    return MobileCafeLayout(content: mobileScrollView());
   }
 
-
-  Widget scrollView(){
+  Widget scrollView() {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
-
       child: Column(
         children: [
           mainImage(),
           SizedBox(height: 126, child: urlMenu()),
-          Container (height: 30,color:Palette.white),
+          Container(height: 30, color: Palette.white),
           SizedBox(height: 473, child: bulletinBoard()),
           SizedBox(height: 213, child: MyWidget.cafeFooter()),
         ],
@@ -67,15 +63,15 @@ class _CafeMainPageState extends State<CafeMainPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(width: 500, child: Image.asset("cafeMainCatch.png")),
+                Container(width: 500, child: Image.asset("assets/cafeMainCatch.png")),
                 Container(
-
                   width: 150,
                   height: 50,
                   child: ElevatedButton(
                     child: Text(
                       "예약문의",
-                      style: TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                      style:
+                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
                     onPressed: () {
                       MenuUtil.push(context, CafeReservationPage());
@@ -130,8 +126,14 @@ class _CafeMainPageState extends State<CafeMainPage> {
                             SizedBox(height: 10),
                             ElevatedButton(
                               onPressed: () {},
-                              child: Text("인스타 바로가기",textAlign: TextAlign.center,style:TextStyle(
-                                  fontFamily: "Jalnan", color: Palette.white, fontSize: 12),),
+                              child: Text(
+                                "인스타 바로가기",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontFamily: "Jalnan",
+                                    color: Palette.white,
+                                    fontSize: 12),
+                              ),
                               style: ElevatedButton.styleFrom(
                                 primary: Palette.mainMediumPurple,
                                 onPrimary: Palette.black,
@@ -144,7 +146,6 @@ class _CafeMainPageState extends State<CafeMainPage> {
                   width: 1,
                   height: 40,
                   color: Colors.black54,
-
                 ),
                 Expanded(
                     flex: 1,
@@ -158,8 +159,14 @@ class _CafeMainPageState extends State<CafeMainPage> {
                             SizedBox(height: 10),
                             ElevatedButton(
                               onPressed: () {},
-                              child: Text("유튜브 바로가기", textAlign: TextAlign.center,style: TextStyle(
-                                  fontFamily: "Jalnan", color: Palette.white, fontSize: 12),),
+                              child: Text(
+                                "유튜브 바로가기",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontFamily: "Jalnan",
+                                    color: Palette.white,
+                                    fontSize: 12),
+                              ),
                               style: ElevatedButton.styleFrom(
                                 primary: Palette.mainMediumPurple,
                                 onPrimary: Palette.black,
@@ -180,7 +187,7 @@ class _CafeMainPageState extends State<CafeMainPage> {
                       padding: EdgeInsets.only(left: 10, top: 5, bottom: 5),
                       alignment: Alignment.center,
                       color: Palette.greyTenPer,
-                      child: Image.asset("giAppBanner.png"),
+                      child: Image.asset("assets/giAppBanner.png"),
                     ),
                   ),
                   Expanded(
@@ -189,7 +196,7 @@ class _CafeMainPageState extends State<CafeMainPage> {
                       height: 100,
                       alignment: Alignment.center,
                       color: Palette.greyTenPer,
-                      child: Image.asset("giAppDownload.png"),
+                      child: Image.asset("assets/giAppDownload.png"),
                     ),
                   ),
                   Container(
@@ -197,7 +204,6 @@ class _CafeMainPageState extends State<CafeMainPage> {
                     width: 1,
                     height: 40,
                     color: Colors.black54,
-
                   ),
                   Expanded(
                     flex: 1,
@@ -215,80 +221,94 @@ class _CafeMainPageState extends State<CafeMainPage> {
 
   Widget bulletinBoard() {
     return Container(
-      padding: EdgeInsets.only(top: 20),
+      padding: EdgeInsets.only(top: 20, bottom: 20),
       color: Palette.white,
       child: Row(
         children: [
           Expanded(flex: 1, child: SizedBox()),
           Expanded(
             flex: 4,
-            child: Column(
-              children: [
-                Container(
-                  width: double.infinity,
-                  child: TextButton(
-                    child: Text("Notice Board",
-                        style: TextStyle(
-                            color: Palette.black, fontFamily: "Jalnan")),
-                    onPressed: () {MenuUtil.push(context, CafeCommunityNoticePage());},
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Palette.mainLightGrey, width: 3),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    child: TextButton(
+                      child: Text("Notice Board",
+                          style: TextStyle(
+                              color: Palette.black, fontFamily: "Jalnan")),
+                      onPressed: () {MenuUtil.push(context, CafeCommunityNoticePage());},
+                    ),
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Palette.mainLightGrey,
+                      border: Border.all(color: Palette.mainLightGrey, width: 3),
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(18),
+                          topRight: Radius.circular(18)),
+                    ),
                   ),
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Palette.mainLightGrey,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20)),
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                        "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
                   ),
-                ),
-                Container(
-                  padding: EdgeInsets.all(20),
-                  child: Text(
-                      "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
-                ),
-                Divider(),
-                Container(
-                  padding: EdgeInsets.all(20),
-                  child: Text(
-                      "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
-                )
-              ],
+                  Divider(),
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                        "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
+                  )
+                ],
+              ),
             ),
           ),
           Expanded(flex: 1, child: SizedBox()),
           Expanded(
             flex: 4,
-            child: Column(
-              children: [
-                Container(
-                  width: double.infinity,
-                  child: TextButton(
-                    child: Text(
-                      "QnA",
-                      style:
-                      TextStyle(color: Palette.black, fontFamily: "Jalnan"),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Palette.mainLightGrey, width: 3),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    child: TextButton(
+                      child: Text(
+                        "QnA",
+                        style:
+                        TextStyle(color: Palette.black, fontFamily: "Jalnan"),
+                      ),
+                      onPressed: () {},
                     ),
-                    onPressed: () {},
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Palette.mainLightGrey,
+                      border: Border.all(color: Palette.mainLightGrey, width: 3),
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(18),
+                          topRight: Radius.circular(18)),
+                    ),
                   ),
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Palette.mainLightGrey,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20)),
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                        "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
                   ),
-                ),
-                Container(
-                  padding: EdgeInsets.all(20),
-                  child: Text(
-                      "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
-                ),
-                Divider(),
-                Container(
-                  padding: EdgeInsets.all(20),
-                  child: Text(
-                      "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
-                )
-              ],
+                  Divider(),
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                        "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
+                  )
+                ],
+              ),
             ),
           ),
           Expanded(flex: 1, child: SizedBox()),
@@ -297,14 +317,11 @@ class _CafeMainPageState extends State<CafeMainPage> {
     );
   }
 
-
-
   //Mobile
 
   Widget mobileScrollView() {
     return SingleChildScrollView(
       child: Container(
-
         child: Column(
           children: [
             mobileMainImage(),
@@ -312,7 +329,6 @@ class _CafeMainPageState extends State<CafeMainPage> {
             mobileUrlMenu(),
             mobileBulletinBoard(),
             SizedBox(height: 51, child: MyWidget.mobileCafeFooter())
-
           ],
         ),
       ),
@@ -321,11 +337,16 @@ class _CafeMainPageState extends State<CafeMainPage> {
 
   Widget mobileUrlMenu() {
     return Container(
-      padding: EdgeInsets.all(30),
+      margin: EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20), color: Palette.greyTenPer),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 10,),
+          SizedBox(
+            height: 10,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -347,7 +368,8 @@ class _CafeMainPageState extends State<CafeMainPage> {
                 color: Colors.black54,
               ),
               Spacer(),
-              Container(width: 70,child: Image.asset("assets/giAppDownload.png")),
+              Container(
+                  width: 70, child: Image.asset("assets/giAppDownload.png")),
               Spacer(),
               Container(
                 width: 80,
@@ -355,8 +377,10 @@ class _CafeMainPageState extends State<CafeMainPage> {
                 child: ElevatedButton(
                   child: Text(
                     "예약문의",
-                    style:
-                    TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                    style: TextStyle(
+                        fontFamily: "Jalnan",
+                        fontSize: 10,
+                        color: Palette.white),
                   ),
                   onPressed: () {
                     MenuUtil.push(context, CafeReservationPage());
@@ -370,92 +394,128 @@ class _CafeMainPageState extends State<CafeMainPage> {
             ],
           ),
         ],
-
       ),
-
     );
   }
 
   Widget mobileBulletinBoard() {
     return Container(
+      margin: EdgeInsets.only(left: 20, right: 20),
       child: Column(
         children: [
-          Column(
-            children: [
-              Container(
-                width: double.maxFinite,
-                height: 50,
-                child: TextButton(
-                  child: Text("Notice Board",
-                      style: TextStyle(
-                          color: Palette.black, fontFamily: "Jalnan")),
-                  onPressed: () {},
-                ),
-                decoration: BoxDecoration(
-                  color: Palette.mainLightGrey,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20)),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.all(20),
-                child: Text(
-                    "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니\n"
-                        "학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
-              ),
-              Divider(),
-              Container(
-                padding: EdgeInsets.all(20),
-                child: Text(
-                    "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니\n"
-                        " 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
-              )
-            ],
-          ),
-          Column(
-            children: [
-              Container(
-                width: double.maxFinite,
-                height: 50,
-                child: TextButton(
-                  child: Text(
-                    "QnA",
-                    style:
-                    TextStyle(color: Palette.black, fontFamily: "Jalnan"),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Palette.mainLightGrey, width: 3),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: double.maxFinite,
+                  height: 50,
+                  child: TextButton(
+                    child: Text("Notice Board",
+                        style: TextStyle(
+                            color: Palette.black, fontFamily: "Jalnan")),
+                    onPressed: () {},
                   ),
-                  onPressed: () {},
+                  decoration: BoxDecoration(
+                    color: Palette.mainLightGrey,
+                    border: Border.all(color: Palette.mainLightGrey, width: 3),
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(18),
+                        topRight: Radius.circular(18)),
+                  ),
                 ),
-                decoration: BoxDecoration(
-                  color: Palette.mainLightGrey,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20)),
+                Container(
+                  padding: EdgeInsets.all(20),
+                  child: Text(
+                      "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니\n"
+                      "학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
                 ),
-              ),
-              Container(
-                padding: EdgeInsets.all(20),
-                child: Text(
-                    "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
-              ),
-              Divider(),
-              Container(
-                padding: EdgeInsets.all(20),
-                child: Text(
-                    "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
-              )
-            ],
+                Divider(),
+                Container(
+                  padding: EdgeInsets.all(20),
+                  child: Text(
+                      "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니\n"
+                      " 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
+                )
+              ],
+            ),
           ),
+          SizedBox(height: 20),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Palette.mainLightGrey, width: 3),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: double.maxFinite,
+                  height: 50,
+                  child: TextButton(
+                    child: Text(
+                      "QnA",
+                      style:
+                          TextStyle(color: Palette.black, fontFamily: "Jalnan"),
+                    ),
+                    onPressed: () {},
+                  ),
+                  decoration: BoxDecoration(
+                    color: Palette.mainLightGrey,
+                    border: Border.all(color: Palette.mainLightGrey, width: 3),
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(18),
+                        topRight: Radius.circular(18)),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(20),
+                  child: Text(
+                      "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
+                ),
+                Divider(),
+                Container(
+                  padding: EdgeInsets.all(20),
+                  child: Text(
+                      "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
+                )
+              ],
+            ),
+          ),
+          SizedBox(height: 20)
         ],
       ),
     );
   }
 
   Widget mobileMainImage() {
-    return Container(
-      child: Image.asset("assets/cafeMainImage.png"),
+    return Stack(
+      alignment: Alignment.bottomRight,
+      children: [Container(
+        child: Image.asset("assets/cafeMainImage.png")),
+        Container(
+          margin: EdgeInsets.all(20),
+          width: 150,
+          height: 40,
+          child: ElevatedButton(
+            child: Text(
+              "예약문의",
+              style:
+              TextStyle(fontFamily: "Jalnan", color: Palette.white),
+            ),
+            onPressed: () {
+              MenuUtil.push(context, CafeReservationPage());
+            },
+            style: ElevatedButton.styleFrom(
+              primary: Palette.mainLime,
+              onPrimary: Palette.black,
+            ),
+
+
+          ),
+        ),],
     );
   }
-
-
 }

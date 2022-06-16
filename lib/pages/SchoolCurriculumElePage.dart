@@ -132,7 +132,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
             ),
             SizedBox(
               height: 20),
-            Container(width:600, child: Image.asset("eleTimetableMWF.png")),
+            Container(width:600, child: Image.asset("assets/eleTimetableMWF.png")),
             SizedBox(
                 height: 20),
 
@@ -142,7 +142,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
             ),
             SizedBox(
                 height: 20),
-            Container(width:600, child: Image.asset("eleTimetableTuesThurs.png")),
+            Container(width:600, child: Image.asset("assets/eleTimetableTuesThurs.png")),
             SizedBox(
                 height: 20),
 
@@ -224,7 +224,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
 
         child: Column(
           children: [
-            mobileMainImage(),
+            // mobileMainImage(),
             mobileLeftMenu(),
             content(),
             SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())

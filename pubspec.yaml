@@ -60,7 +60,6 @@ flutter:
      - assets/mainLogoPurple.png
      - assets/mainGateImageWithLogo.png
      - assets/curriculumImage.png
-     - assets/mobileMainGateImage.png
      - assets/schoolAboutImage.png
      - assets/programMainImage.png
      - assets/communityMainImage.png
@@ -87,6 +86,7 @@ flutter:
      - assets/eleTimetableMWF.png
      - assets/scholasticLogo.jpg
      - assets/wonderCodeLogo.jpg
+     - assets/mobileMainGateImage.png
 
 
 

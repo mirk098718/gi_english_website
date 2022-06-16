@@ -262,7 +262,7 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
       child: Container(
         child: Column(
           children: [
-            mobileMainImage(),
+            // mobileMainImage(),
             mobileLeftMenu(),
             content(),
             SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())

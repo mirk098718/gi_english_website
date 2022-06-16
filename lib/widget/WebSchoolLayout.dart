@@ -177,7 +177,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
       Container(
         height: widget.height,
         padding: EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
-        color: Colors.purple,
+        color: Palette.mainPurple,
       ),
 
       Container(

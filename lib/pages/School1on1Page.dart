@@ -232,7 +232,7 @@ class _School1on1PageState extends State<School1on1Page> {
         color: Colors.white,
         child: Column(
           children: [
-            mobileMainImage(),
+            // mobileMainImage(),
             mobileLeftMenu(),
             content(),
             SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())

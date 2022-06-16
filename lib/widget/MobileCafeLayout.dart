@@ -39,8 +39,8 @@ class _MobileCafeLayoutState extends State<MobileCafeLayout> {
       body: Stack(
         children: [
           Positioned(top: 102, bottom: 0, left: 0, right: 0, child: widget.content),
-          Positioned(top: 0, left: 0, right: 0, child: appBar1(context)),
           Positioned(top: 51, left: 0, right: 0, child: appBar2(context)),
+          Positioned(top: 0, left: 0, right: 0, child: appBar1(context))
 
         ],
       ),
@@ -51,7 +51,6 @@ class _MobileCafeLayoutState extends State<MobileCafeLayout> {
     return Stack(children: [
       Container(
         height: widget.height,
-        padding: EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
         color: Palette.mainLime,
       ),
       Container(
@@ -73,13 +72,11 @@ class _MobileCafeLayoutState extends State<MobileCafeLayout> {
 
   Widget appBar2(BuildContext context) {
     return Stack(children: [
-
       Container(
         height: widget.height,
-        padding: EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
+        padding: EdgeInsets.only(left: 5, right: 5),
         color: Palette.mainLime,
       ),
-      SizedBox(width: 30,),
       Container(
         color: Colors.transparent,
         child: SingleChildScrollView(
@@ -90,7 +87,7 @@ class _MobileCafeLayoutState extends State<MobileCafeLayout> {
             children: [
               InkWell(
                 child: Container(
-                    margin: EdgeInsets.only(left: 20, top: 10, bottom: 5),
+                    margin: EdgeInsets.only(left: 10, top: 10, bottom: 5),
                     width:30, height: 30, child: Image.asset("assets/loginButton.png")),
                 onTap: () {
                   showDialog(
@@ -131,14 +128,14 @@ class _MobileCafeLayoutState extends State<MobileCafeLayout> {
                       });
                 },
               ),
-              SizedBox(width: 40,),
+              SizedBox(width: 30),
               InkWell(
                 onTap: (){MenuUtil.push(context, CafeAboutPage());},
                 child: Container(
                   height: widget.height,
                   alignment: Alignment.center,
                   child: Text("Gi키즈카페",style: TextStyle(color: Palette.white, fontWeight: FontWeight.bold),),),),
-              SizedBox(width: 40),
+              SizedBox(width: 30),
               InkWell(
                 onTap: (){MenuUtil.push(context, CafeProgramPage());},
                 child:
@@ -146,7 +143,7 @@ class _MobileCafeLayoutState extends State<MobileCafeLayout> {
                   height: widget.height,
                   alignment: Alignment.center,
                   child: Text("Program",style: TextStyle(color: Palette.white, fontWeight: FontWeight.bold),),),),
-              SizedBox(width: 40),
+              SizedBox(width: 30),
               InkWell(
                 onTap: (){MenuUtil.push(context, CafeCommunityNoticePage());},
                 child:
@@ -154,7 +151,7 @@ class _MobileCafeLayoutState extends State<MobileCafeLayout> {
                     height: widget.height,
                     alignment: Alignment.center,
                     child: Text("Community",style: TextStyle(color: Palette.white, fontWeight: FontWeight.bold),)),),
-              SizedBox(width: 40),
+              SizedBox(width: 30),
               InkWell(
                 onTap: (){MenuUtil.push(context, CafeReservationPage());},
                 child:

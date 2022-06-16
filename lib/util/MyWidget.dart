@@ -18,7 +18,7 @@ class MyWidget {
     return Stack(
       alignment: Alignment.centerLeft,
       children: [
-        Container(width: double.infinity, color: Colors.purple),
+        Container(width: double.infinity, color: Palette.mainPurple),
         Container(
           padding: EdgeInsets.all(20),
           alignment: Alignment.centerLeft,
@@ -66,11 +66,10 @@ class MyWidget {
     return Stack(
       alignment: Alignment.centerLeft,
       children: [
-        Container(width: double.infinity, color: Colors.purple),
+        Container(width: double.infinity, color: Palette.mainPurple),
         Container(
           padding: EdgeInsets.all(5),
           alignment: Alignment.center,
-
           child: Text("ⓒ 글림아일랜드교육",
               style: TextStyle(color: Palette.white)
           ),

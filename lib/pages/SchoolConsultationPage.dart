@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/cafePages/CafeAboutPage.dart';
+import 'package:gi_english_website/class/Visitor.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/util/SnackbarUtil.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/EasyRadio.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
@@ -23,6 +25,22 @@ class SchoolConsultationPage extends StatefulWidget {
 }
 
 class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
+
+  Visitor visitor = Visitor.init();
+  MyGroupValue levelMyGroupValue = MyGroupValue("Level0");
+  MyGroupValue timeMyGroupValue = MyGroupValue("오전 09am ~ 12pm");
+
+  List<ButtonState> buttonStateList = [
+    ButtonState("Notice Board", BehaviorColor.colorOnDefault, SchoolCommunityNoticePage()),
+    ButtonState("Gallery", BehaviorColor.colorOnDefault, SchoolGalleryPage()),
+    ButtonState("입학상담", BehaviorColor.colorOnClick, SchoolConsultationPage()),
+    ButtonState("FAQ", BehaviorColor.colorOnDefault, SchoolCommunityFAQPage()),
+  ];
+
+  final childNameController = TextEditingController();
+  final parentNameController = TextEditingController();
+  final childAgeController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     MediaQueryData mediaQueryData = MediaQuery.of(context);
@@ -63,7 +81,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
         color: Colors.white,
         child: Column(
           children: [
-            mobileMainImage(),
+            // mobileMainImage(),
             mobileLeftMenu(),
             sharedLeftBox(),
             content(),
@@ -74,20 +92,6 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
     );
   }
 
-  List<ButtonState> buttonStateList = [
-    ButtonState("Notice Board", BehaviorColor.colorOnDefault,
-        SchoolCommunityNoticePage()),
-    ButtonState("Gallery", BehaviorColor.colorOnDefault, SchoolGalleryPage()),
-    ButtonState("입학상담", BehaviorColor.colorOnClick, SchoolConsultationPage()),
-    ButtonState("FAQ", BehaviorColor.colorOnDefault, SchoolCommunityFAQPage()),
-  ];
-
-  final childNameController = TextEditingController();
-  final parentNameController = TextEditingController();
-  final childAgeController = TextEditingController();
-
-  MyGroupValue myGroupValue = MyGroupValue("Level0");
-  MyGroupValue myGroupValue2 = MyGroupValue("오전 09am ~ 12pm");
 
   Widget content() {
     return Container(
@@ -365,64 +369,79 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
   }
 
   Widget levelRadio() {
+    void onChanged(MyGroupValue myGroupValue) {
+      levelMyGroupValue = myGroupValue;
+      visitor.level = levelMyGroupValue.value;
+      SnackbarUtil.showSnackBar("${levelMyGroupValue.value} 선택", context);
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         EasyRadio(
           "Level0",
-          myGroupValue,
+          levelMyGroupValue,
           setState,
           label: "Level 0 알파벳 단계               ",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "Level1",
-          myGroupValue,
+          levelMyGroupValue,
           setState,
           label: "Level 1 파닉스 단계               ",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "Level2",
-          myGroupValue,
+          levelMyGroupValue,
           setState,
           label: "Level 2 리딩 / 문법 초보 단계",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "Level3",
-          myGroupValue,
+          levelMyGroupValue,
           setState,
           label: "Level 3 리딩 / 문법 중급 단계",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "Level4",
-          myGroupValue,
+          levelMyGroupValue,
           setState,
           label: "Level 4 리딩 / 문법 고급 단계",
+          onChanged: onChanged,
         ),
       ],
     );
   }
 
   Widget timeRadio() {
+    void onChanged(MyGroupValue myGroupValue) {
+      timeMyGroupValue = myGroupValue;
+      visitor.time = timeMyGroupValue.value;
+      SnackbarUtil.showSnackBar("${timeMyGroupValue.value} 선택", context);
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         EasyRadio(
           "오전 09am ~ 12pm",
-          myGroupValue2,
+          timeMyGroupValue,
           setState,
-          label: "오전 09am ~ 12pm",
+          label: "오전 09am ~ 12pm",onChanged: onChanged,
         ),
         EasyRadio(
           "오후 01pm ~ 04pm",
-          myGroupValue2,
+          timeMyGroupValue,
           setState,
-          label: "오후 01pm ~ 04pm",
+          label: "오후 01pm ~ 04pm",onChanged: onChanged,
         ),
         EasyRadio(
           "오후 05pm ~ 08pm",
-          myGroupValue2,
+          timeMyGroupValue,
           setState,
-          label: "오후 05pm ~ 08pm",
+          label: "오후 05pm ~ 08pm",onChanged: onChanged,
         ),
       ],
     );

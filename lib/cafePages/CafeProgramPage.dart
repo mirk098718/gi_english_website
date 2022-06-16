@@ -232,7 +232,7 @@ class _CafeProgramPageState extends State<CafeProgramPage> {
         color: Colors.white,
         child: Column(
           children: [
-            mobileMainImage(),
+            // mobileMainImage(),
             mobileLeftMenu(),
             content(),
             SizedBox(height: 51, child: MyWidget.mobileCafeFooter())

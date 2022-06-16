@@ -23,35 +23,24 @@ class SchoolProgramPage extends StatefulWidget {
 }
 
 class _SchoolProgramPageState extends State<SchoolProgramPage> {
-
   List<ButtonState> buttonStateList = [
     ButtonState("정규프로그램", BehaviorColor.colorOnClick, SchoolProgramPage()),
     ButtonState("올데이케어", BehaviorColor.colorOnDefault, SchoolAllDayPage()),
     ButtonState("방학캠프", BehaviorColor.colorOnDefault, SchoolCampPage()),
     ButtonState("NZ연계프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
     ButtonState("1on1 프로그램", BehaviorColor.colorOnDefault, School1on1Page()),
-
   ];
+
   @override
   Widget build(BuildContext context) {
-
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     Size size = mediaQueryData.size;
     double width = size.width;
-    if(width>768){
-      return desktopUi(context);
+    if (width > 768) {
+      return WebSchoolLayout(content: scrollView());
+    } else {
+      return MobileSchoolLayout(content: mobileScrollView());
     }
-    else{
-      return mobileUi(context);
-    }
-  }
-
-  Widget desktopUi(context){
-    return WebSchoolLayout(content: scrollView());
-  }
-
-  Widget mobileUi(context){
-    return MobileSchoolLayout(content:mobileScrollView());
   }
 
   Widget contentGroup() {
@@ -90,8 +79,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 0
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           print(
               "label ${buttonState.label}, selectedColorList: ${buttonState.color}");
           setState(() {});
@@ -104,9 +93,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
       if (!isLast) {
         children.add(Divider(height: 1));
       }
-
     }
-
     return Container(
       padding: EdgeInsets.all(20),
       child: Container(
@@ -147,28 +134,45 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("유치부",style: TextStyle(fontFamily: "Jalnan", fontSize: 15),),
-                      Container(margin:EdgeInsets.only(top: 5), height: 2,width: 180, color: Colors.black,),
+                      Text(
+                        "유치부",
+                        style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 5),
+                        height: 2,
+                        width: 180,
+                        color: Colors.black,
+                      ),
                       Container(width: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                        SizedBox(height: 10),
-                        Text("운영시간",
-                          style: TextStyle(fontFamily: "Jalnan", fontSize: 15),),
-                        SizedBox(height: 10,),
-                        Text(
-                            "오전 9.15 ~ 오후 3시\n"
-                                "(자세한 시간표는 커리큘럼 참조)"
-                        ),
-                        SizedBox(height: 10,),
-                        Text("대상",
-                          style: TextStyle(fontFamily: "Jalnan", fontSize: 15),),
-                        SizedBox(height: 10,),
-                        Text(
-                            "5세 7세 미취학 유아"
-                        ),
-                      ],)
+                          SizedBox(height: 10),
+                          Text(
+                            "운영시간",
+                            style:
+                                TextStyle(fontFamily: "Jalnan", fontSize: 15),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text("오전 9.15 ~ 오후 3시\n"
+                              "(자세한 시간표는 커리큘럼 참조)"),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            "대상",
+                            style:
+                                TextStyle(fontFamily: "Jalnan", fontSize: 15),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text("5세 7세 미취학 유아"),
+                        ],
+                      )
                     ],
                   ),
                 ),
@@ -177,30 +181,47 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("초등부",style: TextStyle(fontFamily: "Jalnan", fontSize: 15),),
-                      Container(margin:EdgeInsets.only(top: 5), height: 2,width: 180, color: Colors.black,),
+                      Text(
+                        "초등부",
+                        style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 5),
+                        height: 2,
+                        width: 180,
+                        color: Colors.black,
+                      ),
                       Container(width: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 10,),
-                          Text("운영시간",
-                            style: TextStyle(fontFamily: "Jalnan", fontSize: 15),),
-                          SizedBox(height: 10,),
-                          Text(
-                              "오후 3.10 ~ 오후 7시\n"
-                                  "(자세한 시간표는 커리큘럼 참조)"
+                          SizedBox(
+                            height: 10,
                           ),
-                          SizedBox(height: 10,),
-                          Text("대상",
-                            style: TextStyle(fontFamily: "Jalnan", fontSize: 15),),
-                          SizedBox(height: 10,),
                           Text(
-                              "초등 1학년 ~ 6학년"
+                            "운영시간",
+                            style:
+                                TextStyle(fontFamily: "Jalnan", fontSize: 15),
                           ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text("오후 3.10 ~ 오후 7시\n"
+                              "(자세한 시간표는 커리큘럼 참조)"),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            "대상",
+                            style:
+                                TextStyle(fontFamily: "Jalnan", fontSize: 15),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text("초등 1학년 ~ 6학년"),
                         ],
                       )
-
                     ],
                   ),
                 )
@@ -216,11 +237,107 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           ),
           Text(
               "Creative Arts는 아이들이 재미있게 즐길 수 있는 다양한 아트 활동을 통해서 아이디어를 자유롭게 표현할 수 있는 시간입니다.\n"
-                  "영어능력뿐 아니라 창의력과 상상력을 함께 성장시킬 수 있는 놀이 프로그램입니다."),
+              "영어능력뿐 아니라 창의력과 상상력을 함께 성장시킬 수 있는 놀이 프로그램입니다."),
           SizedBox(
             height: 20,
           ),
+        ],
+      ),
+    );
+  }
 
+  Widget mobileContent() {
+    return Container(
+      padding: EdgeInsets.all(20),
+      color: Palette.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "정규 프로그램",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
+          ),
+          Divider(),
+          Container(
+            margin: EdgeInsets.only(top: 20, bottom: 20),
+            // padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(20),
+            width: 440,
+            color: Palette.greyTenPer,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "유치부",
+                  style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.mainPurple),
+                ),
+                Container(width: 10),
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  SizedBox(height: 10),
+                  Text(
+                    "운영시간", style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+                  ),
+                  SizedBox(height: 10),
+                  Text("오전 9.15 ~ 오후 3시\n"
+                      "(자세한 시간표는 커리큘럼 참조)"),
+                  SizedBox(
+                    height: 10
+                  ),
+                  Text(
+                    "대상", style: TextStyle(fontFamily: "Jalnan", fontSize: 15)),
+                  SizedBox(height: 10),
+                  Text("5세 7세 미취학 유아"),
+                ]),
+                SizedBox(height: 10),
+                Divider(color: Palette.black, thickness: 2),
+                SizedBox(height: 10),
+                Text("초등부", style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.mainPurple),
+                ),
+                Container(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "운영시간",
+                      style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text("오후 3.10 ~ 오후 7시\n"
+                        "(자세한 시간표는 커리큘럼 참조)"),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "대상",
+                      style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text("초등 1학년 ~ 6학년"),
+                  ],
+                )
+              ],
+            ),
+          ),
+          Text(
+            "프로그램 개요",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+              "Creative Arts는 아이들이 재미있게 즐길 수 있는 다양한 아트 활동을 통해서 아이디어를 자유롭게 표현할 수 있는 시간입니다.\n"
+              "영어능력뿐 아니라 창의력과 상상력을 함께 성장시킬 수 있는 놀이 프로그램입니다."),
+          SizedBox(
+            height: 20,
+          ),
         ],
       ),
     );
@@ -236,7 +353,6 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
         ],
       ),
     );
-
   }
 
   Widget mainImage() {
@@ -247,8 +363,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           Image.asset("assets/ballPoolImage.png"),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
-            child:
-            Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -268,27 +383,25 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                   child: ElevatedButton(
                     child: Text(
                       "상담신청",
-                      style: TextStyle(
-                          fontFamily: "Jalnan", color: Palette.white),
+                      style:
+                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
-                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolConsultationPage());
+                    },
                     style: ElevatedButton.styleFrom(
                       primary: Palette.mainMediumPurple,
                       onPrimary: Palette.black,
                     ),
                   ),
                 ),
-
               ],
             ),
-
           )
         ],
       ),
-
     );
   }
-
 
   //mobile
 
@@ -298,11 +411,10 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
         color: Colors.white,
         child: Column(
           children: [
-            mobileMainImage(),
+            // mobileMainImage(),
             mobileLeftMenu(),
-            content(),
+            mobileContent(),
             SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
-
           ],
         ),
       ),
@@ -319,12 +431,15 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
 
       Widget child;
       if (isFirst) {
-        child = MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
       } else if (isLast) {
         //last
-        child = MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
       } else {
-        child = MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
       }
 
       children.add(InkWell(
@@ -333,8 +448,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 0
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           setState(() {});
         },
         onTap: () {
@@ -343,9 +458,12 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
       ));
 
       if (!isLast) {
-        children.add(Container(width: 1, height: 40, color: Palette.mainLightPurple,));
+        children.add(Container(
+          width: 1,
+          height: 40,
+          color: Palette.mainLightPurple,
+        ));
       }
-
     }
 
     return Container(
@@ -377,9 +495,9 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           Image.asset("assets/ballPoolImage.png"),
           Container(
             padding: EdgeInsets.only(left: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
                   "Program",
@@ -388,9 +506,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                       fontSize: 20,
                       fontFamily: "LucidaCalligraphy"),
                 ),
-                SizedBox(
-                  height: 10,
-                ),
+                Spacer(),
                 Container(
                   width: 150,
                   height: 40,
@@ -398,7 +514,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                     child: Text(
                       "상담신청",
                       style:
-                      TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
@@ -407,10 +523,9 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                       primary: Palette.mainMediumPurple,
                       onPrimary: Palette.black,
                     ),
-
-
                   ),
                 ),
+                SizedBox(width: 20)
               ],
             ),
           )
@@ -418,5 +533,4 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
       ),
     );
   }
-
 }

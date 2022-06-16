@@ -231,7 +231,7 @@ class _CafeProgramPhysicalPageState extends State<CafeProgramPhysicalPage> {
         color: Colors.white,
         child: Column(
           children: [
-            mobileMainImage(),
+            // mobileMainImage(),
             mobileLeftMenu(),
             content(),
             SizedBox(height: 51, child: MyWidget.mobileCafeFooter())

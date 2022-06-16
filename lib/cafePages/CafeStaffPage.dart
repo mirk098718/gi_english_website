@@ -139,7 +139,7 @@ class _CafeStaffPageState extends State<CafeStaffPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Container(alignment: Alignment.topLeft, width: 200, height: 400, child: Image.asset("mobileSchoolMainImage.png")),
+                Container(alignment: Alignment.topLeft, width: 200, height: 400, child: Image.asset("assets/mobileSchoolMainImage.png")),
                 SizedBox(width: 20,),
                 Text("Mia Kim \n\n"
                     "현 Gi 글림아일랜드 어학원 파주 원장\n"
@@ -175,7 +175,7 @@ class _CafeStaffPageState extends State<CafeStaffPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Container(alignment: Alignment.topLeft, width: 200, height: 400, child: Image.asset("mobileSchoolMainImage.png")),
+                Container(alignment: Alignment.topLeft, width: 200, height: 400, child: Image.asset("assets/mobileSchoolMainImage.png")),
                 SizedBox(width: 20,),
                 Text("Mia Kim \n\n"
                     "현 Gi 글림아일랜드 어학원 파주 원장\n"
@@ -271,7 +271,7 @@ class _CafeStaffPageState extends State<CafeStaffPage> {
         color: Colors.white,
         child: Column(
           children: [
-            mobileMainImage(),
+            // mobileMainImage(),
             mobileLeftMenu(),
             content(),
             SizedBox(height: 51, child: MyWidget.mobileCafeFooter())

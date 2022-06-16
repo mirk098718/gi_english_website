@@ -6,10 +6,10 @@ class EasyRadio extends StatelessWidget {
   dynamic uniqueValue;
   MyGroupValue myGroupValue;
   void Function(VoidCallback fn) setStateOfParent;
-  Function? onChanged;
+  void Function(MyGroupValue myGroupValue) onChanged;
 
   EasyRadio(this.uniqueValue, this.myGroupValue, this.setStateOfParent,
-      {Key? key, this.onChanged, this.label=""})
+      {Key? key, required this.onChanged, this.label=""})
       : super(key: key);
 
   @override
@@ -23,13 +23,9 @@ class EasyRadio extends StatelessWidget {
             groupValue: myGroupValue.value, //공유값
             onChanged: (dynamic value) {
               //클릭되었을때,
-
-              if (onChanged != null) {
-                onChanged!(value);
-              }
-
-              if (value != null) {
-                myGroupValue.value = value;
+              if (uniqueValue != null) {
+                myGroupValue.value = uniqueValue;
+                onChanged(myGroupValue);
                 setStateOfParent(() {});
               }
             }),

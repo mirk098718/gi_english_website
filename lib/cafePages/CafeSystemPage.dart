@@ -275,7 +275,7 @@ class _CafeSystemPageState extends State<CafeSystemPage> {
         color: Colors.white,
         child: Column(
           children: [
-            mobileMainImage(),
+            // mobileMainImage(),
             mobileLeftMenu(),
             mobileContent(),
             SizedBox(height: 51, child: MyWidget.mobileCafeFooter())

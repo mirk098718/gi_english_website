@@ -51,7 +51,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(width: 500, child: Image.asset("schoolMainCatch.png")),
+                Container(width: 500, child: Image.asset("assets/schoolMainCatch.png")),
                 Container(
 
                   width: 150,
@@ -164,7 +164,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                       padding: EdgeInsets.only(left: 10, top: 5, bottom: 5),
                       alignment: Alignment.center,
                       color: Palette.greyTenPer,
-                      child: Image.asset("giAppBanner.png"),
+                      child: Image.asset("assets/giAppBanner.png"),
                     ),
                   ),
                   Expanded(
@@ -173,7 +173,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                       height: 100,
                       alignment: Alignment.center,
                       color: Palette.greyTenPer,
-                      child: Image.asset("giAppDownload.png"),
+                      child: Image.asset("assets/giAppDownload.png"),
                     ),
                   ),
                   Container(
@@ -199,7 +199,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
 
   Widget bulletinBoard() {
     return Container(
-      padding: EdgeInsets.only(top: 20),
+      padding: EdgeInsets.only(top: 20, bottom: 20),
       color: Palette.white,
       child: Row(
         children: [
@@ -207,7 +207,10 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
           Expanded(
             flex: 4,
             child: Container(
-              // decoration: BoxDecoration(boxShadow:  ),
+              decoration: BoxDecoration(
+                border: Border.all(color: Palette.mainLightGrey, width: 3),
+                borderRadius: BorderRadius.circular(20),
+              ),
               child: Column(
                 children: [
                   Container(
@@ -221,9 +224,10 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                     height: 50,
                     decoration: BoxDecoration(
                       color: Palette.mainLightGrey,
+                      border: Border.all(color: Palette.mainLightGrey, width: 3),
                       borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20)),
+                          topLeft: Radius.circular(18),
+                          topRight: Radius.circular(18)),
                     ),
                   ),
                   Container(
@@ -244,38 +248,45 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
           Expanded(flex: 1, child: SizedBox()),
           Expanded(
             flex: 4,
-            child: Column(
-              children: [
-                Container(
-                  width: double.infinity,
-                  child: TextButton(
-                    child: Text(
-                      "QnA",
-                      style:
-                          TextStyle(color: Palette.black, fontFamily: "Jalnan"),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Palette.mainLightGrey, width: 3),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    child: TextButton(
+                      child: Text(
+                        "QnA",
+                        style:
+                            TextStyle(color: Palette.black, fontFamily: "Jalnan"),
+                      ),
+                      onPressed: () {},
                     ),
-                    onPressed: () {},
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Palette.mainLightGrey,
+                      border: Border.all(color: Palette.mainLightGrey, width: 3),
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(18),
+                          topRight: Radius.circular(18)),
+                    ),
                   ),
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Palette.mainLightGrey,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20)),
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                        "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
                   ),
-                ),
-                Container(
-                  padding: EdgeInsets.all(20),
-                  child: Text(
-                      "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
-                ),
-                Divider(),
-                Container(
-                  padding: EdgeInsets.all(20),
-                  child: Text(
-                      "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
-                )
-              ],
+                  Divider(),
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                        "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
+                  )
+                ],
+              ),
             ),
           ),
           Expanded(flex: 1, child: SizedBox()),
@@ -320,14 +331,39 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
   }
 
   Widget mobileMainImage() {
-    return Container(
-      child: Image.asset("assets/schoolMainImage.png"),
+    return Stack(
+      alignment: Alignment.bottomRight,
+      children: [Container(
+        child: Image.asset("assets/schoolMainImage.png")),
+        Container(
+          margin: EdgeInsets.all(20),
+          width: 150,
+          height: 40,
+          child: ElevatedButton(
+            child: Text(
+              "상담신청",
+              style:
+              TextStyle(fontFamily: "Jalnan", color: Palette.white),
+            ),
+            onPressed: () {
+              MenuUtil.push(context, SchoolConsultationPage());
+            },
+            style: ElevatedButton.styleFrom(
+              primary: Palette.mainMediumPurple,
+              onPrimary: Palette.black,
+            ),
+
+
+          ),
+        ),]
     );
   }
 
   Widget mobileUrlMenu() {
     return Container(
-      padding: EdgeInsets.all(30),
+      margin: EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Palette.greyTenPer),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -362,7 +398,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                 child: Text(
                   "상담신청",
                   style:
-                  TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                  TextStyle(fontFamily: "Jalnan", fontSize:10, color: Palette.white),
                 ),
                 onPressed: () {
                   MenuUtil.push(context, SchoolConsultationPage());
@@ -384,9 +420,15 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
 
   Widget mobileBulletinBoard() {
     return Container(
+      margin: EdgeInsets.only(left: 20, right: 20),
       child: Column(
-          children: [
-            Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Palette.mainLightGrey, width: 3),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
               children: [
                 Container(
                   width: double.maxFinite,
@@ -395,13 +437,14 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                     child: Text("Notice Board",
                         style: TextStyle(
                             color: Palette.black, fontFamily: "Jalnan")),
-                    onPressed: () {MenuUtil.push(context, SchoolCommunityNoticePage());},
+                    onPressed: () {},
                   ),
                   decoration: BoxDecoration(
                     color: Palette.mainLightGrey,
+                    border: Border.all(color: Palette.mainLightGrey, width: 3),
                     borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20)),
+                        topLeft: Radius.circular(18),
+                        topRight: Radius.circular(18)),
                   ),
                 ),
                 Container(
@@ -419,7 +462,14 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                 )
               ],
             ),
-            Column(
+          ),
+          SizedBox(height: 20),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Palette.mainLightGrey, width: 3),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
               children: [
                 Container(
                   width: double.maxFinite,
@@ -428,15 +478,16 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                     child: Text(
                       "QnA",
                       style:
-                          TextStyle(color: Palette.black, fontFamily: "Jalnan"),
+                      TextStyle(color: Palette.black, fontFamily: "Jalnan"),
                     ),
                     onPressed: () {},
                   ),
                   decoration: BoxDecoration(
                     color: Palette.mainLightGrey,
+                    border: Border.all(color: Palette.mainLightGrey, width: 3),
                     borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20)),
+                        topLeft: Radius.circular(18),
+                        topRight: Radius.circular(18)),
                   ),
                 ),
                 Container(
@@ -452,7 +503,9 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                 )
               ],
             ),
-          ],
+          ),
+          SizedBox(height: 20)
+        ],
       ),
     );
   }
