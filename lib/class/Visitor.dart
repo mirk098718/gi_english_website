@@ -1,23 +1,24 @@
 class Visitor {
   String childName;
-  String childAge;
+  int childAge;
   String parentName;
-  String program;
-  String programPeriod;
-  String time;
-  String level;
   String parentNumber;
 
-  Visitor(this.childName, this.childAge, this.parentName, this.program,
-      this.programPeriod, this.level, this.time, this.parentNumber);
 
-  Visitor.init()
-      : childName = "",
-        childAge = "",
-        parentName = "",
-        program = "",
-        programPeriod = "",
-        level = "",
-        time = "",
-        parentNumber = "";
+  Visitor({required this.childName, required this.childAge, required this.parentName, required this.parentNumber});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'childName': childName,
+      'childAge': childAge,
+      'parentName': parentName,
+      'parentNumber': parentNumber,
+    };
+  }
+
+  Visitor.fromJson(Map<String, dynamic> json)
+      : childName = json['childName'],
+        childAge = json['childAge'],
+        parentName = json['parentName'],
+        parentNumber = json['parentNumber'];
 }

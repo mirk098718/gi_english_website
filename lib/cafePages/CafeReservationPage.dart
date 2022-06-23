@@ -1,16 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/cafePages/CafeAboutPage.dart';
 import 'package:gi_english_website/class/Visitor.dart';
+import 'package:gi_english_website/util/JsonUtil.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
-import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/SnackbarUtil.dart';
 import 'package:gi_english_website/widget/EasyRadio.dart';
 import 'package:gi_english_website/widget/MobileCafeLayout.dart';
 import 'package:gi_english_website/widget/WebCafeLayout.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import '../class/CafeVisitor.dart';
+import '../util/DialogUtil.dart';
 
 class CafeReservationPage extends StatefulWidget {
   const CafeReservationPage({Key? key}) : super(key: key);
@@ -21,18 +23,21 @@ class CafeReservationPage extends StatefulWidget {
 
 class _CafeReservationPageState extends State<CafeReservationPage> {
   late CafeReservationPageService s;
-  Visitor visitor = Visitor.init();
+  late CafeVisitor cafeVisitor;
   MyGroupValue periodMyGroupValue = MyGroupValue("");
   MyGroupValue programMyGroupValue = MyGroupValue("program1");
-
-  final childNameController = TextEditingController();
-  final parentNameController = TextEditingController();
-  final childAgeController = TextEditingController();
-  final parentContactController = TextEditingController();
 
   @override
   void initState() {
     s = CafeReservationPageService(this);
+    cafeVisitor = CafeVisitor(
+      childName: "",
+      childAge: 0,
+      parentName: "",
+      parentNumber: "",
+      program: programMyGroupValue.value,
+      programPeriod: periodMyGroupValue.value,
+    );
   }
 
   @override
@@ -172,7 +177,7 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
   Widget weekdayPeriodRadio() {
     void onChanged(MyGroupValue myGroupValue) {
       periodMyGroupValue = myGroupValue;
-      visitor.programPeriod = periodMyGroupValue.value;
+      cafeVisitor.programPeriod = periodMyGroupValue.value;
       SnackbarUtil.showSnackBar("${periodMyGroupValue.value} 선택", context);
     }
 
@@ -214,7 +219,7 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
   Widget saturdayPeriodRadio() {
     void onChanged(MyGroupValue myGroupValue) {
       periodMyGroupValue = myGroupValue;
-      visitor.programPeriod = periodMyGroupValue.value;
+      cafeVisitor.programPeriod = periodMyGroupValue.value;
       SnackbarUtil.showSnackBar("${periodMyGroupValue.value} 선택", context);
     }
 
@@ -270,7 +275,7 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
   Widget sundayPeriodRadio() {
     void onChanged(MyGroupValue myGroupValue) {
       periodMyGroupValue = myGroupValue;
-      visitor.programPeriod = periodMyGroupValue.value;
+      cafeVisitor.programPeriod = periodMyGroupValue.value;
       SnackbarUtil.showSnackBar("${periodMyGroupValue.value} 선택", context);
     }
 
@@ -319,7 +324,7 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
   Widget programRadio() {
     void onChanged(MyGroupValue myGroupValue) {
       programMyGroupValue = myGroupValue;
-      visitor.program = programMyGroupValue.value;
+      cafeVisitor.program = programMyGroupValue.value;
       SnackbarUtil.showSnackBar("${programMyGroupValue.value} 선택", context);
     }
 
@@ -445,41 +450,34 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
           height: 20,
         ),
         Text("아이 이름"),
-        roundEdgeTextField(childNameController),
+        MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
+          cafeVisitor.childName = text;
+        }),
         SizedBox(
           height: 20,
         ),
         Text("아이 연령"),
-        roundEdgeTextField(childAgeController),
+        MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
+          cafeVisitor.childAge = int.tryParse(text) ?? 0;
+        }),
         SizedBox(
           height: 20,
         ),
         Text("보호자님 성함"),
-        roundEdgeTextField(parentNameController),
+        MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
+          cafeVisitor.parentName = text;
+        }),
         SizedBox(
           height: 20,
         ),
         Text("보호자님 연락처"),
-        roundEdgeTextField(parentContactController),
+        MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
+          cafeVisitor.parentNumber = text;
+        }),
         SizedBox(
           height: 20,
         ),
       ],
-    );
-  }
-
-  Widget roundEdgeTextField(TextEditingController controller) {
-    return Container(
-      padding: EdgeInsets.only(top: 7, bottom: 7),
-      width: 500,
-      color: Colors.transparent,
-      child: TextField(
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        ),
-      ),
     );
   }
 
@@ -550,7 +548,7 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
         child: Column(
           children: [
             // mobileMainImage(),
-            leftBox(),
+            mobileCalendarBox(),
             content(),
             SizedBox(height: 51, child: MyWidget.mobileCafeFooter())
           ],
@@ -604,6 +602,58 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
       ),
     );
   }
+
+  Widget mobileCalendarBox() {
+    return Container(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "상담 희망일",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
+          ),
+          SizedBox(height: 20),
+          Text("원하시는 대면 상담 날짜를 선택해주세요."),
+          Divider(),
+          Container(
+            width: 300,
+            height: 300,
+            alignment: Alignment.center,
+            margin: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                width: 1,
+                color: Colors.grey,
+              ),
+            ),
+            child: SfCalendar(
+              view: CalendarView.month,
+              onTap: (CalendarTapDetails calendarTapDetails) {
+                // DateTime dateTime = DateTime.now();
+                DateTime? dateTime = calendarTapDetails.date;
+                if (dateTime != null) {
+                  // dateTime = dateTime.subtract(Duration(hours: 1));
+                  // dateTime = dateTime.add(Duration(hours: 1));
+                  // dateTime.isAfter(other);
+                  // dateTime.isBefore(other);
+
+                  //마감일과 현재일을 비교. 마감일을 넘겼는가? 마감일을 넘기지 않았는가?
+
+                  //DateTime이라는 자료형이 있음. (dart꺼)
+                  //이 녀석이 날짜를 표현.
+                  print(
+                      "opnTap calendarTapDetails.date:${calendarTapDetails.date}");
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class CafeReservationPageService {
@@ -611,64 +661,15 @@ class CafeReservationPageService {
 
   CafeReservationPageService(this.state);
 
-  void submit() {
+  void submit() async {
     var context = state.context;
-    String childName = state.childNameController.text;
-    String childAge = state.childAgeController.text;
-    String parentName = state.parentNameController.text;
-    String parentNumber = state.parentContactController.text;
-
-    if (childName.isNotEmpty &&
-        (!childAge.isEmpty) &&
-        parentName != "" &&
-        parentNumber != "") {
-      // todo: make else work here
-      // todo: make a visitor instance with above information and save it using shared preferences.
-
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-              content: Container(
-            width: 250,
-            height: 260,
-            alignment: Alignment.center,
-            padding: EdgeInsets.all(30),
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 50,
-                ),
-                Text(
-                  "예약이 완료되었습니다.",
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(
-                  height: 60,
-                ),
-                Container(
-                  width: 150,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Palette.mainLime,
-                      onPrimary: Palette.black,
-                    ),
-                    onPressed: backPage,
-                    child: Text(
-                      "확인",
-                      style: TextStyle(fontFamily: "Jalnan"),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ));
-        },
-      );
-    } else {
+    if (!state.cafeVisitor.isValid()) {
       SnackbarUtil.showSnackBar("정보를 입력해주세요.", context);
+      return;
     }
+
+    await state.cafeVisitor.save();
+    DialogUtil.showAlert(context, "예약이 완료되었습니다.");
   }
 
   void moveCafeReservationPage() {
@@ -676,8 +677,4 @@ class CafeReservationPageService {
     MenuUtil.push(context, CafeReservationPage());
   }
 
-  void backPage() {
-    var context = state.context;
-    MenuUtil.pop(context);
-  }
 }

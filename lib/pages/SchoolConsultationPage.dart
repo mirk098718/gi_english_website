@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/cafePages/CafeAboutPage.dart';
 import 'package:gi_english_website/class/Visitor.dart';
+import 'package:gi_english_website/util/JsonUtil.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -9,10 +9,11 @@ import 'package:gi_english_website/util/SnackbarUtil.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/EasyRadio.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
-import 'package:gi_english_website/widget/WebCafeLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-
+import '../class/SchoolVisitor.dart';
+import '../util/DialogUtil.dart';
 import 'SchoolCommunityFAQPage.dart';
 import 'SchoolCommunityNoticePage.dart';
 import 'SchoolGalleryPage.dart';
@@ -26,7 +27,9 @@ class SchoolConsultationPage extends StatefulWidget {
 
 class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
 
-  Visitor visitor = Visitor.init();
+  late SchoolConsultationPageService s;
+  late SchoolVisitor schoolVisitor;
+
   MyGroupValue levelMyGroupValue = MyGroupValue("Level0");
   MyGroupValue timeMyGroupValue = MyGroupValue("오전 09am ~ 12pm");
 
@@ -37,9 +40,19 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
     ButtonState("FAQ", BehaviorColor.colorOnDefault, SchoolCommunityFAQPage()),
   ];
 
-  final childNameController = TextEditingController();
-  final parentNameController = TextEditingController();
-  final childAgeController = TextEditingController();
+  @override
+  void initState() {
+    s = SchoolConsultationPageService(this);
+    schoolVisitor = SchoolVisitor(
+      childName: "",
+      childAge: 0,
+      parentName: "",
+      parentNumber: "",
+      time: timeMyGroupValue.value,
+      level: levelMyGroupValue.value,
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +77,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Expanded(child: sharedLeftBox()),
+                Expanded(child: calendarBox()),
                 Expanded(child: content()),
               ],
             ),
@@ -83,7 +96,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           children: [
             // mobileMainImage(),
             mobileLeftMenu(),
-            sharedLeftBox(),
+            mobileCalendarBox(),
             content(),
             SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
           ],
@@ -113,16 +126,24 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           Divider(),
           SizedBox(height: 20),
           Text("아이 이름"),
-          roundEdgeTextField(childNameController),
+          MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
+            schoolVisitor.childName = text;
+          }),
           SizedBox(height: 20),
           Text("보호자님 성함"),
-          roundEdgeTextField(parentNameController),
+          MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
+            schoolVisitor.parentName = text;
+          }),
           SizedBox(height: 20),
           Text("보호자님 연락처"),
-          roundEdgeTextField(parentNameController),
+          MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
+            schoolVisitor.parentNumber = text;
+          }),
           SizedBox(height: 20),
           Text("아이 연령"),
-          roundEdgeTextField(childAgeController),
+          MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
+            schoolVisitor.childAge = int.tryParse(text)??0;
+          }),
           SizedBox(height: 20),
           Text("아이 레벨"),
           Divider(),
@@ -139,7 +160,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
     );
   }
 
-  Widget sharedLeftBox() {
+  Widget calendarBox() {
     return Container(
       padding: EdgeInsets.all(20),
       child: Column(
@@ -155,7 +176,8 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           Divider(),
           Container(
             width: 400,
-            height: 400,
+            height: 400  ,
+            alignment: Alignment.center,
             margin: EdgeInsets.all(20),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
@@ -186,20 +208,6 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget roundEdgeTextField(TextEditingController controller) {
-    return Container(
-      width: 500,
-      padding: EdgeInsets.only(top: 7, bottom: 7),
-      child: TextField(
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        ),
       ),
     );
   }
@@ -368,10 +376,62 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
     );
   }
 
+  Widget mobileCalendarBox() {
+    return Container(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "상담 희망일",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
+          ),
+          SizedBox(height: 20),
+          Text("원하시는 대면 상담 날짜를 선택해주세요."),
+          Divider(),
+          Container(
+            width: 300,
+            height: 300  ,
+            alignment: Alignment.center,
+            margin: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                width: 1,
+                color: Colors.grey,
+              ),
+            ),
+            child: SfCalendar(
+              view: CalendarView.month,
+              onTap: (CalendarTapDetails calendarTapDetails) {
+                // DateTime dateTime = DateTime.now();
+                DateTime? dateTime = calendarTapDetails.date;
+                if (dateTime != null) {
+                  // dateTime = dateTime.subtract(Duration(hours: 1));
+                  // dateTime = dateTime.add(Duration(hours: 1));
+                  // dateTime.isAfter(other);
+                  // dateTime.isBefore(other);
+
+                  //마감일과 현재일을 비교. 마감일을 넘겼는가? 마감일을 넘기지 않았는가?
+
+                  //DateTime이라는 자료형이 있음. (dart꺼)
+                  //이 녀석이 날짜를 표현.
+                  print(
+                      "opnTap calendarTapDetails.date:${calendarTapDetails.date}");
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget levelRadio() {
     void onChanged(MyGroupValue myGroupValue) {
       levelMyGroupValue = myGroupValue;
-      visitor.level = levelMyGroupValue.value;
+      schoolVisitor.level = levelMyGroupValue.value;
       SnackbarUtil.showSnackBar("${levelMyGroupValue.value} 선택", context);
     }
     return Column(
@@ -419,7 +479,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
   Widget timeRadio() {
     void onChanged(MyGroupValue myGroupValue) {
       timeMyGroupValue = myGroupValue;
-      visitor.time = timeMyGroupValue.value;
+      schoolVisitor.time = timeMyGroupValue.value;
       SnackbarUtil.showSnackBar("${timeMyGroupValue.value} 선택", context);
     }
     return Column(
@@ -460,54 +520,24 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
             "상담예약",
             style: TextStyle(fontFamily: "Jalnan"),
           ),
-          onPressed: () {
-            // String childName = childNameController.text;
-            // double childAge = double.parse(childAgeController.text);
-            // String parentName = parentNameController.text;
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                    content: Container(
-                  width: 350,
-                  height: 300,
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.all(30),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 50,
-                      ),
-                      Text(
-                        "예약이 완료되었습니다.",
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(
-                        height: 80,
-                      ),
-                      Container(
-                        width: 150,
-                        height: 50,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            primary: Palette.mainMediumPurple,
-                            onPrimary: Palette.black,
-                          ),
-                          onPressed: () {
-                            MenuUtil.pop(context);
-                          },
-                          child: Text(
-                            "확인",
-                            style: TextStyle(fontFamily: "Jalnan"),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ));
-              },
-            );
-          }),
+          onPressed: s.submitButtonPressed)
     );
+  }
+}
+
+class SchoolConsultationPageService {
+  _SchoolConsultationPageState state;
+  SchoolConsultationPageService(this.state);
+
+  void submitButtonPressed()async{
+    var context = state.context;
+
+    if (!state.schoolVisitor.isValid()) {
+      SnackbarUtil.showSnackBar("정보를 입력해주세요.", context);
+      return;
+    }
+
+    await state.schoolVisitor.save();
+    DialogUtil.showAlert(context, "예약이 완료되었습니다.");
   }
 }

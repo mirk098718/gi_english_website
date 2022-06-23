@@ -96,6 +96,24 @@ class MyWidget {
   }
 
 
+  static Widget roundEdgeTextFieldVisitorVer(
+      {TextEditingController? controller, ValueChanged<String>? onChanged}) {
+    return Container(
+      padding: EdgeInsets.only(top: 7, bottom: 7),
+      width: 500,
+      color: Colors.transparent,
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+        onChanged: onChanged,
+      ),
+    );
+  }
+
   static Widget roundEdgeTextField(String hintText, TextEditingController controller) {
     return Container(
       padding: EdgeInsets.all(5),
