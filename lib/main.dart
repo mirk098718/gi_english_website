@@ -2,7 +2,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/MainGatePage.dart';
 
-void main() {
+Future<void> main() async {
+  //TODO: 나중에 주석 풀기
+  // WidgetsFlutterBinding.ensureInitialized();//runApp위에 코드를 넣기 위해 넣는 코드
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
+
   runApp(MyApp());
 }
 

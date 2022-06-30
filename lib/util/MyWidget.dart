@@ -1,15 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/MainGatePage.dart';
-import 'package:gi_english_website/cafePages/CafeAboutPage.dart';
-import 'package:gi_english_website/cafePages/CafeCommunityNoticePage.dart';
-import 'package:gi_english_website/cafePages/CafeProgramPage.dart';
-import 'package:gi_english_website/cafePages/CafeReservationPage.dart';
-import 'package:gi_english_website/pages/SchoolAboutPage.dart';
-import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
-import 'package:gi_english_website/pages/SchoolCurriculumElePage.dart';
-import 'package:gi_english_website/pages/SchoolMainPage.dart';
-import 'package:gi_english_website/pages/SchoolProgramPage.dart';
-import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
 
@@ -119,6 +108,7 @@ class MyWidget {
       padding: EdgeInsets.all(5),
       color: Colors.transparent,
       child: TextField(
+        controller: controller,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.white,

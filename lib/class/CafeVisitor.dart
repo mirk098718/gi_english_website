@@ -39,6 +39,6 @@ class CafeVisitor extends Visitor {
     Map<String, dynamic> jsonMap = toJson();
     String jsonStr = JsonUtil.mapToString(jsonMap);
     await prefs.setString(prefKey(), jsonStr);
-    print(jsonStr);
   }
+
 }

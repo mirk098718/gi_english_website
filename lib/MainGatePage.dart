@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/admin/page/AdminLoginPage.dart';
 import 'package:gi_english_website/cafePages/CafeMainPage.dart';
 import 'package:gi_english_website/pages/SchoolMainPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
@@ -29,27 +30,36 @@ class _MainGatePageState extends State<MainGatePage> {
     }
   }
 
-  //대문 칼럼 이용 그림쪼개기
   Widget desktopUi() {
-
     return Scaffold(
         body: Container(
-          decoration: BoxDecoration(
-              image: DecorationImage(
-            fit: BoxFit.cover,
-            image: AssetImage("assets/mainGateImage.png"),
-          )),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                leftWidget(),
-                rightWidget(),
-              ],
-            ),
-          ),
-        ));
+      decoration: BoxDecoration(
+          image: DecorationImage(
+        fit: BoxFit.cover,
+        image: AssetImage("assets/mainGateImage.png"),
+      )),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            leftWidget(),
+            rightWidget(),
+            Positioned(
+                top: 20,
+                right: 20,
+                child: TextButton(
+                    onPressed: () {
+                      MenuUtil.push(context, AdminLoginPage());
+                    },
+                    child: Text(
+                      "Admin",
+                      style: TextStyle(color: Palette.black),
+                    )))
+          ],
+        ),
+      ),
+    ));
   }
 
   Widget mobileUi() {
@@ -64,12 +74,23 @@ class _MainGatePageState extends State<MainGatePage> {
         ),
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
-          child: Stack(
-            children: [Container(
+          child: Stack(children: [
+            Positioned(
+                top: 20,
+                right: 20,
+                child: TextButton(
+                    onPressed: () {
+                      MenuUtil.push(context, AdminLoginPage());
+                    },
+                    child: Text(
+                      "Admin",
+                      style: TextStyle(color: Palette.black),
+                    ))),
+            Container(
+              alignment: Alignment.bottomCenter,
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   mobileSchoolEnterWidget(),
@@ -80,15 +101,13 @@ class _MainGatePageState extends State<MainGatePage> {
                 ],
               ),
             ),
-              Container(
-                height: MediaQuery.of(context).size.height,
-                padding: EdgeInsets.only(bottom: 10),
-                alignment: Alignment.bottomCenter,
-                child: Text("ⓒ 글림아일랜드교육",
-                    style: TextStyle(color: Palette.white)
-                ),
-              ),]
-          ),
+            Container(
+              height: MediaQuery.of(context).size.height,
+              padding: EdgeInsets.only(bottom: 10),
+              alignment: Alignment.bottomCenter,
+              child: Text("ⓒ 글림아일랜드교육", style: TextStyle(color: Palette.white)),
+            ),
+          ]),
         ),
       ),
     );
@@ -101,8 +120,7 @@ class _MainGatePageState extends State<MainGatePage> {
             onPrimary: Palette.black,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                side: BorderSide(color: Palette.black)
-            ),
+                side: BorderSide(color: Palette.black)),
             minimumSize: Size(150, 50)),
         onPressed: () {
           MenuUtil.push(context, SchoolMainPage());
@@ -117,9 +135,8 @@ class _MainGatePageState extends State<MainGatePage> {
             primary: Palette.white,
             onPrimary: Palette.black,
             shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    side: BorderSide(color: Palette.black)
-                ),
+                borderRadius: BorderRadius.circular(10.0),
+                side: BorderSide(color: Palette.black)),
             minimumSize: Size(150, 50)),
         onPressed: () {
           MenuUtil.push(context, CafeMainPage());
@@ -147,8 +164,9 @@ class _MainGatePageState extends State<MainGatePage> {
             height: 20,
           ),
           Container(
-            padding: EdgeInsets.only(left: 8),
-              height: 50, child: Image.asset("assets/schoolLogoWithColor.png")),
+              padding: EdgeInsets.only(left: 8),
+              height: 50,
+              child: Image.asset("assets/schoolLogoWithColor.png")),
           SizedBox(
             height: 20,
           ),
@@ -195,11 +213,16 @@ class _MainGatePageState extends State<MainGatePage> {
         ),
         Container(
             padding: EdgeInsets.only(top: 10, left: 40),
-            height: 35, width: 140, child: Image.asset("assets/schoolLogoWithColor.png")),
+            height: 35,
+            width: 140,
+            child: Image.asset("assets/schoolLogoWithColor.png")),
         SizedBox(
           height: 15,
         ),
-        Row(children: [SizedBox(width: 40), SizedBox(width:100, child: enterButtonForSchool())]),
+        Row(children: [
+          SizedBox(width: 40),
+          SizedBox(width: 100, child: enterButtonForSchool())
+        ]),
         SizedBox(
           height: 20,
         ),
@@ -213,13 +236,19 @@ class _MainGatePageState extends State<MainGatePage> {
       children: [
         Container(
           padding: EdgeInsets.only(top: 10, right: 40),
-          height: 45, width: 140,
+          height: 45,
+          width: 140,
           child: Image.asset("assets/cafeLogoWithColor.png"),
         ),
         SizedBox(
           height: 15,
         ),
-        Row(mainAxisAlignment: MainAxisAlignment.end, children: [SizedBox(width:100, child: enterButtonForCafe()),SizedBox(width: 40,) ]),
+        Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+          SizedBox(width: 100, child: enterButtonForCafe()),
+          SizedBox(
+            width: 40,
+          )
+        ]),
         SizedBox(
           height: 20,
         ),

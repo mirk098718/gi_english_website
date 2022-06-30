@@ -16,15 +16,15 @@ class WidgetUtil {
     );
   }
 
-  static Widget textFieldWithLabel(String label,
+  static Widget textFieldWithLabel(String label, TextEditingController controller,
       {ValueChanged<String>? onChanged, bool obscureText = false}) {
     return Row(
       children: [
-        Text(label),
-        SizedBox(width: 15),
+        Container(width: 80,alignment: Alignment.bottomLeft,child: Text(label)),
         Expanded(
-          child: TextField(onChanged: onChanged, obscureText: obscureText),
-        )
+          child: TextField(controller: controller, onChanged: onChanged, obscureText: obscureText),
+        ),
+
       ],
     );
   }

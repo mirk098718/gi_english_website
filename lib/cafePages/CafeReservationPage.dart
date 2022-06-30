@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/class/Visitor.dart';
-import 'package:gi_english_website/util/JsonUtil.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -9,8 +7,8 @@ import 'package:gi_english_website/util/SnackbarUtil.dart';
 import 'package:gi_english_website/widget/EasyRadio.dart';
 import 'package:gi_english_website/widget/MobileCafeLayout.dart';
 import 'package:gi_english_website/widget/WebCafeLayout.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+
 import '../class/CafeVisitor.dart';
 import '../util/DialogUtil.dart';
 
@@ -411,7 +409,8 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
                   //DateTime이라는 자료형이 있음. (dart꺼)
                   //이 녀석이 날짜를 표현.
                   print(
-                      "opnTap calendarTapDetails.date:${calendarTapDetails.date}");
+                      "opnTap calendarTapDetails.date:${calendarTapDetails
+                          .date}");
                 }
               },
             ),
@@ -522,7 +521,7 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
                     child: Text(
                       "예약문의",
                       style:
-                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                      TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
                     onPressed: s.moveCafeReservationPage,
                     style: ElevatedButton.styleFrom(
@@ -586,7 +585,7 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
                     child: Text(
                       "예약문의",
                       style:
-                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                      TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
                     onPressed: s.moveCafeReservationPage,
                     style: ElevatedButton.styleFrom(
@@ -645,7 +644,8 @@ class _CafeReservationPageState extends State<CafeReservationPage> {
                   //DateTime이라는 자료형이 있음. (dart꺼)
                   //이 녀석이 날짜를 표현.
                   print(
-                      "opnTap calendarTapDetails.date:${calendarTapDetails.date}");
+                      "opnTap calendarTapDetails.date:${calendarTapDetails
+                          .date}");
                 }
               },
             ),
@@ -669,7 +669,15 @@ class CafeReservationPageService {
     }
 
     await state.cafeVisitor.save();
-    DialogUtil.showAlert(context, "예약이 완료되었습니다.");
+
+    // cafeVisitorListTile.add(ListTile(
+    //   title: Text(
+    //       "${state.cafeVisitor.childName},${state.cafeVisitor.childAge}"),
+    //   subtitle: Text("학부모 성함: ${state.cafeVisitor.parentName} / 학부모 연락처: ${state
+    //       .cafeVisitor.parentNumber}"),
+    // )
+
+        DialogUtil.showAlert(context, "예약이 완료되었습니다.");
   }
 
   void moveCafeReservationPage() {
