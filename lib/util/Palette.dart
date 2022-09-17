@@ -19,6 +19,13 @@ class Palette {
   static const Color greyTenPer = Color(0xffeeeeee);
   static const Color lightPurpleSky = Color(0xffedcffd);
   static const Color mainGrey = Color(0xff919191);
+  static const Color earth = Color(0xffd3b77c);
+  static const Color lightEarth = Color(0xffe9d8b3);
+  static const Color lightestEarth = Color(0xfff3e7ce);
+  static const Color deepGreen = Color(0xff288150);
+  static const Color lightGreen = Color(0xff3e9d68);
+  static const Color lightestGreen = Color(0xff67cc94);
+
 
 
 }

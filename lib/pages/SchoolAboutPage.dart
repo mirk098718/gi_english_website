@@ -1,12 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/cafePages/CafeAboutPage.dart';
-import 'package:gi_english_website/cafePages/CafeReservationPage.dart';
 import 'package:gi_english_website/pages/SchoolMapPage.dart';
 import 'package:gi_english_website/pages/SchoolSystemPage.dart';
 import 'package:gi_english_website/pages/SchoolTeachersPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
-import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
@@ -24,16 +21,6 @@ class SchoolAboutPage extends StatefulWidget {
 }
 
 class _SchoolAboutPageState extends State<SchoolAboutPage> {
-  // List<String> labelList = ["Gi글림아일랜드", "교원소개", "운영시스템", "오시는 길"];
-  // List<Color> selectedColorList = [
-  //   BehaviorColor.colorOnClick,
-  //   BehaviorColor.colorOnDefault,
-  //   BehaviorColor.colorOnDefault,
-  //   BehaviorColor.colorOnDefault
-  // ];
-  // List<Widget> nextPageList = [
-  //   CafeAboutPage(),
-  // ];
 
   List<ButtonState> buttonStateList = [
     ButtonState("Gi글림아일랜드", BehaviorColor.colorOnClick, SchoolAboutPage()),
@@ -229,19 +216,19 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
                   height: 20,
                 ),
                 Container(
-                  width: 150,
-                  height: 50,
+                  width: 100,
+                  height: 40,
                   child: ElevatedButton(
                     child: Text(
                       "상담신청",
-                      style:
-                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                      style: TextStyle(
+                        fontFamily: "Oneprettynight", color: Palette.white, fontSize: 12),
                     ),
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.mainMediumPurple,
+                      primary: Palette.black,
                       onPrimary: Palette.black,
                     ),
                   ),

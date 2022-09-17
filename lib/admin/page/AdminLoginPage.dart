@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/Administrator.dart';
-import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
-import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/SnackbarUtil.dart';
@@ -38,7 +36,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 SizedBox(height: 20),
                 MyWidget.roundEdgeTextField("ID", adminIdController),
                 SizedBox(height: 20),
-                MyWidget.roundEdgeTextField("PASSWORD", adminPwController),
+                MyWidget.roundEdgeTextField("PASSWORD", adminPwController, obscureText: true),
                 SizedBox(height: 20),
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -59,30 +57,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
                       Administrator adminstratorToLogin =
                           Administrator(adminId: id, adminPw: pw);
-                      if (adminstratorToLogin.adminId == "htmiakim" &&
-                          adminstratorToLogin.adminPw == "090910@") {
-                        SnackbarUtil.showSnackBar("관리자 모드로 로그인 되었습니다", context);
-                        MenuUtil.push(context, SchoolConsultationPage());
-                        return;
-                      }
-
-                      SnackbarUtil.showSnackBar("로그인에 실패하였습니다", context);
-
-                      //TODO: 추후에 SharedPrefrese로 해볼 수 있는 코드....
-                      //로컬에만 저장되는거라 실제로 작동은 안함.. 내컴퓨터에서만 해볼수있음.
-                      // String? savedJson = prefs.getString(adminstratorToLogin.prefKey());
-                      // bool idExist = savedJson != null;
-                      // if(idExist) {
-                      //   Administrator registeredAdminstrator = Administrator.fromJson(jsonDecode(savedJson));
-                      //   if(adminstratorToLogin.adminPw == registeredAdminstrator.adminPw) {
-                      //     //로그인을 시켜야함.
-                      //     SnackbarUtil.showSnackBar(
-                      //         "관리자 모드로 로그인 되었습니다", context);
-                      //     MenuUtil.push(context, SchoolConsultationPage());
-                      //     return;
-                      //   }
-                      // }
-
+                      adminstratorToLogin.login(context);
                     },
                     child: Text("Login",
                         style: TextStyle(

@@ -1,7 +1,5 @@
 
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/MainGatePage.dart';
-import 'package:gi_english_website/appBarExample/OnHover.dart';
 import 'package:gi_english_website/pages/School1on1Page.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolAllDayPage.dart';
@@ -177,57 +175,45 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
       Container(
         height: widget.height,
         padding: EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
-        color: Palette.mainPurple,
+        color: Palette.white,
       ),
 
       Container(
         color: Colors.transparent,
+        padding: EdgeInsets.only(top:20),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             InkWell(
               onTap: (){MenuUtil.push(context, SchoolAboutPage());},
-              child: OnHover(
-                builder: (isHovered) {
-                  menu1Transparent = !isHovered;
-                  return menuItem("About Gi어학원", menu1Column());
-                },
-              ),
+              child: Text("About", style: TextStyle(fontFamily: "Cafe24Behappy",
+              fontSize: 10, color: Palette.earth),)
             ),
+            SizedBox(width: 20),
             InkWell(
-              onTap: (){MenuUtil.push(context, SchoolProgramPage());},
-              child: OnHover(
-                builder: (isHovered) {
-                  menu2Transparent = !isHovered;
-                  return menuItem("Program", menu2Column());
-                },
-              ),
+                onTap: (){MenuUtil.push(context, SchoolProgramPage());},
+                child: Text("Program", style: TextStyle(fontFamily: "Cafe24Behappy",
+                    fontSize: 10, color: Palette.earth),)
             ),
+            SizedBox(width: 20),
             InkWell(
-              onTap: (){MenuUtil.push(context, SchoolCurriculumKindyPage());},
-              child: OnHover(
-                builder: (isHovered) {
-                  menu3Transparent = !isHovered;
-                  return menuItem("Curriculum", menu3Column());
-                },
-              ),
+                onTap: (){MenuUtil.push(context, SchoolCurriculumKindyPage());},
+                child: Text("Curriculum", style: TextStyle(fontFamily: "Cafe24Behappy",
+                    fontSize: 10, color: Palette.earth),)
             ),
+            SizedBox(width: 20),
             InkWell(
-              onTap: (){MenuUtil.push(context, SchoolCommunityNoticePage());},
-              child: OnHover(
-                builder: (isHovered) {
-                  menu4Transparent = !isHovered;
-                  return menuItem("Community", menu4Column());
-                },
-              ),
+                onTap: (){MenuUtil.push(context, SchoolCommunityNoticePage());},
+                child: Text("Community", style: TextStyle(fontFamily: "Cafe24Behappy",
+                    fontSize: 10, color: Palette.earth),)
             ),
             SizedBox(width: 40)
           ],
         ),
       ),
       Container(
-        padding: EdgeInsets.only(top: 4, left: 10),
+        padding: EdgeInsets.only(top: 4 ),
         width: 300,
         alignment: Alignment.topLeft,
         child:

@@ -42,5 +42,16 @@ class SchoolVisitor extends Visitor {
     await prefs.setString(prefKey(), jsonStr);
     print(jsonStr);
   }
+
+  static Future<SchoolVisitor?> loadWithkey(String key) async {
+    SharedPreferences storage = await SharedPreferences.getInstance();
+    String? jsonStr = storage.getString(key);
+    if(jsonStr == null) {
+      return null;
+    }
+
+    Map<String, dynamic> json = JsonUtil.stringToMap(jsonStr);
+    return SchoolVisitor.fromJson(json);
+  }
 }
 

@@ -45,17 +45,7 @@ class _MainGatePageState extends State<MainGatePage> {
           children: [
             leftWidget(),
             rightWidget(),
-            Positioned(
-                top: 20,
-                right: 20,
-                child: TextButton(
-                    onPressed: () {
-                      MenuUtil.push(context, AdminLoginPage());
-                    },
-                    child: Text(
-                      "Admin",
-                      style: TextStyle(color: Palette.black),
-                    )))
+            Positioned(top: 20, right: 20, child: moveAdminButton()),
           ],
         ),
       ),
@@ -75,17 +65,7 @@ class _MainGatePageState extends State<MainGatePage> {
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Stack(children: [
-            Positioned(
-                top: 20,
-                right: 20,
-                child: TextButton(
-                    onPressed: () {
-                      MenuUtil.push(context, AdminLoginPage());
-                    },
-                    child: Text(
-                      "Admin",
-                      style: TextStyle(color: Palette.black),
-                    ))),
+            Positioned(top: 20, right: 20, child: moveAdminButton()),
             Container(
               alignment: Alignment.bottomCenter,
               width: MediaQuery.of(context).size.width,
@@ -254,6 +234,17 @@ class _MainGatePageState extends State<MainGatePage> {
         ),
       ],
     );
+  }
+
+  Widget moveAdminButton() {
+    return TextButton(
+        onPressed: () async {
+          MenuUtil.push(context, AdminLoginPage());
+        },
+        child: Text(
+          "Admin",
+          style: TextStyle(color: Palette.black),
+        ));
   }
 }
 /*

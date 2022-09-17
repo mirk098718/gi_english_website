@@ -90,6 +90,8 @@ flutter:
      - assets/scholasticLogo.jpg
      - assets/wonderCodeLogo.jpg
      - assets/mobileMainGateImage.png
+     - assets/giAppBannerFinal.png
+     - assets/giKidsWeekendLogo.png
 
 
 
@@ -122,6 +124,24 @@ flutter:
     - family: LucidaCalligraphy
       fonts:
         - asset: assets/fonts/LucidaCalligraphy-Itelic.TTF
+
+    - family: Behappy
+      fonts:
+        - asset: assets/fonts/Behappy.ttf
+
+    - family: Decoshadow
+      fonts:
+        - asset: assets/fonts/Decoshadow.ttf
+
+    - family: Lovingu
+      fonts:
+        - asset: assets/fonts/Lovingu.ttf
+
+    - family: Oneprettynight
+      fonts:
+        - asset: assets/fonts/Oneprettynight.ttf
+
+
 
 
   #   - family: Schyler

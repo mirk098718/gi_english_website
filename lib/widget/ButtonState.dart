@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
 class BehaviorColor {
-  static const Color colorOnClick = Palette.mainLightPurple;
+  static const Color colorOnClick = Palette.mainLightGrey;
   static const Color colorOnDefault = Palette.white;
-  static const Color colorOnHover = Palette.mainMediumPurple;
+  static const Color colorOnHover = Palette.lightestEarth;
 
   static const Color colorOnClickCafe = Palette.mainLime;
   static const Color colorOnDefaultCafe = Palette.white;

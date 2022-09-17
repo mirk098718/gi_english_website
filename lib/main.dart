@@ -1,6 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/MainGatePage.dart';
+import 'package:gi_english_website/pages/SchoolMainPage.dart';
+
+import 'admin/page/AdminVisitorViewPage.dart';
 
 Future<void> main() async {
   //TODO: 나중에 주석 풀기
@@ -32,7 +35,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MainGatePage(),
+      home: SchoolMainPage(),
     );
   }
 }
