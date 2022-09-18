@@ -6,6 +6,7 @@ import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/SnackbarUtil.dart';
+import 'package:gi_english_website/util/repository/SchoolVisitorRepository.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/EasyRadio.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
@@ -537,7 +538,8 @@ class SchoolConsultationPageService {
       return;
     }
 
-    await state.schoolVisitor.save();
+    final schoolVisitor = state.schoolVisitor;
+    await SchoolVisitorRepository.save(schoolVisitor);
     DialogUtil.showAlert(context, "예약이 완료되었습니다.");
   }
 }

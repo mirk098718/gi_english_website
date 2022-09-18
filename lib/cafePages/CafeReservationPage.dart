@@ -668,7 +668,8 @@ class CafeReservationPageService {
       return;
     }
 
-    await state.cafeVisitor.save();
+    //TODO: cafeVisitor save. (fristore)
+    // await state.cafeVisitor.save();
 
     // cafeVisitorListTile.add(ListTile(
     //   title: Text(

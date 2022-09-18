@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/CafeVisitor.dart';
 import 'package:gi_english_website/class/SchoolVisitor.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/util/repository/SchoolVisitorRepository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminVisitorViewPage extends StatefulWidget {
@@ -25,29 +26,18 @@ class _AdminVisitorViewPageState extends State<AdminVisitorViewPage> {
   Widget build(BuildContext context) {
     if(!isInit) {
       isInit = true;
-
       print("_AdminVisitorViewPageState build");
       Future<SharedPreferences> prefsFuture = SharedPreferences.getInstance();
       prefsFuture.then((prefs) async {
         cafeVisitorList.clear();
         schoolVisitorList.clear();
 
-        Set<String> cafeVisitorKeySet = prefs.getKeys();
-        print("cafeVisitorKeySet $cafeVisitorKeySet");
-        for(String key in cafeVisitorKeySet) {
-          if(key.startsWith("CafeVisitor:")) {
-            CafeVisitor? cafeVisitor = await CafeVisitor.loadWithkey(key);
-            if(cafeVisitor != null) {
-              cafeVisitorList.add(cafeVisitor);
-            }
-          }
-          else if(key.startsWith("SchoolVisitor:")) {
-            SchoolVisitor? schoolVisitor = await SchoolVisitor.loadWithkey(key);
-            if(schoolVisitor != null) {
-              schoolVisitorList.add(schoolVisitor);
-            }
-          }
-        }
+        /*
+       key.startsWith("CafeVisitor:")
+       key.startsWith("SchoolVisitor:")
+         */
+
+        schoolVisitorList.addAll(await SchoolVisitorRepository.getList("childName",isNull: false));
 
         setState(() {});
       });

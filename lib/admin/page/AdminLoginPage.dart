@@ -3,7 +3,6 @@ import 'package:gi_english_website/class/Administrator.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/SnackbarUtil.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({Key? key}) : super(key: key);
@@ -45,8 +44,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                             borderRadius: BorderRadius.circular(10.0)),
                         minimumSize: Size(100, 40)),
                     onPressed: () async {
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
                       String id = adminIdController.text.trim();
                       String pw = adminPwController.text.trim();
                       if (id.isEmpty || pw.isEmpty) {
