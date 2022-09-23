@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'Visitor.dart';
 
 class CafeVisitor extends Visitor {
@@ -14,6 +16,10 @@ class CafeVisitor extends Visitor {
     required this.programPeriod,
   });
 
+  CafeVisitor.fromJson(Map<String, dynamic> json)
+  : program = json['program'],
+  programPeriod = json['programPeriod'], super.fromJson(json);
+
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = super.toJson();
     map.addAll({
@@ -24,9 +30,26 @@ class CafeVisitor extends Visitor {
     return map;
   }
 
-  CafeVisitor.fromJson(Map<String, dynamic> json)
-    : program = json['program'],
-      programPeriod = json['programPeriod'], super.fromJson(json);
+    factory CafeVisitor.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+        SnapshotOptions? options,
+    ) {
+    final data = snapshot.data();
+    return CafeVisitor(
+    childName: data?['childName'],
+    childAge: data?['childAge'],
+    parentName: data?['parentName'],
+    parentNumber: data?['parentNumber'],
+    program: data?['program'],
+    programPeriod: data?['programPeriod'],
+    );
+    }
+
+    Map<String, dynamic> toFirestore() {
+      return toJson();
+    }
+
+
 
   bool isValid() {
     return childName != "" && parentName != "" && parentNumber != "";
