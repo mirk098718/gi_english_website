@@ -1,8 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/MainGatePage.dart';
 import 'package:gi_english_website/firebase_options.dart';
+
+import 'pages/SchoolMainPage.dart';
 
 
 Future<void> main() async {
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MainGatePage()
+      home: SchoolMainPage()
     );
   }
 }

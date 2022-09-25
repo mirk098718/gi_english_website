@@ -1,11 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/cafePages/CafeAboutPage.dart';
-import 'package:gi_english_website/cafePages/CafeReservationPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumElePage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
-import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
@@ -372,7 +369,7 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
                           TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
                     onPressed: () {
-                      MenuUtil.push(context, CafeReservationPage());
+                      MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
                       primary: Palette.mainMediumPurple,

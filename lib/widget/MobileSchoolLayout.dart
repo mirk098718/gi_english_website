@@ -1,14 +1,10 @@
 
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/MainGatePage.dart';
-import 'package:gi_english_website/appBarExample/OnHover.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
-import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumElePage.dart';
-import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
+import 'package:gi_english_website/pages/SchoolMainPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
-import 'package:gi_english_website/pages/schoolTeachersPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -64,7 +60,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
             InkWell(
               child: Container(height: 40,child: Image.asset("assets/giEmblem.png")),
               onTap: () {
-                MenuUtil.push(context, MainGatePage());
+                MenuUtil.push(context, SchoolMainPage());
               },
             ),
         ),
