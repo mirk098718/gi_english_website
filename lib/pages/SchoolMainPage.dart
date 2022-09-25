@@ -5,8 +5,11 @@ import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/EasyKeyboardListener.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
+
+import '../admin/page/AdminLoginPage.dart';
 
 class SchoolMainPage extends StatefulWidget {
   const SchoolMainPage({Key? key}) : super(key: key);
@@ -16,6 +19,7 @@ class SchoolMainPage extends StatefulWidget {
 }
 
 class _SchoolMainPageState extends State<SchoolMainPage> {
+  final hiddenMenu = "hiddenmenu";
   final idController = TextEditingController();
   final pwController = TextEditingController();
 
@@ -24,11 +28,23 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     Size size = mediaQueryData.size;
     double width = size.width;
+
+    Widget returnWidget;
     if (width > 768) {
-      return desktopUi(context);
+      returnWidget = desktopUi(context);
     } else {
-      return mobileUi(context);
+      returnWidget = mobileUi(context);
     }
+
+    return EasyKeyboardListener(
+      onValue: (String value) {
+        if(value==hiddenMenu) {
+          MenuUtil.push(context, AdminLoginPage());
+        }
+      },
+      inputLimit: hiddenMenu.length,
+      child: returnWidget,
+    );
   }
 
   Widget desktopUi(context) {
@@ -46,25 +62,33 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
           // borderRadius: BorderRadius.circular(10),
         ),
         child: Stack(alignment: Alignment.centerLeft, children: [
-           Image.asset("assets/cafeMainImage.png"),
-           Container(
-             width: 500,
-                padding: EdgeInsets.only(left:20),
-                child: Text("",
-              style: TextStyle(fontFamily: "Lovingu", fontSize: 30),),),
-           Positioned(
-             bottom: 20, right: 40,
-             child: ElevatedButton(
-               style: ElevatedButton.styleFrom(primary: Palette.black  , onPrimary: Palette.black,),
-                 onPressed: () {},
-                  child: Text("상담신청",
+          Image.asset("assets/cafeMainImage.png"),
+          Container(
+            width: 500,
+            padding: EdgeInsets.only(left: 20),
+            child: Text(
+              "",
+              style: TextStyle(fontFamily: "Lovingu", fontSize: 30),
+            ),
+          ),
+          Positioned(
+            bottom: 20,
+            right: 40,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Palette.black,
+                onPrimary: Palette.black,
+              ),
+              onPressed: () {},
+              child: Text("상담신청",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: "Oneprettynight",
-                    color: Palette.white, fontSize: 12)),
-        ),
-           )
-    ]));
+                      fontFamily: "Oneprettynight",
+                      color: Palette.white,
+                      fontSize: 12)),
+            ),
+          )
+        ]));
   }
 
   Widget urlMenu() {
@@ -87,16 +111,35 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                       flex: 1,
                       child: Container(
                         padding: EdgeInsets.only(left: 15),
-                        child:
-                            Column(
-                              children: [
-                                Expanded (flex:1, child: Container(),),
-                                Text("GLEAM ISLAND",style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen,),textAlign: TextAlign.left,),
-                                Text("소식을 SNS에서 확인하세요!",textAlign: TextAlign.left, style: TextStyle(
-                                    fontFamily: "Oneprettynight", color: Palette.mainGrey, fontSize: 12), ),
-                                Expanded (flex:1, child: Container(),),
-                              ],
+                        child: Column(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Container(),
                             ),
+                            Text(
+                              "GLEAM ISLAND",
+                              style: TextStyle(
+                                fontFamily: "Jalnan",
+                                fontSize: 15,
+                                color: Palette.deepGreen,
+                              ),
+                              textAlign: TextAlign.left,
+                            ),
+                            Text(
+                              "소식을 SNS에서 확인하세요!",
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontFamily: "Oneprettynight",
+                                  color: Palette.mainGrey,
+                                  fontSize: 12),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Container(),
+                            ),
+                          ],
+                        ),
 
                         //Image.asset("assets/snsArrow.png"),
 
@@ -152,7 +195,6 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   border: Border.all(color: Palette.lightestEarth, width: 1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-
                 child: Row(
                   children: [
                     Expanded(
@@ -186,7 +228,6 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                             child: Image.asset("assets/giKidsWeekendLogo.png")),
                       ),
                     ),
-
                   ],
                 ),
               ))
@@ -299,7 +340,6 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
 
   Widget scrollView() {
     return SingleChildScrollView(
-
       child: Container(
         color: Palette.white,
         child: Column(
