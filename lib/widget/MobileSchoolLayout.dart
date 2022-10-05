@@ -89,7 +89,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
               InkWell(
                 child: Container(
                     margin: EdgeInsets.only(left: 10, top: 10, bottom: 5),
-                    width:30, height: 30, child: Image.asset("assets/loginButton.png")),
+                    width:30, height: 30, child: Image.asset("assets/mobileLoginButton.png")),
                 onTap: () {
                   showDialog(
                       context: context,

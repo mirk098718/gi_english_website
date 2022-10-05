@@ -195,6 +195,7 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
 
   Widget mainImage() {
     return Container(
+
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
@@ -216,21 +217,20 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
                   height: 20,
                 ),
                 Container(
-                  width: 100,
+                  width: 150,
                   height: 40,
                   child: ElevatedButton(
-                    child: Text(
-                      "상담신청",
-                      style: TextStyle(
-                        fontFamily: "Oneprettynight", color: Palette.white, fontSize: 12),
-                    ),
-                    onPressed: () {
-                      MenuUtil.push(context, SchoolConsultationPage());
-                    },
                     style: ElevatedButton.styleFrom(
                       primary: Palette.black,
                       onPrimary: Palette.black,
                     ),
+                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    child: Text("상담신청",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontFamily: "Oneprettynight",
+                            color: Palette.white,
+                            fontSize: 12)),
                   ),
                 ),
               ],

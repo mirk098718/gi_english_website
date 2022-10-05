@@ -21,16 +21,6 @@ class SchoolMapPage extends StatefulWidget {
 }
 
 class _SchoolMapPageState extends State<SchoolMapPage> {
-  // List<String> labelList = ["Gi글림아일랜드", "교원소개", "운영시스템", "오시는 길"];
-  // List<Color> selectedColorList = [
-  //   BehaviorColor.colorOnClick,
-  //   BehaviorColor.colorOnDefault,
-  //   BehaviorColor.colorOnDefault,
-  //   BehaviorColor.colorOnDefault
-  // ];
-  // List<Widget> nextPageList = [
-  //   CafeAboutPage(),
-  // ];
 
   List<ButtonState> buttonStateList = [
     ButtonState("Gi글림아일랜드", BehaviorColor.colorOnDefault, SchoolAboutPage()),
@@ -227,20 +217,19 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
                 ),
                 Container(
                   width: 150,
-                  height: 50,
+                  height: 40,
                   child: ElevatedButton(
-                    child: Text(
-                      "상담신청",
-                      style:
-                      TextStyle(fontFamily: "Jalnan", color: Palette.white),
-                    ),
-                    onPressed: () {
-                      MenuUtil.push(context, SchoolConsultationPage());
-                    },
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.mainMediumPurple,
+                      primary: Palette.black,
                       onPrimary: Palette.black,
                     ),
+                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    child: Text("상담신청",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontFamily: "Oneprettynight",
+                            color: Palette.white,
+                            fontSize: 12)),
                   ),
                 ),
               ],

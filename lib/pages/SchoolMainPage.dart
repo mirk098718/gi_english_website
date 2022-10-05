@@ -39,6 +39,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
     return EasyKeyboardListener(
       onValue: (String value) {
         if(value==hiddenMenu) {
+          MenuUtil.pop(context);
           MenuUtil.push(context, AdminLoginPage());
         }
       },
@@ -74,18 +75,22 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
           Positioned(
             bottom: 20,
             right: 40,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary: Palette.black,
-                onPrimary: Palette.black,
+            child: Container(
+              width: 100,
+              height: 40,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Palette.black,
+                  onPrimary: Palette.black,
+                ),
+                onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                child: Text("상담신청",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontFamily: "Oneprettynight",
+                        color: Palette.white,
+                        fontSize: 12)),
               ),
-              onPressed: () {},
-              child: Text("상담신청",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontFamily: "Oneprettynight",
-                      color: Palette.white,
-                      fontSize: 12)),
             ),
           )
         ]));

@@ -155,7 +155,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                             height: 10,
                           ),
                           Text("오전 9.15 ~ 오후 3시\n"
-                              "(자세한 시간표는 커리큘럼 참조)"),
+                              "(자세한 시간표는 커리큘럼 참조)", style: TextStyle(fontSize: 12)),
                           SizedBox(
                             height: 10,
                           ),
@@ -167,7 +167,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                           SizedBox(
                             height: 10,
                           ),
-                          Text("5세 7세 미취학 유아"),
+                          Text("5세 7세 미취학 유아", style: TextStyle(fontSize: 12)),
                         ],
                       )
                     ],
@@ -204,7 +204,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                             height: 10,
                           ),
                           Text("오후 3.10 ~ 오후 7시\n"
-                              "(자세한 시간표는 커리큘럼 참조)"),
+                              "(자세한 시간표는 커리큘럼 참조)", style: TextStyle(fontSize: 12)),
                           SizedBox(
                             height: 10,
                           ),
@@ -216,7 +216,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                           SizedBox(
                             height: 10,
                           ),
-                          Text("초등 1학년 ~ 6학년"),
+                          Text("초등 1학년 ~ 6학년", style: TextStyle(fontSize: 12)),
                         ],
                       )
                     ],
@@ -376,20 +376,19 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                 ),
                 Container(
                   width: 150,
-                  height: 50,
+                  height: 40,
                   child: ElevatedButton(
-                    child: Text(
-                      "상담신청",
-                      style:
-                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
-                    ),
-                    onPressed: () {
-                      MenuUtil.push(context, SchoolConsultationPage());
-                    },
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.mainMediumPurple,
+                      primary: Palette.black,
                       onPrimary: Palette.black,
                     ),
+                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    child: Text("상담신청",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontFamily: "Oneprettynight",
+                            color: Palette.white,
+                            fontSize: 12)),
                   ),
                 ),
               ],

@@ -10,6 +10,7 @@ import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumElePage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumKindyPage.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
+import 'package:gi_english_website/pages/SchoolMainPage.dart';
 import 'package:gi_english_website/pages/SchoolMapPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
@@ -220,7 +221,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             InkWell(
               child: Container(height: 40,child: Image.asset("assets/schoolLogo.png")),
               onTap: () {
-                MenuUtil.pop(context);
+                MenuUtil.push(context, SchoolMainPage());
               },
             ),
         ),

@@ -172,18 +172,19 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
                 ),
                 Container(
                   width: 150,
-                  height: 50,
+                  height: 40,
                   child: ElevatedButton(
-                    child: Text(
-                      "상담신청",
-                      style: TextStyle(
-                          fontFamily: "Jalnan", color: Palette.white),
-                    ),
-                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.mainMediumPurple,
+                      primary: Palette.black,
                       onPrimary: Palette.black,
                     ),
+                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    child: Text("상담신청",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontFamily: "Oneprettynight",
+                            color: Palette.white,
+                            fontSize: 12)),
                   ),
                 ),
 

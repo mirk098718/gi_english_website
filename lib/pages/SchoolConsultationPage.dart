@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/class/Visitor.dart';
-import 'package:gi_english_website/util/JsonUtil.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -11,8 +9,8 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/EasyRadio.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+
 import '../class/SchoolVisitor.dart';
 import '../util/DialogUtil.dart';
 import 'SchoolCommunityFAQPage.dart';
@@ -98,15 +96,13 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             mobileCalendarBox(),
-            content(),
+            mobileContent(),
             SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
           ],
         ),
       ),
     );
   }
-
-
   Widget content() {
     return Container(
       alignment: Alignment.topLeft,
@@ -158,6 +154,77 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           SizedBox(height: 20),
         ],
       ),
+    );
+  }
+
+  Widget mobileContent() {
+    return Container(
+      alignment: Alignment.topLeft,
+      padding: EdgeInsets.all(20),
+      color: Palette.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "상담 신청하기",
+              style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
+            ),
+          ),
+          SizedBox(height: 20),
+          Text("입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
+          Divider(),
+          SizedBox(height: 20),
+          Text("아이 이름"),
+          MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
+            schoolVisitor.childName = text;
+          }),
+          SizedBox(height: 20),
+          Text("보호자님 성함"),
+          MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
+            schoolVisitor.parentName = text;
+          }),
+          SizedBox(height: 20),
+          Text("보호자님 연락처"),
+          MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
+            schoolVisitor.parentNumber = text;
+          }),
+          SizedBox(height: 20),
+          Text("아이 연령"),
+          MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
+            schoolVisitor.childAge = int.tryParse(text)??0;
+          }),
+          SizedBox(height: 20),
+          Text("아이 레벨"),
+          Divider(),
+          levelRadio(),
+          SizedBox(height: 20),
+          Text("전화상담 희망시간"),
+          Divider(),
+          timeRadio(),
+          SizedBox(height: 20),
+          mobileSubmitButton(),
+          SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget submitButton() {
+    return Container(
+        width: 150,
+        height: 50,
+        child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: Palette.black,
+              onPrimary: Palette.black,
+            ),
+            child: Text(
+              "상담예약",
+              style: TextStyle(fontFamily: "Jalnan", color: Palette.white),
+            ),
+            onPressed: s.submitButtonPressed)
     );
   }
 
@@ -237,20 +304,19 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                 ),
                 Container(
                   width: 150,
-                  height: 50,
+                  height: 40,
                   child: ElevatedButton(
-                    child: Text(
-                      "상담신청",
-                      style:
-                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
-                    ),
-                    onPressed: () {
-                      MenuUtil.push(context, SchoolConsultationPage());
-                    },
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.mainMediumPurple,
+                      primary: Palette.black,
                       onPrimary: Palette.black,
                     ),
+                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    child: Text("상담신청",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontFamily: "Oneprettynight",
+                            color: Palette.white,
+                            fontSize: 12)),
                   ),
                 ),
               ],
@@ -364,7 +430,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.mainMediumPurple,
+                      primary: Palette.black,
                       onPrimary: Palette.black,
                     ),
                   ),
@@ -508,20 +574,21 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
     );
   }
 
-  Widget submitButton() {
+  Widget mobileSubmitButton() {
     return Container(
-      width: 150,
-      height: 50,
-      child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            primary: Palette.mainMediumPurple,
-            onPrimary: Palette.black,
-          ),
-          child: Text(
-            "상담예약",
-            style: TextStyle(fontFamily: "Jalnan"),
-          ),
-          onPressed: s.submitButtonPressed)
+        // alignment: Alignment.center,
+        width: 150,
+        height: 50,
+        child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: Palette.mainPurple,
+              onPrimary: Palette.black,
+            ),
+            child: Text(
+              "상담예약",
+              style: TextStyle(fontFamily: "Jalnan", color: Palette.white),
+            ),
+            onPressed: s.submitButtonPressed)
     );
   }
 }

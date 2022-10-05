@@ -58,7 +58,7 @@ class MyWidget {
     return Stack(
       alignment: Alignment.centerLeft,
       children: [
-        Container(width: double.infinity, color: Palette.lightestEarth),
+        Container(width: double.infinity, color: Palette.mainPurple),
         Container(
           padding: EdgeInsets.all(5),
           alignment: Alignment.center,

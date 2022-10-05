@@ -32,6 +32,7 @@ dependencies:
   syncfusion_flutter_calendar: ^20.1.59
   firebase_core: ^1.22.0
   cloud_firestore: ^3.4.8
+  firebase_auth: ^3.10.0
 
 dev_dependencies:
   flutter_test:
@@ -92,6 +93,8 @@ flutter:
      - assets/mobileMainGateImage.png
      - assets/giAppBannerFinal.png
      - assets/giKidsWeekendLogo.png
+     - assets/mobileLoginButton.png
+
 
 
 
