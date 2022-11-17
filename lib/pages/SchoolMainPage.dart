@@ -76,7 +76,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             bottom: 20,
             right: 40,
             child: Container(
-              width: 100,
+              width: 150,
               height: 40,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -87,9 +87,9 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                 child: Text("상담신청",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontFamily: "Oneprettynight",
+                        fontFamily: "Jalnan",
                         color: Palette.white,
-                        fontSize: 12)),
+                        )),
               ),
             ),
           )

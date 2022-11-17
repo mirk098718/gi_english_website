@@ -198,9 +198,9 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Oneprettynight",
+                            fontFamily: "Jalnan",
                             color: Palette.white,
-                            fontSize: 12)),
+                            )),
                   ),
                 ),
               ],

@@ -172,7 +172,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
           //   height: 10,
           // ),
 
-          Text("부원장 Mia 선생님",style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.mainPurple),),
+          Text("상담실장 Patty 선생님",style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.mainPurple),),
           SizedBox(
             height: 20,
           ),
@@ -184,22 +184,14 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
               children: [
                 Container(alignment: Alignment.topLeft, width: 200, height: 400, child: Image.asset("assets/mobileSchoolMainImage.png")),
                 SizedBox(width: 20,),
-                Text("Mia Kim \n\n"
-                    "현 Gi 글림아일랜드 어학원 파주 원장\n"
-                    "현 글림아일랜드 교육 대표\n"
-                    "전 서대문구 소재 청담 에이프릴 어학원 교수부장\n"
-                    "전 서대문구 소재 위즈빌 어학원 영어 유초등부 강사\n"
-                    "전 하이 잉글리쉬 대기업 출강 강사 (현대케피코, 두산중공업 등)\n"
-                    "전 강남 유명 OPIC (영어 구술 시험) 전문 어학원 강사\n"
-                    "전 비욘드 어학원 초, 중등 강사\n"
-                    "JTBC 다큐멘터리 “스포츠관광을 디렉팅하라” 영문번역"
+                Text("Patty Kim \n\n"
+                    "현 Gi 글림아일랜드 어학원 파주 상담실장\n"
+                    "전 대한항공 국제선 커스터머 서비스 상담 업무\n"
                     "\n\n"
                     "학력 및 자격\n"
                     "\n"
                     "뉴질랜드 오클랜드 공과 대학교 (Auckland University of Technology) 석사졸\n"
-                    "뉴질랜드 오클랜드 소재 Glenfield College 고등학교 졸\n"
-                    "TESOL 영어 강사 자격 보유\n"
-                    "(Certificate in Teaching English as a Second Language)")
+                   )
               ],
             ),
           ),
@@ -257,9 +249,9 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Oneprettynight",
+                            fontFamily: "Jalnan",
                             color: Palette.white,
-                            fontSize: 12)),
+                           )),
                   ),
                 ),
 

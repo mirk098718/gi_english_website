@@ -189,27 +189,27 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             InkWell(
               onTap: (){MenuUtil.push(context, SchoolAboutPage());},
               child: Text("About", style: TextStyle(fontFamily: "Cafe24Behappy",
-              fontSize: 10, color: Palette.earth),)
+              fontSize: 12, color: Palette.earth),)
             ),
             SizedBox(width: 20),
             InkWell(
                 onTap: (){MenuUtil.push(context, SchoolProgramPage());},
                 child: Text("Program", style: TextStyle(fontFamily: "Cafe24Behappy",
-                    fontSize: 10, color: Palette.earth),)
+                    fontSize: 12, color: Palette.earth),)
             ),
             SizedBox(width: 20),
             InkWell(
                 onTap: (){MenuUtil.push(context, SchoolCurriculumKindyPage());},
                 child: Text("Curriculum", style: TextStyle(fontFamily: "Cafe24Behappy",
-                    fontSize: 10, color: Palette.earth),)
+                    fontSize: 12, color: Palette.earth),)
             ),
             SizedBox(width: 20),
             InkWell(
                 onTap: (){MenuUtil.push(context, SchoolCommunityNoticePage());},
                 child: Text("Community", style: TextStyle(fontFamily: "Cafe24Behappy",
-                    fontSize: 10, color: Palette.earth),)
+                    fontSize: 12, color: Palette.earth),)
             ),
-            SizedBox(width: 40)
+            SizedBox(width: 60)
           ],
         ),
       ),
@@ -229,7 +229,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
         right:5, top: 5,
         child: Container(
           alignment: Alignment.topRight,
-          padding: EdgeInsets.all(5),
+          padding: EdgeInsets.only(top: 5, bottom: 5, right: 10),
           child:InkWell(
             child: Container(width:30, height: 30, child: Image.asset("assets/loginButton.png")),
             onTap: () {

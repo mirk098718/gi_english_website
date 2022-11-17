@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/pages/School1on1Page.dart';
 import 'package:gi_english_website/pages/SchoolCampPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
@@ -26,7 +25,7 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
     ButtonState("올데이케어", BehaviorColor.colorOnClick, SchoolAllDayPage()),
     ButtonState("방학캠프", BehaviorColor.colorOnDefault, SchoolCampPage()),
     ButtonState("NZ연계프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
-    ButtonState("1on1 프로그램", BehaviorColor.colorOnDefault, School1on1Page()),
+
 
   ];
   @override
@@ -145,7 +144,7 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
             height: 20,
           ),
           Text(
-              "오후 3시 ~ 오후 6시"),
+              "오후 3시 ~ 오후 6시 까지 (6시 이전 픽업 가능)"),
           SizedBox(
             height: 20,
           ),
@@ -157,7 +156,26 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
             height: 20,
           ),
           Text(
-              "3시에 수업을 마치는 본원 유치부 학생"),
+              "3시에 수업을 마치는 본원 유치부 학생, 학부모님 픽업이 가능한 시간까지 돌봄 서비스"),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            "프로그램",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+              "영어로 진행되는 다양한 놀이 수업:\n"
+                  "1. Origami : 영어 종이접기 놀이 수업\n"
+                  "2. Golf : 안전한 유아용 골프채 이용 간단한 골프 기초 놀이 수업\n"
+                  "3. Media : 영상 자료를 활용한 재미있는 Theme play\n"
+                  "4. Chinese : 유아를 위한 아주 쉬운 기초 중국어 놀이 수업"),
+          SizedBox(
+            height: 50,
+          ),
 
         ],
       ),
@@ -212,9 +230,9 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Oneprettynight",
+                            fontFamily: "Jalnan",
                             color: Palette.white,
-                            fontSize: 12)),
+                            )),
                   ),
                 ),
 

@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/pages/School1on1Page.dart';
 import 'package:gi_english_website/pages/SchoolAllDayPage.dart';
 import 'package:gi_english_website/pages/SchoolCampPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
@@ -25,7 +24,6 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
     ButtonState("올데이케어", BehaviorColor.colorOnDefault, SchoolAllDayPage()),
     ButtonState("방학캠프", BehaviorColor.colorOnDefault, SchoolCampPage()),
     ButtonState("NZ연계프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
-    ButtonState("1on1 프로그램", BehaviorColor.colorOnDefault, School1on1Page()),
   ];
 
   @override
@@ -155,7 +153,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                             height: 10,
                           ),
                           Text("오전 9.15 ~ 오후 3시\n"
-                              "(자세한 시간표는 커리큘럼 참조)", style: TextStyle(fontSize: 12)),
+                              "(자세한 시간표는 커리큘럼 참조)"),
                           SizedBox(
                             height: 10,
                           ),
@@ -167,7 +165,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                           SizedBox(
                             height: 10,
                           ),
-                          Text("5세 7세 미취학 유아", style: TextStyle(fontSize: 12)),
+                          Text("5세 7세 미취학 유아"),
                         ],
                       )
                     ],
@@ -204,7 +202,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                             height: 10,
                           ),
                           Text("오후 3.10 ~ 오후 7시\n"
-                              "(자세한 시간표는 커리큘럼 참조)", style: TextStyle(fontSize: 12)),
+                              "(자세한 시간표는 커리큘럼 참조)"),
                           SizedBox(
                             height: 10,
                           ),
@@ -216,7 +214,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                           SizedBox(
                             height: 10,
                           ),
-                          Text("초등 1학년 ~ 6학년", style: TextStyle(fontSize: 12)),
+                          Text("초등 1학년 ~ 6학년"),
                         ],
                       )
                     ],
@@ -386,9 +384,9 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Oneprettynight",
+                            fontFamily: "Jalnan",
                             color: Palette.white,
-                            fontSize: 12)),
+                            )),
                   ),
                 ),
               ],

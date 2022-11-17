@@ -132,50 +132,10 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           Divider(),
+          Image.asset("assets/map.jpg"),
           SizedBox(
             height: 20,
           ),
-          Text(
-              "GLEAM ISLAND 란 반짝이는 섬 이라는 뜻으로 오세아니아의 아름다운 섬 뉴질랜드의 교육 철학과 정신을 컨셉트로 한 이름입니다. \n"
-                  "자유로운 탐구와 적극적인 토론, Creative learning 을 기반으로 하여, 뉴질랜드와 호주 등 오세아니아 국가들은 아이들이 \n"
-                  "무한히 창의적인 발상을 할 수 있도록 가르치며, 지루하고 틀에 박힌 주입식 교육 시스템에서 벗어나, 반짝이는 아이디어를 마음껏 \n"
-                  "발산할 수 있는 교육 현장을 제공하는 것이 저희 GLEAM ISLAND 의 모토입니다.\n"
-                  "GLEAM ISLAND 는 놀이와 학습 현장이 적절히 배분되어 있어, 아이들이 지루할 틈이 없는 활기 넘치는 공간일 것입니다.\n"
-                  "GLEAM ISLAND 는 크게 두가지의 영어공부 플랫폼을 제공합니다."),
-          SizedBox(
-            height: 20,
-          ),
-          Text("GLEAM ISLAND 어학원",
-              style: TextStyle(
-                  fontFamily: "Jalnan",
-                  fontSize: 15,
-                  color: Palette.mainMediumPurple)),
-          SizedBox(
-            height: 20,
-          ),
-          Text("Gi 글림아일랜드 어학원은,\n"
-              "* 영어의 Fundamental을 확립할 Gi Grammar 프로그램,\n"
-              "* 적극적 의사표현력을 습득할  Gi Discussion 프로그램,\n"
-              "* 풍부한 스피킹 표현력을 배울 Gi Expression 프로그램, \n"
-              "* Reading 능력을 키워줄  원서읽기 다독 Slow Reading 프로그램,\n"
-              "* 유치부를 위한 S.T.E.A.M 프로그램 (Science, Technology, Engineering, Arts, Mathematics)\n"
-              "등의 양질의 교육 서비스와 액티비티 프로그램을 제공하는 프리미엄 소수정예 영어학원입니다."),
-          SizedBox(
-            height: 20,
-          ),
-          Text("GLEAM ISLAND 어학원",
-              style: TextStyle(
-                  fontFamily: "Jalnan", fontSize: 15, color: Palette.mainLime)),
-          SizedBox(
-            height: 20,
-          ),
-          Text(
-              "Gi English 키즈카페 Gi 글림아일랜드 영어키즈카페는 Gi 글림아일랜드 어학원 과 협업하여 프로그램의 전문성을 더하고, \n"
-                  "아이들이 놀이를 통해 재밌게 영어를 접할 수 있는 복합놀이문화공간입니다.  \n"
-                  "Storytelling, Creative Arts, Visual Contents 등 다양한 프리미엄 놀이 프로그램을 제공하며,  \n"
-                  "원어민과의 interaction을 통해 아이들이 자연스럽게 영어로 소통할 수 있도록 하였습니다.  \n"
-                  "또한 소수 정예 예약제를 도입하여 프로그램의 집중도를 높였으며,  \n"
-                  "동행한 보호자에게도 쾌적한 공간과 휴식 시간을 제공합니다."),
         ],
       ),
     );
@@ -227,9 +187,9 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Oneprettynight",
+                            fontFamily: "Jalnan",
                             color: Palette.white,
-                            fontSize: 12)),
+                            )),
                   ),
                 ),
               ],

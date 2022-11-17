@@ -76,7 +76,9 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                // Container(margin:EdgeInsets.only(top:40, left: 50),width: 1,height: 520, color:Palette.greyTenPer,),
                 Expanded(child: calendarBox()),
+                Container(margin:EdgeInsets.only(top:40,right:40),width: 1,height: 520, color:Palette.greyTenPer,),
                 Expanded(child: content()),
               ],
             ),
@@ -106,7 +108,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
   Widget content() {
     return Container(
       alignment: Alignment.topLeft,
-      padding: EdgeInsets.all(20),
+      padding: EdgeInsets.all(40),
       color: Palette.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,7 +122,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           ),
           SizedBox(height: 20),
           Text("입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
-          Divider(),
+          // Divider(),
           SizedBox(height: 20),
           Text("아이 이름"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
@@ -230,7 +232,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
 
   Widget calendarBox() {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: EdgeInsets.all(40),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,12 +243,12 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           ),
           SizedBox(height: 20),
           Text("원하시는 대면 상담 날짜를 선택해주세요."),
-          Divider(),
+          // Divider(),
           Container(
             width: 400,
             height: 400  ,
             alignment: Alignment.center,
-            margin: EdgeInsets.all(20),
+            margin: EdgeInsets.only(left:30, top:60),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
@@ -314,9 +316,9 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Oneprettynight",
+                            fontFamily: "Jalnan",
                             color: Palette.white,
-                            fontSize: 12)),
+                            )),
                   ),
                 ),
               ],
@@ -445,6 +447,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
 
   Widget mobileCalendarBox() {
     return Container(
+      alignment: Alignment.center,
       padding: EdgeInsets.all(20),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -458,8 +461,8 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           Text("원하시는 대면 상담 날짜를 선택해주세요."),
           Divider(),
           Container(
-            width: 300,
-            height: 300  ,
+            width: 400,
+            height: 400  ,
             alignment: Alignment.center,
             margin: EdgeInsets.all(20),
             decoration: BoxDecoration(

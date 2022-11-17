@@ -163,19 +163,22 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
           SizedBox(
             height: 20,
           ),
-          Text("GLEAM ISLAND 어학원",
+          Text("GLEAM ISLAND 어학원만의 New Zealand 현지 체험 프로그램",
               style: TextStyle(
-                  fontFamily: "Jalnan", fontSize: 15, color: Palette.mainLime)),
+                  fontFamily: "Jalnan",
+                  fontSize: 15,
+                  color: Palette.mainMediumPurple)),
           SizedBox(
             height: 20,
           ),
-          Text(
-              "Gi English 키즈카페 Gi 글림아일랜드 영어키즈카페는 Gi 글림아일랜드 어학원 과 협업하여 프로그램의 전문성을 더하고, \n"
-              "아이들이 놀이를 통해 재밌게 영어를 접할 수 있는 복합놀이문화공간입니다.  \n"
-              "Storytelling, Creative Arts, Visual Contents 등 다양한 프리미엄 놀이 프로그램을 제공하며,  \n"
-              "원어민과의 interaction을 통해 아이들이 자연스럽게 영어로 소통할 수 있도록 하였습니다.  \n"
-              "또한 소수 정예 예약제를 도입하여 프로그램의 집중도를 높였으며,  \n"
-              "동행한 보호자에게도 쾌적한 공간과 휴식 시간을 제공합니다."),
+          Text("뻔하고 지루한 방학 특강 프로그램,\n"
+              "여기 저기서 많이 들어 보고 시켜도 봤지만, 큰 효과를 얻지 못하셨죠?\n"
+              "글림아일랜드는 파격적인 뉴질랜드 현지 공립학교 체험 프로그램을 도입하여, \n"
+              "현지 코디네이터와 협업하여, 매 년 아이들이 최상의 방학 프로그램을 즐길 수 있도록 지원합니다!\n"
+              "뉴질랜드 에듀케이션 '공식' 에이전트인 믿을만한 현지 코디네이터 '비전유학'과 함께하는 알차고 재미있는 현지 영어 체험!\n"
+              "공부도 활동도 놓치지 않는 글림아일랜드만의 방학 프로그램! 그 어떤 교육보다 유익하면서도 아이들에게는 잊지 못할 추억을 선사해드립니다!  ,\n"
+              "(자세한 내용은 'NZ 연계 프로그램' 페이지를 참고하세요!^^)"
+              ),
         ],
       ),
     );
@@ -228,9 +231,9 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Oneprettynight",
+                            fontFamily: "Jalnan",
                             color: Palette.white,
-                            fontSize: 12)),
+                            )),
                   ),
                 ),
               ],

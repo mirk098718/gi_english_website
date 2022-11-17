@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/pages/School1on1Page.dart';
 import 'package:gi_english_website/pages/SchoolAllDayPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
@@ -26,7 +25,6 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
     ButtonState("올데이케어", BehaviorColor.colorOnDefault, SchoolAllDayPage()),
     ButtonState("방학캠프", BehaviorColor.colorOnClick, SchoolCampPage()),
     ButtonState("NZ연계프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
-    ButtonState("1on1 프로그램", BehaviorColor.colorOnDefault, School1on1Page()),
 
   ];
   @override
@@ -212,9 +210,9 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Oneprettynight",
+                            fontFamily: "Jalnan",
                             color: Palette.white,
-                            fontSize: 12)),
+                            )),
                   ),
                 ),
 

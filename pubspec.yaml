@@ -33,6 +33,7 @@ dependencies:
   firebase_core: ^1.22.0
   cloud_firestore: ^3.4.8
   firebase_auth: ^3.10.0
+  webview_flutter: ^3.0.4
 
 dev_dependencies:
   flutter_test:
@@ -94,6 +95,14 @@ flutter:
      - assets/giAppBannerFinal.png
      - assets/giKidsWeekendLogo.png
      - assets/mobileLoginButton.png
+     - assets/map.jpg
+     - assets/whyChooseNzClip.png
+     - assets/schoolList.png
+     - assets/schoolSelection.png
+     - assets/whyNz.png
+     - assets/whyTauranga.png
+     - assets/whyTaurangaClipWeb.png
+
 
 
 
