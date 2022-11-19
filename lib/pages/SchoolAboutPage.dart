@@ -135,7 +135,7 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
           SizedBox(
             height: 20,
           ),
-          Text(
+          Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
               "GLEAM ISLAND 란 반짝이는 섬 이라는 뜻으로 오세아니아의 아름다운 섬 뉴질랜드의 교육 철학과 정신을 컨셉트로 한 이름입니다. \n"
               "자유로운 탐구와 적극적인 토론, Creative learning 을 기반으로 하여, 뉴질랜드와 호주 등 오세아니아 국가들은 아이들이 \n"
               "무한히 창의적인 발상을 할 수 있도록 가르치며, 지루하고 틀에 박힌 주입식 교육 시스템에서 벗어나, 반짝이는 아이디어를 마음껏 \n"
@@ -149,11 +149,12 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
               style: TextStyle(
                   fontFamily: "Jalnan",
                   fontSize: 15,
-                  color: Palette.mainMediumPurple)),
+                  color: Palette.deepGreen)),
           SizedBox(
             height: 20,
           ),
-          Text("Gi 글림아일랜드 어학원은,\n"
+          Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
+              "Gi 글림아일랜드 어학원은,\n"
               "* 영어의 Fundamental을 확립할 Gi Grammar 프로그램,\n"
               "* 적극적 의사표현력을 습득할  Gi Discussion 프로그램,\n"
               "* 풍부한 스피킹 표현력을 배울 Gi Expression 프로그램, \n"
@@ -167,16 +168,17 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
               style: TextStyle(
                   fontFamily: "Jalnan",
                   fontSize: 15,
-                  color: Palette.mainMediumPurple)),
+                  color: Palette.deepGreen)),
           SizedBox(
             height: 20,
           ),
-          Text("뻔하고 지루한 방학 특강 프로그램,\n"
+          Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
+              "뻔하고 지루한 방학 특강 프로그램,\n"
               "여기 저기서 많이 들어 보고 시켜도 봤지만, 큰 효과를 얻지 못하셨죠?\n"
               "글림아일랜드는 파격적인 뉴질랜드 현지 공립학교 체험 프로그램을 도입하여, \n"
               "현지 코디네이터와 협업하여, 매 년 아이들이 최상의 방학 프로그램을 즐길 수 있도록 지원합니다!\n"
               "뉴질랜드 에듀케이션 '공식' 에이전트인 믿을만한 현지 코디네이터 '비전유학'과 함께하는 알차고 재미있는 현지 영어 체험!\n"
-              "공부도 활동도 놓치지 않는 글림아일랜드만의 방학 프로그램! 그 어떤 교육보다 유익하면서도 아이들에게는 잊지 못할 추억을 선사해드립니다!  ,\n"
+              "공부도 활동도 놓치지 않는 글림아일랜드만의 방학 프로그램! 그 어떤 교육보다 유익하면서도 아이들에게는 잊지 못할 추억을 선사해드립니다!\n"
               "(자세한 내용은 'NZ 연계 프로그램' 페이지를 참고하세요!^^)"
               ),
         ],

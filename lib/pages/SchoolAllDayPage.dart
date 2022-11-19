@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/pages/SchoolCampPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
@@ -23,7 +22,6 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
   List<ButtonState> buttonStateList = [
     ButtonState("정규프로그램", BehaviorColor.colorOnDefault, SchoolProgramPage()),
     ButtonState("올데이케어", BehaviorColor.colorOnClick, SchoolAllDayPage()),
-    ButtonState("방학캠프", BehaviorColor.colorOnDefault, SchoolCampPage()),
     ButtonState("NZ연계프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
 
 
@@ -138,36 +136,48 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
           ),
           Text(
             "운영시간",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),
               "오후 3시 ~ 오후 6시 까지 (6시 이전 픽업 가능)"),
           SizedBox(
             height: 20,
           ),
           Text(
             "대상",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),
               "3시에 수업을 마치는 본원 유치부 학생, 학부모님 픽업이 가능한 시간까지 돌봄 서비스"),
           SizedBox(
             height: 20,
           ),
           Text(
             "프로그램",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),
               "영어로 진행되는 다양한 놀이 수업:\n"
                   "1. Origami : 영어 종이접기 놀이 수업\n"
                   "2. Golf : 안전한 유아용 골프채 이용 간단한 골프 기초 놀이 수업\n"

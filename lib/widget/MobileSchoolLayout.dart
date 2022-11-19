@@ -6,7 +6,6 @@ import 'package:gi_english_website/pages/SchoolCurriculumElePage.dart';
 import 'package:gi_english_website/pages/SchoolMainPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
-import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
 
@@ -50,7 +49,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
     return Stack(children: [
       Container(
         height: widget.height,
-        color: Palette.mainPurple,
+        color: Palette.deepGreen,
       ),
       Container(
         padding: EdgeInsets.only(top: 10),
@@ -75,7 +74,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
       Container(
         height: widget.height,
         padding: EdgeInsets.only(left: 5, right: 5),
-        color: Palette.mainPurple,
+        color: Palette.deepGreen,
       ),
       SizedBox(width: 30,),
       Container(
@@ -86,56 +85,59 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              InkWell(
-                child: Container(
-                    margin: EdgeInsets.only(left: 10, top: 10, bottom: 5),
-                    width:30, height: 30, child: Image.asset("assets/mobileLoginButton.png")),
-                onTap: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                            title: Text("로그인", textAlign: TextAlign.center,),
-                            content: Container(
-                              width: 280,
-                              height: 240,
-                              child: Column(
-                                children: [
-                                  Divider(),
-                                  SizedBox(height: 10),
-                                  Expanded(
-                                    child: MyWidget.roundEdgeTextField(
-                                        "ID를 입력해주세요", idController),
-                                  ),
-                                  Expanded(
-                                    child: MyWidget.roundEdgeTextField(
-                                        "Password를 입력해주세요", pwController),
-                                  ),
-                                  SizedBox(height: 10),
-                                  Container(
-                                    width: 150,
-                                    height: 50,
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        primary: Palette.mainMediumPurple,
-                                        onPrimary: Palette.black,),
-                                      onPressed: () {},
-                                      child: Text("Login", style: TextStyle(fontFamily: "Jalnan"),),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ));
-                      });
-                },
-              ),
+              // InkWell(
+              //   child:
+              //   Container(
+              //       margin: EdgeInsets.only(left: 10, top: 10, bottom: 5),
+              //       width:30, height: 30, child: Image.asset("assets/mobileLoginButton.png")),
+              //   onTap: () {
+              //     showDialog(
+              //         context: context,
+              //         builder: (context) {
+              //           return AlertDialog(
+              //               title: Text("로그인", textAlign: TextAlign.center,),
+              //               content: Container(
+              //                 width: 280,
+              //                 height: 240,
+              //                 child: Column(
+              //                   children: [
+              //                     Divider(),
+              //                     SizedBox(height: 10),
+              //                     Expanded(
+              //                       child: MyWidget.roundEdgeTextField(
+              //                           "ID를 입력해주세요", idController),
+              //                     ),
+              //                     Expanded(
+              //                       child: MyWidget.roundEdgeTextField(
+              //                           "Password를 입력해주세요", pwController),
+              //                     ),
+              //                     SizedBox(height: 10),
+              //                     Container(
+              //                       width: 150,
+              //                       height: 50,
+              //                       child: ElevatedButton(
+              //                         style: ElevatedButton.styleFrom(
+              //                           primary: Palette.mainMediumPurple,
+              //                           onPrimary: Palette.black,),
+              //                         onPressed: () {},
+              //                         child: Text("Login", style: TextStyle(fontFamily: "Jalnan"),),
+              //                       ),
+              //                     )
+              //                   ],
+              //                 ),
+              //               ));
+              //         });
+              //   },
+              // ),
               SizedBox(width: 30),
               InkWell(
                 onTap: (){MenuUtil.push(context, SchoolAboutPage());},
                 child: Container(
                     height: widget.height,
                     alignment: Alignment.center,
-                    child: Text("About Gi어학원",style: TextStyle(color: Palette.white, fontWeight: FontWeight.bold),),),),
+                    child: Text("About GI",style: TextStyle(color: Palette.white,
+                        fontFamily: "Jalnan",
+                        fontSize: 13),),),),
               SizedBox(width: 30),
               InkWell(
                   onTap: (){MenuUtil.push(context, SchoolProgramPage());},
@@ -143,7 +145,10 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                   Container(
                     height: widget.height,
                     alignment: Alignment.center,
-                    child: Text("Program",style: TextStyle(color: Palette.white, fontWeight: FontWeight.bold),),),),
+                    child: Text("Program",style: TextStyle(color: Palette.white,
+                        fontFamily: "Jalnan",
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13),),),),
               SizedBox(width: 30),
               InkWell(
                 onTap: (){MenuUtil.push(context, SchoolCurriculumElePage());},
@@ -151,7 +156,10 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                    Container(
                        height: widget.height,
                        alignment: Alignment.center,
-                       child: Text("Curriculum",style: TextStyle(color: Palette.white, fontWeight: FontWeight.bold),)),),
+                       child: Text("Curriculum",style: TextStyle(color: Palette.white,
+                           fontFamily: "Jalnan",
+                           fontWeight: FontWeight.bold,
+                           fontSize: 13),)),),
               SizedBox(width: 30),
               InkWell(
                   onTap: (){MenuUtil.push(context, SchoolCommunityNoticePage());},
@@ -159,7 +167,10 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                   Container(
                       height: widget.height,
                       alignment: Alignment.center,
-                      child: Text("Community",style: TextStyle(color: Palette.white, fontWeight: FontWeight.bold),)),),
+                      child: Text("Community",style: TextStyle(color: Palette.white,
+                          fontFamily: "Jalnan",
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13),)),),
               SizedBox(width: 30),
             ],
           ),

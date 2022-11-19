@@ -9,8 +9,6 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
-import 'SchoolCommunityFAQPage.dart';
-
 class SchoolCommunityNoticePage extends StatefulWidget {
   const SchoolCommunityNoticePage({Key? key}) : super(key: key);
 
@@ -24,9 +22,15 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
     ButtonState("Notice Board", BehaviorColor.colorOnClick, SchoolCommunityNoticePage()),
     ButtonState("Gallery", BehaviorColor.colorOnDefault, SchoolGalleryPage()),
     ButtonState("입학상담", BehaviorColor.colorOnDefault, SchoolConsultationPage()),
-    ButtonState("FAQ", BehaviorColor.colorOnDefault, SchoolCommunityFAQPage()),
-
   ];
+
+  List<NoticeBoardEntry> noticeBoardEntryList = [
+    NoticeBoardEntry("3","2023 글림아일랜드 유,초등부 원생 대모집! 1~2월 중 수시",  BehaviorColor.colorOnDefault),
+    NoticeBoardEntry("2","글림아일랜드 어학원 ", BehaviorColor.colorOnDefault),
+    NoticeBoardEntry("1","2023 글림아일랜드 유,초등부 원생 대모집!", BehaviorColor.colorOnDefault),
+  ];
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -127,8 +131,62 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
           ),
           Divider(),
           SizedBox(height: 20,),
-          Container(width: 600,height: 600, child: Text("게시판 필요"),)
+          bulletinBoard()
         ],
+      ),
+    );
+  }
+
+  Widget bulletinBoard(){
+
+    List<Widget> children = [];
+    for (int i = 0; i < noticeBoardEntryList.length; i++) {
+      NoticeBoardEntry noticeBoardEntry = noticeBoardEntryList[i];
+
+      bool isFirst = (i == 0);
+      bool isLast = (i == noticeBoardEntryList.length - 1);
+
+      Widget child;
+      if (isFirst) {
+        child = MyWidget.boardEntryTop(noticeBoardEntry.color,noticeBoardEntry.entryNumber,noticeBoardEntry.title);
+      } else if (isLast) {
+        //last
+        child = MyWidget.boardEntryBottom(noticeBoardEntry.color,noticeBoardEntry.entryNumber,noticeBoardEntry.title);
+      } else {
+        child = MyWidget.boardEntryMiddle(noticeBoardEntry.color,noticeBoardEntry.entryNumber,noticeBoardEntry.title);
+      }
+
+      children.add(InkWell(
+        child: child,
+        onHover: (value) {
+          noticeBoardEntry.color = value
+              ? BehaviorColor.colorOnHover
+              : (i == 0
+              ? BehaviorColor.colorOnDefault
+              : BehaviorColor.colorOnDefault);
+          setState(() {});
+        },
+        onTap: (){}
+      ));
+
+      if (!isLast) {
+        children.add(Divider(height: 1));
+      }
+
+    }
+    return Container(
+      padding: EdgeInsets.all(20),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            width: 1,
+            color: Palette.black,
+          ),
+        ),
+        child: Column(
+          children: children,
+        ),
       ),
     );
   }

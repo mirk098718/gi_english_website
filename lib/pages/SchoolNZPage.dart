@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolAllDayPage.dart';
-import 'package:gi_english_website/pages/SchoolCampPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
 import 'package:gi_english_website/pages/WhyChooseNzWeb.dart';
@@ -28,7 +27,6 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
   List<ButtonState> buttonStateList = [
     ButtonState("정규프로그램", BehaviorColor.colorOnDefault, SchoolProgramPage()),
     ButtonState("올데이케어", BehaviorColor.colorOnDefault, SchoolAllDayPage()),
-    ButtonState("방학캠프", BehaviorColor.colorOnDefault, SchoolCampPage()),
     ButtonState("NZ연계프로그램", BehaviorColor.colorOnClick, SchoolNZPage()),
 
   ];
@@ -145,27 +143,35 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           ),
           Text(
             "운영기간",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 15,color: Palette.deepGreen),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),
               "여름방학 / 겨울방학 기간 동안 뉴질랜드 공립학교에서 직접 수업을 들으며 원어민 친구들을 사귈 수 있는 단기 2주 또는 4주 코스."),
           SizedBox(
             height: 20,
           ),
           Text(
             "대상",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),
               "뉴질랜드 현지 단기 (2주~4주) 어학연수 코스를 경험하고 싶은 본원 초등부 학생과 학부모. 조기 유학은 부담스럽고, 단기 여행으로는 큰 영어 습득의 효과를 얻을 수 없기에, 적절한 기간의 단기 연수를 주기적으로 체험하고 싶은 학생과 학부모."),
           SizedBox(
-            height: 20,
+            height: 40,
           ),
           Text(
             "왜 뉴질랜드인가?",
@@ -182,7 +188,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           ),
           Image.asset("assets/whyNz.png"),
           SizedBox(
-            height: 20,
+            height: 40,
           ),
           Text(
             "왜 타우랑가인가?",
@@ -201,7 +207,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
             height: 20,
           ),
           SizedBox(
-            height: 20,
+            height: 40,
           ),
           Text(
             "학교 선택 기준",
@@ -210,7 +216,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           Divider(),
           Image.asset("assets/schoolSelection.png"),
           SizedBox(
-            height: 20,
+            height: 40,
           ),
           Text(
             "학교 리스트",

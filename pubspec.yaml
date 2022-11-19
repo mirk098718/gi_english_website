@@ -71,8 +71,6 @@ flutter:
      - assets/giAppBanner.png
      - assets/giAppBannerArrow.png
      - assets/giAppBannerBlue.png
-     - assets/arrowLime.png
-     - assets/arrowViolet.png
      - assets/snsArrow.png
      - assets/giAppDownload.png
      - assets/mobileBallPoolImage.png
@@ -102,6 +100,8 @@ flutter:
      - assets/whyNz.png
      - assets/whyTauranga.png
      - assets/whyTaurangaClipWeb.png
+     - assets/mainGateImageFinal.png
+     - assets/mainGateImageLightBlue.png
 
 
 
@@ -129,6 +129,14 @@ flutter:
         - asset: assets/fonts/NotoSansKR-Medium.otf
         - asset: assets/fonts/NotoSansKR-Bold.otf
 
+    - family: MaruBuri
+      fonts:
+        - asset: assets/fonts/MaruBuri-ExtraLight.otf
+        - asset: assets/fonts/MaruBuri-Light.otf
+        - asset: assets/fonts/MaruBuri-Regular.otf
+        - asset: assets/fonts/MaruBuri-SemiBold.otf
+        - asset: assets/fonts/MaruBuri-Bold.otf
+
     - family: Jalnan
       fonts:
         - asset: assets/fonts/Jalnan-Regular.otf
@@ -153,7 +161,9 @@ flutter:
       fonts:
         - asset: assets/fonts/Oneprettynight.ttf
 
-
+    - family: Cafe24Syongsyong
+      fonts:
+        - asset: assets/fonts/Cafe24Syongsyong.ttf
 
 
   #   - family: Schyler

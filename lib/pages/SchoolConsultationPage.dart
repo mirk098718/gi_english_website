@@ -13,7 +13,6 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../class/SchoolVisitor.dart';
 import '../util/DialogUtil.dart';
-import 'SchoolCommunityFAQPage.dart';
 import 'SchoolCommunityNoticePage.dart';
 import 'SchoolGalleryPage.dart';
 
@@ -36,7 +35,6 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
     ButtonState("Notice Board", BehaviorColor.colorOnDefault, SchoolCommunityNoticePage()),
     ButtonState("Gallery", BehaviorColor.colorOnDefault, SchoolGalleryPage()),
     ButtonState("입학상담", BehaviorColor.colorOnClick, SchoolConsultationPage()),
-    ButtonState("FAQ", BehaviorColor.colorOnDefault, SchoolCommunityFAQPage()),
   ];
 
   @override
@@ -121,34 +119,62 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
             ),
           ),
           SizedBox(height: 20),
-          Text("입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),"입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
           // Divider(),
           SizedBox(height: 20),
-          Text("아이 이름"),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),"아이 이름"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.childName = text;
           }),
           SizedBox(height: 20),
-          Text("보호자님 성함"),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),"보호자님 성함"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.parentName = text;
           }),
           SizedBox(height: 20),
-          Text("보호자님 연락처"),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),"보호자님 연락처"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.parentNumber = text;
           }),
           SizedBox(height: 20),
-          Text("아이 연령"),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),"아이 연령"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.childAge = int.tryParse(text)??0;
           }),
           SizedBox(height: 20),
-          Text("아이 레벨"),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),"아이 레벨"),
           Divider(),
           levelRadio(),
           SizedBox(height: 20),
-          Text("전화상담 희망시간"),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),"전화상담 희망시간"),
           Divider(),
           timeRadio(),
           SizedBox(height: 20),
@@ -175,38 +201,66 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
             ),
           ),
           SizedBox(height: 20),
-          Text("입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),"입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
           Divider(),
           SizedBox(height: 20),
-          Text("아이 이름"),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),"아이 이름"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.childName = text;
           }),
           SizedBox(height: 20),
-          Text("보호자님 성함"),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),"보호자님 성함"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.parentName = text;
           }),
           SizedBox(height: 20),
-          Text("보호자님 연락처"),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),"보호자님 연락처"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.parentNumber = text;
           }),
           SizedBox(height: 20),
-          Text("아이 연령"),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),"아이 연령"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.childAge = int.tryParse(text)??0;
           }),
           SizedBox(height: 20),
-          Text("아이 레벨"),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),"아이 레벨"),
           Divider(),
           levelRadio(),
           SizedBox(height: 20),
-          Text("전화상담 희망시간"),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),"전화상담 희망시간"),
           Divider(),
           timeRadio(),
           SizedBox(height: 20),
-          mobileSubmitButton(),
+          submitButton(),
           SizedBox(height: 20),
         ],
       ),
@@ -242,7 +296,11 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           SizedBox(height: 20),
-          Text("원하시는 대면 상담 날짜를 선택해주세요."),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),"원하시는 대면 상담 날짜를 선택해주세요."),
           // Divider(),
           Container(
             width: 400,
@@ -458,7 +516,11 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           SizedBox(height: 20),
-          Text("원하시는 대면 상담 날짜를 선택해주세요."),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),"원하시는 대면 상담 날짜를 선택해주세요."),
           Divider(),
           Container(
             width: 400,
@@ -577,23 +639,6 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
     );
   }
 
-  Widget mobileSubmitButton() {
-    return Container(
-        // alignment: Alignment.center,
-        width: 150,
-        height: 50,
-        child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              primary: Palette.mainPurple,
-              onPrimary: Palette.black,
-            ),
-            child: Text(
-              "상담예약",
-              style: TextStyle(fontFamily: "Jalnan", color: Palette.white),
-            ),
-            onPressed: s.submitButtonPressed)
-    );
-  }
 }
 
 class SchoolConsultationPageService {

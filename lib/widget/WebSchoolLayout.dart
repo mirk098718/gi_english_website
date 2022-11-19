@@ -17,7 +17,6 @@ import 'package:gi_english_website/pages/SchoolProgramPage.dart';
 import 'package:gi_english_website/pages/SchoolSystemPage.dart';
 import 'package:gi_english_website/pages/SchoolTeachersPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
-import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
 
@@ -175,7 +174,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
     return Stack(children: [
       Container(
         height: widget.height,
-        padding: EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
+        padding: EdgeInsets.only(top: 6, bottom: 4, left: 10, right: 10),
         color: Palette.white,
       ),
 
@@ -188,33 +187,46 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
           children: [
             InkWell(
               onTap: (){MenuUtil.push(context, SchoolAboutPage());},
-              child: Text("About", style: TextStyle(fontFamily: "Cafe24Behappy",
-              fontSize: 12, color: Palette.earth),)
+              child: Text("About",
+                style: TextStyle(color: Palette.earth,
+                    fontFamily: "MaruBuri",
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13),
+              ),
             ),
+
             SizedBox(width: 20),
             InkWell(
                 onTap: (){MenuUtil.push(context, SchoolProgramPage());},
-                child: Text("Program", style: TextStyle(fontFamily: "Cafe24Behappy",
-                    fontSize: 12, color: Palette.earth),)
+                child: Text("Program",
+                  style: TextStyle(color: Palette.earth,
+                      fontFamily: "MaruBuri",
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13),
+                )
             ),
             SizedBox(width: 20),
             InkWell(
                 onTap: (){MenuUtil.push(context, SchoolCurriculumKindyPage());},
-                child: Text("Curriculum", style: TextStyle(fontFamily: "Cafe24Behappy",
-                    fontSize: 12, color: Palette.earth),)
+                child: Text("Curriculum", style: TextStyle(color: Palette.earth,
+                    fontFamily: "MaruBuri",
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13),)
             ),
             SizedBox(width: 20),
             InkWell(
                 onTap: (){MenuUtil.push(context, SchoolCommunityNoticePage());},
-                child: Text("Community", style: TextStyle(fontFamily: "Cafe24Behappy",
-                    fontSize: 12, color: Palette.earth),)
+                child: Text("Community", style: TextStyle(color: Palette.earth,
+                    fontFamily: "MaruBuri",
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13),)
             ),
-            SizedBox(width: 60)
+            SizedBox(width: 20)
           ],
         ),
       ),
       Container(
-        padding: EdgeInsets.only(top: 4 ),
+        padding: EdgeInsets.only(top: 5 ),
         width: 300,
         alignment: Alignment.topLeft,
         child:
@@ -225,54 +237,54 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
               },
             ),
         ),
-      Positioned(
-        right:5, top: 5,
-        child: Container(
-          alignment: Alignment.topRight,
-          padding: EdgeInsets.only(top: 5, bottom: 5, right: 10),
-          child:InkWell(
-            child: Container(width:30, height: 30, child: Image.asset("assets/loginButton.png")),
-            onTap: () {
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                        title: Text("로그인", textAlign: TextAlign.center,),
-                        content: Container(
-                          width: 280,
-                          height: 240,
-                          child: Column(
-                            children: [
-                              Divider(),
-                              SizedBox(height: 10),
-                              Expanded(
-                                child: MyWidget.roundEdgeTextField(
-                                    "ID를 입력해주세요", idController),
-                              ),
-                              Expanded(
-                                child: MyWidget.roundEdgeTextField(
-                                    "Password를 입력해주세요", pwController),
-                              ),
-                              SizedBox(height: 10),
-                              Container(
-                                width: 150,
-                                height: 50,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Palette.mainMediumPurple,
-                                    onPrimary: Palette.black,),
-                                  onPressed: () {},
-                                  child: Text("Login", style: TextStyle(fontFamily: "Jalnan"),),
-                                ),
-                              )
-                            ],
-                          ),
-                        ));
-                  });
-            },
-          ),
-        ),
-      ),
+      // Positioned(
+      //   right:5, top: 5,
+      //   child: Container(
+      //     alignment: Alignment.topRight,
+      //     padding: EdgeInsets.only(top: 5, bottom: 5, right: 10),
+      //     child:InkWell(
+      //       child: Container(width:30, height: 30, child: Image.asset("assets/loginButton.png")),
+      //       onTap: () {
+      //         showDialog(
+      //             context: context,
+      //             builder: (context) {
+      //               return AlertDialog(
+      //                   title: Text("로그인", textAlign: TextAlign.center,),
+      //                   content: Container(
+      //                     width: 280,
+      //                     height: 240,
+      //                     child: Column(
+      //                       children: [
+      //                         Divider(),
+      //                         SizedBox(height: 10),
+      //                         Expanded(
+      //                           child: MyWidget.roundEdgeTextField(
+      //                               "ID를 입력해주세요", idController),
+      //                         ),
+      //                         Expanded(
+      //                           child: MyWidget.roundEdgeTextField(
+      //                               "Password를 입력해주세요", pwController),
+      //                         ),
+      //                         SizedBox(height: 10),
+      //                         Container(
+      //                           width: 150,
+      //                           height: 50,
+      //                           child: ElevatedButton(
+      //                             style: ElevatedButton.styleFrom(
+      //                               primary: Palette.mainMediumPurple,
+      //                               onPrimary: Palette.black,),
+      //                             onPressed: () {},
+      //                             child: Text("Login", style: TextStyle(fontFamily: "Jalnan"),),
+      //                           ),
+      //                         )
+      //                       ],
+      //                     ),
+      //                   ));
+      //             });
+      //       },
+      //     ),
+      //   ),
+      // ),
     ],
     );
   }

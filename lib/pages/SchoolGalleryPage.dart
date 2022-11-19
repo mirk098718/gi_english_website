@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/pages/SchoolCommunityFAQPage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
@@ -23,7 +22,6 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
     ButtonState("Notice Board", BehaviorColor.colorOnDefault, SchoolCommunityNoticePage()),
     ButtonState("Gallery", BehaviorColor.colorOnClick,SchoolGalleryPage()),
     ButtonState("입학상담", BehaviorColor.colorOnDefault,SchoolConsultationPage()),
-    ButtonState("FAQ", BehaviorColor.colorOnDefault, SchoolCommunityFAQPage()),
   ];
 
   @override

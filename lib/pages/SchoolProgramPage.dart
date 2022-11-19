@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolAllDayPage.dart';
-import 'package:gi_english_website/pages/SchoolCampPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
@@ -22,7 +21,6 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
   List<ButtonState> buttonStateList = [
     ButtonState("정규프로그램", BehaviorColor.colorOnClick, SchoolProgramPage()),
     ButtonState("올데이케어", BehaviorColor.colorOnDefault, SchoolAllDayPage()),
-    ButtonState("방학캠프", BehaviorColor.colorOnDefault, SchoolCampPage()),
     ButtonState("NZ연계프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
   ];
 
@@ -131,7 +129,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                     children: [
                       Text(
                         "유치부",
-                        style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+                        style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
                       ),
                       Container(
                         margin: EdgeInsets.only(top: 5),
@@ -152,7 +150,12 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                           SizedBox(
                             height: 10,
                           ),
-                          Text("오전 9.15 ~ 오후 3시\n"
+                          Text(style: TextStyle(
+                              color: Palette.black,
+                              fontFamily: "MaruBuri",
+                              fontWeight: FontWeight.normal,
+                              fontSize: 12),
+                              "오전 9.15 ~ 오후 3시\n"
                               "(자세한 시간표는 커리큘럼 참조)"),
                           SizedBox(
                             height: 10,
@@ -165,7 +168,12 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                           SizedBox(
                             height: 10,
                           ),
-                          Text("5세 7세 미취학 유아"),
+                          Text(style: TextStyle(
+                              color: Palette.black,
+                              fontFamily: "MaruBuri",
+                              fontWeight: FontWeight.normal,
+                              fontSize: 12),
+                              "5세 7세 미취학 유아"),
                         ],
                       )
                     ],
@@ -178,7 +186,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                     children: [
                       Text(
                         "초등부",
-                        style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+                        style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
                       ),
                       Container(
                         margin: EdgeInsets.only(top: 5),
@@ -201,7 +209,12 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                           SizedBox(
                             height: 10,
                           ),
-                          Text("오후 3.10 ~ 오후 7시\n"
+                          Text(style: TextStyle(
+                              color: Palette.black,
+                              fontFamily: "MaruBuri",
+                              fontWeight: FontWeight.normal,
+                              fontSize: 12),
+                              "오후 3.10 ~ 오후 7시\n"
                               "(자세한 시간표는 커리큘럼 참조)"),
                           SizedBox(
                             height: 10,
@@ -214,7 +227,12 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                           SizedBox(
                             height: 10,
                           ),
-                          Text("초등 1학년 ~ 6학년"),
+                          Text(style: TextStyle(
+                              color: Palette.black,
+                              fontFamily: "MaruBuri",
+                              fontWeight: FontWeight.normal,
+                              fontSize: 12),
+                              "초등 1학년 ~ 6학년"),
                         ],
                       )
                     ],
@@ -225,12 +243,16 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           ),
           Text(
             "프로그램 개요",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),
               "Creative Arts는 아이들이 재미있게 즐길 수 있는 다양한 아트 활동을 통해서 아이디어를 자유롭게 표현할 수 있는 시간입니다.\n"
               "영어능력뿐 아니라 창의력과 상상력을 함께 성장시킬 수 있는 놀이 프로그램입니다."),
           SizedBox(
@@ -264,7 +286,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
               children: [
                 Text(
                   "유치부",
-                  style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.mainPurple),
+                  style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
                 ),
                 Container(width: 10),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -273,7 +295,12 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                     "운영시간", style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
                   ),
                   SizedBox(height: 10),
-                  Text("오전 9.15 ~ 오후 3시\n"
+                  Text(style: TextStyle(
+                      color: Palette.black,
+                      fontFamily: "MaruBuri",
+                      fontWeight: FontWeight.normal,
+                      fontSize: 12),
+                      "오전 9.15 ~ 오후 3시\n"
                       "(자세한 시간표는 커리큘럼 참조)"),
                   SizedBox(
                     height: 10
@@ -281,12 +308,17 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                   Text(
                     "대상", style: TextStyle(fontFamily: "Jalnan", fontSize: 15)),
                   SizedBox(height: 10),
-                  Text("5세 7세 미취학 유아"),
+                  Text(style: TextStyle(
+                      color: Palette.black,
+                      fontFamily: "MaruBuri",
+                      fontWeight: FontWeight.normal,
+                      fontSize: 12),
+                      "5세 7세 미취학 유아"),
                 ]),
                 SizedBox(height: 10),
                 Divider(color: Palette.black, thickness: 2),
                 SizedBox(height: 10),
-                Text("초등부", style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.mainPurple),
+                Text("초등부", style: TextStyle(color: Palette.deepGreen, fontFamily: "Jalnan", fontSize: 15),
                 ),
                 Container(width: 10),
                 Column(
@@ -302,7 +334,12 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                     SizedBox(
                       height: 10,
                     ),
-                    Text("오후 3.10 ~ 오후 7시\n"
+                    Text(style: TextStyle(
+                        color: Palette.black,
+                        fontFamily: "MaruBuri",
+                        fontWeight: FontWeight.normal,
+                        fontSize: 12),
+                        "오후 3.10 ~ 오후 7시\n"
                         "(자세한 시간표는 커리큘럼 참조)"),
                     SizedBox(
                       height: 10,
@@ -314,7 +351,12 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                     SizedBox(
                       height: 10,
                     ),
-                    Text("초등 1학년 ~ 6학년"),
+                    Text(style: TextStyle(
+                        color: Palette.black,
+                        fontFamily: "MaruBuri",
+                        fontWeight: FontWeight.normal,
+                        fontSize: 12),
+                        "초등 1학년 ~ 6학년"),
                   ],
                 )
               ],
@@ -322,12 +364,16 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           ),
           Text(
             "프로그램 개요",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),
               "Creative Arts는 아이들이 재미있게 즐길 수 있는 다양한 아트 활동을 통해서 아이디어를 자유롭게 표현할 수 있는 시간입니다.\n"
               "영어능력뿐 아니라 창의력과 상상력을 함께 성장시킬 수 있는 놀이 프로그램입니다."),
           SizedBox(

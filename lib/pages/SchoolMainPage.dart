@@ -63,7 +63,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
           // borderRadius: BorderRadius.circular(10),
         ),
         child: Stack(alignment: Alignment.centerLeft, children: [
-          Image.asset("assets/cafeMainImage.png"),
+          Image.asset("assets/mainGateImageLightBlue.png"),
           Container(
             width: 500,
             padding: EdgeInsets.only(left: 20),
@@ -134,10 +134,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                             Text(
                               "소식을 SNS에서 확인하세요!",
                               textAlign: TextAlign.left,
-                              style: TextStyle(
-                                  fontFamily: "Oneprettynight",
-                                  color: Palette.mainGrey,
-                                  fontSize: 12),
+                              style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
                             ),
                             Expanded(
                               flex: 1,
@@ -145,16 +142,6 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                             ),
                           ],
                         ),
-
-                        //Image.asset("assets/snsArrow.png"),
-
-                        // Column(
-                        //         mainAxisAlignment: MainAxisAlignment.center,
-                        //         children: [
-                        //           // Text("GLEAM ISLAND",style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.mainMediumPurple,),textAlign: TextAlign.center,),
-                        //           // Text("소식을 SNS에서 \n 확인하세요!",textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
-                        //         ],
-                        //       ),
                       )),
                   Expanded(
                       flex: 1,
@@ -166,7 +153,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                               Image.asset("assets/instaLogo.png"),
                               SizedBox(height: 5),
                               MyWidget.schoolTextButton(
-                                  "인스타 바로가기", Palette.mainGrey, 12)
+                                  "인스타 바로가기", Palette.black, 12)
                             ]),
                       )),
                   Container(
@@ -185,7 +172,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                               Image.asset("assets/youtubeLogo.png"),
                               SizedBox(height: 5),
                               MyWidget.schoolTextButton(
-                                  "유투브 바로가기", Palette.mainGrey, 12)
+                                  "유투브 바로가기", Palette.black, 12)
                             ]),
                       )),
                 ],
@@ -279,13 +266,13 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   ),
                   Container(
                     padding: EdgeInsets.all(20),
-                    child: Text(
+                    child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
                         "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
                   ),
                   Divider(),
                   Container(
                     padding: EdgeInsets.all(20),
-                    child: Text(
+                    child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
                         "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
                   )
                 ],
@@ -324,13 +311,13 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   ),
                   Container(
                     padding: EdgeInsets.all(20),
-                    child: Text(
+                    child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
                         "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
                   ),
                   Divider(),
                   Container(
                     padding: EdgeInsets.all(20),
-                    child: Text(
+                    child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
                         "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
                   )
                 ],
@@ -381,24 +368,24 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
   Widget mobileMainImage() {
     return Stack(alignment: Alignment.bottomRight, children: [
       Container(child: Image.asset("assets/cafeMainImage.png")),
-      Container(
-        margin: EdgeInsets.all(20),
-        width: 150,
-        height: 40,
-        child: ElevatedButton(
-          child: Text(
-            "상담신청",
-            style: TextStyle(fontFamily: "Jalnan", color: Palette.white),
-          ),
-          onPressed: () {
-            MenuUtil.push(context, SchoolConsultationPage());
-          },
-          style: ElevatedButton.styleFrom(
-            primary: Palette.mainMediumPurple,
-            onPrimary: Palette.black,
-          ),
-        ),
-      ),
+      // Container(
+      //   margin: EdgeInsets.all(20),
+      //   width: 150,
+      //   height: 40,
+      //   child: ElevatedButton(
+      //     style: ElevatedButton.styleFrom(
+      //       primary: Palette.black,
+      //       onPrimary: Palette.black,
+      //     ),
+      //     onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+      //     child: Text("상담신청",
+      //         textAlign: TextAlign.center,
+      //         style: TextStyle(
+      //           fontFamily: "Jalnan",
+      //           color: Palette.white,
+      //         )),
+      //   ),
+      // ),
     ]);
   }
 
@@ -453,7 +440,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                     MenuUtil.push(context, SchoolConsultationPage());
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Palette.mainMediumPurple,
+                    primary: Palette.deepGreen,
                     onPrimary: Palette.black,
                   ),
                 ),
@@ -496,14 +483,14 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                 ),
                 Container(
                   padding: EdgeInsets.all(20),
-                  child: Text(
+                  child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
                       "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니\n"
                       "학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
                 ),
                 Divider(),
                 Container(
                   padding: EdgeInsets.all(20),
-                  child: Text(
+                  child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
                       "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니\n"
                       " 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
                 )
@@ -539,13 +526,13 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                 ),
                 Container(
                   padding: EdgeInsets.all(20),
-                  child: Text(
+                  child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
                       "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
                 ),
                 Divider(),
                 Container(
                   padding: EdgeInsets.all(20),
-                  child: Text(
+                  child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
                       "Gi 글림아일랜드 어학원 유치부(5세~7세) 입학설명회 2023년 2월 1일~3일 Gi 유치부 소수정예반 입학 설명회가 예정되어 있으니 학부모님들의 많은 관심과 참여 부탁드립니다! :) 입학설명회 상세 스케줄 및 예약문의: "),
                 )
               ],

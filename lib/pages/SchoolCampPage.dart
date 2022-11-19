@@ -137,25 +137,36 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
           ),
           Text(
             "운영기간",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),
               "여름방학 / 겨울방학 기간 2주 코스"),
           SizedBox(
             height: 20,
           ),
           Text(
             "대상",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 12),
               "본원 초등부 저학년 대상"),
+          SizedBox(
+            height: 150,
+          ),
 
         ],
       ),

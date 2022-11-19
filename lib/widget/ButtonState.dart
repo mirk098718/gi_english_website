@@ -19,3 +19,14 @@ class ButtonState {
 
   ButtonState(this.label, this.color, this.nextPage);
 }
+
+class NoticeBoardEntry {
+  String entryNumber;
+  String title;
+  Color color;
+
+
+  NoticeBoardEntry(this.entryNumber, this.title,this.color);
+}
+
+

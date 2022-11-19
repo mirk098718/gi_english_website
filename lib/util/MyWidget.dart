@@ -23,7 +23,7 @@ class MyWidget {
                 "사업자 등록번호 : 124234354534\n"
                 "신고번호 : 12345567888\n"
                 "Copyright ⓒ 글림아일랜드교육",
-            style: TextStyle(color: Palette.black)
+            style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
           ),
         ),
       ],
@@ -58,12 +58,15 @@ class MyWidget {
     return Stack(
       alignment: Alignment.centerLeft,
       children: [
-        Container(width: double.infinity, color: Palette.mainPurple),
+        Container(width: double.infinity, color: Palette.deepGreen),
         Container(
           padding: EdgeInsets.all(5),
           alignment: Alignment.center,
           child: Text("ⓒ 글림아일랜드교육",
-              style: TextStyle(color: Palette.white)
+            style: TextStyle(color: Palette.white,
+                fontFamily: "MaruBuri",
+                fontWeight: FontWeight.bold,
+                fontSize: 12),
           ),
         ),
       ],
@@ -92,7 +95,8 @@ class MyWidget {
   static Widget roundEdgeTextFieldVisitorVer(
       {TextEditingController? controller, ValueChanged<String>? onChanged}) {
     return Container(
-      padding: EdgeInsets.only(top: 7, bottom: 7),
+      margin: EdgeInsets.only(top: 10,bottom: 10),
+      padding: EdgeInsets.only(top: 10, bottom: 10),
       width: 500,
       color: Colors.transparent,
       child: TextField(
@@ -109,7 +113,8 @@ class MyWidget {
 
   static Widget roundEdgeTextField(String hintText, TextEditingController controller, {bool obscureText=false}) {
     return Container(
-      padding: EdgeInsets.all(5),
+      margin: EdgeInsets.only(top: 20,bottom: 20),
+      padding: EdgeInsets.all(10),
       color: Colors.transparent,
       child: TextField(
         controller: controller,
@@ -140,7 +145,7 @@ class MyWidget {
     return TextButton(
       onPressed: () {},
       child: Text(text, textAlign: TextAlign.center,style: TextStyle(
-          fontFamily: "Oneprettynight", color: color, fontSize: size),),
+          fontFamily: "MaruBuri", color: color, fontSize: size),),
       style: ElevatedButton.styleFrom(
       ),
     );
@@ -182,6 +187,62 @@ class MyWidget {
           ,color: menuColor),
       child: Text(content,
         style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+
+  //게시판 세분화
+
+  static Widget boardEntryTop(Color selectedMenuColor, String entryNumber, String content) {
+    return Container(
+      padding: EdgeInsets.all(5),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10))
+        ,color: selectedMenuColor,
+      ),
+      child: Row(
+        children: [
+          Text(entryNumber),
+          SizedBox(width:30),
+          Text(
+          content, textAlign: TextAlign.center, style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        ),]
+      ),
+    );
+  }
+
+  static Widget boardEntryMiddle(Color menuColor, String entryNumber, String content) {
+    return Container(
+      padding: EdgeInsets.all(5),
+      color: menuColor,
+      alignment: Alignment.center,
+      child: Row(
+          children: [
+            Text(entryNumber),
+            SizedBox(width: 30),
+            Text(
+              content, textAlign: TextAlign.center, style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+            ),]
+      ),
+    );
+  }
+
+  static Widget boardEntryBottom(Color menuColor, String entryNumber, String content) {
+    return Container(
+      padding: EdgeInsets.all(5),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10))
+          ,color: menuColor),
+      child: Row(
+          children: [
+            Text(entryNumber),
+            SizedBox(width: 30),
+            Text(
+              content, textAlign: TextAlign.center, style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+            ),]
       ),
     );
   }

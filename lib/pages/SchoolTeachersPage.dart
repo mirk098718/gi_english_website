@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolMapPage.dart';
-import 'package:gi_english_website/pages/SchoolProgramPage.dart';
 import 'package:gi_english_website/pages/SchoolSystemPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
@@ -23,7 +23,7 @@ class SchoolTeachersPage extends StatefulWidget {
 class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
 
   List<ButtonState> buttonStateList = [
-    ButtonState("Gi글림아일랜드", BehaviorColor.colorOnDefault, SchoolProgramPage()),
+    ButtonState("Gi글림아일랜드", BehaviorColor.colorOnDefault, SchoolAboutPage()),
     ButtonState("교원소개", BehaviorColor.colorOnClick, SchoolTeachersPage()),
     ButtonState("운영시스템", BehaviorColor.colorOnDefault, SchoolSystemPage()),
     ButtonState("오시는길", BehaviorColor.colorOnDefault, SchoolMapPage()),
@@ -148,9 +148,9 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
               children: [
                 Container(alignment: Alignment.topLeft, width: 200, height: 400, child: Image.asset("assets/miaKimPhoto.jpg")),
                 SizedBox(width: 20,),
-                Text("Mia Kim \n\n"
+                Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
+                    "Mia Kim \n\n"
                     "현 Gi 글림아일랜드 어학원 파주 원장\n"
-                    "현 글림아일랜드 교육 대표\n"
                     "전 서대문구 소재 청담 에이프릴 어학원 교수부장\n"
                     "전 서대문구 소재 위즈빌 어학원 영어 유초등부 강사\n"
                     "전 하이 잉글리쉬 대기업 출강 강사 (현대케피코, 두산중공업 등)\n"
@@ -184,7 +184,8 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
               children: [
                 Container(alignment: Alignment.topLeft, width: 200, height: 400, child: Image.asset("assets/mobileSchoolMainImage.png")),
                 SizedBox(width: 20,),
-                Text("Patty Kim \n\n"
+                Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
+                    "Patty Kim \n\n"
                     "현 Gi 글림아일랜드 어학원 파주 상담실장\n"
                     "전 대한항공 국제선 커스터머 서비스 상담 업무\n"
                     "\n\n"
