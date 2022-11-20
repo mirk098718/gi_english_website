@@ -35,8 +35,8 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned(top: 102, bottom: 0, left: 0, right: 0, child: widget.content),
-          Positioned(top: 51, left: 0, right: 0, child: appBar2(context)),
+          Positioned(top: 111, bottom: 0, left: 0, right: 0, child: widget.content),
+          Positioned(top: 60, left: 0, right: 0, child: appBar2(context)),
           Positioned(top: 0, left: 0, right: 0, child: appBar1(context))
 
         ],
@@ -48,7 +48,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
   Widget appBar1(BuildContext context) {
     return Stack(children: [
       Container(
-        height: widget.height,
+        height: 60,
         color: Palette.deepGreen,
       ),
       Container(
@@ -57,7 +57,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
         alignment: Alignment.topCenter,
         child:
             InkWell(
-              child: Container(height: 40,child: Image.asset("assets/giEmblem.png")),
+              child: Container(height: 50,child: Image.asset("assets/giEmblem.png")),
               onTap: () {
                 MenuUtil.push(context, SchoolMainPage());
               },
@@ -73,7 +73,6 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
 
       Container(
         height: widget.height,
-        padding: EdgeInsets.only(left: 5, right: 5),
         color: Palette.deepGreen,
       ),
       SizedBox(width: 30,),
@@ -82,8 +81,6 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // InkWell(
               //   child:
@@ -129,7 +126,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
               //         });
               //   },
               // ),
-              SizedBox(width: 30),
+              SizedBox(width: 10),
               InkWell(
                 onTap: (){MenuUtil.push(context, SchoolAboutPage());},
                 child: Container(

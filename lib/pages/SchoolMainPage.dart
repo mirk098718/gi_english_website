@@ -80,8 +80,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
               height: 40,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: Palette.black,
-                  onPrimary: Palette.black,
+                  backgroundColor: Palette.black,
+                  foregroundColor: Palette.black,
                 ),
                 onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
                 child: Text("상담신청",
@@ -367,7 +367,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
 
   Widget mobileMainImage() {
     return Stack(alignment: Alignment.bottomRight, children: [
-      Container(child: Image.asset("assets/cafeMainImage.png")),
+      Container(child: Image.asset("assets/mainGateImageLightBlue.png")),
       // Container(
       //   margin: EdgeInsets.all(20),
       //   width: 150,
@@ -440,8 +440,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                     MenuUtil.push(context, SchoolConsultationPage());
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Palette.deepGreen,
-                    onPrimary: Palette.black,
+                    backgroundColor: Palette.deepGreen,
+                    foregroundColor: Palette.black,
                   ),
                 ),
               )
