@@ -127,7 +127,7 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
                 fontFamily: "MaruBuri",
                 fontWeight: FontWeight.normal,
                 fontSize: 12),
-                "글림아일랜드 정규유치부는 필수과목(CCSS), 창의과목(Creative Subject), 그리고 체육과목(Physical Education)의\n"
+                "글림아일랜드 정규유치부는 필수과목(Core), 창의과목(Creative Subject), 그리고 체육과목(Physical Education)의\n"
                 "균형을 맞춘 자체 커리큘럼을 100% 영어로 소화하고 있으며,아이들이 창의성을 최대한 발휘할 수 있는 재미있는 수업 방식을 채택하여 진행합니다.\n"
                 "또한 Scholastic Reading과 어린이 코딩 수업을 영어로 제공하는 Wonder Code 등 뛰어난 외부 교육프로그램 역시 적용하고 교육 효과를 극대화하고 있습니다."),
             SizedBox(height: 20),
@@ -244,8 +244,8 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.black,
-                      onPrimary: Palette.black,
+                      backgroundColor: Palette.black,
+                      foregroundColor: Palette.black,
                     ),
                     onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
                     child: Text("상담신청",
@@ -376,8 +376,8 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.black,
-                      onPrimary: Palette.black,
+                      backgroundColor: Palette.black,
+                      foregroundColor: Palette.black,
                     ),
                     onPressed: () {},
                     child: Text("상담신청",
