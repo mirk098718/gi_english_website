@@ -154,7 +154,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                               color: Palette.black,
                               fontFamily: "MaruBuri",
                               fontWeight: FontWeight.normal,
-                              fontSize: 12),
+                              fontSize: 13),
                               "오전 9.15 ~ 오후 3시\n"
                               "(자세한 시간표는 커리큘럼 참조)"),
                           SizedBox(
@@ -172,7 +172,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                               color: Palette.black,
                               fontFamily: "MaruBuri",
                               fontWeight: FontWeight.normal,
-                              fontSize: 12),
+                              fontSize: 13),
                               "5세 7세 미취학 유아"),
                         ],
                       )
@@ -213,7 +213,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                               color: Palette.black,
                               fontFamily: "MaruBuri",
                               fontWeight: FontWeight.normal,
-                              fontSize: 12),
+                              fontSize: 13),
                               "오후 3.10 ~ 오후 7시\n"
                               "(자세한 시간표는 커리큘럼 참조)"),
                           SizedBox(
@@ -231,7 +231,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                               color: Palette.black,
                               fontFamily: "MaruBuri",
                               fontWeight: FontWeight.normal,
-                              fontSize: 12),
+                              fontSize: 13),
                               "초등 1학년 ~ 6학년"),
                         ],
                       )
@@ -242,7 +242,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
             ),
           ),
           Text(
-            "프로그램 개요",
+            "유치부 프로그램 개요",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
           ),
           SizedBox(
@@ -252,9 +252,38 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),
-              "Creative Arts는 아이들이 재미있게 즐길 수 있는 다양한 아트 활동을 통해서 아이디어를 자유롭게 표현할 수 있는 시간입니다.\n"
-              "영어능력뿐 아니라 창의력과 상상력을 함께 성장시킬 수 있는 놀이 프로그램입니다."),
+              fontSize: 13),
+              "글림아일랜드의 영어 유치부 프로그램은, \n"
+              "뉴질랜드 유아 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
+                  "다양하면서도 독특한 수업을 제공합니다. 아이들을 질리게 하는 공부만을 위한 공부가 되지 않도록\n"
+                  "필수 과목 (Common Core Subjects)과 재미있는 활동, 창의 수업 (Fun Activities / Creative Subjects) 들을\n"
+                  "골고루 배치하였으며, 특히 아이들이 사회, 과학, 예술 등 다양한 영역에 대한 상식과 세상을 배울 수 있도록 어린이 영자신문을 활용한\n"
+                  "NIE Speaking 프로그램은 아이들의 영어 실력을 눈에 띄게 향상시킬 것 입니다.\n"
+                  "그 외에도, 프로그래밍적인 사고를 배울 수 있는 코딩 수업, 두뇌 발달과 재미을 동시에 잡는 체스 시간 역시\n"
+                  "타 영어유치원에서는 볼 수 없는 글림아일랜드만의 특별 프로그램이랍니다! :)"),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            "초등부 프로그램 개요",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 13),
+              "글림아일랜드의 영어 초등부 프로그램은, \n"
+                  "뉴질랜드 초등 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
+                  "다양하면서도 독특한 수업을 제공합니다. 언어 교육에 기본이 되는 리딩, 문법 수업을 통하여 기본기를 탄탄히 하되,\n"
+                  "영자 신문을 활용한 스피치, Debate 수업을 통하여 아이들이 다양한 상식을 접함과 동시에 이에 대한 본인의 생각을\n"
+                  "표현할 수 있도록 가르치며, 토론이 익숙치 않은 아이들이 효과적으로 설득력 있게 말하는 방법을 배울 것 입니다.\n"
+                  "또한 분기별로 이루어질 Speech Contest 를 통하여, 아이들이 더욱 적극적으로 목표 의식을 가지고 수업에 임할 수 있도록 합니다.\n"
+                  "글림아일랜드의 초등부 수업은 아이들이 현지 초등학교 수업에 참여할 수 있을 정도의 실용적 영어실력을 갖추게 하는 것이 목표이며,\n"
+                  "실제로 뉴질랜드 공립학교 방항 프로그램에 참여하여 현지 영어를 직접 체험할 수 있도록 합니다."),
           SizedBox(
             height: 20,
           ),
@@ -299,7 +328,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                       color: Palette.black,
                       fontFamily: "MaruBuri",
                       fontWeight: FontWeight.normal,
-                      fontSize: 12),
+                      fontSize: 13),
                       "오전 9.15 ~ 오후 3시\n"
                       "(자세한 시간표는 커리큘럼 참조)"),
                   SizedBox(
@@ -312,7 +341,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                       color: Palette.black,
                       fontFamily: "MaruBuri",
                       fontWeight: FontWeight.normal,
-                      fontSize: 12),
+                      fontSize: 13),
                       "5세 7세 미취학 유아"),
                 ]),
                 SizedBox(height: 10),
@@ -338,7 +367,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                         color: Palette.black,
                         fontFamily: "MaruBuri",
                         fontWeight: FontWeight.normal,
-                        fontSize: 12),
+                        fontSize: 13),
                         "오후 3.10 ~ 오후 7시\n"
                         "(자세한 시간표는 커리큘럼 참조)"),
                     SizedBox(
@@ -355,7 +384,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                         color: Palette.black,
                         fontFamily: "MaruBuri",
                         fontWeight: FontWeight.normal,
-                        fontSize: 12),
+                        fontSize: 13),
                         "초등 1학년 ~ 6학년"),
                   ],
                 )
@@ -363,7 +392,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
             ),
           ),
           Text(
-            "프로그램 개요",
+            "유치부 프로그램 개요",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
           ),
           SizedBox(
@@ -373,9 +402,38 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),
-              "Creative Arts는 아이들이 재미있게 즐길 수 있는 다양한 아트 활동을 통해서 아이디어를 자유롭게 표현할 수 있는 시간입니다.\n"
-              "영어능력뿐 아니라 창의력과 상상력을 함께 성장시킬 수 있는 놀이 프로그램입니다."),
+              fontSize: 13),
+              "글림아일랜드의 영어 유치부 프로그램은, \n"
+                  "뉴질랜드 유아 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
+                  "다양하면서도 독특한 수업을 제공합니다. 아이들을 질리게 하는 공부만을 위한 공부가 되지 않도록\n"
+                  "필수 과목 (Common Core Subjects)과 재미있는 활동, 창의 수업 (Fun Activities / Creative Subjects) 들을\n"
+                  "골고루 배치하였으며, 특히 아이들이 사회, 과학, 예술 등 다양한 영역에 대한 상식과 세상을 배울 수 있도록 어린이 영자신문을 활용한\n"
+                  "NIE Speaking 프로그램은 아이들의 영어 실력을 눈에 띄게 향상시킬 것 입니다.\n"
+                  "그 외에도, 프로그래밍적인 사고를 배울 수 있는 코딩 수업, 두뇌 발달과 재미을 동시에 잡는 체스 시간 역시\n"
+                  "타 영어유치원에서는 볼 수 없는 글림아일랜드만의 특별 프로그램이랍니다! :)"),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            "초등부 프로그램 개요",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 13),
+              "글림아일랜드의 영어 초등부 프로그램은, \n"
+                  "뉴질랜드 초등 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
+                  "다양하면서도 독특한 수업을 제공합니다. 언어 교육에 기본이 되는 리딩, 문법 수업을 통하여 기본기를 탄탄히 하되,\n"
+                  "영자 신문을 활용한 스피치, Debate 수업을 통하여 아이들이 다양한 상식을 접함과 동시에 이에 대한 본인의 생각을\n"
+                  "표현할 수 있도록 가르치며, 토론이 익숙치 않은 아이들이 효과적으로 설득력 있게 말하는 방법을 배울 것 입니다.\n"
+                  "또한 분기별로 이루어질 Speech Contest 를 통하여, 아이들이 더욱 적극적으로 목표 의식을 가지고 수업에 임할 수 있도록 합니다.\n"
+                  "글림아일랜드의 초등부 수업은 아이들이 현지 초등학교 수업에 참여할 수 있을 정도의 실용적 영어실력을 갖추게 하는 것이 목표이며,\n"
+                  "실제로 뉴질랜드 공립학교 방항 프로그램에 참여하여 현지 영어를 직접 체험할 수 있도록 합니다."),
           SizedBox(
             height: 20,
           ),
@@ -423,8 +481,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.black,
-                      onPrimary: Palette.black,
+                      backgroundColor: Palette.black,
+                      foregroundColor: Palette.black,
                     ),
                     onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
                     child: Text("상담신청",
@@ -560,8 +618,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.mainMediumPurple,
-                      onPrimary: Palette.black,
+                      backgroundColor: Palette.mainMediumPurple,
+                      foregroundColor: Palette.black,
                     ),
                   ),
                 ),

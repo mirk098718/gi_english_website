@@ -145,8 +145,8 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),
-              "오후 3시 ~ 오후 6시 까지 (6시 이전 픽업 가능)"),
+              fontSize: 13),
+              "오후 2시 20분 ~ 오후 6시 까지 (6시 이전 픽업 가능)"),
           SizedBox(
             height: 20,
           ),
@@ -161,8 +161,8 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),
-              "3시에 수업을 마치는 본원 유치부 학생, 학부모님 픽업이 가능한 시간까지 돌봄 서비스"),
+              fontSize: 13),
+              "2시에 수업을 마치는 본원 유치부 학생, 학부모님 픽업이 가능한 시간까지 돌봄 서비스"),
           SizedBox(
             height: 20,
           ),
@@ -177,10 +177,10 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),
+              fontSize: 13),
               "영어로 진행되는 다양한 놀이 수업:\n"
                   "1. Origami : 영어 종이접기 놀이 수업\n"
-                  "2. Golf : 안전한 유아용 골프채 이용 간단한 골프 기초 놀이 수업\n"
+                  "2. Mini Golf : 안전한 유아용 골프채 이용 간단한 골프 기초 놀이 수업\n"
                   "3. Media : 영상 자료를 활용한 재미있는 Theme play\n"
                   "4. Chinese : 유아를 위한 아주 쉬운 기초 중국어 놀이 수업"),
           SizedBox(
@@ -233,8 +233,8 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.black,
-                      onPrimary: Palette.black,
+                      backgroundColor: Palette.black,
+                      foregroundColor: Palette.black,
                     ),
                     onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
                     child: Text("상담신청",
@@ -371,8 +371,8 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.mainMediumPurple,
-                      onPrimary: Palette.black,
+                      backgroundColor: Palette.mainMediumPurple,
+                      foregroundColor: Palette.black,
                     ),
 
 

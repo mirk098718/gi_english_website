@@ -135,8 +135,8 @@ class MyWidget {
       child: Text(text, textAlign: TextAlign.center,style: TextStyle(
           fontFamily: "Oneprettynight", color: Palette.white, fontSize: 12),),
       style: ElevatedButton.styleFrom(
-        primary: color,
-        onPrimary: Palette.black,
+        backgroundColor: color,
+        foregroundColor: Palette.black,
       ),
     );
   }
@@ -204,10 +204,13 @@ class MyWidget {
       ),
       child: Row(
         children: [
-          Text(entryNumber),
+          SizedBox(width:20),
+          Text(entryNumber,
+              style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold, fontSize: 14)),
           SizedBox(width:30),
           Text(
-          content, textAlign: TextAlign.center, style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+          content, textAlign: TextAlign.center,
+            style: TextStyle(color: Palette.black, fontWeight: FontWeight.normal, fontSize: 14),
         ),]
       ),
     );
@@ -220,10 +223,12 @@ class MyWidget {
       alignment: Alignment.center,
       child: Row(
           children: [
-            Text(entryNumber),
+            SizedBox(width:20,),
+            Text(entryNumber,
+                style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold, fontSize: 14)),
             SizedBox(width: 30),
             Text(
-              content, textAlign: TextAlign.center, style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+              content, textAlign: TextAlign.center, style: TextStyle(color: Palette.black, fontWeight: FontWeight.normal, fontSize: 14),
             ),]
       ),
     );
@@ -238,10 +243,12 @@ class MyWidget {
           ,color: menuColor),
       child: Row(
           children: [
-            Text(entryNumber),
+            SizedBox(width:20),
+            Text(entryNumber,
+                style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold, fontSize: 14)),
             SizedBox(width: 30),
             Text(
-              content, textAlign: TextAlign.center, style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+              content, textAlign: TextAlign.center, style: TextStyle(color: Palette.black, fontWeight: FontWeight.normal, fontSize: 14),
             ),]
       ),
     );

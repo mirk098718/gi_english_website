@@ -143,6 +143,26 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
             SizedBox(
                 height: 20),
 
+            Text(
+              "NIE",
+              style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
+            ),
+
+            Divider(),
+            SizedBox(height: 20),
+            Container( alignment: Alignment.topLeft,
+                child: Row(children: [Image.asset("assets/juniorTimesLogo.png")],)),
+            SizedBox(height: 20),
+            Text(style: TextStyle(
+                color: Palette.black,
+                fontFamily: "MaruBuri",
+                fontWeight: FontWeight.normal,
+                fontSize: 13),
+                "킨더 타임즈, 키즈 타임즈, 주니어 타임즈 등 아이들의 레벨과 연령에 맞추어 다양한 영자신문을 제공하는\n"
+                    "어린이 영자 신문 전문 브랜드로, 글림아일랜드는 유치부 NIE Speaking 수업과 초등부 NIE Debate 수업을 위하여\n"
+                    "모든 레벨의 어린이 영자신문을 class material 로 적극 활용합니다."),
+            SizedBox(height: 20),
+
           ],
         ),
       ),
@@ -191,8 +211,8 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.black,
-                      onPrimary: Palette.black,
+                      backgroundColor: Palette.black,
+                      foregroundColor: Palette.black,
                     ),
                     onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
                     child: Text("상담신청",
@@ -321,8 +341,8 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.black,
-                      onPrimary: Palette.black,
+                      backgroundColor: Palette.black,
+                      foregroundColor: Palette.black,
                     ),
                     onPressed: () {},
                     child: Text("상담신청",
@@ -330,7 +350,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
                         style: TextStyle(
                             fontFamily: "Oneprettynight",
                             color: Palette.white,
-                            fontSize: 12)),
+                            fontSize: 13)),
                   ),
                 ),
               ],

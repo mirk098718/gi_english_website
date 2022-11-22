@@ -10,7 +10,6 @@ import 'package:gi_english_website/widget/EasyRadio.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-
 import '../class/SchoolVisitor.dart';
 import '../util/DialogUtil.dart';
 import 'SchoolCommunityNoticePage.dart';
@@ -273,8 +272,8 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
         height: 50,
         child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              primary: Palette.black,
-              onPrimary: Palette.black,
+              backgroundColor: Palette.black,
+              foregroundColor: Palette.black,
             ),
             child: Text(
               "상담예약",
@@ -300,7 +299,9 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),"원하시는 대면 상담 날짜를 선택해주세요."),
+              fontSize: 12),
+              // "원하시는 대면 상담 날짜를 선택해주세요."
+              "(* 현재 상담일자 선택은 불가능 : 대면 상담은 준공, 입학설명회 이후인 2023년 2월부터 가능합니다. 간단한 인적사항과 연락처를 입력해주시면 상담 가능일자에 연락드리겠습니다!)"),
           // Divider(),
           Container(
             width: 400,
@@ -367,8 +368,8 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.black,
-                      onPrimary: Palette.black,
+                      backgroundColor: Palette.black,
+                      foregroundColor: Palette.black,
                     ),
                     onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
                     child: Text("상담신청",
@@ -490,8 +491,8 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.black,
-                      onPrimary: Palette.black,
+                      backgroundColor: Palette.black,
+                      foregroundColor: Palette.black,
                     ),
                   ),
                 ),
@@ -520,7 +521,9 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),"원하시는 대면 상담 날짜를 선택해주세요."),
+              fontSize: 12),
+              // "원하시는 대면 상담 날짜를 선택해주세요."
+                  "(* 현재 상담일자 선택은 불가능 : 대면 상담은 준공, 입학설명회 이후인 2023년 2월부터 가능합니다. 간단한 인적사항과 연락처를 입력해주시면 상담 가능일자에 연락드리겠습니다!)"),
           Divider(),
           Container(
             width: 400,

@@ -25,9 +25,22 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
   ];
 
   List<NoticeBoardEntry> noticeBoardEntryList = [
-    NoticeBoardEntry("3","2023 글림아일랜드 유,초등부 원생 대모집! 1~2월 중 수시",  BehaviorColor.colorOnDefault),
+    NoticeBoardEntry("3","2023 글림아일랜드 유,초등부 원생 대모집! 1~2월 중 수시, 상담문의 전화는 곧 공개됩니다.",  BehaviorColor.colorOnDefault),
     NoticeBoardEntry("2","글림아일랜드 어학원 ", BehaviorColor.colorOnDefault),
     NoticeBoardEntry("1","2023 글림아일랜드 유,초등부 원생 대모집!", BehaviorColor.colorOnDefault),
+    NoticeBoardEntry("", "", BehaviorColor.colorOnDefault),
+    NoticeBoardEntry("", "", BehaviorColor.colorOnDefault),
+    NoticeBoardEntry("", "", BehaviorColor.colorOnDefault),
+    NoticeBoardEntry("", "", BehaviorColor.colorOnDefault),
+    NoticeBoardEntry("", "", BehaviorColor.colorOnDefault),
+    NoticeBoardEntry("", "", BehaviorColor.colorOnDefault),
+    NoticeBoardEntry("", "", BehaviorColor.colorOnDefault),
+    NoticeBoardEntry("", "", BehaviorColor.colorOnDefault),
+    NoticeBoardEntry("", "", BehaviorColor.colorOnDefault),
+    NoticeBoardEntry("", "", BehaviorColor.colorOnDefault),
+    NoticeBoardEntry("", "", BehaviorColor.colorOnDefault),
+    NoticeBoardEntry("", "", BehaviorColor.colorOnDefault),
+    NoticeBoardEntry("", "", BehaviorColor.colorOnDefault),
   ];
 
 
@@ -233,8 +246,8 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.black,
-                      onPrimary: Palette.black,
+                      backgroundColor: Palette.black,
+                      foregroundColor: Palette.black,
                     ),
                     onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
                     child: Text("상담신청",
@@ -370,8 +383,8 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.mainMediumPurple,
-                      onPrimary: Palette.black,
+                      backgroundColor: Palette.mainMediumPurple,
+                      foregroundColor: Palette.black,
                     ),
 
 
