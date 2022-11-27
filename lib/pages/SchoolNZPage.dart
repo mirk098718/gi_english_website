@@ -3,53 +3,48 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolAllDayPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
-import 'package:gi_english_website/pages/WhyChooseNzWeb.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../util/UrlIUtil.dart';
 
 class SchoolNZPage extends StatefulWidget {
   const SchoolNZPage({Key? key}) : super(key: key);
-
 
   @override
   _SchoolNZPageState createState() => _SchoolNZPageState();
 }
 
 class _SchoolNZPageState extends State<SchoolNZPage> {
-
-
-
   List<ButtonState> buttonStateList = [
     ButtonState("정규프로그램", BehaviorColor.colorOnDefault, SchoolProgramPage()),
     ButtonState("올데이케어", BehaviorColor.colorOnDefault, SchoolAllDayPage()),
     ButtonState("NZ연계프로그램", BehaviorColor.colorOnClick, SchoolNZPage()),
-
   ];
+
   @override
   Widget build(BuildContext context) {
-
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     Size size = mediaQueryData.size;
     double width = size.width;
-    if(width>768){
+    if (width > 768) {
       return desktopUi(context);
-    }
-    else{
+    } else {
       return mobileUi(context);
     }
   }
 
-  Widget desktopUi(context){
+  Widget desktopUi(context) {
     return WebSchoolLayout(content: scrollView());
   }
 
-  Widget mobileUi(context){
-    return MobileSchoolLayout(content:mobileScrollView());
+  Widget mobileUi(context) {
+    return MobileSchoolLayout(content: mobileScrollView());
   }
 
   Widget contentGroup() {
@@ -88,8 +83,8 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 3
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           print(
               "label ${buttonState.label}, selectedColorList: ${buttonState.color}");
           setState(() {});
@@ -102,7 +97,6 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
       if (!isLast) {
         children.add(Divider(height: 1));
       }
-
     }
 
     return Container(
@@ -143,32 +137,36 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           ),
           Text(
             "운영기간",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15,color: Palette.deepGreen),
+            style: TextStyle(
+                fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "MaruBuri",
-              fontWeight: FontWeight.normal,
-              fontSize: 13),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "MaruBuri",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 13),
               "여름방학 / 겨울방학 기간 동안 뉴질랜드 공립학교에서 직접 수업을 들으며 원어민 친구들을 사귈 수 있는 단기 2주 또는 4주 코스."),
           SizedBox(
             height: 20,
           ),
           Text(
             "대상",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+            style: TextStyle(
+                fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "MaruBuri",
-              fontWeight: FontWeight.normal,
-              fontSize: 13),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "MaruBuri",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 13),
               "뉴질랜드 현지 단기 (2주~4주) 어학연수 코스를 경험하고 싶은 본원 초등부 학생과 학부모. 조기 유학은 부담스럽고, 단기 여행으로는 큰 영어 습득의 효과를 얻을 수 없기에, 적절한 기간의 단기 연수를 주기적으로 체험하고 싶은 학생과 학부모."),
           SizedBox(
             height: 40,
@@ -181,7 +179,12 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           SizedBox(
             height: 20,
           ),
-          InkWell(onTap: (){MenuUtil.push(context, WhyChooseNzWeb());},
+          InkWell(
+              onTap: () {
+                launchUrl(
+                  Uri.parse('https://m.youtube.com/watch?v=Ytc6ClRRhw0'),
+                );
+              },
               child: Image.asset("assets/whyChooseNzClip.png")),
           SizedBox(
             height: 20,
@@ -198,7 +201,12 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           SizedBox(
             height: 20,
           ),
-          Image.asset("assets/whyTaurangaClipWeb.png"),
+          InkWell(
+            child: Image.asset("assets/whyTaurangaClipWeb.png"),
+            onTap: () async {
+              UrlUtil.open('https://www.youtube.com/watch?v=uT2IIPu5uuY');
+            },
+          ),
           SizedBox(
             height: 20,
           ),
@@ -227,10 +235,10 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           SizedBox(
             height: 20,
           ),
-          Text("자료 제공: 비전유학", textAlign: TextAlign.end,),
-
-
-
+          Text(
+            "자료 제공: 비전유학",
+            textAlign: TextAlign.end,
+          ),
         ],
       ),
     );
@@ -246,7 +254,6 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
         ],
       ),
     );
-
   }
 
   Widget mainImage() {
@@ -257,8 +264,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           Image.asset("assets/ballPoolImage.png"),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
-            child:
-            Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -280,25 +286,24 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
                       backgroundColor: Palette.black,
                       foregroundColor: Palette.black,
                     ),
-                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolConsultationPage());
+                    },
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Jalnan",
-                            color: Palette.white,
-                            )),
+                          fontFamily: "Jalnan",
+                          color: Palette.white,
+                        )),
                   ),
                 ),
               ],
             ),
-
           )
         ],
       ),
-
     );
   }
-
 
   //mobile
 
@@ -312,7 +317,6 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
             mobileLeftMenu(),
             content(),
             SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
-
           ],
         ),
       ),
@@ -329,12 +333,15 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
 
       Widget child;
       if (isFirst) {
-        child = MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
       } else if (isLast) {
         //last
-        child = MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
       } else {
-        child = MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
       }
 
       children.add(InkWell(
@@ -343,8 +350,8 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 3
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           setState(() {});
         },
         onTap: () {
@@ -353,9 +360,12 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
       ));
 
       if (!isLast) {
-        children.add(Container(width: 1, height: 40, color: Palette.mainLightPurple,));
+        children.add(Container(
+          width: 1,
+          height: 40,
+          color: Palette.mainLightPurple,
+        ));
       }
-
     }
 
     return Container(
@@ -408,7 +418,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
                     child: Text(
                       "상담신청",
                       style:
-                      TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
@@ -417,8 +427,6 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
                       backgroundColor: Palette.mainMediumPurple,
                       foregroundColor: Palette.black,
                     ),
-
-
                   ),
                 ),
               ],
@@ -428,5 +436,4 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
       ),
     );
   }
-
 }

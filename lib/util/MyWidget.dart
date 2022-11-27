@@ -17,12 +17,13 @@ class MyWidget {
 
           child: Text(
                 "Gi Gleam Island 어학원 파주\n"
-                "경기도 파주시 교하로 100번길 00, 태산W타워 7층\n"
-                "문의 : 031) 90049-380005  /  email : @gmail.com\n"
+                "경기도 파주시 해올1길 태산 W 타워 7층\n"
+                "문의 : 준비중, 본 웹사이트의 상담문의 페이지 또는 이메일을 이용해주세요. \n"
+                    "email : gienglish.paju@gmail.com\n"
                 "사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희\n"
-                "사업자 등록번호 : 124234354534\n"
-                "신고번호 : 12345567888\n"
-                "Copyright ⓒ 글림아일랜드교육",
+                "사업자 등록번호 : 준비중\n"
+                "신고번호 : 준비중\n"
+                "Copyright ⓒ 글림아일랜드어학원",
             style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
           ),
         ),

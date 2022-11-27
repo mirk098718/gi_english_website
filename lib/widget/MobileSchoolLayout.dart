@@ -159,7 +159,9 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                            fontSize: 13),)),),
               SizedBox(width: 30),
               InkWell(
-                  onTap: (){MenuUtil.push(context, SchoolCommunityNoticePage());},
+                  onTap: (){
+                    // MenuUtil.push(context, SchoolCommunityNoticePage());
+                    },
                   child:
                   Container(
                       height: widget.height,

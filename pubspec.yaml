@@ -33,7 +33,9 @@ dependencies:
   firebase_core: ^1.22.0
   cloud_firestore: ^3.4.8
   firebase_auth: ^3.10.0
-  webview_flutter: ^3.0.4
+  url_launcher: ^6.1.7
+  url_launcher_web: ^2.0.13
+
 
 dev_dependencies:
   flutter_test:
