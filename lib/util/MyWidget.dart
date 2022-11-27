@@ -209,10 +209,12 @@ class MyWidget {
           Text(entryNumber,
               style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold, fontSize: 14)),
           SizedBox(width:30),
-          Text(
-          content, textAlign: TextAlign.center,
-            style: TextStyle(color: Palette.black, fontWeight: FontWeight.normal, fontSize: 14),
-        ),]
+          Expanded(
+            child: Text(
+            content, textAlign: TextAlign.left,
+              style: TextStyle(color: Palette.black, fontWeight: FontWeight.normal, fontSize: 14),
+        ),
+          ),]
       ),
     );
   }
