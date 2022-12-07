@@ -22,7 +22,7 @@ class EasyRadio extends StatelessWidget {
             color: Palette.black,
             fontFamily: "MaruBuri",
             fontWeight: FontWeight.normal,
-            fontSize: 12)),
+            fontSize: 14)),
         Radio(
             value: uniqueValue, //고유값. (체크박스랑 다름)
             groupValue: myGroupValue.value, //공유값

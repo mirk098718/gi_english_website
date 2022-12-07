@@ -119,7 +119,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           Container(
             margin: EdgeInsets.only(top: 20, bottom: 20),
             // padding: EdgeInsets.all(10),
-            width: 440, color: Palette.greyTenPer,
+            width: 500, color: Palette.greyTenPer,
             child: Row(
               children: [
                 Container(
@@ -154,8 +154,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                               color: Palette.black,
                               fontFamily: "MaruBuri",
                               fontWeight: FontWeight.normal,
-                              fontSize: 13),
-                              "오전 9.15 ~ 오후 3시\n"
+                              fontSize: 14),
+                              "오전 9시 30분 ~ 오후 2시 30분\n"
                               "(자세한 시간표는 커리큘럼 참조)"),
                           SizedBox(
                             height: 10,
@@ -172,8 +172,9 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                               color: Palette.black,
                               fontFamily: "MaruBuri",
                               fontWeight: FontWeight.normal,
-                              fontSize: 13),
-                              "5세 7세 미취학 유아"),
+                              fontSize: 14),
+                              "6세~7세 (만 5세, 만 6세) \n"
+                                  "미취학 유아"),
                         ],
                       )
                     ],
@@ -213,8 +214,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                               color: Palette.black,
                               fontFamily: "MaruBuri",
                               fontWeight: FontWeight.normal,
-                              fontSize: 13),
-                              "오후 3.10 ~ 오후 7시\n"
+                              fontSize: 14),
+                              "오후 2.20 ~ 오후 7시\n"
                               "(자세한 시간표는 커리큘럼 참조)"),
                           SizedBox(
                             height: 10,
@@ -231,8 +232,9 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                               color: Palette.black,
                               fontFamily: "MaruBuri",
                               fontWeight: FontWeight.normal,
-                              fontSize: 13),
-                              "초등 1학년 ~ 6학년"),
+                              fontSize: 14),
+                              "초등학교 1학년 ~ 6학년 \n"
+                                  ""),
                         ],
                       )
                     ],
@@ -252,7 +254,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 13),
+              fontSize: 14),
               "글림아일랜드의 영어 유치부 프로그램은, \n"
               "뉴질랜드 유아 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
                   "다양하면서도 독특한 수업을 제공합니다. 아이들을 질리게 하는 공부만을 위한 공부가 되지 않도록\n"
@@ -275,7 +277,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 13),
+              fontSize: 14),
               "글림아일랜드의 영어 초등부 프로그램은, \n"
                   "뉴질랜드 초등 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
                   "다양하면서도 독특한 수업을 제공합니다. 언어 교육에 기본이 되는 리딩, 문법 수업을 통하여 기본기를 탄탄히 하되,\n"
@@ -328,8 +330,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                       color: Palette.black,
                       fontFamily: "MaruBuri",
                       fontWeight: FontWeight.normal,
-                      fontSize: 13),
-                      "오전 9.15 ~ 오후 3시\n"
+                      fontSize: 14),
+                      "오전 9시 30분 ~ 오후 2시 30분\n"
                       "(자세한 시간표는 커리큘럼 참조)"),
                   SizedBox(
                     height: 10
@@ -341,8 +343,9 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                       color: Palette.black,
                       fontFamily: "MaruBuri",
                       fontWeight: FontWeight.normal,
-                      fontSize: 13),
-                      "5세 7세 미취학 유아"),
+                      fontSize: 14),
+                      "6세~7세 (만5세~만6세) \n"
+                          "미취학 유아"),
                 ]),
                 SizedBox(height: 10),
                 Divider(color: Palette.black, thickness: 2),
@@ -367,8 +370,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                         color: Palette.black,
                         fontFamily: "MaruBuri",
                         fontWeight: FontWeight.normal,
-                        fontSize: 13),
-                        "오후 3.10 ~ 오후 7시\n"
+                        fontSize: 14),
+                        "오후 2시 20분 ~ 오후 7시\n"
                         "(자세한 시간표는 커리큘럼 참조)"),
                     SizedBox(
                       height: 10,
@@ -384,8 +387,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                         color: Palette.black,
                         fontFamily: "MaruBuri",
                         fontWeight: FontWeight.normal,
-                        fontSize: 13),
-                        "초등 1학년 ~ 6학년"),
+                        fontSize: 14),
+                        "초등학교 1학년 ~ 6학년"),
                   ],
                 )
               ],
@@ -402,7 +405,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 13),
+              fontSize: 14),
               "글림아일랜드의 영어 유치부 프로그램은, \n"
                   "뉴질랜드 유아 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
                   "다양하면서도 독특한 수업을 제공합니다. 아이들을 질리게 하는 공부만을 위한 공부가 되지 않도록\n"
@@ -425,7 +428,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 13),
+              fontSize: 14),
               "글림아일랜드의 영어 초등부 프로그램은, \n"
                   "뉴질랜드 초등 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
                   "다양하면서도 독특한 수업을 제공합니다. 언어 교육에 기본이 되는 리딩, 문법 수업을 통하여 기본기를 탄탄히 하되,\n"

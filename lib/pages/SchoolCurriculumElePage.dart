@@ -157,7 +157,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
                 color: Palette.black,
                 fontFamily: "MaruBuri",
                 fontWeight: FontWeight.normal,
-                fontSize: 13),
+                fontSize: 14),
                 "킨더 타임즈, 키즈 타임즈, 주니어 타임즈 등 아이들의 레벨과 연령에 맞추어 다양한 영자신문을 제공하는\n"
                     "어린이 영자 신문 전문 브랜드로, 글림아일랜드는 유치부 NIE Speaking 수업과 초등부 NIE Debate 수업을 위하여\n"
                     "모든 레벨의 어린이 영자신문을 class material 로 적극 활용합니다."),
@@ -350,7 +350,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
                         style: TextStyle(
                             fontFamily: "Oneprettynight",
                             color: Palette.white,
-                            fontSize: 13)),
+                            fontSize: 14)),
                   ),
                 ),
               ],

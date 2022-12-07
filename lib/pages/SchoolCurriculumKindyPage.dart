@@ -126,7 +126,7 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
                 color: Palette.black,
                 fontFamily: "MaruBuri",
                 fontWeight: FontWeight.normal,
-                fontSize: 13),
+                fontSize: 14),
                 "글림아일랜드 정규유치부는 필수과목(Core), 창의과목(Creative Subject), 그리고 체육과목(Physical Education)의\n"
                 "균형을 맞춘 자체 커리큘럼을 100% 영어로 소화하고 있으며,아이들이 창의성을 최대한 발휘할 수 있는 재미있는 수업 방식을 채택하여 진행합니다.\n"
                 "또한 Scholastic Reading과 어린이 코딩 수업을 영어로 제공하는 Wonder Code 등 뛰어난 외부 교육프로그램 역시 적용하고 교육 효과를 극대화하고 있습니다."),
@@ -147,7 +147,7 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
                 color: Palette.black,
                 fontFamily: "MaruBuri",
                 fontWeight: FontWeight.normal,
-                fontSize: 13),
+                fontSize: 14),
                 "Scholastic 은 전 세계적으로 가장 크고 유명한 출판사 중 하나로, 양질의 영문원서들과 다양한 관련 교육 프로그램들을 제공합니다.\n"
                 "Scholastic 은 'Lexile 지수'를 사용, 사용자의 읽기 능력을 판별하고, 읽기 능력에 따라 적합한 레벨의 서적들을 제시합니다.\n"
                 "글림아일랜드는 Scholastic 에서 출판한 교육적이며 재미있는 영문 원서들로 구성된 자체 Library 를 제공하며,\n"
@@ -160,7 +160,7 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
             //     color: Palette.black,
             //     fontFamily: "MaruBuri",
             //     fontWeight: FontWeight.normal,
-            //     fontSize: 13),
+            //     fontSize: 14),
             //     "학교에서 학생 독자의 능력을 측정하는 데 사용하는 인기 있는 방법은 Lexile 수준 또는 Lexile 측정입니다. Lexile 지수는 교사, 학부모, 학생에게 유용한 도구입니다.\n"
             //     "두 가지 고유한 기능을 제공합니다. 텍스트가 얼마나 어려운지 또는 학생의 읽기 능력 수준을 측정하는 것입니다.\n"
             //     "Lexile Framework는 원래 국립 아동 건강 및 인간 발달 연구소(National Institute of Child Health and Human Development)의\n"
@@ -198,7 +198,7 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
                 color: Palette.black,
                 fontFamily: "MaruBuri",
                 fontWeight: FontWeight.normal,
-                fontSize: 13),
+                fontSize: 14),
                 "원더코드는 코딩 및 IT 전문 교육 기관으로, 글림아일랜드는 원더코드와 손잡고\n"
                 "아이들의 프로그래밍적 사고와 문제해결능력을 키우기 위한 특별한 코딩 교육을 제공합니다."),
             SizedBox(height: 20),
@@ -217,7 +217,7 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
                 color: Palette.black,
                 fontFamily: "MaruBuri",
                 fontWeight: FontWeight.normal,
-                fontSize: 13),
+                fontSize: 14),
                 "킨더 타임즈, 키즈 타임즈, 주니어 타임즈 등 아이들의 레벨과 연령에 맞추어 다양한 영자신문을 제공하는\n"
                     "어린이 영자 신문 전문 브랜드로, 글림아일랜드는 유치부 NIE Speaking 수업과 초등부 NIE Debate 수업을 위하여\n"
                     "모든 레벨의 어린이 영자신문을 class material 로 적극 활용합니다."),
@@ -408,7 +408,7 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
                         style: TextStyle(
                             fontFamily: "Oneprettynight",
                             color: Palette.white,
-                            fontSize: 13)),
+                            fontSize: 14)),
                   ),
                 ),
               ],

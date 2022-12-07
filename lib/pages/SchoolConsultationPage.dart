@@ -122,14 +122,14 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),"입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
+              fontSize: 14),"입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
           // Divider(),
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),"아이 이름"),
+              fontSize: 14),"아이 이름"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.childName = text;
           }),
@@ -138,7 +138,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),"보호자님 성함"),
+              fontSize: 14),"보호자님 성함"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.parentName = text;
           }),
@@ -147,7 +147,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),"보호자님 연락처"),
+              fontSize: 14),"보호자님 연락처"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.parentNumber = text;
           }),
@@ -156,7 +156,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),"아이 연령"),
+              fontSize: 14),"아이 연령"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.childAge = int.tryParse(text)??0;
           }),
@@ -165,7 +165,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),"아이 레벨"),
+              fontSize: 14),"아이 레벨"),
           Divider(),
           levelRadio(),
           SizedBox(height: 20),
@@ -173,7 +173,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),"전화상담 희망시간"),
+              fontSize: 14),"전화상담 희망시간"),
           Divider(),
           timeRadio(),
           SizedBox(height: 20),
@@ -204,14 +204,14 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),"입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
+              fontSize: 14),"입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
           Divider(),
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),"아이 이름"),
+              fontSize: 14),"아이 이름"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.childName = text;
           }),
@@ -220,7 +220,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),"보호자님 성함"),
+              fontSize: 14),"보호자님 성함"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.parentName = text;
           }),
@@ -229,7 +229,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),"보호자님 연락처"),
+              fontSize: 14),"보호자님 연락처"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.parentNumber = text;
           }),
@@ -238,7 +238,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),"아이 연령"),
+              fontSize: 14),"아이 연령"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.childAge = int.tryParse(text)??0;
           }),
@@ -247,7 +247,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),"아이 레벨"),
+              fontSize: 14),"아이 레벨"),
           Divider(),
           levelRadio(),
           SizedBox(height: 20),
@@ -255,7 +255,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),"전화상담 희망시간"),
+              fontSize: 14),"전화상담 희망시간"),
           Divider(),
           timeRadio(),
           SizedBox(height: 20),
@@ -299,7 +299,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),
+              fontSize: 14),
               // "원하시는 대면 상담 날짜를 선택해주세요."
               "(* 현재 상담일자 선택은 불가능 : 대면 상담은 준공, 입학설명회 이후인 2023년 2월부터 가능합니다. 간단한 인적사항과 연락처를 입력해주시면 상담 가능일자에 연락드리겠습니다!)"),
           // Divider(),
@@ -521,7 +521,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),
+              fontSize: 14),
               // "원하시는 대면 상담 날짜를 선택해주세요."
                   "(* 현재 상담일자 선택은 불가능 : 대면 상담은 준공, 입학설명회 이후인 2023년 2월부터 가능합니다. 간단한 인적사항과 연락처를 입력해주시면 상담 가능일자에 연락드리겠습니다!)"),
           Divider(),

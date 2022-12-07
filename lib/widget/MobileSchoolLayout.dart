@@ -134,7 +134,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                     alignment: Alignment.center,
                     child: Text("About GI",style: TextStyle(color: Palette.white,
                         fontFamily: "Jalnan",
-                        fontSize: 13),),),),
+                        fontSize: 14),),),),
               SizedBox(width: 30),
               InkWell(
                   onTap: (){MenuUtil.push(context, SchoolProgramPage());},
@@ -145,7 +145,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                     child: Text("Program",style: TextStyle(color: Palette.white,
                         fontFamily: "Jalnan",
                         fontWeight: FontWeight.bold,
-                        fontSize: 13),),),),
+                        fontSize: 14),),),),
               SizedBox(width: 30),
               InkWell(
                 onTap: (){MenuUtil.push(context, SchoolCurriculumElePage());},
@@ -156,11 +156,11 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                        child: Text("Curriculum",style: TextStyle(color: Palette.white,
                            fontFamily: "Jalnan",
                            fontWeight: FontWeight.bold,
-                           fontSize: 13),)),),
+                           fontSize: 14),)),),
               SizedBox(width: 30),
               InkWell(
                   onTap: (){
-                    // MenuUtil.push(context, SchoolCommunityNoticePage());
+                    MenuUtil.push(context, SchoolCommunityNoticePage());
                     },
                   child:
                   Container(
@@ -169,7 +169,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                       child: Text("Community",style: TextStyle(color: Palette.white,
                           fontFamily: "Jalnan",
                           fontWeight: FontWeight.bold,
-                          fontSize: 13),)),),
+                          fontSize: 14),)),),
               SizedBox(width: 30),
             ],
           ),

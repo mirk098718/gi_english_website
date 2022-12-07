@@ -24,7 +24,8 @@ class MyWidget {
                 "사업자 등록번호 : 준비중\n"
                 "신고번호 : 준비중\n"
                 "Copyright ⓒ 글림아일랜드어학원",
-            style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
+            style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
+                fontSize: 14),
           ),
         ),
       ],
@@ -67,7 +68,7 @@ class MyWidget {
             style: TextStyle(color: Palette.white,
                 fontFamily: "MaruBuri",
                 fontWeight: FontWeight.bold,
-                fontSize: 12),
+                fontSize: 14),
           ),
         ),
       ],
@@ -134,7 +135,7 @@ class MyWidget {
     return ElevatedButton(
       onPressed: () {},
       child: Text(text, textAlign: TextAlign.center,style: TextStyle(
-          fontFamily: "Oneprettynight", color: Palette.white, fontSize: 12),),
+          fontFamily: "Oneprettynight", color: Palette.white, fontSize: 14),),
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         foregroundColor: Palette.black,

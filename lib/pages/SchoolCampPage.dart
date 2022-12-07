@@ -146,7 +146,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),
+              fontSize: 14),
               "여름방학 / 겨울방학 기간 2주 코스"),
           SizedBox(
             height: 20,
@@ -162,7 +162,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
               color: Palette.black,
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
-              fontSize: 12),
+              fontSize: 14),
               "본원 초등부 저학년 대상"),
           SizedBox(
             height: 150,
@@ -214,8 +214,8 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.black,
-                      onPrimary: Palette.black,
+                      backgroundColor: Palette.black,
+                      foregroundColor: Palette.black,
                     ),
                     onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
                     child: Text("상담신청",
@@ -352,8 +352,8 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.mainMediumPurple,
-                      onPrimary: Palette.black,
+                      backgroundColor: Palette.mainMediumPurple,
+                      foregroundColor: Palette.black,
                     ),
 
 

@@ -134,7 +134,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                             Text(
                               "소식을 SNS에서 확인하세요!",
                               textAlign: TextAlign.left,
-                              style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 12),
+                              style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 14),
                             ),
                             Expanded(
                               flex: 1,
@@ -236,7 +236,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         children: [
           Expanded(flex: 1, child: SizedBox()),
           Expanded(
-            flex: 4,
+            flex: 5,
             child: Container(
               decoration: BoxDecoration(
                 border: Border.all(color: Palette.mainLightGrey, width: 3),
@@ -268,11 +268,25 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   Expanded(
                     child: Container(
                       alignment: Alignment.topLeft,
+                      margin: EdgeInsets.all(20),
+                      child: Container(
+                        child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 14),
+                            "글림아일랜드 어학원 초등부 (8세~13세) 입학설명회 : \n"
+                                "2023년 2월 9일~10일 \n"
+                                "Gi 초등부 1차 입학설명회가 2월 9일부터 이틀간 예정되어 있으니, 학부모님들의 많은 관심과 참여 부탁드립니다! :) \n"
+                                "(장소 및 상세스케줄 곧 업데이트 예정, 준공 이후 주소 확정)"),
+                      ),
+                    ),
+                  ),
+                  Container(height: 1,color: Colors.black26, margin: EdgeInsets.only(right: 10, left: 10),),
+                  Expanded(
+                    child: Container(
+                      alignment: Alignment.topLeft,
                       padding: EdgeInsets.all(20),
-                      child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 13),
-                          "글림아일랜드 어학원 초등부 (8세~13세) 입학설명회 : 2023년 2월 1일~3일 / \n"
-                              "Gi 초등부 1차 입학설명회가 2월 1일부터 3일간 예정되어 있으니, \n"
-                              "학부모님들의 많은 관심과 참여 부탁드립니다! :) \n"
+                      child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 14),
+                          "글림아일랜드 어학원 유치부 (6세~7세) 입학설명회 : \n"
+                              "2023년 2월 9일~10일 \n"
+                              "Gi 유치부 1차 입학설명회가 2월 9일부터 이틀간 예정되어 있으니, 학부모님들의 많은 관심과 참여 부탁드립니다! :) \n"
                               "(장소 및 상세스케줄 곧 업데이트 예정, 준공 이후 주소 확정)"),
                     ),
                   ),
@@ -281,19 +295,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                     child: Container(
                       alignment: Alignment.topLeft,
                       padding: EdgeInsets.all(20),
-                      child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 13),
-                          "글림아일랜드 어학원 유치부 (5세~7세) 입학설명회 : 2023년 1월 28일~30일 / \n"
-                              "Gi 유치부 1차 입학설명회가 1월 28일부터 3일간 예정되어 있으니, \n"
-                              "학부모님들의 많은 관심과 참여 부탁드립니다! :) \n"
-                              "(장소 및 상세스케줄 곧 업데이트 예정, 준공 이후 주소 확정)"),
-                    ),
-                  ),
-                  Container(height: 1,color: Colors.black26, margin: EdgeInsets.only(right: 10, left: 10),),
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.topLeft,
-                      padding: EdgeInsets.all(20),
-                      child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 13),
+                      child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 14),
                           "글림아일랜드 어학원 입주 예정지인, 다율동 '태산 W 타워' 준공 12월 중순 예정"),
                     ),
                   )
@@ -303,7 +305,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
           ),
           Expanded(flex: 1, child: SizedBox()),
           Expanded(
-            flex: 4,
+            flex: 5,
             child: Container(
               decoration: BoxDecoration(
                 border: Border.all(color: Palette.mainLightGrey, width: 3),
@@ -339,10 +341,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.bold, fontSize: 13),
+                          Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.bold, fontSize: 14),
                             "Q: 글림아일랜드 어학원 정식 오픈일이 언제일까요?"),
+                          Divider(),
                           Expanded(
-                            child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 13),
+                            child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 14),
                                 "A: 글림아일랜드 어학원 예정지인 다율동 태산 W 타워의 준공이 12월 중순 준공 예정이므로, 약 한달의 인테리어 기간 이후인 1월 중순 오픈 예정이며, 이때부터 현장에서 입학설명회가 열릴 예정입니다.^^"),
                           ),
                         ]
@@ -356,10 +359,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.bold, fontSize: 13),
+                          Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.bold, fontSize: 14),
                               "Q: 유치부 정원은 몇 명이며 몇 개 반이 있나요?"),
+                          Divider(),
                           Expanded(
-                            child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 13),
+                            child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 14),
                                 "A: 유치부 정원은 한 반에 6~8명이며, 총 최대 6반이 운영될 예정입니다. bilingual 선생님께서 담임을 맡아 주실 것이고, 각반을 담당하는 원어민 선생님이 배정됩니다."),
                           ),
                         ]
@@ -373,10 +377,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.bold, fontSize: 13),
+                          Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.bold, fontSize: 14),
                               "Q: 초등부는 연령별로 반이 나뉘나요?"),
+                          Divider(),
                           Expanded(
-                            child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 13),
+                            child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 14),
                                 "A: 초등부는 연령을 고려하되, 실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다."),
                           ),
                         ]
@@ -402,7 +407,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             mainImage(),
             SizedBox(height: 150, child: urlMenu()),
             Container(height: 30, color: Palette.white),
-            SizedBox(height: 473, child: bulletinBoard()),
+            SizedBox(height: 600, child: bulletinBoard()),
             SizedBox(height: 213, child: MyWidget.footer()),
           ],
         ),
@@ -550,26 +555,27 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                 Container(
                   alignment: Alignment.topLeft,
                   padding: EdgeInsets.all(20),
-                  child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 13),
-                      "글림아일랜드 어학원 초등부 (8세~13세) 입학설명회 : 2023년 2월 1일~3일 / \n"
-                          "Gi 초등부 1차 입학설명회가 2월 1일부터 3일간 예정되어 있으니, \n"
-                          "학부모님들의 많은 관심과 참여 부탁드립니다! :) \n"
-                          "(장소 및 상세스케줄 곧 업데이트 예정, 준공 이후 주소 확정)"),
+                  child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
+                      fontSize: 14),
+                      "글림아일랜드 어학원 초등부 (8세~13세) 입학설명회 : 2023년 2월 9일~10일 / \n"
+                          "Gi 초등부 1차 입학설명회가 2월 9일부터 이틀간 예정되어 있으니, \n"
+                          "학부모님들의 많은 관심과 참여 부탁드립니다! :) \n(장소 및 상세스케줄 곧 업데이트 예정, 준공 이후 주소 확정)"),
                 ),
                 Container(height: 1,color: Colors.black26, margin: EdgeInsets.only(right: 10, left: 10),),
                 Container(
                   alignment: Alignment.topLeft,
                   padding: EdgeInsets.all(20),
-                  child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 13),
-                      "글림아일랜드 어학원 유치부 (5세~7세) 입학설명회 : 2023년 1월 28일~30일 / \n"
-                          "Gi 유치부 1차 입학설명회가 1월 28일부터 3일간 예정되어 있으니, \n"
-                          "학부모님들의 많은 관심과 참여 부탁드립니다! :) (장소 및 상세스케줄 곧 업데이트 예정, 준공 이후 주소 확정)"),
+                  child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
+                      fontSize: 14),
+                      "글림아일랜드 어학원 유치부 (6세~7세) 입학설명회 : 2023년 2월 9일~10일 / \n"
+                          "Gi 유치부 1차 입학설명회가 2월 9일부터 이틀간 예정되어 있으니, 학부모님들의 많은 관심과 참여 부탁드립니다! :) (장소 및 상세스케줄 곧 업데이트 예정, 준공 이후 주소 확정)"),
                 ),
                 Container(height: 1,color: Colors.black26, margin: EdgeInsets.only(right: 10, left: 10),),
                 Container(
                   alignment: Alignment.topLeft,
                   padding: EdgeInsets.all(20),
-                  child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 13),
+                  child: Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
+                      fontSize: 14),
                       "글림아일랜드 어학원 입주 예정지인, 다율동 '태산 W 타워' 준공 12월 중순 예정"),
                 )
               ],
@@ -609,9 +615,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.bold, fontSize: 13),
+                        Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.bold,
+                            fontSize: 14),
                             "Q: 글림아일랜드 어학원 정식 오픈일이 언제일까요?"),
-                        Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 13),
+                        Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
+                            fontSize: 14),
                             "A: 글림아일랜드 어학원 예정지인 다율동 태산 W 타워의 준공이 12월 중순 준공 예정이므로, 약 한달의 인테리어 기간 이후인 1월 중순 오픈 예정이며, 이때부터 현장에서 입학설명회가 열릴 예정입니다.^^"),
                       ]
                   ),
@@ -622,9 +630,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.bold, fontSize: 13),
+                        Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.bold,
+                            fontSize: 14),
                             "Q: 유치부 정원은 몇 명이며 몇 개 반이 있나요?"),
-                        Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 13),
+                        Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
+                            fontSize: 14),
                             "A: 유치부 정원은 한 반에 6~8명이며, 총 최대 6반이 운영될 예정입니다. bilingual 선생님께서 담임을 맡아 주실 것이고, 각반을 담당하는 원어민 선생님이 배정됩니다."),
                       ]
                   ),
@@ -635,9 +645,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.bold, fontSize: 13),
+                        Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.bold,
+                            fontSize: 14),
                             "Q: 초등부는 연령별로 반이 나뉘나요?"),
-                        Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 13),
+                        Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
+                            fontSize: 14),
                             "A: 초등부는 연령을 고려하되, 실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다."),
                       ]
                   ),

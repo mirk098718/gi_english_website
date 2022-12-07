@@ -148,7 +148,8 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
               children: [
                 Container(alignment: Alignment.topLeft, width: 200, height: 400, child: Image.asset("assets/miaKimPhoto.jpg")),
                 SizedBox(width: 20,),
-                Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 13),
+                Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
+                    fontSize: 14),
                     "Mia Kim \n\n"
                     "현 Gi 글림아일랜드 어학원 파주 원장\n"
                     "전 서대문구 소재 청담 에이프릴 어학원 교수부장\n"
@@ -184,7 +185,8 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
               children: [
                 Container(alignment: Alignment.topLeft, width: 200, height: 400, child: Image.asset("assets/mobileSchoolMainImage.png")),
                 SizedBox(width: 20,),
-                Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal, fontSize: 13),
+                Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
+                    fontSize: 14),
                     "Patty Kim \n\n"
                     "현 Gi 글림아일랜드 어학원 파주 상담실장\n"
                     "전 대한항공 국제선 커스터머 서비스 상담 업무\n"
