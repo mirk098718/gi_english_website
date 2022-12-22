@@ -10,6 +10,7 @@ import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 import '../admin/page/AdminLoginPage.dart';
+import '../util/UrlIUtil.dart';
 
 class SchoolMainPage extends StatefulWidget {
   const SchoolMainPage({Key? key}) : super(key: key);
@@ -190,7 +191,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                 child: Row(
                   children: [
                     Expanded(
-                      flex: 2,
+                      flex: 3,
                       child: Container(
                         padding: EdgeInsets.only(left: 15, top: 5, bottom: 5),
                         alignment: Alignment.center,
@@ -212,12 +213,13 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                       color: Palette.mainGrey,
                     ),
                     Expanded(
-                      flex: 2,
+                      flex: 3,
                       child: Container(
-                        alignment: Alignment.center,
-                        child: Container(
-                            padding: EdgeInsets.all(15),
-                            child: Image.asset("assets/giKidsWeekendLogo.png")),
+                        margin: EdgeInsets.all(10),
+                        child: InkWell(child: Image.asset("assets/trophyLogo.png"),
+                          onTap: () async {
+                            UrlUtil.open('https://www.trophy9.com/');
+                          },),
                       ),
                     ),
                   ],
@@ -252,7 +254,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                           style: TextStyle(
                               color: Palette.black, fontFamily: "Jalnan")),
                       onPressed: () {
-                        MenuUtil.push(context, SchoolCommunityNoticePage());
+                        // MenuUtil.push(context, SchoolCommunityNoticePage());
                       },
                     ),
 
@@ -515,6 +517,16 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
               )
             ],
           ),
+          SizedBox(height: 10,),
+          Container(
+            alignment: Alignment.center,
+            height: 90,
+            margin: EdgeInsets.all(10),
+            child: InkWell(child: Image.asset("assets/trophyLogo.png"),
+              onTap: () async {
+                UrlUtil.open('https://www.trophy9.com/');
+              },),
+          ),
         ],
       ),
     );
@@ -539,7 +551,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                         style: TextStyle(
                             color: Palette.black, fontFamily: "Jalnan")),
                     onPressed: () {
-                      MenuUtil.push(context, SchoolCommunityNoticePage());
+                      // MenuUtil.push(context, SchoolCommunityNoticePage());
                     },
                   ),
                   height: 50,

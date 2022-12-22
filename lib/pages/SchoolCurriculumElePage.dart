@@ -141,27 +141,32 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
                 height: 20),
             Container(width:600, child: Image.asset("assets/eleTimetableTuesThurs.png")),
             SizedBox(
-                height: 20),
-
+                height: 10),
             Text(
-              "NIE",
+              "NIE 영자신문 수업",
               style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
             ),
-
             Divider(),
             SizedBox(height: 20),
-            Container( alignment: Alignment.topLeft,
-                child: Row(children: [Image.asset("assets/juniorTimesLogo.png")],)),
-            SizedBox(height: 20),
-            Text(style: TextStyle(
-                color: Palette.black,
-                fontFamily: "MaruBuri",
-                fontWeight: FontWeight.normal,
-                fontSize: 14),
-                "킨더 타임즈, 키즈 타임즈, 주니어 타임즈 등 아이들의 레벨과 연령에 맞추어 다양한 영자신문을 제공하는\n"
-                    "어린이 영자 신문 전문 브랜드로, 글림아일랜드는 유치부 NIE Speaking 수업과 초등부 NIE Debate 수업을 위하여\n"
-                    "모든 레벨의 어린이 영자신문을 class material 로 적극 활용합니다."),
-            SizedBox(height: 20),
+            Container(width:600,
+                margin: EdgeInsets.only(top:10,bottom: 10,left: 30, right: 30),
+                child: Image.asset("assets/nieAd2.png")),
+            Container(
+              width: 600,
+              margin: EdgeInsets.only(top:10,bottom: 10,left: 30, right:30),
+              child: Text(style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "MaruBuri",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
+                  "킨더 타임즈, 키즈 타임즈, 주니어 타임즈 등 아이들의 레벨과 연령에 맞추어 다양한 영자신문을 제공하는 어린이 영자 신문 전문 브랜드로, "
+                      "글림아일랜드는 유치부 NIE Speaking 수업과 초등부 NIE Debate 수업을 위하여"
+                      "모든 레벨의 어린이 영자신문을 class material 로 적극 활용합니다."),
+            ),
+            Divider(),
+            SizedBox(height: 10),
+            Image.asset("assets/nieAd.png"),
+
 
           ],
         ),

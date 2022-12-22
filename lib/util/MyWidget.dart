@@ -7,19 +7,25 @@ class MyWidget {
 
 
   static Widget footer() {
-    return Stack(
+    return Container(width: double.infinity, color: Palette.lightestEarth,
       alignment: Alignment.centerLeft,
-      children: [
-        Container(width: double.infinity, color: Palette.lightestEarth),
-        Container(
-          padding: EdgeInsets.all(20),
-          alignment: Alignment.centerLeft,
-
-          child: Text(
-                "Gi Gleam Island 어학원 파주\n"
-                "경기도 파주시 해올1길 태산 W 타워 7층\n"
+      padding: EdgeInsets.all(20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Gi Gleam Island 어학원 파주",
+            style: TextStyle(
+                color: Palette.black,
+                fontFamily: "Decoshadow",
+                fontWeight: FontWeight.bold,
+                fontSize: 14),
+          ),
+          SizedBox(height: 5,),
+          Text("경기도 파주시 해올1길 태산 W 타워 7층\n"
                 "문의 : 준비중, 본 웹사이트의 상담문의 페이지 또는 이메일을 이용해주세요. \n"
-                    "email : gienglish.paju@gmail.com\n"
+                "email : gienglish.paju@gmail.com\n"
                 "사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희\n"
                 "사업자 등록번호 : 준비중\n"
                 "신고번호 : 준비중\n"
@@ -27,8 +33,8 @@ class MyWidget {
             style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
                 fontSize: 14),
           ),
-        ),
-      ],
+        ],
+      )
     );
   }
 
