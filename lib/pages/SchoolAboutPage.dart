@@ -10,6 +10,7 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
+import '../util/WidgetUtil.dart';
 import 'SchoolConsultationPage.dart';
 
 
@@ -131,7 +132,7 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
             "GLEAM ISLAND 의 철학과 목표",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
-          Divider(),
+          WidgetUtil.myDivider(),
           SizedBox(
             height: 20,
           ),

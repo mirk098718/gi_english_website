@@ -10,6 +10,8 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
+import '../util/WidgetUtil.dart';
+
 class SchoolProgramPage extends StatefulWidget {
   const SchoolProgramPage({Key? key}) : super(key: key);
 
@@ -115,7 +117,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
             "정규 프로그램",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
-          Divider(),
+          WidgetUtil.myDivider(),
           Container(
             margin: EdgeInsets.only(top: 20, bottom: 20),
             // padding: EdgeInsets.all(10),
@@ -173,7 +175,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                               fontFamily: "MaruBuri",
                               fontWeight: FontWeight.normal,
                               fontSize: 14),
-                              "6세~7세 (만 5세, 만 6세) \n"
+                              "5세~7세 (만 4세~만 6세) \n"
                                   "미취학 유아"),
                         ],
                       )
@@ -305,7 +307,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
             "정규 프로그램",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
-          Divider(),
+          WidgetUtil.myDivider(),
           Container(
             margin: EdgeInsets.only(top: 20, bottom: 20),
             // padding: EdgeInsets.all(10),

@@ -10,6 +10,7 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
+import '../util/WidgetUtil.dart';
 import 'SchoolConsultationPage.dart';
 
 
@@ -132,7 +133,7 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
             "운영 System",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
-          Divider(),
+          WidgetUtil.myDivider(),
           SizedBox(
             height: 20,
           ),

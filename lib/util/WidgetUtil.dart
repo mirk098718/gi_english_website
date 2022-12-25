@@ -1,7 +1,15 @@
 
 import 'package:flutter/material.dart';
 
+import 'Palette.dart';
+
 class WidgetUtil {
+
+  static Widget myDivider(){
+    return Container
+      (margin: EdgeInsets.only(top: 5, bottom: 5), height: 1,width: double.infinity,color: Palette.black,);
+  }
+
   static Widget withLabel(String label, Widget widget,
       {bool useExpanded = false}) {
     return Row(

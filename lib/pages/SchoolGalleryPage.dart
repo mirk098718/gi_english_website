@@ -9,6 +9,8 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
+import '../util/WidgetUtil.dart';
+
 class SchoolGalleryPage extends StatefulWidget {
   const SchoolGalleryPage({Key? key}) : super(key: key);
 
@@ -128,7 +130,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
             "Gallery",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
-          Divider(),
+          WidgetUtil.myDivider(),
           SizedBox(height: 30,),
           Row(
             children: [

@@ -9,6 +9,8 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
+import '../util/WidgetUtil.dart';
+
 class SchoolCurriculumKindyPage extends StatefulWidget {
   const SchoolCurriculumKindyPage({Key? key}) : super(key: key);
 
@@ -120,7 +122,7 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
               "정규 유치부 Curriculum",
               style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
             ),
-            Divider(),
+            WidgetUtil.myDivider(),
             SizedBox(height: 20),
             Text(style: TextStyle(
                 color: Palette.black,
@@ -189,7 +191,7 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
               "Wonder Code",
               style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
             ),
-            Divider(),
+            WidgetUtil.myDivider(),
             SizedBox(height: 20),
             Container(
                 width: 500, child: Image.asset("assets/wonderCodeLogo.jpg")),
@@ -207,8 +209,8 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
               "NIE 영자신문 수업",
               style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
             ),
-            Divider(),
-            SizedBox(height: 20),
+            WidgetUtil.myDivider(),
+            SizedBox(height: 5),
             Container(width:600,
                 margin: EdgeInsets.only(top:10,bottom: 10,left: 30, right: 30),
                 child: Image.asset("assets/nieAd2.png")),
@@ -224,11 +226,11 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
                       "글림아일랜드는 유치부 NIE Speaking 수업과 초등부 NIE Debate 수업을 위하여"
                       "모든 레벨의 어린이 영자신문을 class material 로 적극 활용합니다."),
             ),
-            Divider(),
+            WidgetUtil.myDivider(),
             SizedBox(height: 10),
             Image.asset("assets/nieAd.png"),
 
-            Divider(),
+            WidgetUtil.myDivider(),
             SizedBox(height: 20),
           ],
         ),
@@ -380,50 +382,4 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
     );
   }
 
-  Widget mobileMainImage() {
-    return Container(
-      child: Stack(
-        alignment: Alignment.centerLeft,
-        children: [
-          Image.asset("assets/curriculumImage.png"),
-          Container(
-            padding: EdgeInsets.only(left: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Curriculum",
-                  style: TextStyle(
-                      color: Palette.white,
-                      fontSize: 20,
-                      fontFamily: "LucidaCalligraphy"),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  width: 150,
-                  height: 40,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.black,
-                      foregroundColor: Palette.black,
-                    ),
-                    onPressed: () {},
-                    child: Text("상담신청",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontFamily: "Oneprettynight",
-                            color: Palette.white,
-                            fontSize: 14)),
-                  ),
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
 }

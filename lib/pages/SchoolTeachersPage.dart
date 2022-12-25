@@ -11,6 +11,8 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
+import '../util/WidgetUtil.dart';
+
 class SchoolTeachersPage extends StatefulWidget {
   const SchoolTeachersPage({Key? key}) : super(key: key);
 
@@ -132,7 +134,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
               "GLEAM ISLAND 교원 소개",
               style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
             ),
-          Divider(),
+          WidgetUtil.myDivider(),
           SizedBox(
             height: 30,
           ),

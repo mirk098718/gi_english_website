@@ -11,6 +11,8 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
+import '../util/WidgetUtil.dart';
+
 class SchoolCampPage extends StatefulWidget {
   const SchoolCampPage({Key? key}) : super(key: key);
 
@@ -131,7 +133,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
             "Gi 방학캠프",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
-          Divider(),
+          WidgetUtil.myDivider(),
           SizedBox(
             height: 20,
           ),

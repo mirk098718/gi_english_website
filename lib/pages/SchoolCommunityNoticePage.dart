@@ -9,6 +9,8 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
+import '../util/WidgetUtil.dart';
+
 class SchoolCommunityNoticePage extends StatefulWidget {
   const SchoolCommunityNoticePage({Key? key}) : super(key: key);
 
@@ -142,7 +144,7 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
             "Notice Board",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
-          Divider(),
+          WidgetUtil.myDivider(),
           SizedBox(height: 20,),
           bulletinBoard()
         ],

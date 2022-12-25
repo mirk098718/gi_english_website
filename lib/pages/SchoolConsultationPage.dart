@@ -12,6 +12,7 @@ import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../class/SchoolVisitor.dart';
 import '../util/DialogUtil.dart';
+import '../util/WidgetUtil.dart';
 import 'SchoolCommunityNoticePage.dart';
 import 'SchoolGalleryPage.dart';
 
@@ -166,7 +167,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
               fontSize: 14),"아이 레벨"),
-          Divider(),
+          WidgetUtil.myDivider(),
           levelRadio(),
           SizedBox(height: 20),
           Text(style: TextStyle(
@@ -174,7 +175,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
               fontSize: 14),"전화상담 희망시간"),
-          Divider(),
+          WidgetUtil.myDivider(),
           timeRadio(),
           SizedBox(height: 20),
           submitButton(),
@@ -205,7 +206,6 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
               fontSize: 14),"입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
-          Divider(),
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
@@ -248,7 +248,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
               fontSize: 14),"아이 레벨"),
-          Divider(),
+          WidgetUtil.myDivider(),
           levelRadio(),
           SizedBox(height: 20),
           Text(style: TextStyle(
@@ -256,7 +256,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
               fontSize: 14),"전화상담 희망시간"),
-          Divider(),
+          WidgetUtil.myDivider(),
           timeRadio(),
           SizedBox(height: 20),
           submitButton(),
@@ -524,7 +524,6 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               fontSize: 14),
               // "원하시는 대면 상담 날짜를 선택해주세요."
                   "(* 현재 상담일자 선택은 불가능 : 대면 상담은 준공, 입학설명회 이후인 2023년 2월부터 가능합니다. 간단한 인적사항과 연락처를 입력해주시면 상담 가능일자에 연락드리겠습니다!)"),
-          Divider(),
           Container(
             width: 400,
             height: 400  ,

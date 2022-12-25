@@ -10,6 +10,7 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
+import '../util/WidgetUtil.dart';
 import 'SchoolConsultationPage.dart';
 
 
@@ -131,7 +132,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
             "오시는 길",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
-          Divider(),
+          WidgetUtil.myDivider(),
           Image.asset("assets/map.jpg"),
           SizedBox(
             height: 20,

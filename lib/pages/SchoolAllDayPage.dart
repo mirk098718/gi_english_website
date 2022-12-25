@@ -10,6 +10,8 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
+import '../util/WidgetUtil.dart';
+
 class SchoolAllDayPage extends StatefulWidget {
   const SchoolAllDayPage({Key? key}) : super(key: key);
 
@@ -130,7 +132,7 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
             "올데이케어 프로그램",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
-          Divider(),
+          WidgetUtil.myDivider(),
           SizedBox(
             height: 20,
           ),

@@ -12,6 +12,8 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
+import '../util/WidgetUtil.dart';
+
 class School1on1Page extends StatefulWidget {
   const School1on1Page({Key? key}) : super(key: key);
 
@@ -132,7 +134,7 @@ class _School1on1PageState extends State<School1on1Page> {
             "1 on 1 프로그램",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
-          Divider(),
+          WidgetUtil.myDivider(),
           SizedBox(
             height: 20,
           ),

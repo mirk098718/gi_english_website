@@ -10,6 +10,8 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
+import '../util/WidgetUtil.dart';
+
 class SchoolCommunityFAQPage extends StatefulWidget {
   const SchoolCommunityFAQPage({Key? key}) : super(key: key);
 
@@ -132,7 +134,7 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
             "Notice Board",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
-          Divider(),
+          WidgetUtil.myDivider(),
           SizedBox(height: 20,),
           Container(width: 600,height: 600, child: Text("게시판 필요"),)
         ],

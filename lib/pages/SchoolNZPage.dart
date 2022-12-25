@@ -12,6 +12,7 @@ import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../util/UrlIUtil.dart';
+import '../util/WidgetUtil.dart';
 
 class SchoolNZPage extends StatefulWidget {
   const SchoolNZPage({Key? key}) : super(key: key);
@@ -127,7 +128,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
             "New Zealand 연계 방학 프로그램",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
-          Divider(),
+          WidgetUtil.myDivider(),
           SizedBox(
             height: 20,
           ),
@@ -175,7 +176,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
             "왜 뉴질랜드인가?",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
           ),
-          Divider(),
+          WidgetUtil.myDivider(),
           SizedBox(
             height: 20,
           ),
@@ -197,7 +198,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
             "왜 타우랑가인가?",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
           ),
-          Divider(),
+          WidgetUtil.myDivider(),
           SizedBox(
             height: 20,
           ),
@@ -221,7 +222,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
             "학교 선택 기준",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
           ),
-          Divider(),
+          WidgetUtil.myDivider(),
           Image.asset("assets/schoolSelection.png"),
           SizedBox(
             height: 40,
@@ -230,7 +231,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
             "학교 리스트",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
           ),
-          Divider(),
+          WidgetUtil.myDivider(),
           Image.asset("assets/schoolList.png"),
           SizedBox(
             height: 20,
