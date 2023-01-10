@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
@@ -310,9 +309,9 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                               fontFamily: "MaruBuri",
                               fontWeight: FontWeight.normal,
                               fontSize: 14),
-                          "글림아일랜드 어학원 유치부 (5세~7세) 입학설명회 : \n"
+                          "글림아일랜드 어학원 중등부 (14~16세) 입학설명회 : \n"
                           "2023년 2월 9일~10일 \n"
-                          "Gi 유치부 1차 입학설명회가 2월 9일부터 이틀간 예정되어 있으니, 학부모님들의 많은 관심과 참여 부탁드립니다! :) \n"
+                          "Gi 중등부 1차 입학설명회가 2월 9일부터 이틀간 예정되어 있으니, 학부모님들의 많은 관심과 참여 부탁드립니다! :) \n"
                           "(장소 및 상세스케줄 곧 업데이트 예정, 준공 이후 주소 확정)"),
                     ),
                     Container(
@@ -409,7 +408,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontFamily: "MaruBuri",
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14),
-                                "Q: 유치부 정원은 몇 명이며 몇 개 반이 있나요?"),
+                                "Q: 초등, 중등부 각반 정원은 몇명인가요?"),
                             WidgetUtil.myDivider(),
                             Text(
                                 style: TextStyle(
@@ -417,7 +416,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontFamily: "MaruBuri",
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
-                                "A: 유치부 정원은 한 반에 6~8명이며, 총 최대 6반이 운영될 예정입니다. bilingual 선생님께서 담임을 맡아 주실 것이고, 각반을 담당하는 원어민 선생님이 배정됩니다."),
+                                "A: 초등부, 중등부 정원은 한 반에 8명~10명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, 각반을 담당하는 원어민 선생님이 배정됩니다."),
                           ]),
                     ),
                     Container(
@@ -660,8 +659,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                           fontFamily: "MaruBuri",
                           fontWeight: FontWeight.normal,
                           fontSize: 14),
-                      "글림아일랜드 어학원 유치부 (5세~7세) 입학설명회 : 2023년 2월 9일~10일 / \n"
-                      "Gi 유치부 1차 입학설명회가 2월 9일부터 이틀간 예정되어 있으니, 학부모님들의 많은 관심과 참여 부탁드립니다! :) (장소 및 상세스케줄 곧 업데이트 예정, 준공 이후 주소 확정)"),
+                      "글림아일랜드 어학원 중등부 (14세~16세) 입학설명회 : 2023년 2월 9일~10일 / \n"
+                      "Gi 중등부 1차 입학설명회가 2월 9일부터 이틀간 예정되어 있으니, 학부모님들의 많은 관심과 참여 부탁드립니다! :) (장소 및 상세스케줄 곧 업데이트 예정, 준공 이후 주소 확정)"),
                 ),
                 Container(
                   height: 1,
@@ -748,7 +747,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontFamily: "MaruBuri",
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14),
-                            "Q: 유치부 정원은 몇 명이며 몇 개 반이 있나요?"),
+                            "Q: 초등, 중등부 각반 정원은 몇명인가요?"),
                         WidgetUtil.myDivider(),
                         Text(
                             style: TextStyle(
@@ -756,7 +755,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontFamily: "MaruBuri",
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
-                            "A: 유치부 정원은 한 반에 6~8명이며, 총 최대 6반이 운영될 예정입니다. bilingual 선생님께서 담임을 맡아 주실 것이고, 각반을 담당하는 원어민 선생님이 배정됩니다."),
+                            "A: 정원은 한 반에 8~10명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, 각반을 담당하는 원어민 선생님이 배정됩니다."),
                       ]),
                 ),
                 Container(

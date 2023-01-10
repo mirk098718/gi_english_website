@@ -1,29 +1,33 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
-import 'package:gi_english_website/pages/SchoolCurriculumMiddleSchoolPage.dart';
+import 'package:gi_english_website/pages/SchoolNZPage.dart';
+import 'package:gi_english_website/pages/SchoolProgramPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
-import 'package:gi_english_website/util/WidgetUtil.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
-class SchoolCurriculumElePage extends StatefulWidget {
-  const SchoolCurriculumElePage({Key? key}) : super(key: key);
+import '../util/WidgetUtil.dart';
+
+class SchoolCodingPage extends StatefulWidget {
+  const SchoolCodingPage({Key? key}) : super(key: key);
 
   @override
-  _SchoolCurriculumElePageState createState() => _SchoolCurriculumElePageState();
+  _SchoolCodingPageState createState() => _SchoolCodingPageState();
 }
 
-class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
+class _SchoolCodingPageState extends State<SchoolCodingPage> {
 
   List<ButtonState> buttonStateList = [
-    ButtonState("정규중등부", BehaviorColor.colorOnDefault, SchoolCurriculumMiddleSchoolPage()),
-    ButtonState("정규초등부", BehaviorColor.colorOnClick, SchoolCurriculumElePage()),
-  ];
+    ButtonState("정규프로그램", BehaviorColor.colorOnDefault, SchoolProgramPage()),
+    ButtonState("올데이케어", BehaviorColor.colorOnClick, SchoolCodingPage()),
+    ButtonState("NZ연계프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
 
+
+  ];
   @override
   Widget build(BuildContext context) {
 
@@ -31,13 +35,20 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
     Size size = mediaQueryData.size;
     double width = size.width;
     if(width>768){
-      return WebSchoolLayout(content: scrollView());
+      return desktopUi(context);
     }
     else{
-      return MobileSchoolLayout(content:mobileScrollView());
+      return mobileUi(context);
     }
   }
 
+  Widget desktopUi(context){
+    return WebSchoolLayout(content: scrollView());
+  }
+
+  Widget mobileUi(context){
+    return MobileSchoolLayout(content:mobileScrollView());
+  }
 
   Widget contentGroup() {
     return Container(
@@ -72,8 +83,11 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
       children.add(InkWell(
         child: child,
         onHover: (value) {
-          buttonState.color =
-          value ? BehaviorColor.colorOnHover : (i == 1 ? BehaviorColor.colorOnClick : BehaviorColor.colorOnDefault);
+          buttonState.color = value
+              ? BehaviorColor.colorOnHover
+              : (i == 1
+              ? BehaviorColor.colorOnClick
+              : BehaviorColor.colorOnDefault);
           print(
               "label ${buttonState.label}, selectedColorList: ${buttonState.color}");
           setState(() {});
@@ -107,70 +121,71 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
   }
 
   Widget content() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        alignment: Alignment.topLeft,
-        padding: EdgeInsets.all(20),
-        color: Palette.white,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "정규 초등부 Curriculum",
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 20,),
-            ),
-            WidgetUtil.myDivider(),
-            SizedBox(
-              height: 20),
-            Text(
-              "월수금반",
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 15,),
-            ),
-            SizedBox(
-              height: 20),
-            Container(width:600, child: Image.asset("assets/eleTimetableMWF.png")),
-            SizedBox(
-                height: 20),
+    return Container(
+      alignment: Alignment.topLeft,
+      padding: EdgeInsets.all(20),
+      color: Palette.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "올데이케어 프로그램",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
+          ),
+          WidgetUtil.myDivider(),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            "운영시간",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 14),
+              "오후 2시 30분 ~ 오후 9시 까지"),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            "대상",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 14),
+              "기초 코딩 스킬과 컴퓨팅 사고력을 키우고자 하는 초등~중등학생. 초등/중등 반으로 나뉘어 반 편성이 되며, 실력 테스트 없이 모두 기초반에서 시작하게 됩니다."),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            "프로그램",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(style: TextStyle(
+              color: Palette.black,
+              fontFamily: "MaruBuri",
+              fontWeight: FontWeight.normal,
+              fontSize: 14),
+              ""),
+          SizedBox(
+            height: 50,
+          ),
 
-            Text(
-              "화목반",
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 15,),
-            ),
-            SizedBox(
-                height: 20),
-            Container(width:600, child: Image.asset("assets/eleTimetableTuesThurs.png")),
-            SizedBox(
-                height: 40),
-            Text(
-              "NIE 영자신문 수업",
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
-            ),
-            WidgetUtil.myDivider(),
-            SizedBox(height: 5),
-            Container(width:600,
-                margin: EdgeInsets.only(top:10,bottom: 10,left: 30, right: 30),
-                child: Image.asset("assets/nieAd2.png")),
-            Container(
-              width: 600,
-              margin: EdgeInsets.only(top:10,bottom: 10,left: 30, right:30),
-              child: Text(style: TextStyle(
-                  color: Palette.black,
-                  fontFamily: "MaruBuri",
-                  fontWeight: FontWeight.normal,
-                  fontSize: 14),
-                  "킨더 타임즈, 키즈 타임즈, 주니어 타임즈 등 아이들의 레벨과 연령에 맞추어 다양한 영자신문을 제공하는 어린이 영자 신문 전문 브랜드로, "
-                      "글림아일랜드는 중등부 NIE Speaking 수업과 초등부 NIE Debate 수업을 위하여"
-                      "모든 레벨의 어린이 영자신문을 class material 로 적극 활용합니다."),
-            ),
-            WidgetUtil.myDivider(),
-            SizedBox(height: 10),
-            Image.asset("assets/nieAd.png"),
-
-
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -190,11 +205,10 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
 
   Widget mainImage() {
     return Container(
-
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/curriculumImage.png"),
+          Image.asset("assets/ballPoolImage.png"),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child:
@@ -203,7 +217,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  "Curriculum",
+                  "Program",
                   style: TextStyle(
                       color: Palette.white,
                       fontSize: 30,
@@ -229,12 +243,14 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
                             )),
                   ),
                 ),
+
               ],
             ),
 
           )
         ],
       ),
+
     );
   }
 
@@ -244,7 +260,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
   Widget mobileScrollView() {
     return SingleChildScrollView(
       child: Container(
-
+        color: Colors.white,
         child: Column(
           children: [
             // mobileMainImage(),
@@ -298,8 +314,6 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
     }
 
     return Container(
-      alignment: Alignment.center,
-      width: MediaQuery.of(context).size.width,
       color: Palette.white,
       padding: EdgeInsets.all(20),
       child: Container(
@@ -325,7 +339,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
       child: Stack(
         alignment: Alignment.centerLeft,
         children: [
-          Image.asset("assets/curriculumImage.png"),
+          Image.asset("assets/ballPoolImage.png"),
           Container(
             padding: EdgeInsets.only(left: 20),
             child: Column(
@@ -333,7 +347,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Curriculum",
+                  "Program",
                   style: TextStyle(
                       color: Palette.white,
                       fontSize: 20,
@@ -346,17 +360,20 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
                   width: 150,
                   height: 40,
                   child: ElevatedButton(
+                    child: Text(
+                      "상담신청",
+                      style:
+                      TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                    ),
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolConsultationPage());
+                    },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.black,
+                      backgroundColor: Palette.mainMediumPurple,
                       foregroundColor: Palette.black,
                     ),
-                    onPressed: () {},
-                    child: Text("상담신청",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontFamily: "Oneprettynight",
-                            color: Palette.white,
-                            fontSize: 14)),
+
+
                   ),
                 ),
               ],
@@ -366,4 +383,5 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
       ),
     );
   }
+
 }

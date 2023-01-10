@@ -8,7 +8,7 @@ import 'package:gi_english_website/pages/SchoolCommunityFAQPage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumElePage.dart';
-import 'package:gi_english_website/pages/SchoolCurriculumKindyPage.dart';
+import 'package:gi_english_website/pages/SchoolCurriculumMiddleSchoolPage.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
 import 'package:gi_english_website/pages/SchoolMainPage.dart';
 import 'package:gi_english_website/pages/SchoolMapPage.dart';
@@ -46,7 +46,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
       body: Stack(
         children: [
           Positioned(
-              top: 51, bottom: 0, left: 0, right: 0, child: widget.content),
+              top: 80, bottom: 0, left: 0, right: 0, child: widget.content),
           Positioned(top: 0, left: 0, right: 0, child: appBar(context)),
         ],
       ),
@@ -134,8 +134,8 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           InkWell(
-            onTap: (){MenuUtil.push(context, SchoolCurriculumKindyPage());},
-            child: labelInColorContainer(Palette.violet, "정규 유치부"),),
+            onTap: (){MenuUtil.push(context, SchoolCurriculumMiddleSchoolPage());},
+            child: labelInColorContainer(Palette.violet, "정규 중등부"),),
           InkWell(
             onTap: (){MenuUtil.push(context, SchoolCurriculumElePage());},
             child: labelInColorContainer(Palette.mediumViolet, "정규 초등부"),
@@ -173,17 +173,17 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
   Widget appBar(BuildContext context) {
     return Stack(children: [
       Container(
-        height: widget.height,
-        padding: EdgeInsets.only(top: 6, bottom: 4, left: 10, right: 10),
+        height: 80,
+        alignment: Alignment.center,
         color: Palette.white,
       ),
 
       Container(
         color: Colors.transparent,
-        padding: EdgeInsets.only(top:20),
+        padding: EdgeInsets.only(top:25),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             InkWell(
               onTap: (){MenuUtil.push(context, SchoolAboutPage());},
@@ -191,7 +191,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                 style: TextStyle(color: Palette.earth,
                     fontFamily: "MaruBuri",
                     fontWeight: FontWeight.bold,
-                    fontSize: 15),
+                    fontSize: 20),
               ),
             ),
 
@@ -202,16 +202,16 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                   style: TextStyle(color: Palette.earth,
                       fontFamily: "MaruBuri",
                       fontWeight: FontWeight.bold,
-                      fontSize: 15),
+                      fontSize: 20),
                 )
             ),
             SizedBox(width: 20),
             InkWell(
-                onTap: (){MenuUtil.push(context, SchoolCurriculumKindyPage());},
+                onTap: (){MenuUtil.push(context, SchoolCurriculumMiddleSchoolPage());},
                 child: Text("Curriculum", style: TextStyle(color: Palette.earth,
                     fontFamily: "MaruBuri",
                     fontWeight: FontWeight.bold,
-                    fontSize: 15),)
+                    fontSize: 20),)
             ),
             SizedBox(width: 20),
             InkWell(
@@ -221,14 +221,14 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                 child: Text("Community", style: TextStyle(color: Palette.earth,
                     fontFamily: "MaruBuri",
                     fontWeight: FontWeight.bold,
-                    fontSize: 15),)
+                    fontSize: 20),)
             ),
             SizedBox(width: 20)
           ],
         ),
       ),
       Container(
-        padding: EdgeInsets.only(top: 5 ),
+        padding: EdgeInsets.only(top: 20),
         width: 300,
         alignment: Alignment.topLeft,
         child:

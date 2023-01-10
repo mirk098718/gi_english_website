@@ -142,8 +142,8 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
               fontSize: 14),
-              "글림아일랜드 어학원은 원장의 총괄 관리 하에 유치부와 초등부 한 해 전체 커리큘럼이 사전에 완벽하게 짜여진 상태로 진행되는 시스템으로, 담임 선생님들이 아이들을 밀착 관리하되, 수업 내용은 원장 및 교수부가 부단한 노력으로 연구 개발한 커리큘럼의 틀을 크게 벗어나지 않도록 철저히 관리합니다.\n"
-                  "글림 아일랜드의 시간표는 버리는 시간이 없도록 알찬 내용으로 구성되어 있으며, 아이들이 재미와 학습을 모두 잡을 수 있도록 합니다."
+              "글림아일랜드 어학원은 원장의 총괄 관리 하에 중등부와 초등부 한 해 전체 커리큘럼이 사전에 완벽하게 짜여진 상태로 진행되는 시스템으로, 담임 선생님들이 아이들을 밀착 관리하되, 수업 내용은 원장 및 교수부가 부단한 노력으로 연구 개발한 커리큘럼의 틀을 크게 벗어나지 않도록 철저히 관리합니다.\n"
+                  "글림아일랜드의 시간표는 버리는 시간이 없도록 알찬 내용으로 구성되어 있으며, 아이들이 재미와 학습을 모두 잡을 수 있도록 합니다."
                   ),
           SizedBox(
             height: 20,
@@ -161,8 +161,8 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
               fontWeight: FontWeight.normal,
               fontSize: 14),
               "본원에서는 아이들의 학업 성취와 원 생활에 대한 정보을 학부모님과 보다 가깝게 소통하기 위하여\n"
-              "* 초등부는 월 정기 상담 1회 + alpha,\n"
-              "* 유치부는 월 정기 상담 2회 + alpha 를 진행하고 있습니다.\n"
+              "* 초등부는 월 정기 상담 2회 + alpha,\n"
+              "* 중등부는 월 정기 상담 1회 + alpha 를 진행하고 있습니다.\n"
                   "그리고, 학부모님들의 수업 이해도를 높이기 위하여 매년 학부모 참관 수업 및 행사도 준비될 예정입니다."),
           SizedBox(
             height: 20,
@@ -178,9 +178,9 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
           Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
               fontSize: 14),
               "* 본원에서는 아이들의 원활한 Vocabulary 습득을 위하여 Gi 영단어 어플리케이션을 커리큘럼에 적용, 사용하고 있습니다.\n"
-              "* 유치부, 초등부 모두 매주 해당 주에 배운 단어들에 대한 쪽지 시험을 보며,\n"
+              "* 중등, 초등부 모두 매주 해당 주에 배운 단어들에 대한 쪽지 시험을 보며,\n"
               "* 초등부는 매월 정기 Monthly Test, 6개월에 1회 Level Up Test 를 진행하며,\n"
-              "* 유치부는 3개월에 1회 정기 Mid Term Test, Term Test를 진행하고 있습니다."),
+              "* 중등부는 3개월에 1회 정기 Mid Term Test, Term Test를 진행하고 있습니다."),
           SizedBox(
             height: 20,
           ),

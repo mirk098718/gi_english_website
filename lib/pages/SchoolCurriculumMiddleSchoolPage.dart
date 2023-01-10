@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumElePage.dart';
@@ -11,18 +11,18 @@ import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 import '../util/WidgetUtil.dart';
 
-class SchoolCurriculumKindyPage extends StatefulWidget {
-  const SchoolCurriculumKindyPage({Key? key}) : super(key: key);
+class SchoolCurriculumMiddleSchoolPage extends StatefulWidget {
+  const SchoolCurriculumMiddleSchoolPage({Key? key}) : super(key: key);
 
   @override
-  _SchoolCurriculumKindyPageState createState() =>
-      _SchoolCurriculumKindyPageState();
+  _SchoolCurriculumMiddleSchoolPageState createState() =>
+      _SchoolCurriculumMiddleSchoolPageState();
 }
 
-class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
+class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddleSchoolPage> {
   List<ButtonState> buttonStateList = [
     ButtonState(
-        "정규유치부", BehaviorColor.colorOnClick, SchoolCurriculumKindyPage()),
+        "정규중등부", BehaviorColor.colorOnClick, SchoolCurriculumMiddleSchoolPage()),
     ButtonState(
         "정규초등부", BehaviorColor.colorOnDefault, SchoolCurriculumElePage()),
   ];
@@ -119,7 +119,7 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "정규 유치부 Curriculum",
+              "정규 중등부 Curriculum",
               style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
             ),
             WidgetUtil.myDivider(),
@@ -129,12 +129,12 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
                 fontFamily: "MaruBuri",
                 fontWeight: FontWeight.normal,
                 fontSize: 14),
-                "글림아일랜드 정규유치부는 필수과목(Core), 창의과목(Creative Subject), 그리고 체육과목(Physical Education)의\n"
-                "균형을 맞춘 자체 커리큘럼을 100% 영어로 소화하고 있으며,아이들이 창의성을 최대한 발휘할 수 있는 재미있는 수업 방식을 채택하여 진행합니다.\n"
-                "또한 Scholastic Reading과 어린이 코딩 수업을 영어로 제공하는 Wonder Code 등 뛰어난 외부 교육프로그램 역시 적용하고 교육 효과를 극대화하고 있습니다."),
+                "글림아일랜드 중등부는 "
+                "균형을 맞춘 자체 커리큘럼을 100% 영어로 소화하고 있으며, 아이들이 창의성을 최대한 발휘할 수 있는 재미있는 수업 방식을 채택하여 진행합니다.\n"
+                "또한 Kids Times, Junior Times와 같은 영자신문 프로그램과 코딩 수업을 영어로 제공하는 Wonder Code 등 뛰어난 외부 교육프로그램 역시 적용하고 교육 효과를 극대화하고 있습니다."),
             SizedBox(height: 20),
             Container(
-                width: 600, child: Image.asset("assets/kindyTimetable.png")),
+                width: 600, child: Image.asset("assets/eleTimetableMWF.png")),
             // SizedBox(height: 40),
             // Text(
             //   "Scholastic Reading",
@@ -223,7 +223,7 @@ class _SchoolCurriculumKindyPageState extends State<SchoolCurriculumKindyPage> {
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
                   "킨더 타임즈, 키즈 타임즈, 주니어 타임즈 등 아이들의 레벨과 연령에 맞추어 다양한 영자신문을 제공하는 어린이 영자 신문 전문 브랜드로, "
-                      "글림아일랜드는 유치부 NIE Speaking 수업과 초등부 NIE Debate 수업을 위하여"
+                      "글림아일랜드는 중등부 NIE Speaking 수업과 초등부 NIE Debate 수업을 위하여"
                       "모든 레벨의 어린이 영자신문을 class material 로 적극 활용합니다."),
             ),
             WidgetUtil.myDivider(),

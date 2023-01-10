@@ -167,7 +167,7 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
               "* 적극적 의사표현력을 습득할  NIE Speaking (Debate) 프로그램,\n"
               "* 풍부한 스피킹 표현력을 배울 Gi Expression 프로그램, \n"
               "* Reading 능력을 키워줄  원서읽기 Slow Reading 프로그램,\n"
-              "* 유치부를 위한 S.T.E.A.M 프로그램 (Science, Technology, Engineering, Arts, Mathematics)\n"
+              "* 초등부를 위한 S.T.E.A.M 프로그램 (Science, Technology, Engineering, Arts, Mathematics)\n"
               "등의 양질의 교육 서비스와 액티비티 프로그램을 제공하는 프리미엄 소수정예 영어학원입니다."),
           SizedBox(
             height: 20,

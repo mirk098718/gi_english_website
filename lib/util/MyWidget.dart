@@ -18,7 +18,7 @@ class MyWidget {
             "Gi Gleam Island 어학원 파주",
             style: TextStyle(
                 color: Palette.black,
-                fontFamily: "Decoshadow",
+                fontFamily: "MaruBuri",
                 fontWeight: FontWeight.bold,
                 fontSize: 14),
           ),

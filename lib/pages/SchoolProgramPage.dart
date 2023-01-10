@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/pages/SchoolAllDayPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
@@ -11,6 +10,7 @@ import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 import '../util/WidgetUtil.dart';
+import 'SchoolCodingPage.dart';
 
 class SchoolProgramPage extends StatefulWidget {
   const SchoolProgramPage({Key? key}) : super(key: key);
@@ -22,7 +22,7 @@ class SchoolProgramPage extends StatefulWidget {
 class _SchoolProgramPageState extends State<SchoolProgramPage> {
   List<ButtonState> buttonStateList = [
     ButtonState("정규프로그램", BehaviorColor.colorOnClick, SchoolProgramPage()),
-    ButtonState("올데이케어", BehaviorColor.colorOnDefault, SchoolAllDayPage()),
+    ButtonState("영어코딩프로그램", BehaviorColor.colorOnDefault, SchoolCodingPage()),
     ButtonState("NZ연계프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
   ];
 
@@ -130,7 +130,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "유치부",
+                        "중등부",
                         style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
                       ),
                       Container(
@@ -175,8 +175,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                               fontFamily: "MaruBuri",
                               fontWeight: FontWeight.normal,
                               fontSize: 14),
-                              "5세~7세 (만 4세~만 6세) \n"
-                                  "미취학 유아"),
+                              "14세~16세 (만 13세~만 15세) \n"
+                                  "중학생"),
                         ],
                       )
                     ],
@@ -246,7 +246,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
             ),
           ),
           Text(
-            "유치부 프로그램 개요",
+            "중등부 프로그램 개요",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
           ),
           SizedBox(
@@ -257,14 +257,12 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
               fontSize: 14),
-              "글림아일랜드의 영어 유치부 프로그램은, \n"
-              "뉴질랜드 유아 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
+              "글림아일랜드의 영어 중등부 프로그램은, \n"
+              "뉴질랜드 College 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
                   "다양하면서도 독특한 수업을 제공합니다. 아이들을 질리게 하는 공부만을 위한 공부가 되지 않도록\n"
-                  "필수 과목 (Common Core Subjects)과 재미있는 활동, 창의 수업 (Fun Activities / Creative Subjects) 들을\n"
-                  "골고루 배치하였으며, 특히 아이들이 사회, 과학, 예술 등 다양한 영역에 대한 상식과 세상을 배울 수 있도록 어린이 영자신문을 활용한\n"
+                  "아이들이 사회, 과학, 예술 등 다양한 영역에 대한 상식과 세상을 배울 수 있도록 다양한 컨텐츠를 다루는 영자신문을 활용한\n"
                   "NIE Speaking 프로그램은 아이들의 영어 실력을 눈에 띄게 향상시킬 것 입니다.\n"
-                  "그 외에도, 프로그래밍적인 사고를 배울 수 있는 코딩 수업, 두뇌 발달과 재미을 동시에 잡는 체스 시간 역시\n"
-                  "타 영어유치원에서는 볼 수 없는 글림아일랜드만의 특별 프로그램이랍니다! :)"),
+                  "그 외, 선택 과목으로 컴퓨터 프로그래밍적인 사고를 배울 수 있는 코딩 수업을 제공합니다."),
           SizedBox(
             height: 20,
           ),
@@ -318,7 +316,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "유치부",
+                  "중등",
                   style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
                 ),
                 Container(width: 10),
@@ -346,8 +344,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                       fontFamily: "MaruBuri",
                       fontWeight: FontWeight.normal,
                       fontSize: 14),
-                      "6세~7세 (만5세~만6세) \n"
-                          "미취학 유아"),
+                      "14세~16세 (만13세~만15세) \n"
+                          "중등학생"),
                 ]),
                 SizedBox(height: 10),
                 Divider(color: Palette.black, thickness: 2),
@@ -397,7 +395,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
             ),
           ),
           Text(
-            "유치부 프로그램 개요",
+            "중등부 프로그램 개요",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
           ),
           SizedBox(
@@ -408,13 +406,11 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
               fontFamily: "MaruBuri",
               fontWeight: FontWeight.normal,
               fontSize: 14),
-              "글림아일랜드의 영어 유치부 프로그램은, \n"
-                  "뉴질랜드 유아 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
-                  "다양하면서도 독특한 수업을 제공합니다. 아이들을 질리게 하는 공부만을 위한 공부가 되지 않도록\n"
-                  "필수 과목 (Common Core Subjects)과 재미있는 활동, 창의 수업 (Fun Activities / Creative Subjects) 들을\n"
-                  "골고루 배치하였으며, 특히 아이들이 사회, 과학, 예술 등 다양한 영역에 대한 상식과 세상을 배울 수 있도록 어린이 영자신문을 활용한\n"
+              "글림아일랜드의 영어 중등부 프로그램은, \n"
+                  "뉴질랜드 College 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입한 커리큘럼을 제공하며,\n"
+                  "아이들이 사회, 과학, 예술 등 다양한 영역에 대한 상식과 세상을 배울 수 있도록 다양한 컨텐츠를 제공하는 영자신문을 활용한\n"
                   "NIE Speaking 프로그램은 아이들의 영어 실력을 눈에 띄게 향상시킬 것 입니다.\n"
-                  "그 외에도, 프로그래밍적인 사고를 배울 수 있는 코딩 수업, 두뇌 발달과 재미을 동시에 잡는 체스 시간 역시\n"
+                  "그 외에도, 컴퓨터 프로그래밍적인 사고를 배울 수 있는 코딩 수업, 두뇌 발달과 재미을 동시에 잡는 체스 시간 역시\n"
                   "타 영어유치원에서는 볼 수 없는 글림아일랜드만의 특별 프로그램이랍니다! :)"),
           SizedBox(
             height: 20,
