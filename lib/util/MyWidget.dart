@@ -7,7 +7,7 @@ class MyWidget {
 
 
   static Widget footer() {
-    return Container(width: double.infinity, color: Palette.lightestEarth,
+    return Container(width: double.infinity, color: Palette.deepGreen,
       alignment: Alignment.centerLeft,
       padding: EdgeInsets.all(20),
       child: Column(
@@ -17,20 +17,20 @@ class MyWidget {
           Text(
             "Gi Gleam Island 어학원 파주",
             style: TextStyle(
-                color: Palette.black,
-                fontFamily: "MaruBuri",
+                color: Palette.white,
+                fontFamily: "NotoSansKR",
                 fontWeight: FontWeight.bold,
                 fontSize: 14),
           ),
           SizedBox(height: 5,),
-          Text("경기도 파주시 해올1길 태산 W 타워 7층\n"
-                "문의 : 준비중, 본 웹사이트의 상담문의 페이지 또는 이메일을 이용해주세요. \n"
+          Text("경기도 파주시 해올2길 12 태산 W 타워 7층 701~703호\n"
+                "문의 : 010 2788 0907 \n"
                 "email : gienglish.paju@gmail.com\n"
                 "사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희\n"
                 "사업자 등록번호 : 준비중\n"
                 "신고번호 : 준비중\n"
                 "Copyright ⓒ 글림아일랜드어학원",
-            style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
+            style: TextStyle(color: Palette.white, fontFamily: "NotoSansKR", fontWeight: FontWeight.normal,
                 fontSize: 14),
           ),
         ],
@@ -72,7 +72,7 @@ class MyWidget {
           alignment: Alignment.center,
           child: Text("ⓒ 글림아일랜드교육",
             style: TextStyle(color: Palette.white,
-                fontFamily: "MaruBuri",
+                fontFamily: "NotoSansKR",
                 fontWeight: FontWeight.bold,
                 fontSize: 14),
           ),
@@ -153,7 +153,7 @@ class MyWidget {
     return TextButton(
       onPressed: () {},
       child: Text(text, textAlign: TextAlign.center,style: TextStyle(
-          fontFamily: "MaruBuri", color: color, fontSize: size),),
+          fontFamily: "Behappy", color: color, fontSize: size),),
       style: ElevatedButton.styleFrom(
       ),
     );

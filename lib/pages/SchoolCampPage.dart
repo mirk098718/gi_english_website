@@ -146,7 +146,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
           ),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
               "여름방학 / 겨울방학 기간 2주 코스"),
@@ -162,7 +162,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
           ),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
               "본원 초등부 저학년 대상"),

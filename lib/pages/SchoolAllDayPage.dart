@@ -145,7 +145,7 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
           ),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
               "오후 2시 20분 ~ 오후 6시 까지 (6시 이전 픽업 가능)"),
@@ -161,7 +161,7 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
           ),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
               "2시에 수업을 마치는 본원 유치부 학생, 학부모님 픽업이 가능한 시간까지 돌봄 서비스"),
@@ -177,7 +177,7 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
           ),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
               "영어로 진행되는 다양한 놀이 수업:\n"

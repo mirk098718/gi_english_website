@@ -20,7 +20,7 @@ class EasyRadio extends StatelessWidget {
       children: [
         Text(label,style: TextStyle(
             color: Palette.black,
-            fontFamily: "MaruBuri",
+            fontFamily: "NotoSansKR",
             fontWeight: FontWeight.normal,
             fontSize: 14)),
         Radio(

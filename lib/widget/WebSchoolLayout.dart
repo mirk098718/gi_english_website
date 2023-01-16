@@ -188,38 +188,53 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             InkWell(
               onTap: (){MenuUtil.push(context, SchoolAboutPage());},
               child: Text("About",
-                style: TextStyle(color: Palette.earth,
-                    fontFamily: "MaruBuri",
+                style: TextStyle(color: Palette.black,
+                    fontFamily: "NotoSansKR",
                     fontWeight: FontWeight.bold,
                     fontSize: 20),
               ),
             ),
 
-            SizedBox(width: 20),
+            Container(
+              margin: EdgeInsets.only(left: 10,right: 10,top:5,bottom: 5),
+              width: 0.5,
+              height: 10,
+              color: Palette.mainGrey,
+            ),
             InkWell(
                 onTap: (){MenuUtil.push(context, SchoolProgramPage());},
                 child: Text("Program",
-                  style: TextStyle(color: Palette.earth,
-                      fontFamily: "MaruBuri",
+                  style: TextStyle(color: Palette.black,
+                      fontFamily: "NotoSansKR",
                       fontWeight: FontWeight.bold,
                       fontSize: 20),
                 )
             ),
-            SizedBox(width: 20),
+            Container(
+              margin: EdgeInsets.only(left: 10,right: 10,top:5,bottom: 5),
+              width: 0.5,
+              height: 10,
+              color: Palette.mainGrey,
+            ),
             InkWell(
                 onTap: (){MenuUtil.push(context, SchoolCurriculumMiddleSchoolPage());},
-                child: Text("Curriculum", style: TextStyle(color: Palette.earth,
-                    fontFamily: "MaruBuri",
+                child: Text("Curriculum", style: TextStyle(color: Palette.black,
+                    fontFamily: "NotoSansKR",
                     fontWeight: FontWeight.bold,
                     fontSize: 20),)
             ),
-            SizedBox(width: 20),
+            Container(
+              margin: EdgeInsets.only(left: 10,right: 10,top:5,bottom: 5),
+              width: 0.5,
+              height: 10,
+              color: Palette.mainGrey,
+            ),
             InkWell(
                 onTap: (){
                   // MenuUtil.push(context, SchoolCommunityNoticePage());
                   },
-                child: Text("Community", style: TextStyle(color: Palette.earth,
-                    fontFamily: "MaruBuri",
+                child: Text("Community", style: TextStyle(color: Palette.black,
+                    fontFamily: "NotoSansKR",
                     fontWeight: FontWeight.bold,
                     fontSize: 20),)
             ),

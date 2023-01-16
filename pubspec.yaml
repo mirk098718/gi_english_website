@@ -72,7 +72,6 @@ flutter:
      - assets/communityMainImage.png
      - assets/giAppBanner.png
      - assets/giAppBannerArrow.png
-     - assets/giAppBannerBlue.png
      - assets/snsArrow.png
      - assets/giAppDownload.png
      - assets/mobileBallPoolImage.png
@@ -106,11 +105,19 @@ flutter:
      - assets/mainGateImageLightBlue.png
      - assets/kinderTimesLogo.png
      - assets/juniorTimesLogo.png
-     - assets/trophyLogo.png
+     - assets/eleOnlineLink.png
+     - assets/middleOnlineLink.png
      - assets/nieAd.png
      - assets/nieAd2.png
      - assets/trophyAd1.png
      - assets/trophyAd2.png
+     - assets/bulletinBoardBG.png
+     - assets/mainBannerOpening.png
+     - naverBlogLogo.png
+     - assets/mainGateImageSimple.png
+     - assets/mainGateImageBlack.png
+     - assets/gleamIslandMoto.png
+
 
 
 

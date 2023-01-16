@@ -121,14 +121,14 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),"입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
           // Divider(),
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),"아이 이름"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
@@ -137,7 +137,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),"보호자님 성함"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
@@ -146,7 +146,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),"보호자님 연락처"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
@@ -155,7 +155,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),"아이 연령"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
@@ -164,7 +164,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),"아이 레벨"),
           WidgetUtil.myDivider(),
@@ -172,7 +172,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),"전화상담 희망시간"),
           WidgetUtil.myDivider(),
@@ -203,13 +203,13 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),"입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),"아이 이름"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
@@ -218,7 +218,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),"보호자님 성함"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
@@ -227,7 +227,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),"보호자님 연락처"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
@@ -236,7 +236,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),"아이 연령"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
@@ -245,7 +245,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),"아이 레벨"),
           WidgetUtil.myDivider(),
@@ -253,7 +253,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),"전화상담 희망시간"),
           WidgetUtil.myDivider(),
@@ -297,7 +297,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
               // "원하시는 대면 상담 날짜를 선택해주세요."
@@ -519,7 +519,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           SizedBox(height: 20),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
               // "원하시는 대면 상담 날짜를 선택해주세요."

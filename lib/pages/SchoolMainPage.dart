@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
@@ -59,12 +59,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
 
   Widget mainImage() {
     return Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Palette.lightestEarth, width: 10),
-          // borderRadius: BorderRadius.circular(10),
-        ),
         child: Stack(alignment: Alignment.centerLeft, children: [
-          Image.asset("assets/mainGateImageLightBlue.png"),
+          Image.asset("assets/mainGateImageBlack.png"),
           Container(
             width: 500,
             padding: EdgeInsets.only(left: 20),
@@ -108,60 +104,47 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
           Expanded(
             flex: 1,
             child: Container(
-              margin: EdgeInsets.all(5),
+             height: 120,
               decoration: BoxDecoration(
-                border: Border.all(color: Palette.lightestEarth, width: 1),
-                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Palette.lightestEarth, width: 5),
+                // borderRadius: BorderRadius.circular(5),
               ),
               child: Row(
                 children: [
                   Expanded(
-                      flex: 1,
-                      child: Container(
-                        padding: EdgeInsets.only(left: 15),
-                        child: Column(
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: Container(),
-                            ),
-                            Text(
-                              "GLEAM ISLAND",
-                              style: TextStyle(
-                                fontFamily: "Jalnan",
-                                fontSize: 15,
-                                color: Palette.deepGreen,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                            Text(
-                              "소식을 SNS에서 확인하세요!",
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                  color: Palette.black,
-                                  fontFamily: "MaruBuri",
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 14),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Container(),
-                            ),
-                          ],
-                        ),
-                      )),
+                    flex: 3,
+                    child: Container(
+                      padding: EdgeInsets.only(top: 5, bottom: 5),
+                      alignment: Alignment.center,
+                      child: Image.asset("assets/giAppBannerFinal.png"),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      height: 60,
+                      alignment: Alignment.center,
+                      child: Image.asset("assets/giAppDownload.png"),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(5),
+                    width: 0.5,
+                    height: 40,
+                    color: Palette.mainGrey,
+                  ),
                   Expanded(
                       flex: 1,
                       child: Container(
+                        width: 80,
+                        height: 80,
+                        padding: EdgeInsets.all(10),
                         alignment: Alignment.center,
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset("assets/instaLogo.png"),
-                              SizedBox(height: 5),
-                              MyWidget.schoolTextButton(
-                                  "인스타 바로가기", Palette.black, 12)
-                            ]),
+                        child: InkWell(
+                            onTap: () async {
+                              UrlUtil.open('https://www.instagram.com/gleam_island_school/');
+                            },
+                            child: Image.asset("assets/instaLogo.png")),
                       )),
                   Container(
                     margin: EdgeInsets.all(5),
@@ -172,15 +155,17 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   Expanded(
                       flex: 1,
                       child: Container(
+                        width: 80,
+                        height: 80,
+                        padding: EdgeInsets.all(10),
                         alignment: Alignment.center,
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset("assets/youtubeLogo.png"),
-                              SizedBox(height: 5),
-                              MyWidget.schoolTextButton(
-                                  "유투브 바로가기", Palette.black, 12)
-                            ]),
+                        child: InkWell(
+                            onTap: () async {
+                              UrlUtil.open('https://blog.naver.com/gleam-island-paju');
+                            },
+                          child: Container(
+                              width:40,child: Image.asset("assets/naverBlogLogo.png")),
+                        ),
                       )),
                 ],
               ),
@@ -189,27 +174,25 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
           Expanded(
               flex: 1,
               child: Container(
-                margin: EdgeInsets.all(5),
+                height: 120,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Palette.lightestEarth, width: 1),
-                  borderRadius: BorderRadius.circular(10),
+                  border: Border(top: BorderSide(color: Palette.lightestEarth, width:5),
+                      bottom: BorderSide(color: Palette.lightestEarth, width:5),
+                      right: BorderSide(color: Palette.lightestEarth, width:5)),
+                  // borderRadius: BorderRadius.circular(5),
                 ),
                 child: Row(
                   children: [
                     Expanded(
                       flex: 3,
                       child: Container(
-                        padding: EdgeInsets.only(left: 15, top: 5, bottom: 5),
-                        alignment: Alignment.center,
-                        child: Image.asset("assets/giAppBannerFinal.png"),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        height: 100,
-                        alignment: Alignment.center,
-                        child: Image.asset("assets/giAppDownload.png"),
+                        margin: EdgeInsets.only(top:15, bottom: 15),
+                        child: InkWell(
+                          child: Image.asset("assets/middleOnlineLink.png"),
+                          onTap: () async {
+                            UrlUtil.open('http://demo.theclip.net/Pages/Contents?mid=HP1023');
+                          },
+                        ),
                       ),
                     ),
                     Container(
@@ -223,7 +206,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                       child: Container(
                         margin: EdgeInsets.all(10),
                         child: InkWell(
-                          child: Image.asset("assets/trophyLogo.png"),
+                          child: Image.asset("assets/eleOnlineLink.png"),
                           onTap: () async {
                             UrlUtil.open('https://www.trophy9.com/');
                           },
@@ -239,11 +222,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
   }
 
   Widget bulletinBoard() {
-    double eachBoardHeight = 450;
+    double eachBoardHeight = 500;
 
     return Container(
-      padding: EdgeInsets.only(top: 20, bottom: 20),
-      color: Palette.white,
+      decoration: BoxDecoration(image: DecorationImage(image: AssetImage("assets/bulletinBoardBG.png"), fit: BoxFit.fill)),
+      padding: EdgeInsets.only(top: 20, bottom: 200),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -252,6 +235,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             flex: 5,
             child: Container(
               decoration: BoxDecoration(
+                color: Colors.white,
                 border: Border.all(color: Palette.mainLightGrey, width: 3),
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -280,55 +264,78 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                       ),
                     ),
                     Container(
+                    color: Colors.white,
+                    alignment: Alignment.topLeft,
+                    padding: EdgeInsets.all(20),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              style: TextStyle(
+                                  color: Palette.black,
+                                  fontFamily: "NotoSansKR",
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14),
+                              "글림아일랜드 소식"),
+                          WidgetUtil.myDivider(),
+                          Text(
+                              style: TextStyle(
+                                  color: Palette.black,
+                                  fontFamily: "NotoSansKR",
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 14),
+                              "글림아일랜드 어학원 입주 예정지인, 다율동 '태산 W 타워' 준공 완료! 글림아일랜드 어학원이 2월 15일 오픈 예정입니다*^^*"),]
+                    ),
+                  ),
+                    Container(
+                      color: Colors.white,
                       alignment: Alignment.topLeft,
-                      margin: EdgeInsets.all(20),
-                      child: Container(
-                        child: Text(
-                            style: TextStyle(
-                                color: Palette.black,
-                                fontFamily: "Maruburi",
-                                fontWeight: FontWeight.normal,
-                                fontSize: 14),
-                            "글림아일랜드 어학원 초등부 (8세~13세) 입학설명회 : \n"
-                            "2023년 2월 9일~10일 \n"
-                            "Gi 초등부 1차 입학설명회가 2월 9일부터 이틀간 예정되어 있으니, 학부모님들의 많은 관심과 참여 부탁드립니다! :) \n"
-                            "(장소 및 상세스케줄 곧 업데이트 예정, 준공 이후 주소 확정)"),
+                      padding: EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                style: TextStyle(
+                                    color: Palette.black,
+                                    fontFamily: "NotoSansKR",
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14),
+                                "Gi어학원 초등부 학부모설명회"),
+                            WidgetUtil.myDivider(),
+                            Text(
+                                style: TextStyle(
+                                    color: Palette.black,
+                                    fontFamily: "NotoSansKR",
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14),
+                                "글림아일랜드에서 학부모님들을 초대하여\n입학설명회를 진행하고자 합니다! \n"
+                                    "초등부: 2월 17일 금 2시~3시, 2월 18일 금 2시~3시\n"
+                                    "중등부: 2월 17일 금 3시~4시, 2월 18일 토 3시~4시"),]
                       ),
                     ),
                     Container(
-                      height: 1,
-                      color: Colors.black26,
-                      margin: EdgeInsets.only(right: 10, left: 10),
-                    ),
-                    Container(
+                      color: Colors.white,
                       alignment: Alignment.topLeft,
                       padding: EdgeInsets.all(20),
-                      child: Text(
-                          style: TextStyle(
-                              color: Palette.black,
-                              fontFamily: "MaruBuri",
-                              fontWeight: FontWeight.normal,
-                              fontSize: 14),
-                          "글림아일랜드 어학원 중등부 (14~16세) 입학설명회 : \n"
-                          "2023년 2월 9일~10일 \n"
-                          "Gi 중등부 1차 입학설명회가 2월 9일부터 이틀간 예정되어 있으니, 학부모님들의 많은 관심과 참여 부탁드립니다! :) \n"
-                          "(장소 및 상세스케줄 곧 업데이트 예정, 준공 이후 주소 확정)"),
-                    ),
-                    Container(
-                      height: 1,
-                      color: Colors.black26,
-                      margin: EdgeInsets.only(right: 10, left: 10),
-                    ),
-                    Container(
-                      alignment: Alignment.topLeft,
-                      padding: EdgeInsets.all(20),
-                      child: Text(
-                          style: TextStyle(
-                              color: Palette.black,
-                              fontFamily: "MaruBuri",
-                              fontWeight: FontWeight.normal,
-                              fontSize: 14),
-                          "글림아일랜드 어학원 입주 예정지인, 다율동 '태산 W 타워' 준공 1월 초순 예정"),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              style: TextStyle(
+                                  color: Palette.black,
+                                  fontFamily: "NotoSansKR",
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14),
+                              "학원 차량 노선"),
+                          WidgetUtil.myDivider(),
+                          Text(
+                            style: TextStyle(
+                                color: Palette.black,
+                                fontFamily: "NotoSansKR",
+                                fontWeight: FontWeight.normal,
+                                fontSize: 14),
+                            "본원에서는 초등, 중등반 수업 스케줄에 따른 학원 차량을 운행하며 자세한 내용은 상담시 차량 노선과 함께 제공합니다."),]
+                      ),
                     )
                   ],
                 ),
@@ -340,6 +347,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             flex: 5,
             child: Container(
               decoration: BoxDecoration(
+                color: Colors.white,
                 border: Border.all(color: Palette.mainLightGrey, width: 3),
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -368,6 +376,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                       ),
                     ),
                     Container(
+                      color: Colors.white,
                       alignment: Alignment.topLeft,
                       padding: EdgeInsets.all(20),
                       child: Column(
@@ -377,7 +386,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                             Text(
                                 style: TextStyle(
                                     color: Palette.black,
-                                    fontFamily: "MaruBuri",
+                                    fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14),
                                 "Q: 글림아일랜드 어학원 정식 오픈일이 언제일까요?"),
@@ -385,10 +394,12 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                             Text(
                                 style: TextStyle(
                                     color: Palette.black,
-                                    fontFamily: "MaruBuri",
+                                    fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
-                                "A: 글림아일랜드 어학원 예정지인 다율동 태산 W 타워의 준공이 12월 중순 준공 예정이므로, 약 한달의 인테리어 기간 이후인 1월 중순 오픈 예정이며, 이때부터 현장에서 입학설명회가 열릴 예정입니다.^^"),
+                                "A: 글림아일랜드 어학원 예정지인 다율동 태산 W 타워의 준공이 1월 중순 준공 예정이므로, "
+                                    "약 한달의 인테리어 기간 이후인 2월 17일 오픈 예정이며, 이때부터 현장에서 입학설명회가 열릴 예정입니다.^^\n"
+                                    "수업 개강일은 2월 27일입니다."),
                           ]),
                     ),
                     Container(
@@ -396,6 +407,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                       margin: EdgeInsets.only(right: 10, left: 10),
                     ),
                     Container(
+                      color: Colors.white,
                       alignment: Alignment.topLeft,
                       padding: EdgeInsets.all(20),
                       child: Column(
@@ -405,7 +417,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                             Text(
                                 style: TextStyle(
                                     color: Palette.black,
-                                    fontFamily: "MaruBuri",
+                                    fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14),
                                 "Q: 초등, 중등부 각반 정원은 몇명인가요?"),
@@ -413,17 +425,19 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                             Text(
                                 style: TextStyle(
                                     color: Palette.black,
-                                    fontFamily: "MaruBuri",
+                                    fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
-                                "A: 초등부, 중등부 정원은 한 반에 8명~10명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, 각반을 담당하는 원어민 선생님이 배정됩니다."),
+                                "A: 초등부, 중등부 정원은 한 반에 8명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, 각반을 담당하는 원어민 선생님이 배정됩니다."),
                           ]),
                     ),
                     Container(
+                      color: Colors.white,
                       height: 1,
                       margin: EdgeInsets.only(right: 10, left: 10),
                     ),
                     Container(
+                      color: Colors.white,
                       alignment: Alignment.topLeft,
                       padding: EdgeInsets.all(20),
                       child: Column(
@@ -433,18 +447,20 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                             Text(
                                 style: TextStyle(
                                     color: Palette.black,
-                                    fontFamily: "MaruBuri",
+                                    fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14),
-                                "Q: 초등부는 연령별로 반이 나뉘나요?"),
+                                "Q: 연령별로 반이 나뉘나요?"),
                             WidgetUtil.myDivider(),
                             Text(
                                 style: TextStyle(
                                     color: Palette.black,
-                                    fontFamily: "MaruBuri",
+                                    fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
-                                "A: 초등부는 연령을 고려하되, 실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다."),
+                                "A: 초등부는 연령을 고려하되,\n"
+                                    "실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다.\n"
+                                    "중등부는 연령과 실력에 따라 반 배정이 되며 내신을 고려하여 학교도 되도록이면 통일합니다."),
                           ]),
                     ),
                   ],
@@ -465,10 +481,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         child: Column(
           children: [
             mainImage(),
-            SizedBox(height: 150, child: urlMenu()),
-            Container(height: 30, color: Palette.white),
+            SizedBox(height: 120, child: urlMenu()),
+            Container(width:double.infinity,child: Image.asset("assets/mainBannerOpening.png")),
             bulletinBoard(),
             SizedBox(height: 213, child: MyWidget.footer()),
+
           ],
         ),
       ),
@@ -482,7 +499,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
       child: Container(
         child: Column(
           children: [
-            mobileMainImage(),
+            Image.asset("assets/mainBannerOpening.png"),
             // mobileMenuList(),
             mobileUrlMenu(),
             mobileBulletinBoard(),
@@ -541,7 +558,9 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                 color: Colors.black54,
               ),
               Spacer(),
-              Image.asset("assets/youtubeLogo.png"),
+              Container(
+                  width: 40,
+                  child: Image.asset("assets/naverBlogLogo.png")),
               Spacer(),
               Container(
                 margin: EdgeInsets.all(5),
@@ -582,19 +601,44 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
               )
             ],
           ),
+
           SizedBox(
             height: 10,
           ),
-          Container(
-            alignment: Alignment.center,
-            height: 90,
-            margin: EdgeInsets.all(10),
-            child: InkWell(
-              child: Image.asset("assets/trophyLogo.png"),
-              onTap: () async {
-                UrlUtil.open('https://www.trophy9.com/');
-              },
-            ),
+
+          Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: Container(
+                  margin: EdgeInsets.only(top:15, bottom: 15),
+                  child: InkWell(
+                    child: Image.asset("assets/middleOnlineLink.png"),
+                    onTap: () async {
+                      UrlUtil.open('http://demo.theclip.net/Pages/Contents?mid=HP1023');
+                    },
+                  ),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.all(5),
+                width: 0.5,
+                height: 40,
+                color: Palette.mainGrey,
+              ),
+              Expanded(
+                flex: 3,
+                child: Container(
+                  margin: EdgeInsets.all(10),
+                  child: InkWell(
+                    child: Image.asset("assets/eleOnlineLink.png"),
+                    onTap: () async {
+                      UrlUtil.open('https://www.trophy9.com/');
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -614,69 +658,78 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             child: Column(
               children: [
                 Container(
-                  width: double.infinity,
-                  child: TextButton(
-                    child: Text("Notice Board",
-                        style: TextStyle(
-                            color: Palette.black, fontFamily: "Jalnan")),
-                    onPressed: () {
-                      // MenuUtil.push(context, SchoolCommunityNoticePage());
-                    },
+                  color: Colors.white,
+                  alignment: Alignment.topLeft,
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                            style: TextStyle(
+                                color: Palette.black,
+                                fontFamily: "NotoSansKR",
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14),
+                            "글림아일랜드 소식"),
+                        WidgetUtil.myDivider(),
+                        Text(
+                            style: TextStyle(
+                                color: Palette.black,
+                                fontFamily: "NotoSansKR",
+                                fontWeight: FontWeight.normal,
+                                fontSize: 14),
+                            "글림아일랜드 어학원 입주 예정지인, 다율동 '태산 W 타워' 준공 완료! 글림아일랜드 어학원이 2월 15일 오픈 예정입니다*^^*"),]
                   ),
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Palette.mainLightGrey,
-                    border: Border.all(color: Palette.mainLightGrey, width: 3),
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(18),
-                        topRight: Radius.circular(18)),
+                ),
+                Container(
+                  color: Colors.white,
+                  alignment: Alignment.topLeft,
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                            style: TextStyle(
+                                color: Palette.black,
+                                fontFamily: "NotoSansKR",
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14),
+                            "Gi어학원 초등부 학부모설명회"),
+                        WidgetUtil.myDivider(),
+                        Text(
+                            style: TextStyle(
+                                color: Palette.black,
+                                fontFamily: "NotoSansKR",
+                                fontWeight: FontWeight.normal,
+                                fontSize: 14),
+                            "글림아일랜드에서 학부모님들을 초대하여\n입학설명회를 진행하고자 합니다! \n"
+                                "초등부: 2월 17일 금 2시~3시, 2월 18일 금 2시~3시\n"
+                                "중등부: 2월 17일 금 3시~4시, 2월 18일 토 3시~4시"),]
                   ),
                 ),
                 Container(
+                  color: Colors.white,
                   alignment: Alignment.topLeft,
                   padding: EdgeInsets.all(20),
-                  child: Text(
-                      style: TextStyle(
-                          color: Palette.black,
-                          fontFamily: "MaruBuri",
-                          fontWeight: FontWeight.normal,
-                          fontSize: 14),
-                      "글림아일랜드 어학원 초등부 (8세~13세) 입학설명회 : 2023년 2월 9일~10일 / \n"
-                      "Gi 초등부 1차 입학설명회가 2월 9일부터 이틀간 예정되어 있으니, \n"
-                      "학부모님들의 많은 관심과 참여 부탁드립니다! :) \n(장소 및 상세스케줄 곧 업데이트 예정, 준공 이후 주소 확정)"),
-                ),
-                Container(
-                  height: 1,
-                  color: Colors.black26,
-                  margin: EdgeInsets.only(right: 10, left: 10),
-                ),
-                Container(
-                  alignment: Alignment.topLeft,
-                  padding: EdgeInsets.all(20),
-                  child: Text(
-                      style: TextStyle(
-                          color: Palette.black,
-                          fontFamily: "MaruBuri",
-                          fontWeight: FontWeight.normal,
-                          fontSize: 14),
-                      "글림아일랜드 어학원 중등부 (14세~16세) 입학설명회 : 2023년 2월 9일~10일 / \n"
-                      "Gi 중등부 1차 입학설명회가 2월 9일부터 이틀간 예정되어 있으니, 학부모님들의 많은 관심과 참여 부탁드립니다! :) (장소 및 상세스케줄 곧 업데이트 예정, 준공 이후 주소 확정)"),
-                ),
-                Container(
-                  height: 1,
-                  color: Colors.black26,
-                  margin: EdgeInsets.only(right: 10, left: 10),
-                ),
-                Container(
-                  alignment: Alignment.topLeft,
-                  padding: EdgeInsets.all(20),
-                  child: Text(
-                      style: TextStyle(
-                          color: Palette.black,
-                          fontFamily: "MaruBuri",
-                          fontWeight: FontWeight.normal,
-                          fontSize: 14),
-                      "글림아일랜드 어학원 입주 예정지인, 다율동 '태산 W 타워' 준공 1월 초순 예정"),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                            style: TextStyle(
+                                color: Palette.black,
+                                fontFamily: "NotoSansKR",
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14),
+                            "학원 차량 노선"),
+                        WidgetUtil.myDivider(),
+                        Text(
+                            style: TextStyle(
+                                color: Palette.black,
+                                fontFamily: "NotoSansKR",
+                                fontWeight: FontWeight.normal,
+                                fontSize: 14),
+                            "본원에서는 초등, 중등반 수업 스케줄에 따른 학원 차량을 운행하며 자세한 내용은 상담시 차량 노선과 함께 제공합니다."),]
+                  ),
                 )
               ],
             ),
@@ -709,15 +762,17 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   ),
                 ),
                 Container(
+                  color: Colors.white,
                   alignment: Alignment.topLeft,
                   padding: EdgeInsets.all(20),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                             style: TextStyle(
                                 color: Palette.black,
-                                fontFamily: "MaruBuri",
+                                fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14),
                             "Q: 글림아일랜드 어학원 정식 오픈일이 언제일까요?"),
@@ -725,10 +780,12 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                         Text(
                             style: TextStyle(
                                 color: Palette.black,
-                                fontFamily: "MaruBuri",
+                                fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
-                            "A: 글림아일랜드 어학원 예정지인 다율동 태산 W 타워의 준공이 1월 초순 준공 예정이므로, 약 한달의 인테리어 기간 이후인 1월 중순 오픈 예정이며, 이때부터 현장에서 입학설명회가 열릴 예정입니다.^^"),
+                            "A: 글림아일랜드 어학원 예정지인 다율동 태산 W 타워의 준공이 1월 중순 준공 예정이므로, "
+                                "약 한달의 인테리어 기간 이후인 2월 17일 오픈 예정이며, 이때부터 현장에서 입학설명회가 열릴 예정입니다.^^\n"
+                                "수업 개강일은 2월 27일입니다."),
                       ]),
                 ),
                 Container(
@@ -736,15 +793,17 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   margin: EdgeInsets.only(right: 10, left: 10),
                 ),
                 Container(
+                  color: Colors.white,
                   alignment: Alignment.topLeft,
                   padding: EdgeInsets.all(20),
                   child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                             style: TextStyle(
                                 color: Palette.black,
-                                fontFamily: "MaruBuri",
+                                fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14),
                             "Q: 초등, 중등부 각반 정원은 몇명인가요?"),
@@ -752,37 +811,42 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                         Text(
                             style: TextStyle(
                                 color: Palette.black,
-                                fontFamily: "MaruBuri",
+                                fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
-                            "A: 정원은 한 반에 8~10명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, 각반을 담당하는 원어민 선생님이 배정됩니다."),
+                            "A: 초등부, 중등부 정원은 한 반에 8명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, 각반을 담당하는 원어민 선생님이 배정됩니다."),
                       ]),
                 ),
                 Container(
+                  color: Colors.white,
                   height: 1,
                   margin: EdgeInsets.only(right: 10, left: 10),
                 ),
                 Container(
+                  color: Colors.white,
                   alignment: Alignment.topLeft,
                   padding: EdgeInsets.all(20),
                   child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                             style: TextStyle(
                                 color: Palette.black,
-                                fontFamily: "MaruBuri",
+                                fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14),
-                            "Q: 초등부는 연령별로 반이 나뉘나요?"),
+                            "Q: 연령별로 반이 나뉘나요?"),
                         WidgetUtil.myDivider(),
                         Text(
                             style: TextStyle(
                                 color: Palette.black,
-                                fontFamily: "MaruBuri",
+                                fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
-                            "A: 초등부는 연령을 고려하되, 실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다."),
+                            "A: 초등부는 연령을 고려하되,\n"
+                                "실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다.\n"
+                                "중등부는 연령과 실력에 따라 반 배정이 되며 내신을 고려하여 학교도 되도록이면 통일합니다."),
                       ]),
                 ),
               ],

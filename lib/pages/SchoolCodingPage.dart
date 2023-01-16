@@ -145,7 +145,7 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
           ),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
               "오후 2시 30분 ~ 오후 9시 까지"),
@@ -161,7 +161,7 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
           ),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
               "기초 코딩 스킬과 컴퓨팅 사고력을 키우고자 하는 초등~중등학생. 초등/중등 반으로 나뉘어 반 편성이 되며, 실력 테스트 없이 모두 기초반에서 시작하게 됩니다."),
@@ -177,7 +177,7 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
           ),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
               ""),

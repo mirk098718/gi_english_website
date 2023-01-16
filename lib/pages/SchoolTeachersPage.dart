@@ -150,7 +150,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
               children: [
                 Container(alignment: Alignment.topLeft, width: 200, height: 400, child: Image.asset("assets/miaKimPhoto.jpg")),
                 SizedBox(width: 20,),
-                Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
+                Text(style: TextStyle(color: Palette.black, fontFamily: "NotoSansKR", fontWeight: FontWeight.normal,
                     fontSize: 14),
                     "Mia Kim \n\n"
                     "현 Gi 글림아일랜드 어학원 파주 원장\n"
@@ -187,7 +187,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
               children: [
                 Container(alignment: Alignment.topLeft, width: 200, height: 400, child: Image.asset("assets/mobileSchoolMainImage.png")),
                 SizedBox(width: 20,),
-                Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
+                Text(style: TextStyle(color: Palette.black, fontFamily: "NotoSansKR", fontWeight: FontWeight.normal,
                     fontSize: 14),
                     "Patty Kim \n\n"
                     "현 Gi 글림아일랜드 어학원 파주 상담실장\n"

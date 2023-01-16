@@ -147,7 +147,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           Text(
               style: TextStyle(
                   color: Palette.black,
-                  fontFamily: "MaruBuri",
+                  fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
               "여름방학 / 겨울방학 기간 동안 뉴질랜드 공립학교에서 직접 수업을 들으며 원어민 친구들을 사귈 수 있는 단기 2주 또는 4주 코스."),
@@ -165,7 +165,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           Text(
               style: TextStyle(
                   color: Palette.black,
-                  fontFamily: "MaruBuri",
+                  fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
               "뉴질랜드 현지 단기 (2주~4주) 어학연수 코스를 경험하고 싶은 본원 초등부 학생과 학부모. 조기 유학은 부담스럽고, 단기 여행으로는 큰 영어 습득의 효과를 얻을 수 없기에, 적절한 기간의 단기 연수를 주기적으로 체험하고 싶은 학생과 학부모."),

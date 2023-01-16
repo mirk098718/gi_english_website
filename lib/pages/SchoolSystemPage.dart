@@ -139,7 +139,7 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
           ),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
               "글림아일랜드 어학원은 원장의 총괄 관리 하에 중등부와 초등부 한 해 전체 커리큘럼이 사전에 완벽하게 짜여진 상태로 진행되는 시스템으로, 담임 선생님들이 아이들을 밀착 관리하되, 수업 내용은 원장 및 교수부가 부단한 노력으로 연구 개발한 커리큘럼의 틀을 크게 벗어나지 않도록 철저히 관리합니다.\n"
@@ -157,7 +157,7 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
           ),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
               "본원에서는 아이들의 학업 성취와 원 생활에 대한 정보을 학부모님과 보다 가깝게 소통하기 위하여\n"
@@ -175,7 +175,7 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
+          Text(style: TextStyle(color: Palette.black, fontFamily: "NotoSansKR", fontWeight: FontWeight.normal,
               fontSize: 14),
               "* 본원에서는 아이들의 원활한 Vocabulary 습득을 위하여 Gi 영단어 어플리케이션을 커리큘럼에 적용, 사용하고 있습니다.\n"
               "* 중등, 초등부 모두 매주 해당 주에 배운 단어들에 대한 쪽지 시험을 보며,\n"

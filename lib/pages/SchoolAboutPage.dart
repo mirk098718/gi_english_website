@@ -136,7 +136,7 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
+          Text(style: TextStyle(color: Palette.black, fontFamily: "NotoSansKR", fontWeight: FontWeight.normal,
               fontSize: 14),
               "GLEAM ISLAND 란 반짝이는 섬 이라는 뜻으로 오세아니아의 아름다운 섬, \n"
                   "뉴질랜드의 교육 철학과 정신을 컨셉트로 한 이름입니다. \n"
@@ -160,7 +160,7 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
+          Text(style: TextStyle(color: Palette.black, fontFamily: "NotoSansKR", fontWeight: FontWeight.normal,
               fontSize: 14),
               "Gi 글림아일랜드 어학원은,\n"
               "* 영어의 Fundamental을 확립할 Grammar 프로그램,\n"
@@ -180,7 +180,7 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(color: Palette.black, fontFamily: "MaruBuri", fontWeight: FontWeight.normal,
+          Text(style: TextStyle(color: Palette.black, fontFamily: "NotoSansKR", fontWeight: FontWeight.normal,
               fontSize: 14),
               "뻔하고 지루한 방학 특강 프로그램,\n"
               "여기 저기서 많이 들어 보고 시켜도 봤지만, 큰 효과를 얻지 못하셨죠?\n"

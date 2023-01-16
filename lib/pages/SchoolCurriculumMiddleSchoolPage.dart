@@ -126,7 +126,7 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
             SizedBox(height: 20),
             Text(style: TextStyle(
                 color: Palette.black,
-                fontFamily: "MaruBuri",
+                fontFamily: "NotoSansKR",
                 fontWeight: FontWeight.normal,
                 fontSize: 14),
                 "글림아일랜드 중등부는 "
@@ -198,7 +198,7 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
             SizedBox(height: 20),
             Text(style: TextStyle(
                 color: Palette.black,
-                fontFamily: "MaruBuri",
+                fontFamily: "NotoSansKR",
                 fontWeight: FontWeight.normal,
                 fontSize: 14),
                 "원더코드는 코딩 및 IT 전문 교육 기관으로, 글림아일랜드는 원더코드와 손잡고\n"
@@ -219,7 +219,7 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
               margin: EdgeInsets.only(top:10,bottom: 10,left: 30, right:30),
               child: Text(style: TextStyle(
                   color: Palette.black,
-                  fontFamily: "MaruBuri",
+                  fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
                   "킨더 타임즈, 키즈 타임즈, 주니어 타임즈 등 아이들의 레벨과 연령에 맞추어 다양한 영자신문을 제공하는 어린이 영자 신문 전문 브랜드로, "

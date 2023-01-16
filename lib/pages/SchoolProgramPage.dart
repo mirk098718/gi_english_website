@@ -154,7 +154,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                           ),
                           Text(style: TextStyle(
                               color: Palette.black,
-                              fontFamily: "MaruBuri",
+                              fontFamily: "NotoSansKR",
                               fontWeight: FontWeight.normal,
                               fontSize: 14),
                               "오전 9시 30분 ~ 오후 2시 30분\n"
@@ -172,7 +172,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                           ),
                           Text(style: TextStyle(
                               color: Palette.black,
-                              fontFamily: "MaruBuri",
+                              fontFamily: "NotoSansKR",
                               fontWeight: FontWeight.normal,
                               fontSize: 14),
                               "14세~16세 (만 13세~만 15세) \n"
@@ -214,7 +214,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                           ),
                           Text(style: TextStyle(
                               color: Palette.black,
-                              fontFamily: "MaruBuri",
+                              fontFamily: "NotoSansKR",
                               fontWeight: FontWeight.normal,
                               fontSize: 14),
                               "오후 2.20 ~ 오후 7시\n"
@@ -232,7 +232,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                           ),
                           Text(style: TextStyle(
                               color: Palette.black,
-                              fontFamily: "MaruBuri",
+                              fontFamily: "NotoSansKR",
                               fontWeight: FontWeight.normal,
                               fontSize: 14),
                               "초등학교 1학년 ~ 6학년 \n"
@@ -254,7 +254,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           ),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
               "글림아일랜드의 영어 중등부 프로그램은, \n"
@@ -275,7 +275,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           ),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
               "글림아일랜드의 영어 초등부 프로그램은, \n"
@@ -328,7 +328,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                   SizedBox(height: 10),
                   Text(style: TextStyle(
                       color: Palette.black,
-                      fontFamily: "MaruBuri",
+                      fontFamily: "NotoSansKR",
                       fontWeight: FontWeight.normal,
                       fontSize: 14),
                       "오전 9시 30분 ~ 오후 2시 30분\n"
@@ -341,7 +341,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                   SizedBox(height: 10),
                   Text(style: TextStyle(
                       color: Palette.black,
-                      fontFamily: "MaruBuri",
+                      fontFamily: "NotoSansKR",
                       fontWeight: FontWeight.normal,
                       fontSize: 14),
                       "14세~16세 (만13세~만15세) \n"
@@ -368,7 +368,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                     ),
                     Text(style: TextStyle(
                         color: Palette.black,
-                        fontFamily: "MaruBuri",
+                        fontFamily: "NotoSansKR",
                         fontWeight: FontWeight.normal,
                         fontSize: 14),
                         "오후 2시 20분 ~ 오후 7시\n"
@@ -385,7 +385,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                     ),
                     Text(style: TextStyle(
                         color: Palette.black,
-                        fontFamily: "MaruBuri",
+                        fontFamily: "NotoSansKR",
                         fontWeight: FontWeight.normal,
                         fontSize: 14),
                         "초등학교 1학년 ~ 6학년"),
@@ -403,7 +403,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           ),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
               "글림아일랜드의 영어 중등부 프로그램은, \n"
@@ -424,7 +424,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           ),
           Text(style: TextStyle(
               color: Palette.black,
-              fontFamily: "MaruBuri",
+              fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
               "글림아일랜드의 영어 초등부 프로그램은, \n"
