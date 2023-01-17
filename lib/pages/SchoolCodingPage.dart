@@ -23,7 +23,7 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
 
   List<ButtonState> buttonStateList = [
     ButtonState("정규프로그램", BehaviorColor.colorOnDefault, SchoolProgramPage()),
-    ButtonState("올데이케어", BehaviorColor.colorOnClick, SchoolCodingPage()),
+    ButtonState("선택프로그램", BehaviorColor.colorOnClick, SchoolCodingPage()),
     ButtonState("NZ연계프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
 
 
@@ -129,26 +129,10 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "올데이케어 프로그램",
+            "선택 프로그램",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
-          SizedBox(
-            height: 20,
-          ),
-          Text(
-            "운영시간",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),
-              "오후 2시 30분 ~ 오후 9시 까지"),
           SizedBox(
             height: 20,
           ),
@@ -164,23 +148,11 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
               fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
-              "기초 코딩 스킬과 컴퓨팅 사고력을 키우고자 하는 초등~중등학생. 초등/중등 반으로 나뉘어 반 편성이 되며, 실력 테스트 없이 모두 기초반에서 시작하게 됩니다."),
+              "이공계 / 예체능 적성의 본원 정규 초등영어 과정 수강생"),
           SizedBox(
             height: 20,
           ),
-          Text(
-            "프로그램",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),
-              ""),
+          Image.asset("assets/optionalPrograms.png"),
           SizedBox(
             height: 50,
           ),

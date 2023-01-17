@@ -22,9 +22,9 @@ class SchoolCurriculumMiddleSchoolPage extends StatefulWidget {
 class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddleSchoolPage> {
   List<ButtonState> buttonStateList = [
     ButtonState(
-        "정규중등부", BehaviorColor.colorOnClick, SchoolCurriculumMiddleSchoolPage()),
-    ButtonState(
         "정규초등부", BehaviorColor.colorOnDefault, SchoolCurriculumElePage()),
+    ButtonState(
+        "정규중등부", BehaviorColor.colorOnClick, SchoolCurriculumMiddleSchoolPage()),
   ];
 
   @override
@@ -133,8 +133,27 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
                 "균형을 맞춘 자체 커리큘럼을 100% 영어로 소화하고 있으며, 아이들이 창의성을 최대한 발휘할 수 있는 재미있는 수업 방식을 채택하여 진행합니다.\n"
                 "또한 Kids Times, Junior Times와 같은 영자신문 프로그램과 코딩 수업을 영어로 제공하는 Wonder Code 등 뛰어난 외부 교육프로그램 역시 적용하고 교육 효과를 극대화하고 있습니다."),
             SizedBox(height: 20),
+            SizedBox(
+                height: 20),
+            Text(
+              "월수금반",
+              style: TextStyle(fontFamily: "Jalnan", fontSize: 15,),
+            ),
+            SizedBox(
+                height: 20),
             Container(
-                width: 600, child: Image.asset("assets/eleTimetableMWF.png")),
+                width: 600, child: Image.asset("assets/middleTimetableMWF.png")),
+            SizedBox(
+                height: 20),
+            Text(
+              "화목토반",
+             style: TextStyle(fontFamily: "Jalnan", fontSize: 15,),
+            ),
+            SizedBox(
+                height: 20),
+            Container(
+                width: 600, child: Image.asset("assets/middleTimetableTTS.png")),
+
             // SizedBox(height: 40),
             // Text(
             //   "Scholastic Reading",

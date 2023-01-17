@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/pages/SchoolAllDayPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
@@ -13,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../util/UrlIUtil.dart';
 import '../util/WidgetUtil.dart';
+import 'SchoolCodingPage.dart';
 
 class SchoolNZPage extends StatefulWidget {
   const SchoolNZPage({Key? key}) : super(key: key);
@@ -24,7 +24,7 @@ class SchoolNZPage extends StatefulWidget {
 class _SchoolNZPageState extends State<SchoolNZPage> {
   List<ButtonState> buttonStateList = [
     ButtonState("정규프로그램", BehaviorColor.colorOnDefault, SchoolProgramPage()),
-    ButtonState("올데이케어", BehaviorColor.colorOnDefault, SchoolAllDayPage()),
+    ButtonState("선택프로그램", BehaviorColor.colorOnDefault, SchoolCodingPage()),
     ButtonState("NZ연계프로그램", BehaviorColor.colorOnClick, SchoolNZPage()),
   ];
 
@@ -83,7 +83,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
         onHover: (value) {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
-              : (i == 3
+              : (i == 2
                   ? BehaviorColor.colorOnClick
                   : BehaviorColor.colorOnDefault);
           print(

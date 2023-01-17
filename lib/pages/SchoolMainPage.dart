@@ -309,7 +309,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
                                 "글림아일랜드에서 학부모님들을 초대하여\n입학설명회를 진행하고자 합니다! \n"
-                                    "초등부: 2월 17일 금 2시~3시, 2월 18일 금 2시~3시\n"
+                                    "초등부: 2월 17일 금 2시~3시, 2월 18일 토 2시~3시\n"
                                     "중등부: 2월 17일 금 3시~4시, 2월 18일 토 3시~4시"),]
                       ),
                     ),
@@ -397,9 +397,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
-                                "A: 글림아일랜드 어학원 예정지인 다율동 태산 W 타워의 준공이 1월 중순 준공 예정이므로, "
-                                    "약 한달의 인테리어 기간 이후인 2월 17일 오픈 예정이며, 이때부터 현장에서 입학설명회가 열릴 예정입니다.^^\n"
-                                    "수업 개강일은 2월 27일입니다."),
+                                "A: 글림아일랜드 어학원은 2월 17일 오픈 예정이며, 당일부터 양일간 현장에서 입학설명회가 열릴 예정입니다.^^\n"
+                                    "(수업 개강일은 2월 27일입니다.)"),
                           ]),
                     ),
                     Container(
@@ -783,8 +782,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
-                            "A: 글림아일랜드 어학원 예정지인 다율동 태산 W 타워의 준공이 1월 중순 준공 예정이므로, "
-                                "약 한달의 인테리어 기간 이후인 2월 17일 오픈 예정이며, 이때부터 현장에서 입학설명회가 열릴 예정입니다.^^\n"
+                            "A: 글림아일랜드 어학원은 인테리어가 끝나는 2월 17일 오픈 예정이며, 당일부터 양일간 현장에서 입학설명회가 열릴 예정입니다.^^\n"
                                 "수업 개강일은 2월 27일입니다."),
                       ]),
                 ),

@@ -20,8 +20,9 @@ class SchoolCurriculumElePage extends StatefulWidget {
 class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
 
   List<ButtonState> buttonStateList = [
-    ButtonState("정규중등부", BehaviorColor.colorOnDefault, SchoolCurriculumMiddleSchoolPage()),
     ButtonState("정규초등부", BehaviorColor.colorOnClick, SchoolCurriculumElePage()),
+    ButtonState("정규중등부", BehaviorColor.colorOnDefault, SchoolCurriculumMiddleSchoolPage()),
+
   ];
 
   @override
@@ -124,6 +125,9 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
             WidgetUtil.myDivider(),
             SizedBox(
               height: 20),
+            Container(width:600, child: Image.asset("assets/eleProgramPeriod.png")),
+            SizedBox(
+                height: 20),
             Text(
               "월수금반",
               style: TextStyle(fontFamily: "Jalnan", fontSize: 15,),

@@ -217,7 +217,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
               color: Palette.mainGrey,
             ),
             InkWell(
-                onTap: (){MenuUtil.push(context, SchoolCurriculumMiddleSchoolPage());},
+                onTap: (){MenuUtil.push(context, SchoolCurriculumElePage());},
                 child: Text("Curriculum", style: TextStyle(color: Palette.black,
                     fontFamily: "NotoSansKR",
                     fontWeight: FontWeight.bold,

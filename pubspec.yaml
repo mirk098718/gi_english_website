@@ -58,12 +58,9 @@ flutter:
      - assets/schoolLogo.png
      - assets/loginButton.png
      - assets/instaLogo.png
-     - assets/youtubeLogo.png
      - assets/aboutMainImage.png
      - assets/cafeLogo.png
      - assets/mainGateImage.png
-     - assets/mainGateImageBottomLeft.png
-     - assets/mainGateImageBottomRight.png
      - assets/mainLogoPurple.png
      - assets/mainGateImageWithLogo.png
      - assets/curriculumImage.png
@@ -74,7 +71,6 @@ flutter:
      - assets/giAppBannerArrow.png
      - assets/snsArrow.png
      - assets/giAppDownload.png
-     - assets/mobileBallPoolImage.png
      - assets/mobileSchoolMainImage.png
      - assets/cafeMainImage.png
      - assets/cafeMainCatch.png
@@ -90,7 +86,6 @@ flutter:
      - assets/eleTimetableMWF.png
      - assets/scholasticLogo.jpg
      - assets/wonderCodeLogo.jpg
-     - assets/mobileMainGateImage.png
      - assets/giAppBannerFinal.png
      - assets/giKidsWeekendLogo.png
      - assets/mobileLoginButton.png
@@ -117,6 +112,15 @@ flutter:
      - assets/mainGateImageSimple.png
      - assets/mainGateImageBlack.png
      - assets/gleamIslandMoto.png
+     - assets/middleTimetableTTS.png
+     - assets/middleTimetableMWF.png
+     - assets/gleamIslandMoto1.png
+     - assets/gleamIslandMoto2.png
+     - assets/optionalPrograms.png
+     - assets/eleProgramPeriod.png
+     - assets/elePrep.png
+     - assets/eleProgram.png
+
 
 
 
