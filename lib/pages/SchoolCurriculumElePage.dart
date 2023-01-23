@@ -74,7 +74,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
         child: child,
         onHover: (value) {
           buttonState.color =
-          value ? BehaviorColor.colorOnHover : (i == 1 ? BehaviorColor.colorOnClick : BehaviorColor.colorOnDefault);
+          value ? BehaviorColor.colorOnHover : (i == 0 ? BehaviorColor.colorOnClick : BehaviorColor.colorOnDefault);
           print(
               "label ${buttonState.label}, selectedColorList: ${buttonState.color}");
           setState(() {});
@@ -125,7 +125,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
             WidgetUtil.myDivider(),
             SizedBox(
               height: 20),
-            Container(width:600, child: Image.asset("assets/eleProgramPeriod.png")),
+            Container(width:700, child: Image.asset("assets/eleProgramPeriod.png")),
             SizedBox(
                 height: 20),
             Text(
@@ -134,7 +134,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
             ),
             SizedBox(
               height: 20),
-            Container(width:600, child: Image.asset("assets/eleTimetableMWF.png")),
+            Container(width:700, child: Image.asset("assets/eleTimetableMWF.png")),
             SizedBox(
                 height: 20),
 
@@ -144,7 +144,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
             ),
             SizedBox(
                 height: 20),
-            Container(width:600, child: Image.asset("assets/eleTimetableTuesThurs.png")),
+            Container(width:700, child: Image.asset("assets/eleTimetableTuesThurs.png")),
             SizedBox(
                 height: 40),
             Text(
@@ -153,24 +153,10 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
             ),
             WidgetUtil.myDivider(),
             SizedBox(height: 5),
-            Container(width:600,
-                margin: EdgeInsets.only(top:10,bottom: 10,left: 30, right: 30),
-                child: Image.asset("assets/nieAd2.png")),
             Container(
-              width: 600,
-              margin: EdgeInsets.only(top:10,bottom: 10,left: 30, right:30),
-              child: Text(style: TextStyle(
-                  color: Palette.black,
-                  fontFamily: "NotoSansKR",
-                  fontWeight: FontWeight.normal,
-                  fontSize: 14),
-                  "킨더 타임즈, 키즈 타임즈, 주니어 타임즈 등 아이들의 레벨과 연령에 맞추어 다양한 영자신문을 제공하는 어린이 영자 신문 전문 브랜드로, "
-                      "글림아일랜드는 중등부 NIE Speaking 수업과 초등부 NIE Debate 수업을 위하여"
-                      "모든 레벨의 어린이 영자신문을 class material 로 적극 활용합니다."),
-            ),
-            WidgetUtil.myDivider(),
-            SizedBox(height: 10),
-            Image.asset("assets/nieAd.png"),
+              margin: EdgeInsets.only(top: 20),
+              width: 1000,
+                child: Image.asset("assets/nie.png")),
 
 
           ],
@@ -285,7 +271,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
         onHover: (value) {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
-              : (i == 1
+              : (i == 0
               ? BehaviorColor.colorOnClick
               : BehaviorColor.colorOnDefault);
           setState(() {});

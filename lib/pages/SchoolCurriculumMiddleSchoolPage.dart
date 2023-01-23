@@ -75,7 +75,7 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
         onHover: (value) {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
-              : (i == 0
+              : (i == 1
                   ? BehaviorColor.colorOnClick
                   : BehaviorColor.colorOnDefault);
           setState(() {});
@@ -142,7 +142,7 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
             SizedBox(
                 height: 20),
             Container(
-                width: 600, child: Image.asset("assets/middleTimetableMWF.png")),
+                width: 700, child: Image.asset("assets/middleTimetableMWF.png")),
             SizedBox(
                 height: 20),
             Text(
@@ -152,7 +152,7 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
             SizedBox(
                 height: 20),
             Container(
-                width: 600, child: Image.asset("assets/middleTimetableTTS.png")),
+                width: 700, child: Image.asset("assets/middleTimetableTTS.png")),
 
             // SizedBox(height: 40),
             // Text(
@@ -205,23 +205,6 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
             // //     "자녀의 Lexile 수준을 알면 이 수준에 맞는 책을 검색하여 가정 도서관을 확장하고 가정에서 매일 읽기 연습을 장려할 수 있습니다.\n"
             // //     "Lexile 데이터베이스를 사용하여 Lexile 수준, 제목 또는 주제별로 검색하여 자녀가 좋아하고 읽기 성취도에 낙담하지 않고 읽을 수 있는 책을 찾으십시오.\n"
             // //     "아래 차트를 사용하여 Lexile 수준을 다른 수준별 읽기 시스템과 비교하십시오:"),
-            SizedBox(height: 40),
-            Text(
-              "Wonder Code",
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
-            ),
-            WidgetUtil.myDivider(),
-            SizedBox(height: 20),
-            Container(
-                width: 500, child: Image.asset("assets/wonderCodeLogo.jpg")),
-            SizedBox(height: 20),
-            Text(style: TextStyle(
-                color: Palette.black,
-                fontFamily: "NotoSansKR",
-                fontWeight: FontWeight.normal,
-                fontSize: 14),
-                "원더코드는 코딩 및 IT 전문 교육 기관으로, 글림아일랜드는 원더코드와 손잡고\n"
-                "아이들의 프로그래밍적 사고와 문제해결능력을 키우기 위한 특별한 코딩 교육을 제공합니다."),
             SizedBox(
                 height: 40),
             Text(
@@ -230,26 +213,10 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
             ),
             WidgetUtil.myDivider(),
             SizedBox(height: 5),
-            Container(width:600,
-                margin: EdgeInsets.only(top:10,bottom: 10,left: 30, right: 30),
-                child: Image.asset("assets/nieAd2.png")),
             Container(
-              width: 600,
-              margin: EdgeInsets.only(top:10,bottom: 10,left: 30, right:30),
-              child: Text(style: TextStyle(
-                  color: Palette.black,
-                  fontFamily: "NotoSansKR",
-                  fontWeight: FontWeight.normal,
-                  fontSize: 14),
-                  "킨더 타임즈, 키즈 타임즈, 주니어 타임즈 등 아이들의 레벨과 연령에 맞추어 다양한 영자신문을 제공하는 어린이 영자 신문 전문 브랜드로, "
-                      "글림아일랜드는 중등부 NIE Speaking 수업과 초등부 NIE Debate 수업을 위하여"
-                      "모든 레벨의 어린이 영자신문을 class material 로 적극 활용합니다."),
-            ),
-            WidgetUtil.myDivider(),
-            SizedBox(height: 10),
-            Image.asset("assets/nieAd.png"),
-
-            WidgetUtil.myDivider(),
+                margin: EdgeInsets.only(top: 20),
+                width: 1000,
+                child: Image.asset("assets/nie.png")),
             SizedBox(height: 20),
           ],
         ),
@@ -359,7 +326,7 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
         onHover: (value) {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
-              : (i == 0
+              : (i == 1
                   ? BehaviorColor.colorOnClick
                   : BehaviorColor.colorOnDefault);
           setState(() {});

@@ -117,7 +117,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             child: labelInColorContainer(Palette.violet, "방학캠프"),),
           InkWell(
             onTap: (){MenuUtil.push(context, SchoolNZPage());},
-            child: labelInColorContainer(Palette.mediumViolet, "NZ연계프로그램"),),
+            child: labelInColorContainer(Palette.mediumViolet, "뉴질랜드프로그램"),),
           InkWell(
             onTap: (){MenuUtil.push(context, School1on1Page());},
             child: labelInColorContainer(Palette.mediumViolet, "1ON1프로그램"),)

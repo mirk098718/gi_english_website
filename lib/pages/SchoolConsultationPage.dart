@@ -13,8 +13,7 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../class/SchoolVisitor.dart';
 import '../util/DialogUtil.dart';
 import '../util/WidgetUtil.dart';
-import 'SchoolCommunityNoticePage.dart';
-import 'SchoolGalleryPage.dart';
+
 
 class SchoolConsultationPage extends StatefulWidget {
   const SchoolConsultationPage({Key? key}) : super(key: key);
@@ -32,8 +31,8 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
   MyGroupValue timeMyGroupValue = MyGroupValue("오전 09am ~ 12pm");
 
   List<ButtonState> buttonStateList = [
-    ButtonState("Notice Board", BehaviorColor.colorOnDefault, SchoolCommunityNoticePage()),
-    ButtonState("Gallery", BehaviorColor.colorOnDefault, SchoolGalleryPage()),
+    ButtonState("Notice Board", BehaviorColor.colorOnDefault, SchoolConsultationPage()),
+    ButtonState("Gallery", BehaviorColor.colorOnDefault, SchoolConsultationPage()),
     ButtonState("입학상담", BehaviorColor.colorOnClick, SchoolConsultationPage()),
   ];
 

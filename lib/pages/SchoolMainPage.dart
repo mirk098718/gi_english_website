@@ -190,7 +190,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                         child: InkWell(
                           child: Image.asset("assets/middleOnlineLink.png"),
                           onTap: () async {
-                            UrlUtil.open('http://demo.theclip.net/Pages/Contents?mid=HP1023');
+                            UrlUtil.open('http://gienglish.theclip.net/');
                           },
                         ),
                       ),
@@ -208,7 +208,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                         child: InkWell(
                           child: Image.asset("assets/eleOnlineLink.png"),
                           onTap: () async {
-                            UrlUtil.open('https://www.trophy9.com/');
+                            UrlUtil.open('https://www.trophy9.com/account/account.do?stdcmd=sign&url=%2Fdefault%2Edo%3F');
                           },
                         ),
                       ),
@@ -548,7 +548,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset("assets/instaLogo.png"),
+              InkWell(
+                  onTap: () async {
+                    UrlUtil.open('https://www.instagram.com/gleam_island_school/');
+                  },
+                  child: Image.asset("assets/instaLogo.png")),
               Spacer(),
               Container(
                 margin: EdgeInsets.all(5),
@@ -559,7 +563,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
               Spacer(),
               Container(
                   width: 40,
-                  child: Image.asset("assets/naverBlogLogo.png")),
+                  child: InkWell(
+                      onTap: () async {
+                        UrlUtil.open('https://blog.naver.com/gleam-island-paju');
+                      },
+                      child: Image.asset("assets/naverBlogLogo.png"))),
               Spacer(),
               Container(
                 margin: EdgeInsets.all(5),
@@ -609,14 +617,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             children: [
               Expanded(
                 flex: 3,
-                child: Container(
-                  margin: EdgeInsets.only(top:15, bottom: 15),
-                  child: InkWell(
-                    child: Image.asset("assets/middleOnlineLink.png"),
-                    onTap: () async {
-                      UrlUtil.open('http://demo.theclip.net/Pages/Contents?mid=HP1023');
-                    },
-                  ),
+                child: InkWell(
+                  child: Container(height: 55, child: Image.asset("assets/middleOnlineLink.png")),
+                  onTap: () async {
+                    UrlUtil.open('http://gienglish.theclip.net/');
+                  },
                 ),
               ),
               Container(
@@ -627,16 +632,14 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
               ),
               Expanded(
                 flex: 3,
-                child: Container(
-                  margin: EdgeInsets.all(10),
-                  child: InkWell(
-                    child: Image.asset("assets/eleOnlineLink.png"),
-                    onTap: () async {
-                      UrlUtil.open('https://www.trophy9.com/');
-                    },
-                  ),
+                child: InkWell(
+                  child: Container(height: 55,child: Image.asset("assets/eleOnlineLink.png")),
+                  onTap: () async {
+                    UrlUtil.open('https://www.trophy9.com/account/account.do?stdcmd=sign&url=%2Fdefault%2Edo%3F');
+                  },
                 ),
               ),
+              SizedBox(width: 20,)
             ],
           ),
         ],
@@ -656,6 +659,25 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             ),
             child: Column(
               children: [
+                Container(
+                  width: double.infinity,
+                  child: TextButton(
+                    child: Text(
+                      "Notice Board",
+                      style:
+                      TextStyle(color: Palette.black, fontFamily: "Jalnan"),
+                    ),
+                    onPressed: () {},
+                  ),
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Palette.mainLightGrey,
+                    border: Border.all(color: Palette.mainLightGrey, width: 3),
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(18),
+                        topRight: Radius.circular(18)),
+                  ),
+                ),
                 Container(
                   color: Colors.white,
                   alignment: Alignment.topLeft,
@@ -707,9 +729,13 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   ),
                 ),
                 Container(
-                  color: Colors.white,
+
                   alignment: Alignment.topLeft,
                   padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(20),bottomRight: Radius.circular(20))),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -821,9 +847,12 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   margin: EdgeInsets.only(right: 10, left: 10),
                 ),
                 Container(
-                  color: Colors.white,
                   alignment: Alignment.topLeft,
                   padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20),bottomRight: Radius.circular(20))),
                   child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,

@@ -27,7 +27,7 @@ class _School1on1PageState extends State<School1on1Page> {
     ButtonState("정규프로그램", BehaviorColor.colorOnDefault, SchoolProgramPage()),
     ButtonState("올데이케어", BehaviorColor.colorOnDefault, SchoolAllDayPage()),
     ButtonState("방학캠프", BehaviorColor.colorOnDefault, SchoolCampPage()),
-    ButtonState("NZ연계프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
+    ButtonState("뉴질랜드프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
     ButtonState("1on1 프로그램", BehaviorColor.colorOnClick, School1on1Page()),
 
   ];
@@ -201,8 +201,8 @@ class _School1on1PageState extends State<School1on1Page> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.black,
-                      onPrimary: Palette.black,
+                      backgroundColor: Palette.black,
+                      foregroundColor: Palette.black,
                     ),
                     onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
                     child: Text("상담신청",
@@ -339,8 +339,8 @@ class _School1on1PageState extends State<School1on1Page> {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.mainMediumPurple,
-                      onPrimary: Palette.black,
+                      backgroundColor: Palette.mainMediumPurple,
+                      foregroundColor: Palette.black,
                     ),
 
 

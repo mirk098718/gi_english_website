@@ -23,7 +23,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
   List<ButtonState> buttonStateList = [
     ButtonState("정규프로그램", BehaviorColor.colorOnClick, SchoolProgramPage()),
     ButtonState("선택프로그램", BehaviorColor.colorOnDefault, SchoolCodingPage()),
-    ButtonState("NZ연계프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
+    ButtonState("뉴질랜드프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
   ];
 
   @override

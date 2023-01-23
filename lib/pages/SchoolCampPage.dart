@@ -26,7 +26,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
     ButtonState("정규프로그램", BehaviorColor.colorOnDefault, SchoolProgramPage()),
     ButtonState("올데이케어", BehaviorColor.colorOnDefault, SchoolAllDayPage()),
     ButtonState("방학캠프", BehaviorColor.colorOnClick, SchoolCampPage()),
-    ButtonState("NZ연계프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
+    ButtonState("뉴질랜드프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
 
   ];
   @override

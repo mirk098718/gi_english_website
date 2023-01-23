@@ -24,7 +24,7 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
   List<ButtonState> buttonStateList = [
     ButtonState("정규프로그램", BehaviorColor.colorOnDefault, SchoolProgramPage()),
     ButtonState("올데이케어", BehaviorColor.colorOnClick, SchoolAllDayPage()),
-    ButtonState("NZ연계프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
+    ButtonState("뉴질랜드프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
 
 
   ];

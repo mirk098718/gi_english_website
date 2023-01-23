@@ -25,7 +25,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
   List<ButtonState> buttonStateList = [
     ButtonState("정규프로그램", BehaviorColor.colorOnDefault, SchoolProgramPage()),
     ButtonState("선택프로그램", BehaviorColor.colorOnDefault, SchoolCodingPage()),
-    ButtonState("NZ연계프로그램", BehaviorColor.colorOnClick, SchoolNZPage()),
+    ButtonState("뉴질랜드프로그램", BehaviorColor.colorOnClick, SchoolNZPage()),
   ];
 
   @override
@@ -125,7 +125,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "New Zealand 연계 방학 프로그램",
+            "New Zealand 현지 공립학교 체험 프로그램",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
@@ -350,7 +350,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
         onHover: (value) {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
-              : (i == 3
+              : (i == 2
                   ? BehaviorColor.colorOnClick
                   : BehaviorColor.colorOnDefault);
           setState(() {});
