@@ -93,8 +93,6 @@ flutter:
      - assets/whyChooseNzClip.png
      - assets/schoolList.png
      - assets/schoolSelection.png
-     - assets/whyNz.png
-     - assets/whyTauranga.png
      - assets/whyTaurangaClipWeb.png
      - assets/mainGateImageFinal.png
      - assets/mainGateImageLightBlue.png
@@ -121,6 +119,10 @@ flutter:
      - assets/elePrep.png
      - assets/eleProgram.png
      - assets/nie.png
+     - assets/nzMiddleSchoolList.png
+     - assets/whyTaurangaInfo.png
+     - assets/whyNZInfo.png
+
 
 
 

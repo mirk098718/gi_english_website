@@ -173,12 +173,18 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
             height: 40,
           ),
           Text(
-            "왜 뉴질랜드인가?",
+            "뉴질랜드 교육환경",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
           ),
           WidgetUtil.myDivider(),
           SizedBox(
-            height: 20,
+            height: 40,
+          ),
+          SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Container( child: Image.asset("assets/whyNZInfo.png"))),
+          SizedBox(
+            height: 40,
           ),
           InkWell(
               onTap: () {
@@ -186,43 +192,46 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
                   Uri.parse('https://m.youtube.com/watch?v=Ytc6ClRRhw0'),
                 );
               },
-              child: Image.asset("assets/whyChooseNzClip.png")),
-          SizedBox(
-            height: 20,
-          ),
-          Image.asset("assets/whyNz.png"),
+              child: Container(width:900, child: Image.asset("assets/whyChooseNzClip.png"))),
+
           SizedBox(
             height: 40,
           ),
           Text(
-            "왜 타우랑가인가?",
+            "Tauranga City 소개",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
           ),
           WidgetUtil.myDivider(),
           SizedBox(
-            height: 20,
+            height: 40,
+          ),
+          SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Container(child: Image.asset("assets/whyTaurangaInfo.png"))),
+
+          SizedBox(
+            height: 40,
           ),
           InkWell(
-            child: Image.asset("assets/whyTaurangaClipWeb.png"),
+            child: Container(width:900, child: Image.asset("assets/whyTaurangaClipWeb.png")),
             onTap: () async {
               UrlUtil.open('https://www.youtube.com/watch?v=uT2IIPu5uuY');
             },
           ),
           SizedBox(
-            height: 20,
-          ),
-          Image.asset("assets/whyTauranga.png"),
-          SizedBox(
-            height: 20,
+            height: 40,
           ),
           SizedBox(
             height: 40,
           ),
           Text(
-            "학교 선택 기준",
+            "학교 선택",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
           ),
           WidgetUtil.myDivider(),
+          SizedBox(
+            height: 40,
+          ),
           Image.asset("assets/schoolSelection.png"),
           SizedBox(
             height: 40,
@@ -232,9 +241,14 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
           ),
           WidgetUtil.myDivider(),
-          Image.asset("assets/schoolList.png"),
           SizedBox(
-            height: 20,
+            height: 40,
+          ),
+          Image.asset("assets/schoolList.png"),
+          Image.asset("assets/nzMiddleSchoolList.png"),
+
+          SizedBox(
+            height: 40,
           ),
           Text(
             "자료 제공: 비전유학",
