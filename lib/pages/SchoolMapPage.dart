@@ -133,6 +133,13 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
+          SizedBox(
+            height: 20,
+          ),
+          Text("주소: 경기도 파주시 해올2길2 태산W타워 7층, 701~703호 (다율동 1044)"),
+          SizedBox(
+            height: 20,
+          ),
           Image.asset("assets/map.jpg"),
           SizedBox(
             height: 20,

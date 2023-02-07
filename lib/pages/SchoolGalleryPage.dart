@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
@@ -21,7 +21,7 @@ class SchoolGalleryPage extends StatefulWidget {
 class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
 
   List<ButtonState> buttonStateList = [
-    ButtonState("Notice Board", BehaviorColor.colorOnDefault, SchoolCommunityNoticePage()),
+    //ButtonState("Notice Board", BehaviorColor.colorOnDefault, SchoolCommunityNoticePage()),
     ButtonState("Gallery", BehaviorColor.colorOnClick,SchoolGalleryPage()),
     ButtonState("입학상담", BehaviorColor.colorOnDefault,SchoolConsultationPage()),
   ];
@@ -81,11 +81,8 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
       children.add(InkWell(
         child: child,
         onHover: (value) {
-          buttonState.color = value
-              ? BehaviorColor.colorOnHover
-              : (i == 1
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+          buttonState.color =
+          value ? BehaviorColor.colorOnHover : (i == 0 ? BehaviorColor.colorOnClick : BehaviorColor.colorOnDefault);
           print(
               "label ${buttonState.label}, selectedColorList: ${buttonState.color}");
           setState(() {});
@@ -122,32 +119,133 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
     return Container(
       padding: EdgeInsets.all(20),
       color: Palette.white,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Text(
-            "Gallery",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Gallery",
+                  style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
+                ),
+                WidgetUtil.myDivider(),
+                SizedBox(height: 30,),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Container(color:Palette.greyTenPer, width: 200, height:200
+                        ,child: Image.asset("assets/lobby1.jpeg", fit: BoxFit.fitHeight),),
+                      SizedBox(width: 20,),
+                      Container(color:Palette.greyTenPer, width: 200, height:200,
+                        child: Image.asset("assets/doors.jpeg", fit: BoxFit.fitWidth),
+                      ),
+                      SizedBox(width: 20,),
+                      Container(color:Palette.greyTenPer, width: 200, height:200
+                        ,child: Image.asset("assets/lobby1.jpeg", fit: BoxFit.fitHeight),),
+                      SizedBox(width: 20,),
+                      Container(color:Palette.greyTenPer, width: 200, height:200,
+                        child: Image.asset("assets/doors.jpeg", fit: BoxFit.fitWidth),)
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20,),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Container(color:Palette.greyTenPer, width: 200, height:200,
+                        child: Image.asset("assets/mainEnterance.jpeg",fit: BoxFit.fitWidth),),
+                      SizedBox(width: 20,),
+                      Container(color:Palette.greyTenPer, width: 200, height:200
+                          ,child: Image.asset("assets/gleamIslandLogo.jpeg")),
+                      SizedBox(width: 20,),
+                      Container(color:Palette.greyTenPer, width: 200, height:200
+                        ,child: Image.asset("assets/lobby1.jpeg", fit: BoxFit.fitHeight),),
+                      SizedBox(width: 20,),
+                      Container(color:Palette.greyTenPer, width: 200, height:200,
+                        child: Image.asset("assets/doors.jpeg", fit: BoxFit.fitWidth),)
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
-          WidgetUtil.myDivider(),
-          SizedBox(height: 30,),
-          Row(
-            children: [
-              Container(color:Palette.greyTenPer, width: 200, height:200),
-              SizedBox(width: 20,),
-              Container(color:Palette.greyTenPer, width: 200, height:200),
-            ],
-          ),
-          SizedBox(height: 20,),
-          Row(
-            children: [
-              Container(color:Palette.greyTenPer, width: 200, height:200),
-              SizedBox(width: 20,),
-              Container(color:Palette.greyTenPer, width: 200, height:200),
-            ],
-          )
-        ],
+        ]
+
+      ),
+    );
+  }
+
+  Widget mobileContent() {
+    return Container(
+      padding: EdgeInsets.all(20),
+      color: Palette.white,
+      child: Column(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Gallery",
+                  style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
+                ),
+                WidgetUtil.myDivider(),
+                SizedBox(height: 30,),
+                Row(
+                  children: [
+                    Container(color:Palette.greyTenPer, width: 200, height:200
+                      ,child: Image.asset("assets/lobby1.jpeg", fit: BoxFit.fitHeight),),
+                    SizedBox(width: 20,),
+                    Container(color:Palette.greyTenPer, width: 200, height:200,
+                      child: Image.asset("assets/doors.jpeg", fit: BoxFit.fitWidth),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20,),
+                Row(
+                  children: [
+                    Container(color:Palette.greyTenPer, width: 200, height:200,
+                      child: Image.asset("assets/mainEnterance.jpeg",fit: BoxFit.fitWidth),),
+                    SizedBox(width: 20,),
+                    Container(color:Palette.greyTenPer, width: 200, height:200
+                        ,child: Image.asset("assets/gleamIslandLogo.jpeg")),
+                  ],
+                )
+              ],
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 20,),
+                Row(
+                  children: [
+                    Container(color:Palette.greyTenPer, width: 200, height:200
+                      ,child: Image.asset("assets/lobby1.jpeg", fit: BoxFit.fitHeight),),
+                    SizedBox(width: 20,),
+                    Container(color:Palette.greyTenPer, width: 200, height:200,
+                      child: Image.asset("assets/doors.jpeg", fit: BoxFit.fitWidth),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20,),
+                Row(
+                  children: [
+                    Container(color:Palette.greyTenPer, width: 200, height:200,
+                      child: Image.asset("assets/mainEnterance.jpeg",fit: BoxFit.fitWidth),),
+                    SizedBox(width: 20,),
+                    Container(color:Palette.greyTenPer, width: 200, height:200
+                        ,child: Image.asset("assets/gleamIslandLogo.jpeg")),
+                  ],
+                )
+              ],
+            ),
+          ]
+
       ),
     );
   }
@@ -225,7 +323,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
           children: [
             // mobileMainImage(),
             mobileLeftMenu(),
-            content(),
+            mobileContent(),
             SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
 
           ],
@@ -257,7 +355,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
         onHover: (value) {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
-              : (i == 1
+              : (i == 0
               ? BehaviorColor.colorOnClick
               : BehaviorColor.colorOnDefault);
           setState(() {});
@@ -274,6 +372,8 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
     }
 
     return Container(
+      alignment: Alignment.center,
+      width: MediaQuery.of(context).size.width,
       color: Palette.white,
       padding: EdgeInsets.all(20),
       child: Container(

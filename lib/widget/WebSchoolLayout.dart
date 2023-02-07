@@ -231,7 +231,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             ),
             InkWell(
                 onTap: (){
-                  // MenuUtil.push(context, SchoolCommunityNoticePage());
+                  MenuUtil.push(context, SchoolGalleryPage());
                   },
                 child: Text("Community", style: TextStyle(color: Palette.black,
                     fontFamily: "NotoSansKR",

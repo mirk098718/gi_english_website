@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumElePage.dart';
+import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
 import 'package:gi_english_website/pages/SchoolMainPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
@@ -160,7 +161,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
               SizedBox(width: 30),
               InkWell(
                   onTap: (){
-                    // MenuUtil.push(context, SchoolCommunityNoticePage());
+                    MenuUtil.push(context, SchoolGalleryPage());
                     },
                   child:
                   Container(

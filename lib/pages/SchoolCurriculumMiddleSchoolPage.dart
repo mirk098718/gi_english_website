@@ -124,17 +124,6 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
             ),
             WidgetUtil.myDivider(),
             SizedBox(height: 20),
-            Text(style: TextStyle(
-                color: Palette.black,
-                fontFamily: "NotoSansKR",
-                fontWeight: FontWeight.normal,
-                fontSize: 14),
-                "글림아일랜드 중등부는 "
-                "균형을 맞춘 자체 커리큘럼을 100% 영어로 소화하고 있으며, 아이들이 창의성을 최대한 발휘할 수 있는 재미있는 수업 방식을 채택하여 진행합니다.\n"
-                "또한 Kids Times, Junior Times와 같은 영자신문 프로그램과 코딩 수업을 영어로 제공하는 Wonder Code 등 뛰어난 외부 교육프로그램 역시 적용하고 교육 효과를 극대화하고 있습니다."),
-            SizedBox(height: 20),
-            SizedBox(
-                height: 20),
             Text(
               "월수금반",
               style: TextStyle(fontFamily: "Jalnan", fontSize: 15,),
@@ -153,6 +142,16 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
                 height: 20),
             Container(
                 width: 700, child: Image.asset("assets/middleTimetableTTS.png")),
+            SizedBox(
+                height: 20),
+            Text(
+              "화목반",
+              style: TextStyle(fontFamily: "Jalnan", fontSize: 15,),
+            ),
+            SizedBox(
+                height: 20),
+            Container(
+                width: 700, child: Image.asset("assets/middleTimetableTT.png")),
 
             // SizedBox(height: 40),
             // Text(

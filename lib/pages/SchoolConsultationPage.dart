@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -31,8 +32,8 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
   MyGroupValue timeMyGroupValue = MyGroupValue("오전 09am ~ 12pm");
 
   List<ButtonState> buttonStateList = [
-    ButtonState("Notice Board", BehaviorColor.colorOnDefault, SchoolConsultationPage()),
-    ButtonState("Gallery", BehaviorColor.colorOnDefault, SchoolConsultationPage()),
+    //ButtonState("Notice Board", BehaviorColor.colorOnDefault, SchoolConsultationPage()),
+    ButtonState("Gallery", BehaviorColor.colorOnDefault, SchoolGalleryPage()),
     ButtonState("입학상담", BehaviorColor.colorOnClick, SchoolConsultationPage()),
   ];
 
@@ -75,8 +76,8 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               children: [
                 // Container(margin:EdgeInsets.only(top:40, left: 50),width: 1,height: 520, color:Palette.greyTenPer,),
                 Expanded(child: calendarBox()),
-                Container(margin:EdgeInsets.only(top:40,right:40),width: 1,height: 520, color:Palette.greyTenPer,),
-                Expanded(child: content()),
+                // Container(margin:EdgeInsets.only(top:40,right:40),width: 1,height: 520, color:Palette.greyTenPer,),
+                // Expanded(child: content()),
               ],
             ),
           ),
@@ -95,7 +96,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             mobileCalendarBox(),
-            mobileContent(),
+            // mobileContent(),
             SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
           ],
         ),
@@ -290,7 +291,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "상담 희망일",
+            "상담 예약하기",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           SizedBox(height: 20),
@@ -300,13 +301,18 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               fontWeight: FontWeight.normal,
               fontSize: 14),
               // "원하시는 대면 상담 날짜를 선택해주세요."
-              "(* 현재 상담일자 선택은 불가능 : 대면 상담은 준공, 입학설명회 이후인 2023년 2월부터 가능합니다. 간단한 인적사항과 연락처를 입력해주시면 상담 가능일자에 연락드리겠습니다!)"),
+              "• 상담 요일 : 월요일 ~ 금요일 / 토요일 오전\n"
+                  "• 상담 시간 : 오후 1시 ~ 오후 8ㅅ9시 / 토요일 9시 ~ 12시\n"
+                  "• 상담 절차 : 031 942 0908 대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n"
+                  "\n"
+                  "• 전화 상담 : 031 942 0908\n"
+                  "• 이메일 : gienglish.paju@gmail.com"),
           // Divider(),
           Container(
             width: 400,
             height: 400  ,
             alignment: Alignment.center,
-            margin: EdgeInsets.only(left:30, top:60),
+            margin: EdgeInsets.only(left:10, top:40),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
@@ -415,9 +421,9 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
         onHover: (value) {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
-              : (i == 2
-                  ? BehaviorColor.colorOnClick
-                  : BehaviorColor.colorOnDefault);
+              : (i == 1
+              ? BehaviorColor.colorOnClick
+              : BehaviorColor.colorOnDefault);
           setState(() {});
         },
         onTap: () {
@@ -435,6 +441,8 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
     }
 
     return Container(
+      alignment: Alignment.center,
+      width: MediaQuery.of(context).size.width,
       color: Palette.white,
       padding: EdgeInsets.all(20),
       child: Container(
@@ -512,7 +520,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "상담 희망일",
+            "상담 예약하기",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           SizedBox(height: 20),
@@ -522,12 +530,16 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               fontWeight: FontWeight.normal,
               fontSize: 14),
               // "원하시는 대면 상담 날짜를 선택해주세요."
-                  "(* 현재 상담일자 선택은 불가능 : 대면 상담은 준공, 입학설명회 이후인 2023년 2월부터 가능합니다. 간단한 인적사항과 연락처를 입력해주시면 상담 가능일자에 연락드리겠습니다!)"),
-          Container(
+              "• 상담 요일 : 월요일 ~ 금요일 / 토요일 오전\n"
+                  "• 상담 시간 : 오후 1시 ~ 오후 8ㅅ9시 / 토요일 9시 ~ 12시\n"
+                  "• 상담 절차 : 031 942 0908 대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n"
+                  "\n"
+                  "• 전화 상담 : 031 942 0908\n"
+                  "• 이메일 : gienglish.paju@gmail.com"),          Container(
             width: 400,
             height: 400  ,
             alignment: Alignment.center,
-            margin: EdgeInsets.all(20),
+            margin: EdgeInsets.only(left: 10, top:40),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(

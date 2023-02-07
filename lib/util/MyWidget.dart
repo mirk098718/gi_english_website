@@ -23,12 +23,10 @@ class MyWidget {
                 fontSize: 14),
           ),
           SizedBox(height: 5,),
-          Text("경기도 파주시 해올2길 12 태산 W 타워 7층 701~703호\n"
-                "문의 : 010 2788 0907 \n"
+          Text("경기도 파주시 해올2길 2 태산 W 타워 7층 701~703호 (다율동 1044)\n"
+                "문의 : 031 942 0908 \n"
                 "email : gienglish.paju@gmail.com\n"
                 "사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희\n"
-                "사업자 등록번호 : 준비중\n"
-                "신고번호 : 준비중\n"
                 "Copyright ⓒ 글림아일랜드어학원",
             style: TextStyle(color: Palette.white, fontFamily: "NotoSansKR", fontWeight: FontWeight.normal,
                 fontSize: 14),

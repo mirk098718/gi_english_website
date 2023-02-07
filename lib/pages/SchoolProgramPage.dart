@@ -120,7 +120,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           WidgetUtil.myDivider(),
           Container(
             margin: EdgeInsets.only(top: 20, bottom: 20,),
-            padding: EdgeInsets.only(left:45),
+            padding: EdgeInsets.only(left:20),
             width: 500, color: Palette.greyTenPer,
             child: Row(
               children: [
@@ -254,26 +254,36 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           SizedBox(
             height: 20,
           ),
-          Image.asset("assets/elePrep.png"),
-          SizedBox(height: 20,),
-          Image.asset("assets/eleProgram.png"),
-          SizedBox(height: 20,),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),
-              "글림아일랜드의 영어 초등부 프로그램은, \n"
-                  "뉴질랜드 초등 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
-                  "다양하면서도 독특한 수업을 제공합니다. 언어 교육에 기본이 되는 리딩, 문법 수업을 통하여 기본기를 탄탄히 하되,\n"
-                  "영자 신문을 활용한 스피치, Debate 수업을 통하여 아이들이 다양한 상식을 접함과 동시에 이에 대한 본인의 생각을\n"
-                  "표현할 수 있도록 가르치며, 토론이 익숙치 않은 아이들이 효과적으로 설득력 있게 말하는 방법을 배울 것 입니다.\n"
-                  "또한 분기별로 이루어질 Speech Contest 를 통하여, 아이들이 더욱 적극적으로 목표 의식을 가지고 수업에 임할 수 있도록 합니다.\n"
-                  "글림아일랜드의 초등부 수업은 아이들이 현지 초등학교 수업에 참여할 수 있을 정도의 실용적 영어실력을 갖추게 하는 것이 목표이며,\n"
-                  "실제로 뉴질랜드 공립학교 방항 프로그램에 참여하여 현지 영어를 직접 체험할 수 있도록 합니다."),
-          SizedBox(
-            height: 20,
+          SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child:Column(
+                children: [
+                  Container(
+                      width:700,
+                      child: Image.asset("assets/elePrep.png")),
+                  Container(
+                      width: 720,
+                      child: Image.asset("assets/eleProgram.png"))
+                ],
+              )
           ),
+          SizedBox(height: 60),
+          // Text(style: TextStyle(
+          //     color: Palette.black,
+          //     fontFamily: "NotoSansKR",
+          //     fontWeight: FontWeight.normal,
+          //     fontSize: 14),
+          //     "글림아일랜드의 영어 초등부 프로그램은, \n"
+          //         "뉴질랜드 초등 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
+          //         "다양하면서도 독특한 수업을 제공합니다. 언어 교육에 기본이 되는 리딩, 문법 수업을 통하여 기본기를 탄탄히 하되,\n"
+          //         "영자 신문을 활용한 스피치, Debate 수업을 통하여 아이들이 다양한 상식을 접함과 동시에 이에 대한 본인의 생각을\n"
+          //         "표현할 수 있도록 가르치며, 토론이 익숙치 않은 아이들이 효과적으로 설득력 있게 말하는 방법을 배울 것 입니다.\n"
+          //         "또한 분기별로 이루어질 Speech Contest 를 통하여, 아이들이 더욱 적극적으로 목표 의식을 가지고 수업에 임할 수 있도록 합니다.\n"
+          //         "글림아일랜드의 초등부 수업은 아이들이 현지 초등학교 수업에 참여할 수 있을 정도의 실용적 영어실력을 갖추게 하는 것이 목표이며,\n"
+          //         "실제로 뉴질랜드 공립학교 방항 프로그램에 참여하여 현지 영어를 직접 체험할 수 있도록 합니다."),
+          // SizedBox(
+          //   height: 20,
+          // ),
           Text(
             "중등부 프로그램 개요",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
@@ -281,20 +291,31 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),
-              "글림아일랜드의 영어 중등부 프로그램은, \n"
-                  "뉴질랜드 College 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
-                  "다양하면서도 독특한 수업을 제공합니다. 아이들을 질리게 하는 공부만을 위한 공부가 되지 않도록\n"
-                  "아이들이 사회, 과학, 예술 등 다양한 영역에 대한 상식과 세상을 배울 수 있도록 다양한 컨텐츠를 다루는 영자신문을 활용한\n"
-                  "NIE Speaking 프로그램은 아이들의 영어 실력을 눈에 띄게 향상시킬 것 입니다.\n"
-                  "그 외, 선택 과목으로 컴퓨터 프로그래밍적인 사고를 배울 수 있는 코딩 수업을 제공합니다."),
+
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Container(
+              width: 720,
+              child: Image.asset("assets/middleSchoolProgramInfo.png"),
+            ),
+          ),
           SizedBox(
             height: 20,
           ),
+          // Text(style: TextStyle(
+          //     color: Palette.black,
+          //     fontFamily: "NotoSansKR",
+          //     fontWeight: FontWeight.normal,
+          //     fontSize: 14),
+          //     "글림아일랜드의 영어 중등부 프로그램은, \n"
+          //         "뉴질랜드 College 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
+          //         "다양하면서도 독특한 수업을 제공합니다. 아이들을 질리게 하는 공부만을 위한 공부가 되지 않도록\n"
+          //         "아이들이 사회, 과학, 예술 등 다양한 영역에 대한 상식과 세상을 배울 수 있도록 다양한 컨텐츠를 다루는 영자신문을 활용한\n"
+          //         "NIE Speaking 프로그램은 아이들의 영어 실력을 눈에 띄게 향상시킬 것 입니다.\n"
+          //         "그 외, 선택 과목으로 컴퓨터 프로그래밍적인 사고를 배울 수 있는 코딩 수업을 제공합니다."),
+          // SizedBox(
+          //   height: 20,
+          // ),
         ],
       ),
     );
@@ -409,28 +430,38 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           SizedBox(
             height: 20,
           ),
-          Image.asset("assets/elePrep.png"),
-          SizedBox(height: 20,),
-          Image.asset("assets/eleProgram.png"),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+              child:Column(
+                children: [
+                  Container(
+                      width:700,
+                      child: Image.asset("assets/elePrep.png")),
+                  Container(
+                      width: 720,
+                      child: Image.asset("assets/eleProgram.png"))
+                ],
+              )
+             ),
           SizedBox(
-            height: 20,
+            height: 60,
           ),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),
-              "글림아일랜드의 영어 초등부 프로그램은, \n"
-                  "뉴질랜드 초등 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
-                  "다양하면서도 독특한 수업을 제공합니다. 언어 교육에 기본이 되는 리딩, 문법 수업을 통하여 기본기를 탄탄히 하되,\n"
-                  "영자 신문을 활용한 스피치, Debate 수업을 통하여 아이들이 다양한 상식을 접함과 동시에 이에 대한 본인의 생각을\n"
-                  "표현할 수 있도록 가르치며, 토론이 익숙치 않은 아이들이 효과적으로 설득력 있게 말하는 방법을 배울 것 입니다.\n"
-                  "또한 분기별로 이루어질 Speech Contest 를 통하여, 아이들이 더욱 적극적으로 목표 의식을 가지고 수업에 임할 수 있도록 합니다.\n"
-                  "글림아일랜드의 초등부 수업은 아이들이 현지 초등학교 수업에 참여할 수 있을 정도의 실용적 영어실력을 갖추게 하는 것이 목표이며,\n"
-                  "실제로 뉴질랜드 공립학교 방항 프로그램에 참여하여 현지 영어를 직접 체험할 수 있도록 합니다."),
-          SizedBox(
-            height: 20,
-          ),
+          // Text(style: TextStyle(
+          //     color: Palette.black,
+          //     fontFamily: "NotoSansKR",
+          //     fontWeight: FontWeight.normal,
+          //     fontSize: 14),
+          //     "글림아일랜드의 영어 초등부 프로그램은, \n"
+          //         "뉴질랜드 초등 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입하여\n"
+          //         "다양하면서도 독특한 수업을 제공합니다. 언어 교육에 기본이 되는 리딩, 문법 수업을 통하여 기본기를 탄탄히 하되,\n"
+          //         "영자 신문을 활용한 스피치, Debate 수업을 통하여 아이들이 다양한 상식을 접함과 동시에 이에 대한 본인의 생각을\n"
+          //         "표현할 수 있도록 가르치며, 토론이 익숙치 않은 아이들이 효과적으로 설득력 있게 말하는 방법을 배울 것 입니다.\n"
+          //         "또한 분기별로 이루어질 Speech Contest 를 통하여, 아이들이 더욱 적극적으로 목표 의식을 가지고 수업에 임할 수 있도록 합니다.\n"
+          //         "글림아일랜드의 초등부 수업은 아이들이 현지 초등학교 수업에 참여할 수 있을 정도의 실용적 영어실력을 갖추게 하는 것이 목표이며,\n"
+          //         "실제로 뉴질랜드 공립학교 방항 프로그램에 참여하여 현지 영어를 직접 체험할 수 있도록 합니다."),
+          // SizedBox(
+          //   height: 20,
+          // ),
           Text(
             "중등부 프로그램 개요",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
@@ -438,20 +469,31 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),
-              "글림아일랜드의 영어 중등부 프로그램은, \n"
-                  "뉴질랜드 College 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입한 커리큘럼을 제공하며,\n"
-                  "아이들이 사회, 과학, 예술 등 다양한 영역에 대한 상식과 세상을 배울 수 있도록 다양한 컨텐츠를 제공하는 영자신문을 활용한\n"
-                  "NIE Speaking 프로그램은 아이들의 영어 실력을 눈에 띄게 향상시킬 것 입니다.\n"
-                  "그 외에도, 컴퓨터 프로그래밍적인 사고를 배울 수 있는 코딩 수업, 두뇌 발달과 재미을 동시에 잡는 체스 시간 역시\n"
-                  "타 영어유치원에서는 볼 수 없는 글림아일랜드만의 특별 프로그램이랍니다! :)"),
+
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Container(
+              width: 720,
+              child: Image.asset("assets/middleSchoolProgramInfo.png"),
+            ),
+          ),
           SizedBox(
             height: 20,
           ),
+          // Text(style: TextStyle(
+          //     color: Palette.black,
+          //     fontFamily: "NotoSansKR",
+          //     fontWeight: FontWeight.normal,
+          //     fontSize: 14),
+          //     "글림아일랜드의 영어 중등부 프로그램은, \n"
+          //         "뉴질랜드 College 교육 현장의 자유로움과, 자기표현, 크리에이티비티를 중시하는 분위기를 그대로 도입한 커리큘럼을 제공하며,\n"
+          //         "아이들이 사회, 과학, 예술 등 다양한 영역에 대한 상식과 세상을 배울 수 있도록 다양한 컨텐츠를 제공하는 영자신문을 활용한\n"
+          //         "NIE Speaking 프로그램은 아이들의 영어 실력을 눈에 띄게 향상시킬 것 입니다.\n"
+          //         "그 외에도, 컴퓨터 프로그래밍적인 사고를 배울 수 있는 코딩 수업, 두뇌 발달과 재미을 동시에 잡는 체스 시간 역시\n"
+          //         "타 영어유치원에서는 볼 수 없는 글림아일랜드만의 특별 프로그램이랍니다! :)"),
+          // SizedBox(
+          //   height: 20,
+          // ),
         ],
       ),
     );

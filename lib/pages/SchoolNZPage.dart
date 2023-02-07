@@ -136,6 +136,27 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           SizedBox(
             height: 20,
           ),
+          Text("GLEAM ISLAND 어학원만의 New Zealand 현지 체험 프로그램",
+              style: TextStyle(
+                  fontFamily: "Jalnan",
+                  fontSize: 15,
+                  color: Palette.deepGreen)),
+          SizedBox(
+            height: 20,
+          ),
+          Text(style: TextStyle(color: Palette.black, fontFamily: "NotoSansKR", fontWeight: FontWeight.normal,
+              fontSize: 14),
+              "뻔하고 지루한 방학 특강 프로그램,\n"
+                  "여기 저기서 많이 들어 보고 시켜도 봤지만, 큰 효과를 얻지 못하셨죠?\n"
+                  "글림아일랜드는 파격적인 뉴질랜드 현지 공립학교 체험 프로그램을 도입하여, \n"
+                  "현지 코디네이터와 협업하여, 매 년 아이들이 최상의 방학 프로그램을 즐길 수 있도록 지원합니다!\n"
+                  "뉴질랜드 에듀케이션 '공식' 에이전트인 믿을만한 현지 코디네이터 '비전유학'과 함께하는 알차고 재미있는 현지 영어 체험!\n"
+                  "공부도 활동도 놓치지 않는 글림아일랜드만의 방학 프로그램! 그 어떤 교육보다 유익하면서도 아이들에게는 잊지 못할 추억을 선사해드립니다!"
+
+          ),
+          SizedBox(
+            height: 20,
+          ),
           Text(
             "운영기간",
             style: TextStyle(
@@ -182,7 +203,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           ),
           SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Container( child: Image.asset("assets/whyNZInfo.png"))),
+              child: Container(width: 800, child: Image.asset("assets/whyNZInfo.png"))),
           SizedBox(
             height: 40,
           ),
@@ -192,7 +213,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
                   Uri.parse('https://m.youtube.com/watch?v=Ytc6ClRRhw0'),
                 );
               },
-              child: Container(width:900, child: Image.asset("assets/whyChooseNzClip.png"))),
+              child: Container(width:800, child: Image.asset("assets/whyChooseNzClip.png"))),
 
           SizedBox(
             height: 40,
@@ -207,13 +228,13 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           ),
           SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Container(child: Image.asset("assets/whyTaurangaInfo.png"))),
+              child: Container(width:800, child: Image.asset("assets/whyTaurangaInfo.png"))),
 
           SizedBox(
             height: 40,
           ),
           InkWell(
-            child: Container(width:900, child: Image.asset("assets/whyTaurangaClipWeb.png")),
+            child: Container(width:800, child: Image.asset("assets/whyTaurangaClipWeb.png")),
             onTap: () async {
               UrlUtil.open('https://www.youtube.com/watch?v=uT2IIPu5uuY');
             },

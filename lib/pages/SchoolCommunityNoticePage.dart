@@ -21,7 +21,7 @@ class SchoolCommunityNoticePage extends StatefulWidget {
 class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
 
   List<ButtonState> buttonStateList = [
-    ButtonState("Notice Board", BehaviorColor.colorOnClick, SchoolCommunityNoticePage()),
+    // ButtonState("Notice Board", BehaviorColor.colorOnClick, SchoolCommunityNoticePage()),
     ButtonState("Gallery", BehaviorColor.colorOnDefault, SchoolGalleryPage()),
     ButtonState("입학상담", BehaviorColor.colorOnDefault, SchoolConsultationPage()),
   ];

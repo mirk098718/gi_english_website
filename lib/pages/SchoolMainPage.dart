@@ -308,7 +308,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
-                                "글림아일랜드에서 학부모님들을 초대하여\n입학설명회를 진행하고자 합니다! \n"
+                                "글림아일랜드에서 학부모님들을 초대하여 입학설명회를 진행하고자 합니다! \n"
                                     "초등부: 2월 17일 금 2시~3시, 2월 18일 토 2시~3시\n"
                                     "중등부: 2월 17일 금 3시~4시, 2월 18일 토 3시~4시"),]
                       ),
@@ -398,7 +398,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
                                 "A: 글림아일랜드 어학원은 2월 17일 오픈 예정이며, 당일부터 양일간 현장에서 입학설명회가 열릴 예정입니다.^^\n"
-                                    "(수업 개강일은 2월 27일입니다.)"),
+                                    "(수업 개강일은 3월 6일입니다.)"),
                           ]),
                     ),
                     Container(
@@ -427,7 +427,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
-                                "A: 초등부, 중등부 정원은 한 반에 8명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, 각반을 담당하는 원어민 선생님이 배정됩니다."),
+                                "A: 초등부, 중등부 정원은 한 반에 8명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, 주 1회 원어민 선생님이 배정됩니다."),
                           ]),
                     ),
                     Container(
@@ -457,9 +457,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
-                                "A: 초등부는 연령을 고려하되,\n"
-                                    "실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다.\n"
-                                    "중등부는 연령과 실력에 따라 반 배정이 되며 내신을 고려하여 학교도 되도록이면 통일합니다."),
+                                "A: 초등부는 연령을 고려하되,실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다. 중등부는 연령과 실력에 따라 반 배정이 되며 학교도 되도록이면 통일합니다."),
                           ]),
                     ),
                   ],
@@ -724,7 +722,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
                             "글림아일랜드에서 학부모님들을 초대하여\n입학설명회를 진행하고자 합니다! \n"
-                                "초등부: 2월 17일 금 2시~3시, 2월 18일 금 2시~3시\n"
+                                "초등부: 2월 17일 금 2시~3시, 2월 18일 토 2시~3시\n"
                                 "중등부: 2월 17일 금 3시~4시, 2월 18일 토 3시~4시"),]
                   ),
                 ),
@@ -809,7 +807,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
                             "A: 글림아일랜드 어학원은 인테리어가 끝나는 2월 17일 오픈 예정이며, 당일부터 양일간 현장에서 입학설명회가 열릴 예정입니다.^^\n"
-                                "수업 개강일은 2월 27일입니다."),
+                                "수업 개강일은 3월 6일입니다."),
                       ]),
                 ),
                 Container(
@@ -838,7 +836,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
-                            "A: 초등부, 중등부 정원은 한 반에 8명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, 각반을 담당하는 원어민 선생님이 배정됩니다."),
+                            "A: 초등부, 중등부 정원은 한 반에 8명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, 주 1회 원어민 선생님이 배정됩니다."),
                       ]),
                 ),
                 Container(
@@ -873,13 +871,13 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontSize: 14),
                             "A: 초등부는 연령을 고려하되,\n"
                                 "실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다.\n"
-                                "중등부는 연령과 실력에 따라 반 배정이 되며 내신을 고려하여 학교도 되도록이면 통일합니다."),
+                                "중등부는 연령과 실력에 따라 반 배정이 되며 학교도 되도록이면 통일합니다."),
                       ]),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 20)
+          Container(height: 20)
         ],
       ),
     );

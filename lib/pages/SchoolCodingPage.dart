@@ -148,11 +148,27 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
               fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
-              "이공계 / 예체능 적성의 본원 정규 초등영어 과정 수강생"),
+              "1) 선택/특강 프로그램 : 이공계 / 예체능 적성의 본원 정규 초등영어 과정 수강생\n"
+                  "2) 방학특강 프로그램 : 이공계 적성의 본원 정규 중등영어 과정 수강생 또는 유학준비생"),
           SizedBox(
             height: 20,
           ),
-          Image.asset("assets/optionalPrograms.png"),
+          SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                  width: 700,
+                  child: Image.asset("assets/optionalPrograms.png")),
+          ),
+
+          SizedBox(
+            height: 60,
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Container(
+                width: 700,
+                child: Image.asset("assets/middleSchoolOptionalProgram.png")),
+          ),
           SizedBox(
             height: 50,
           ),
