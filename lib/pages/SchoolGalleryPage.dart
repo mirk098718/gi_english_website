@@ -144,10 +144,10 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                       ),
                       SizedBox(width: 20,),
                       Container(color:Palette.greyTenPer, width: 200, height:200
-                        ,child: Image.asset("assets/lobby1.jpeg", fit: BoxFit.fitHeight),),
+                        ,child: Image.asset("assets/lobby.jpeg", fit: BoxFit.fitHeight),),
                       SizedBox(width: 20,),
                       Container(color:Palette.greyTenPer, width: 200, height:200,
-                        child: Image.asset("assets/doors.jpeg", fit: BoxFit.fitWidth),)
+                        child: Image.asset("assets/classroom.jpeg", fit: BoxFit.fitWidth),)
                     ],
                   ),
                 ),
@@ -163,10 +163,28 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                           ,child: Image.asset("assets/gleamIslandLogo.jpeg")),
                       SizedBox(width: 20,),
                       Container(color:Palette.greyTenPer, width: 200, height:200
-                        ,child: Image.asset("assets/lobby1.jpeg", fit: BoxFit.fitHeight),),
+                        ,child: Image.asset("assets/car1.jpeg", fit: BoxFit.fitHeight),),
                       SizedBox(width: 20,),
                       Container(color:Palette.greyTenPer, width: 200, height:200,
-                        child: Image.asset("assets/doors.jpeg", fit: BoxFit.fitWidth),)
+                        child: Image.asset("assets/car2.jpeg", fit: BoxFit.fitHeight),)
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20,),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Container(color:Palette.greyTenPer, width: 200, height:200,
+                        child: Image.asset("assets/scienceday.jpeg",fit: BoxFit.fitWidth),),
+                      SizedBox(width: 20,),
+                      Container(color:Palette.greyTenPer, width: 200, height:200
+                          ,child: Image.asset("assets/projectart.jpeg")),
+                      SizedBox(width: 20,),
+                      Container(color:Palette.greyTenPer, width: 200, height:200
+                        ,child: Image.asset("assets/lobby2.jpeg", fit: BoxFit.fitHeight),),
+                      SizedBox(width: 20,),
+
                     ],
                   ),
                 )
@@ -195,25 +213,31 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                 ),
                 WidgetUtil.myDivider(),
                 SizedBox(height: 30,),
-                Row(
-                  children: [
-                    Container(color:Palette.greyTenPer, width: 200, height:200
-                      ,child: Image.asset("assets/lobby1.jpeg", fit: BoxFit.fitHeight),),
-                    SizedBox(width: 20,),
-                    Container(color:Palette.greyTenPer, width: 200, height:200,
-                      child: Image.asset("assets/doors.jpeg", fit: BoxFit.fitWidth),
-                    ),
-                  ],
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Container(color:Palette.greyTenPer, width: 200, height:200
+                        ,child: Image.asset("assets/lobby1.jpeg", fit: BoxFit.fitHeight),),
+                      SizedBox(width: 20,),
+                      Container(color:Palette.greyTenPer, width: 200, height:200,
+                        child: Image.asset("assets/doors.jpeg", fit: BoxFit.fitWidth),
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(height: 20,),
-                Row(
-                  children: [
-                    Container(color:Palette.greyTenPer, width: 200, height:200,
-                      child: Image.asset("assets/mainEnterance.jpeg",fit: BoxFit.fitWidth),),
-                    SizedBox(width: 20,),
-                    Container(color:Palette.greyTenPer, width: 200, height:200
-                        ,child: Image.asset("assets/gleamIslandLogo.jpeg")),
-                  ],
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Container(color:Palette.greyTenPer, width: 200, height:200,
+                        child: Image.asset("assets/mainEnterance.jpeg",fit: BoxFit.fitWidth),),
+                      SizedBox(width: 20,),
+                      Container(color:Palette.greyTenPer, width: 200, height:200
+                          ,child: Image.asset("assets/gleamIslandLogo.jpeg")),
+                    ],
+                  ),
                 )
               ],
             ),
@@ -222,25 +246,44 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 20,),
-                Row(
-                  children: [
-                    Container(color:Palette.greyTenPer, width: 200, height:200
-                      ,child: Image.asset("assets/lobby1.jpeg", fit: BoxFit.fitHeight),),
-                    SizedBox(width: 20,),
-                    Container(color:Palette.greyTenPer, width: 200, height:200,
-                      child: Image.asset("assets/doors.jpeg", fit: BoxFit.fitWidth),
-                    ),
-                  ],
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Container(color:Palette.greyTenPer, width: 200, height:200
+                        ,child: Image.asset("assets/lobby.jpeg", fit: BoxFit.fitHeight),),
+                      SizedBox(width: 20,),
+                      Container(color:Palette.greyTenPer, width: 200, height:200,
+                        child: Image.asset("assets/classroom.jpeg", fit: BoxFit.fitWidth),
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(height: 20,),
-                Row(
-                  children: [
-                    Container(color:Palette.greyTenPer, width: 200, height:200,
-                      child: Image.asset("assets/mainEnterance.jpeg",fit: BoxFit.fitWidth),),
-                    SizedBox(width: 20,),
-                    Container(color:Palette.greyTenPer, width: 200, height:200
-                        ,child: Image.asset("assets/gleamIslandLogo.jpeg")),
-                  ],
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Container(color:Palette.greyTenPer, width: 200, height:200,
+                        child: Image.asset("assets/car1.jpeg",fit: BoxFit.fitWidth),),
+                      SizedBox(width: 20,),
+                      Container(color:Palette.greyTenPer, width: 200, height:200
+                          ,child: Image.asset("assets/car2.jpeg",fit: BoxFit.fitHeight)),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20,),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Container(color:Palette.greyTenPer, width: 200, height:200,
+                        child: Image.asset("assets/scienceday.jpeg",fit: BoxFit.fitWidth),),
+                      SizedBox(width: 20,),
+                      Container(color:Palette.greyTenPer, width: 200, height:200
+                          ,child: Image.asset("assets/projectart.jpeg",fit: BoxFit.fitHeight)),
+                    ],
+                  ),
                 )
               ],
             ),

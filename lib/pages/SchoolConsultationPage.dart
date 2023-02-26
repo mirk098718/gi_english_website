@@ -301,9 +301,10 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               fontWeight: FontWeight.normal,
               fontSize: 14),
               // "원하시는 대면 상담 날짜를 선택해주세요."
-              "• 상담 요일 : 월요일 ~ 금요일 / 토요일 오전\n"
-                  "• 상담 시간 : 오후 1시 ~ 오후 8ㅅ9시 / 토요일 9시 ~ 12시\n"
-                  "• 상담 절차 : 031 942 0908 대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n"
+              "• 상담 요일 : 월요일~금요일 / 토요일 오전\n"
+                  "• 상담 시간 : 오후 1시~8시40분 / 토요일 9시~12시\n"
+                  "• 상담 절차 : 031 942 0908 \n"
+                  "  대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n"
                   "\n"
                   "• 전화 상담 : 031 942 0908\n"
                   "• 이메일 : gienglish.paju@gmail.com"),
@@ -312,7 +313,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
             width: 400,
             height: 400  ,
             alignment: Alignment.center,
-            margin: EdgeInsets.only(left:10, top:40),
+            margin: EdgeInsets.only(top:40),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
@@ -530,16 +531,17 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               fontWeight: FontWeight.normal,
               fontSize: 14),
               // "원하시는 대면 상담 날짜를 선택해주세요."
-              "• 상담 요일 : 월요일 ~ 금요일 / 토요일 오전\n"
-                  "• 상담 시간 : 오후 1시 ~ 오후 8ㅅ9시 / 토요일 9시 ~ 12시\n"
-                  "• 상담 절차 : 031 942 0908 대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n"
+              "• 상담 요일 : 월요일~금요일 / 토요일 오전\n"
+                  "• 상담 시간 : 오후 1시~8시40분 / 토요일 9시~12시\n"
+                  "• 상담 절차 : 031 942 0908 \n\n"
+                  "대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n"
                   "\n"
                   "• 전화 상담 : 031 942 0908\n"
                   "• 이메일 : gienglish.paju@gmail.com"),          Container(
             width: 400,
             height: 400  ,
             alignment: Alignment.center,
-            margin: EdgeInsets.only(left: 10, top:40),
+            margin: EdgeInsets.only(top:40),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(

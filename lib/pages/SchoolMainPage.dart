@@ -284,7 +284,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                   fontFamily: "NotoSansKR",
                                   fontWeight: FontWeight.normal,
                                   fontSize: 14),
-                              "글림아일랜드 어학원 입주 예정지인, 다율동 '태산 W 타워' 준공 완료! 글림아일랜드 어학원이 2월 15일 오픈 예정입니다*^^*"),]
+                              "글림아일랜드 어학원 입주 예정지인, 다율동 '태산 W 타워' 준공 완료! 글림아일랜드 어학원이 2월 17일 오픈 예정입니다*^^*"),]
                     ),
                   ),
                     Container(
@@ -389,7 +389,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14),
-                                "Q: 글림아일랜드 어학원 정식 오픈일이 언제일까요?"),
+                                "Q: 글림아일랜드 정식 오픈일이 언제일까요?"),
                             WidgetUtil.myDivider(),
                             Text(
                                 style: TextStyle(
@@ -647,6 +647,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
 
   Widget mobileBulletinBoard() {
     return Container(
+      color: Colors.white,
       margin: EdgeInsets.only(left: 20, right: 20),
       child: Column(
         children: [
@@ -697,7 +698,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
-                            "글림아일랜드 어학원 입주 예정지인, 다율동 '태산 W 타워' 준공 완료! 글림아일랜드 어학원이 2월 15일 오픈 예정입니다*^^*"),]
+                            "글림아일랜드 어학원 입주 예정지인, 다율동 '태산 W 타워' 준공 완료! 글림아일랜드 어학원이 2월 17일 오픈 예정입니다*^^*"),]
                   ),
                 ),
                 Container(
@@ -798,7 +799,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14),
-                            "Q: 글림아일랜드 어학원 정식 오픈일이 언제일까요?"),
+                            "Q: 글림아일랜드 정식 오픈일이 언제일까요?"),
                         WidgetUtil.myDivider(),
                         Text(
                             style: TextStyle(
@@ -870,8 +871,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
                             "A: 초등부는 연령을 고려하되,\n"
-                                "실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다.\n"
-                                "중등부는 연령과 실력에 따라 반 배정이 되며 학교도 되도록이면 통일합니다."),
+                                "실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다. 중등부는 연령과 실력에 따라 반 배정이 되며 학교도 되도록이면 통일합니다."),
                       ]),
                 ),
               ],

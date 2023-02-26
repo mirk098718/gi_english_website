@@ -149,7 +149,7 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
             height: 20,
           ),
           Text(
-            "정기상담 및 참관수업",
+            "정기상담",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
           ),
           SizedBox(
@@ -160,10 +160,9 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
               fontFamily: "NotoSansKR",
               fontWeight: FontWeight.normal,
               fontSize: 14),
-              "본원에서는 아이들의 학업 성취와 원 생활에 대한 정보을 학부모님과 보다 가깝게 소통하기 위하여\n"
-              "* 초등부는 월 정기 상담 2회 + alpha,\n"
-              "* 중등부는 월 정기 상담 1회 + alpha 를 진행하고 있습니다.\n"
-                  "그리고, 학부모님들의 수업 이해도를 높이기 위하여 매년 학부모 참관 수업 및 행사도 준비될 예정입니다."),
+              "본원에서는 아이들의 학업 성취와 원 생활에 대한 정보을 학부모님과 보다 가깝게 소통하기 위하여 "
+              "월 정기 담임 상담 1회, 레벨업 상담 1회를 진행합니다. 또한 상담실은 언제든 열려 있으며, "
+                  "원장 상담 역시 언제든 예약해주십시오."),
           SizedBox(
             height: 20,
           ),
@@ -177,10 +176,9 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
           ),
           Text(style: TextStyle(color: Palette.black, fontFamily: "NotoSansKR", fontWeight: FontWeight.normal,
               fontSize: 14),
-              "* 본원에서는 아이들의 원활한 Vocabulary 습득을 위하여 Gi 영단어 어플리케이션을 커리큘럼에 적용, 사용하고 있습니다.\n"
-              "* 중등, 초등부 모두 매주 해당 주에 배운 단어들에 대한 쪽지 시험을 보며,\n"
-              "* 초등부는 매월 정기 Monthly Test, 6개월에 1회 Level Up Test 를 진행하며,\n"
-              "* 중등부는 3개월에 1회 정기 Mid Term Test, Term Test를 진행하고 있습니다."),
+              "• 본원에서는 아이들의 원활한 Vocabulary 습득을 위하여 정기적인 단어시험을 진행합니다.\n"
+              "• 중등, 초등부 모두 매주 해당 주에 배운 단어들에 대한 쪽지 시험을 보며,\n"
+              "• 매월 정기 Monthly Test, 6개월에 1회 Level Up Test 를 진행합니다\n"),
           SizedBox(
             height: 20,
           ),

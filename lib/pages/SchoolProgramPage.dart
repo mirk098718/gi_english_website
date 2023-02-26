@@ -159,7 +159,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                               fontFamily: "NotoSansKR",
                               fontWeight: FontWeight.normal,
                               fontSize: 14),
-                              "오후 2:30 ~ 오후 7:00\n"
+                              "오후 2:30 ~ 오후 8:40\n"
                                   "(자세한 시간표는 커리큘럼 참조)"),
                           SizedBox(
                             height: 10,
@@ -177,7 +177,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                               fontFamily: "NotoSansKR",
                               fontWeight: FontWeight.normal,
                               fontSize: 14),
-                              "예비초, 초등학교 1학년 ~ 6학년 \n"
+                              "예비초(6~7(), 초등학교 1학년 ~ 6학년 \n"
                                   ""),
                         ],
                       )
@@ -217,7 +217,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                               fontFamily: "NotoSansKR",
                               fontWeight: FontWeight.normal,
                               fontSize: 14),
-                              "오후 5:30분 ~ 오후 9:05\n"
+                              "오후 7:10분 ~ 오후 8:40\n"
                               "(자세한 시간표는 커리큘럼 참조)"),
                           SizedBox(
                             height: 10,
@@ -363,7 +363,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                         fontFamily: "NotoSansKR",
                         fontWeight: FontWeight.normal,
                         fontSize: 14),
-                        "오후 2:30 ~ 오후 7:00\n"
+                        "오후 2:30 ~ 오후 8:40\n"
                             "(자세한 시간표는 커리큘럼 참조)"),
                     SizedBox(
                       height: 10,
@@ -380,7 +380,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                         fontFamily: "NotoSansKR",
                         fontWeight: FontWeight.normal,
                         fontSize: 14),
-                        "예비초, 초등학교 1학년 ~ 6학년"),
+                        "예비초(6~7세), 초등학교 1학년 ~ 6학년"),
                   ],
                 ),
                 SizedBox(height: 10),
@@ -402,7 +402,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                       fontFamily: "NotoSansKR",
                       fontWeight: FontWeight.normal,
                       fontSize: 14),
-                      "오후 5:30 ~ 오후 9:05\n"
+                      "오후 7:10 ~ 오후 8:40\n"
                           "(자세한 시간표는 커리큘럼 참조)"),
                   SizedBox(
                       height: 10
