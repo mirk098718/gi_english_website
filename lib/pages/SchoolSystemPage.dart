@@ -182,7 +182,7 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
           SizedBox(
             height: 20,
           ),
-
+          Container(width: double.infinity,child: Image.asset("assets/tuitionFeeChart.jpeg"),),
         ],
       ),
     );

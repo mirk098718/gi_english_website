@@ -123,6 +123,9 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
               style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
             ),
             WidgetUtil.myDivider(),
+            SizedBox(
+                height: 20),
+            Container(width:700, child: Image.asset("assets/giProgramPeriod.png")),
             SizedBox(height: 20),
             Text(
               "월수금반",
@@ -132,16 +135,8 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
                 height: 20),
             Container(
                 width: 700, child: Image.asset("assets/middleTimetableMWF.png")),
-            SizedBox(
-                height: 20),
-            Text(
-              "화목토반",
-             style: TextStyle(fontFamily: "Jalnan", fontSize: 15,),
-            ),
-            SizedBox(
-                height: 20),
-            Container(
-                width: 700, child: Image.asset("assets/middleTimetableTTS.png")),
+
+
             SizedBox(
                 height: 20),
             Text(

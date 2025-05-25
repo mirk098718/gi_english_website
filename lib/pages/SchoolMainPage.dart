@@ -7,7 +7,6 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/EasyKeyboardListener.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
-
 import '../admin/page/AdminLoginPage.dart';
 import '../util/UrlIUtil.dart';
 import '../util/WidgetUtil.dart';
@@ -284,7 +283,9 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                   fontFamily: "NotoSansKR",
                                   fontWeight: FontWeight.normal,
                                   fontSize: 14),
-                              "글림아일랜드 어학원 입주 예정지인, 다율동 '태산 W 타워' 준공 완료! 글림아일랜드 어학원이 2월 17일 오픈 예정입니다*^^*"),]
+                              "* 글림아일랜드 2024년 신학기 개강 일정 :\n"
+                                  "- 월수금반 : 3월 6일  /  화목반 : 3월 5일\n"
+                                  "* 신규 Prep(파닉스)반 2반 신설 및 중등부 신설"),]
                     ),
                   ),
                     Container(
@@ -300,7 +301,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14),
-                                "Gi어학원 초등부 학부모설명회"),
+                                "글림아일랜드 어학원 초등부 체험수업"),
                             WidgetUtil.myDivider(),
                             Text(
                                 style: TextStyle(
@@ -308,9 +309,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
-                                "글림아일랜드에서 학부모님들을 초대하여 입학설명회를 진행하고자 합니다! \n"
-                                    "초등부: 2월 17일 금 2시~3시, 2월 18일 토 2시~3시\n"
-                                    "중등부: 2월 17일 금 3시~4시, 2월 18일 토 3시~4시"),]
+                                "- 글림아일랜드의 모든 수업은 체험 수업이 가능합니다. "
+                                    "아이가 직접 수업을 참여해보고 결정할 수 있도록 해 주십시오.(일일 수강료 발생)"),]
                       ),
                     ),
                     Container(
@@ -389,7 +389,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14),
-                                "Q: 글림아일랜드 정식 오픈일이 언제일까요?"),
+                                "Q: 글림아일랜드 24년도 개강일은?"),
                             WidgetUtil.myDivider(),
                             Text(
                                 style: TextStyle(
@@ -397,8 +397,9 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
-                                "A: 글림아일랜드 어학원은 2월 17일 오픈 예정이며, 당일부터 양일간 현장에서 입학설명회가 열릴 예정입니다.^^\n"
-                                    "(수업 개강일은 3월 6일입니다.)"),
+                                "A: 글림아일랜드 2024년 신학기 개강 일정 :\n"
+                                    "- 월수금반 : 3월 6일\n"
+                                    "- 화목반 : 3월 5일"),
                           ]),
                     ),
                     Container(
@@ -427,7 +428,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
-                                "A: 초등부, 중등부 정원은 한 반에 8명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, 주 1회 원어민 선생님이 배정됩니다."),
+                                "A: 초등부, 중등부 정원은 한 반에 8명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, "
+                                    "최소 주 1회 원어민 선생님 수업이 있습니다."),
                           ]),
                     ),
                     Container(
@@ -457,7 +459,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontFamily: "NotoSansKR",
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
-                                "A: 초등부는 연령을 고려하되,실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다. 중등부는 연령과 실력에 따라 반 배정이 되며 학교도 되도록이면 통일합니다."),
+                                "A: 예비초, 초등부는 연령을 고려하되,실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다. 중등부는 연령과 실력에 따라 반 배정이 되며 학교도 되도록이면 통일합니다."),
                           ]),
                     ),
                   ],
@@ -479,7 +481,10 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
           children: [
             mainImage(),
             SizedBox(height: 120, child: urlMenu()),
-            Container(width:double.infinity,child: Image.asset("assets/mainBannerOpening.png")),
+            Container(width:double.infinity,child: InkWell(child: Image.asset("assets/mainBannerOpening.png")
+            , onTap: () async {
+                UrlUtil.open('https://blog.naver.com/gleam-island-paju/223029184863');
+              },)),
             bulletinBoard(),
             SizedBox(height: 213, child: MyWidget.footer()),
 
@@ -496,7 +501,10 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
       child: Container(
         child: Column(
           children: [
-            Image.asset("assets/mainBannerOpening.png"),
+            InkWell(child: Image.asset("assets/mainBannerOpening.png"),
+              onTap: () async {
+                UrlUtil.open('https://blog.naver.com/gleam-island-paju/223029184863');
+              },),
             // mobileMenuList(),
             mobileUrlMenu(),
             mobileBulletinBoard(),
@@ -698,7 +706,10 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
-                            "글림아일랜드 어학원 입주 예정지인, 다율동 '태산 W 타워' 준공 완료! 글림아일랜드 어학원이 2월 17일 오픈 예정입니다*^^*"),]
+                            "* 글림아일랜드 2024년 신학기 개강 일정 :\n"
+                                "- 월수금반 : 3월 6일\n"
+                                "- 화목반 : 3월 5일\n"
+                                "* 신규 Prep(파닉스)반 2반 신설 및 중등부 신설"),]
                   ),
                 ),
                 Container(
@@ -714,7 +725,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14),
-                            "Gi어학원 초등부 학부모설명회"),
+                            "글림아일랜드어학원 초등부 체험수업"),
                         WidgetUtil.myDivider(),
                         Text(
                             style: TextStyle(
@@ -722,9 +733,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
-                            "글림아일랜드에서 학부모님들을 초대하여\n입학설명회를 진행하고자 합니다! \n"
-                                "초등부: 2월 17일 금 2시~3시, 2월 18일 토 2시~3시\n"
-                                "중등부: 2월 17일 금 3시~4시, 2월 18일 토 3시~4시"),]
+                            "- 글림아일랜드의 모든 수업은 체험 수업이 가능합니다. "
+                                "아이가 직접 수업을 참여해보고 결정할 수 있도록 해 주십시오.(일일 수강료 발생)"),]
                   ),
                 ),
                 Container(
@@ -752,7 +762,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
-                            "본원에서는 초등, 중등반 수업 스케줄에 따른 학원 차량을 운행하며 자세한 내용은 상담시 차량 노선과 함께 제공합니다."),]
+                            "- 본원에서는 초등, 중등반 수업 스케줄에 따른 학원 차량을 "
+                                "운행하며 자세한 내용은 상담시 차량 노선과 함께 제공합니다."),]
                   ),
                 )
               ],
@@ -799,7 +810,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14),
-                            "Q: 글림아일랜드 정식 오픈일이 언제일까요?"),
+                            "Q: 글림아일랜드 24년도 개강일은?"),
                         WidgetUtil.myDivider(),
                         Text(
                             style: TextStyle(
@@ -807,8 +818,9 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
-                            "A: 글림아일랜드 어학원은 인테리어가 끝나는 2월 17일 오픈 예정이며, 당일부터 양일간 현장에서 입학설명회가 열릴 예정입니다.^^\n"
-                                "수업 개강일은 3월 6일입니다."),
+                            "A: 글림아일랜드 2024년 신학기 개강 일정 :\n"
+                            "- 월수금반 : 3월 6일\n"
+                            "- 화목반 : 3월 5일"),
                       ]),
                 ),
                 Container(
@@ -829,7 +841,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14),
-                            "Q: 초등, 중등부 각반 정원은 몇명인가요?"),
+                            "Q: 예비초, 초등, 중등부 각반 정원은 몇명인가요?"),
                         WidgetUtil.myDivider(),
                         Text(
                             style: TextStyle(
@@ -837,7 +849,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
-                            "A: 초등부, 중등부 정원은 한 반에 8명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, 주 1회 원어민 선생님이 배정됩니다."),
+                            "A: 초등부, 중등부 정원은 한 반에 8명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, "
+                                "최소 주 1회 원어민 선생님 수업이 있습니다."),
                       ]),
                 ),
                 Container(
@@ -870,7 +883,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
-                            "A: 초등부는 연령을 고려하되,\n"
+                            "A: 예비초, 초등부는 연령을 고려하되,\n"
                                 "실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다. 중등부는 연령과 실력에 따라 반 배정이 되며 학교도 되도록이면 통일합니다."),
                       ]),
                 ),

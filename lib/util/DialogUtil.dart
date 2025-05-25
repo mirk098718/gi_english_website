@@ -36,8 +36,7 @@ class DialogUtil {
                     height: 50,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        primary: Palette.mainLime,
-                        onPrimary: Palette.black,
+                        foregroundColor: Palette.black, backgroundColor: Palette.mainLime,
                       ),
                       onPressed: ()=>backPage(context),
                       child: Text(

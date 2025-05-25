@@ -47,7 +47,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   SizedBox(height: 20),
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          primary: Palette.mainMediumPurple,
+                          backgroundColor: Palette.mainMediumPurple,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0)),
                           minimumSize: Size(100, 40)),

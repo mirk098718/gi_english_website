@@ -148,7 +148,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Container(alignment: Alignment.topLeft, width: 150, height: 300, child: Image.asset("assets/miaKimPhoto.jpg")),
+                Container(alignment: Alignment.topLeft, width: 150, height: 300, child: Image.asset("assets/directorPhoto.jpeg")),
                 SizedBox(width: 20,),
                 Text(style: TextStyle(color: Palette.black,
                     fontFamily: "NotoSansKR",

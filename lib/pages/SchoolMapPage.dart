@@ -188,8 +188,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.black,
-                      onPrimary: Palette.black,
+                      foregroundColor: Palette.black, backgroundColor: Palette.black,
                     ),
                     onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
                     child: Text("상담신청",
@@ -315,8 +314,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Palette.mainMediumPurple,
-                      onPrimary: Palette.black,
+                      foregroundColor: Palette.black, backgroundColor: Palette.mainMediumPurple,
                     ),
 
                   ),
