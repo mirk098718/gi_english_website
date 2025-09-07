@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolAllDayPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
@@ -21,34 +20,30 @@ class SchoolCampPage extends StatefulWidget {
 }
 
 class _SchoolCampPageState extends State<SchoolCampPage> {
-
   List<ButtonState> buttonStateList = [
     ButtonState("정규프로그램", BehaviorColor.colorOnDefault, SchoolProgramPage()),
     ButtonState("올데이케어", BehaviorColor.colorOnDefault, SchoolAllDayPage()),
     ButtonState("방학캠프", BehaviorColor.colorOnClick, SchoolCampPage()),
     ButtonState("뉴질랜드프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
-
   ];
   @override
   Widget build(BuildContext context) {
-
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     Size size = mediaQueryData.size;
     double width = size.width;
-    if(width>768){
+    if (width > 768) {
       return desktopUi(context);
-    }
-    else{
+    } else {
       return mobileUi(context);
     }
   }
 
-  Widget desktopUi(context){
+  Widget desktopUi(context) {
     return WebSchoolLayout(content: scrollView());
   }
 
-  Widget mobileUi(context){
-    return MobileSchoolLayout(content:mobileScrollView());
+  Widget mobileUi(context) {
+    return MobileSchoolLayout(content: mobileScrollView());
   }
 
   Widget contentGroup() {
@@ -87,8 +82,8 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 2
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           print(
               "label ${buttonState.label}, selectedColorList: ${buttonState.color}");
           setState(() {});
@@ -101,7 +96,6 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
       if (!isLast) {
         children.add(Divider(height: 1));
       }
-
     }
 
     return Container(
@@ -139,37 +133,40 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
           ),
           Text(
             "운영기간",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+            style: TextStyle(
+                fontFamily: "Jalnan", fontSize: 15, color: const Color.fromRGBO(4, 120, 87, 1)),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
               "여름방학 / 겨울방학 기간 2주 코스"),
           SizedBox(
             height: 20,
           ),
           Text(
             "대상",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+            style: TextStyle(
+                fontFamily: "Jalnan", fontSize: 15, color: const Color.fromRGBO(4, 120, 87, 1)),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
               "본원 초등부 저학년 대상"),
           SizedBox(
             height: 150,
           ),
-
         ],
       ),
     );
@@ -181,11 +178,10 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
         children: [
           mainImage(),
           contentGroup(),
-          SizedBox(height: 213, child: MyWidget.footer()),
+          MyWidget.footer(),
         ],
       ),
     );
-
   }
 
   Widget mainImage() {
@@ -196,8 +192,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
           Image.asset("assets/ballPoolImage.png"),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
-            child:
-            Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -219,26 +214,24 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
                       backgroundColor: Palette.black,
                       foregroundColor: Palette.black,
                     ),
-                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolConsultationPage());
+                    },
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Jalnan",
-                            color: Palette.white,
-                            )),
+                          fontFamily: "Jalnan",
+                          color: Palette.white,
+                        )),
                   ),
                 ),
-
               ],
             ),
-
           )
         ],
       ),
-
     );
   }
-
 
   //mobile
 
@@ -251,8 +244,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
-
+            MyWidget.mobileSchoolFooter()
           ],
         ),
       ),
@@ -269,12 +261,15 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
 
       Widget child;
       if (isFirst) {
-        child = MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
       } else if (isLast) {
         //last
-        child = MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
       } else {
-        child = MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
       }
 
       children.add(InkWell(
@@ -283,8 +278,8 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 2
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           setState(() {});
         },
         onTap: () {
@@ -293,9 +288,12 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
       ));
 
       if (!isLast) {
-        children.add(Container(width: 1, height: 40, color: Palette.mainLightPurple,));
+        children.add(Container(
+          width: 1,
+          height: 40,
+          color: const Color.fromRGBO(96, 165, 250, 1),
+        ));
       }
-
     }
 
     return Container(
@@ -348,17 +346,15 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
                     child: Text(
                       "상담신청",
                       style:
-                      TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.mainMediumPurple,
+                      backgroundColor: const Color.fromRGBO(139, 92, 246, 1),
                       foregroundColor: Palette.black,
                     ),
-
-
                   ),
                 ),
               ],
@@ -368,5 +364,4 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
       ),
     );
   }
-
 }

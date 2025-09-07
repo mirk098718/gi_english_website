@@ -60,9 +60,8 @@ flutter:
      - assets/instaLogo.png
      - assets/aboutMainImage.png
      - assets/cafeLogo.png
-     - assets/mainGateImage.png
+     - assets/mainGateImageMiddleSchool.png
      - assets/mainLogoPurple.png
-     - assets/mainGateImageWithLogo.png
      - assets/curriculumImage.png
      - assets/schoolAboutImage.png
      - assets/programMainImage.png
@@ -94,8 +93,6 @@ flutter:
      - assets/schoolList.png
      - assets/schoolSelection.png
      - assets/whyTaurangaClipWeb.png
-     - assets/mainGateImageFinal.png
-     - assets/mainGateImageLightBlue.png
      - assets/kinderTimesLogo.png
      - assets/juniorTimesLogo.png
      - assets/eleOnlineLink.png

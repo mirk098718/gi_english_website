@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumElePage.dart';
@@ -19,12 +18,13 @@ class SchoolCurriculumMiddleSchoolPage extends StatefulWidget {
       _SchoolCurriculumMiddleSchoolPageState();
 }
 
-class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddleSchoolPage> {
+class _SchoolCurriculumMiddleSchoolPageState
+    extends State<SchoolCurriculumMiddleSchoolPage> {
   List<ButtonState> buttonStateList = [
     ButtonState(
         "정규초등부", BehaviorColor.colorOnDefault, SchoolCurriculumElePage()),
-    ButtonState(
-        "정규중등부", BehaviorColor.colorOnClick, SchoolCurriculumMiddleSchoolPage()),
+    ButtonState("정규중등부", BehaviorColor.colorOnClick,
+        SchoolCurriculumMiddleSchoolPage()),
   ];
 
   @override
@@ -38,7 +38,6 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
       return MobileSchoolLayout(content: mobileScrollView());
     }
   }
-
 
   Widget contentGroup() {
     return Container(
@@ -123,28 +122,31 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
               style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
             ),
             WidgetUtil.myDivider(),
-            SizedBox(
-                height: 20),
-            Container(width:700, child: Image.asset("assets/giProgramPeriod.png")),
+            SizedBox(height: 20),
+            Container(
+                width: 700, child: Image.asset("assets/giProgramPeriod.png")),
             SizedBox(height: 20),
             Text(
               "월수금반",
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 15,),
+              style: TextStyle(
+                fontFamily: "Jalnan",
+                fontSize: 15,
+              ),
             ),
-            SizedBox(
-                height: 20),
+            SizedBox(height: 20),
             Container(
-                width: 700, child: Image.asset("assets/middleTimetableMWF.png")),
+                width: 700,
+                child: Image.asset("assets/middleTimetableMWF.png")),
 
-
-            SizedBox(
-                height: 20),
+            SizedBox(height: 20),
             Text(
               "화목반",
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 15,),
+              style: TextStyle(
+                fontFamily: "Jalnan",
+                fontSize: 15,
+              ),
             ),
-            SizedBox(
-                height: 20),
+            SizedBox(height: 20),
             Container(
                 width: 700, child: Image.asset("assets/middleTimetableTT.png")),
 
@@ -199,8 +201,7 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
             // //     "자녀의 Lexile 수준을 알면 이 수준에 맞는 책을 검색하여 가정 도서관을 확장하고 가정에서 매일 읽기 연습을 장려할 수 있습니다.\n"
             // //     "Lexile 데이터베이스를 사용하여 Lexile 수준, 제목 또는 주제별로 검색하여 자녀가 좋아하고 읽기 성취도에 낙담하지 않고 읽을 수 있는 책을 찾으십시오.\n"
             // //     "아래 차트를 사용하여 Lexile 수준을 다른 수준별 읽기 시스템과 비교하십시오:"),
-            SizedBox(
-                height: 40),
+            SizedBox(height: 40),
             Text(
               "NIE 영자신문 수업",
               style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
@@ -260,13 +261,15 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
                       backgroundColor: Palette.black,
                       foregroundColor: Palette.black,
                     ),
-                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolConsultationPage());
+                    },
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Jalnan",
-                            color: Palette.white,
-                            )),
+                          fontFamily: "Jalnan",
+                          color: Palette.white,
+                        )),
                   ),
                 ),
               ],
@@ -334,7 +337,7 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
         children.add(Container(
           width: 1,
           height: 40,
-          color: Palette.mainLightPurple,
+          color: Palette.primaryLight,
         ));
       }
     }
@@ -361,5 +364,4 @@ class _SchoolCurriculumMiddleSchoolPageState extends State<SchoolCurriculumMiddl
       ),
     );
   }
-
 }

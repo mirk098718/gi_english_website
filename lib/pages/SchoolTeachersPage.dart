@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
@@ -16,14 +15,11 @@ import '../util/WidgetUtil.dart';
 class SchoolTeachersPage extends StatefulWidget {
   const SchoolTeachersPage({Key? key}) : super(key: key);
 
-
-
   @override
   _SchoolTeachersPageState createState() => _SchoolTeachersPageState();
 }
 
 class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
-
   List<ButtonState> buttonStateList = [
     ButtonState("Gi글림아일랜드", BehaviorColor.colorOnDefault, SchoolAboutPage()),
     ButtonState("교원소개", BehaviorColor.colorOnClick, SchoolTeachersPage()),
@@ -48,7 +44,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
   }
 
   Widget mobileUi(context) {
-    return MobileSchoolLayout(content:mobileScrollView());
+    return MobileSchoolLayout(content: mobileScrollView());
   }
 
   Widget contentGroup() {
@@ -87,8 +83,8 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 1
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           print(
               "label ${buttonState.label}, selectedColorList: ${buttonState.color}");
           setState(() {});
@@ -101,7 +97,6 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
       if (!isLast) {
         children.add(Divider(height: 1));
       }
-
     }
 
     return Container(
@@ -131,28 +126,40 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-              "GLEAM ISLAND 교원 소개",
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
-            ),
+            "GLEAM ISLAND 교원 소개",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
+          ),
           WidgetUtil.myDivider(),
           SizedBox(
             height: 30,
           ),
-          Text("원장 Mia 선생님",style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.mainPurple),),
+          Text(
+            "원장 Mia 선생님",
+            style: TextStyle(
+                fontFamily: "Jalnan", fontSize: 15, color: Palette.primary),
+          ),
           SizedBox(
             height: 20,
           ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-             crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Container(alignment: Alignment.topLeft, width: 150, height: 300, child: Image.asset("assets/directorPhoto.jpeg")),
-                SizedBox(width: 20,),
-                Text(style: TextStyle(color: Palette.black,
-                    fontFamily: "NotoSansKR",
-                    fontSize: 14),
+                Container(
+                    alignment: Alignment.topLeft,
+                    width: 150,
+                    height: 300,
+                    child: Image.asset("assets/directorPhoto.jpeg")),
+                SizedBox(
+                  width: 20,
+                ),
+                Text(
+                    style: TextStyle(
+                        color: Palette.black,
+                        fontFamily: "NotoSansKR",
+                        fontSize: 14),
                     "Mia Kim \n\n"
                     "현 Gi 글림아일랜드 어학원 파주 원장\n"
                     "전 서대문구 소재 청담 에이프릴 어학원 교수부장\n"
@@ -161,26 +168,29 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
                     "강남 유명 OPIC (영어 구술 시험) 전문 어학원 강사\n"
                     "비욘드 어학원 초, 중등 강사\n"
                     "JTBC 다큐멘터리 “스포츠관광을 디렉팅하라” 영문번역"),
-                SizedBox(width: 20,),
-
-                Text(style: TextStyle(color: Palette.black,
-                    fontFamily: "NotoSansKR",
-                    fontSize: 14),
+                SizedBox(
+                  width: 20,
+                ),
+                Text(
+                    style: TextStyle(
+                        color: Palette.black,
+                        fontFamily: "NotoSansKR",
+                        fontSize: 14),
                     "학력 및 자격\n"
-                        "\n"
-                        "뉴질랜드 오클랜드 공과 대학교\n"
-                        "(Auckland University of Technology) 석사졸\n"
-                        "뉴질랜드 오클랜드 소재 Glenfield College 고등학교 졸\n"
-                        "TESOL 영어 강사 자격 보유\n"
-                        "(Certificate in Teaching English as a Second Language)\n"
-                        "(Queens Academic Group)"
-                )
+                    "\n"
+                    "뉴질랜드 오클랜드 공과 대학교\n"
+                    "(Auckland University of Technology) 석사졸\n"
+                    "뉴질랜드 오클랜드 소재 Glenfield College 고등학교 졸\n"
+                    "TESOL 영어 강사 자격 보유\n"
+                    "(Certificate in Teaching English as a Second Language)\n"
+                    "(Queens Academic Group)")
               ],
             ),
           ),
           Container(child: Image.asset("assets/teachers.png")),
           SizedBox(
-            height: 20,),
+            height: 20,
+          ),
         ],
       ),
     );
@@ -192,7 +202,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
         children: [
           mainImage(),
           contentGroup(),
-          SizedBox(height: 213, child: MyWidget.footer()),
+          MyWidget.footer(),
         ],
       ),
     );
@@ -206,8 +216,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
           Image.asset("assets/aboutMainImage.png"),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
-            child:
-            Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -229,25 +238,24 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
                       backgroundColor: Palette.black,
                       foregroundColor: Palette.black,
                     ),
-                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolConsultationPage());
+                    },
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Jalnan",
-                            color: Palette.white,
-                           )),
+                          fontFamily: "Jalnan",
+                          color: Palette.white,
+                        )),
                   ),
                 ),
-
               ],
             ),
-
           )
         ],
       ),
     );
   }
-
 
   //mobile
 
@@ -260,8 +268,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
-
+            MyWidget.mobileSchoolFooter()
           ],
         ),
       ),
@@ -278,12 +285,15 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
 
       Widget child;
       if (isFirst) {
-        child = MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
       } else if (isLast) {
         //last
-        child = MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
       } else {
-        child = MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
       }
 
       children.add(InkWell(
@@ -292,8 +302,8 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 1
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           setState(() {});
         },
         onTap: () {
@@ -302,9 +312,12 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
       ));
 
       if (!isLast) {
-        children.add(Container(width: 1, height: 40, color: Palette.mainLightPurple,));
+        children.add(Container(
+          width: 1,
+          height: 40,
+          color: Palette.primaryLight,
+        ));
       }
-
     }
 
     return Container(
@@ -357,17 +370,15 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
                     child: Text(
                       "상담신청",
                       style:
-                      TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.mainMediumPurple,
+                      backgroundColor: Palette.accent,
                       foregroundColor: Palette.black,
                     ),
-
-
                   ),
                 ),
               ],

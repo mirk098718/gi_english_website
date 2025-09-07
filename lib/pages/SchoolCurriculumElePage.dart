@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumMiddleSchoolPage.dart';
@@ -14,31 +13,28 @@ class SchoolCurriculumElePage extends StatefulWidget {
   const SchoolCurriculumElePage({Key? key}) : super(key: key);
 
   @override
-  _SchoolCurriculumElePageState createState() => _SchoolCurriculumElePageState();
+  _SchoolCurriculumElePageState createState() =>
+      _SchoolCurriculumElePageState();
 }
 
 class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
-
   List<ButtonState> buttonStateList = [
     ButtonState("정규초등부", BehaviorColor.colorOnClick, SchoolCurriculumElePage()),
-    ButtonState("정규중등부", BehaviorColor.colorOnDefault, SchoolCurriculumMiddleSchoolPage()),
-
+    ButtonState("정규중등부", BehaviorColor.colorOnDefault,
+        SchoolCurriculumMiddleSchoolPage()),
   ];
 
   @override
   Widget build(BuildContext context) {
-
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     Size size = mediaQueryData.size;
     double width = size.width;
-    if(width>768){
+    if (width > 768) {
       return WebSchoolLayout(content: scrollView());
-    }
-    else{
-      return MobileSchoolLayout(content:mobileScrollView());
+    } else {
+      return MobileSchoolLayout(content: mobileScrollView());
     }
   }
-
 
   Widget contentGroup() {
     return Container(
@@ -73,8 +69,11 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
       children.add(InkWell(
         child: child,
         onHover: (value) {
-          buttonState.color =
-          value ? BehaviorColor.colorOnHover : (i == 0 ? BehaviorColor.colorOnClick : BehaviorColor.colorOnDefault);
+          buttonState.color = value
+              ? BehaviorColor.colorOnHover
+              : (i == 0
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           print(
               "label ${buttonState.label}, selectedColorList: ${buttonState.color}");
           setState(() {});
@@ -87,7 +86,6 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
       if (!isLast) {
         children.add(Divider(height: 1));
       }
-
     }
 
     return Container(
@@ -120,33 +118,39 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
           children: [
             Text(
               "정규 초등부 Curriculum",
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 20,),
+              style: TextStyle(
+                fontFamily: "Jalnan",
+                fontSize: 20,
+              ),
             ),
             WidgetUtil.myDivider(),
-            SizedBox(
-              height: 20),
-            Container(width:700, child: Image.asset("assets/eleProgramPeriod.png")),
-            SizedBox(
-                height: 20),
+            SizedBox(height: 20),
+            Container(
+                width: 700, child: Image.asset("assets/eleProgramPeriod.png")),
+            SizedBox(height: 20),
             Text(
               "월수금반",
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 15,),
+              style: TextStyle(
+                fontFamily: "Jalnan",
+                fontSize: 15,
+              ),
             ),
-            SizedBox(
-              height: 20),
-            Container(width:700, child: Image.asset("assets/eleTimetableMWF.png")),
-            SizedBox(
-                height: 20),
-
+            SizedBox(height: 20),
+            Container(
+                width: 700, child: Image.asset("assets/eleTimetableMWF.png")),
+            SizedBox(height: 20),
             Text(
               "화목반",
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 15,),
+              style: TextStyle(
+                fontFamily: "Jalnan",
+                fontSize: 15,
+              ),
             ),
-            SizedBox(
-                height: 20),
-            Container(width:700, child: Image.asset("assets/eleTimetableTuesThurs.png")),
-            SizedBox(
-                height: 40),
+            SizedBox(height: 20),
+            Container(
+                width: 700,
+                child: Image.asset("assets/eleTimetableTuesThurs.png")),
+            SizedBox(height: 40),
             Text(
               "NIE 영자신문 수업",
               style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
@@ -154,11 +158,9 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
             WidgetUtil.myDivider(),
             SizedBox(height: 5),
             Container(
-              margin: EdgeInsets.only(top: 20),
-              width: 1000,
+                margin: EdgeInsets.only(top: 20),
+                width: 1000,
                 child: Image.asset("assets/nie.png")),
-
-
           ],
         ),
       ),
@@ -175,20 +177,17 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
         ],
       ),
     );
-
   }
 
   Widget mainImage() {
     return Container(
-
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
           Image.asset("assets/curriculumImage.png"),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
-            child:
-            Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -210,38 +209,36 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
                       backgroundColor: Palette.black,
                       foregroundColor: Palette.black,
                     ),
-                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolConsultationPage());
+                    },
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Jalnan",
-                            color: Palette.white,
-                            )),
+                          fontFamily: "Jalnan",
+                          color: Palette.white,
+                        )),
                   ),
                 ),
               ],
             ),
-
           )
         ],
       ),
     );
   }
 
-
   //mobile
 
   Widget mobileScrollView() {
     return SingleChildScrollView(
       child: Container(
-
         child: Column(
           children: [
             // mobileMainImage(),
             mobileLeftMenu(),
             content(),
             SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
-
           ],
         ),
       ),
@@ -258,12 +255,15 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
 
       Widget child;
       if (isFirst) {
-        child = MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
       } else if (isLast) {
         //last
-        child = MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
       } else {
-        child = MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
       }
 
       children.add(InkWell(
@@ -272,8 +272,8 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 0
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           setState(() {});
         },
         onTap: () {
@@ -282,9 +282,12 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
       ));
 
       if (!isLast) {
-        children.add(Container(width: 1, height: 40, color: Palette.mainLightPurple,));
+        children.add(Container(
+          width: 1,
+          height: 40,
+          color: Palette.primaryLight,
+        ));
       }
-
     }
 
     return Container(

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
@@ -119,9 +118,13 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           ),
           WidgetUtil.myDivider(),
           Container(
-            margin: EdgeInsets.only(top: 20, bottom: 20,),
-            padding: EdgeInsets.only(left:20),
-            width: 500, color: Palette.greyTenPer,
+            margin: EdgeInsets.only(
+              top: 20,
+              bottom: 20,
+            ),
+            padding: EdgeInsets.only(left: 20),
+            width: 500,
+            color: Palette.grey100,
             child: Row(
               children: [
                 Container(
@@ -131,7 +134,10 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                     children: [
                       Text(
                         "초등부",
-                        style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+                        style: TextStyle(
+                            fontFamily: "Jalnan",
+                            fontSize: 15,
+                            color: Palette.secondaryDark),
                       ),
                       Container(
                         margin: EdgeInsets.only(top: 5),
@@ -149,36 +155,38 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                           Text(
                             "운영시간",
                             style:
-                            TextStyle(fontFamily: "Jalnan", fontSize: 15),
+                                TextStyle(fontFamily: "Jalnan", fontSize: 15),
                           ),
                           SizedBox(
                             height: 10,
                           ),
-                          Text(style: TextStyle(
-                              color: Palette.black,
-                              fontFamily: "NotoSansKR",
-                              fontWeight: FontWeight.normal,
-                              fontSize: 14),
+                          Text(
+                              style: TextStyle(
+                                  color: Palette.black,
+                                  fontFamily: "NotoSansKR",
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 14),
                               "오후 2:30 ~ 오후 8:40\n"
-                                  "(자세한 시간표는 커리큘럼 참조)"),
+                              "(자세한 시간표는 커리큘럼 참조)"),
                           SizedBox(
                             height: 10,
                           ),
                           Text(
                             "대상",
                             style:
-                            TextStyle(fontFamily: "Jalnan", fontSize: 15),
+                                TextStyle(fontFamily: "Jalnan", fontSize: 15),
                           ),
                           SizedBox(
                             height: 10,
                           ),
-                          Text(style: TextStyle(
-                              color: Palette.black,
-                              fontFamily: "NotoSansKR",
-                              fontWeight: FontWeight.normal,
-                              fontSize: 14),
+                          Text(
+                              style: TextStyle(
+                                  color: Palette.black,
+                                  fontFamily: "NotoSansKR",
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 14),
                               "예비초(6~7(), 초등학교 1학년 ~ 6학년 \n"
-                                  ""),
+                              ""),
                         ],
                       )
                     ],
@@ -191,7 +199,10 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                     children: [
                       Text(
                         "중등부",
-                        style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+                        style: TextStyle(
+                            fontFamily: "Jalnan",
+                            fontSize: 15,
+                            color: Palette.secondaryDark),
                       ),
                       Container(
                         margin: EdgeInsets.only(top: 5),
@@ -212,11 +223,12 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                           SizedBox(
                             height: 10,
                           ),
-                          Text(style: TextStyle(
-                              color: Palette.black,
-                              fontFamily: "NotoSansKR",
-                              fontWeight: FontWeight.normal,
-                              fontSize: 14),
+                          Text(
+                              style: TextStyle(
+                                  color: Palette.black,
+                                  fontFamily: "NotoSansKR",
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 14),
                               "오후 7:10분 ~ 오후 8:40\n"
                               "(자세한 시간표는 커리큘럼 참조)"),
                           SizedBox(
@@ -230,43 +242,43 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                           SizedBox(
                             height: 10,
                           ),
-                          Text(style: TextStyle(
-                              color: Palette.black,
-                              fontFamily: "NotoSansKR",
-                              fontWeight: FontWeight.normal,
-                              fontSize: 14),
+                          Text(
+                              style: TextStyle(
+                                  color: Palette.black,
+                                  fontFamily: "NotoSansKR",
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 14),
                               "14세~16세 (만 13세~만 15세) \n"
-                                  "예비중, 중학생"),
+                              "예비중, 중학생"),
                         ],
                       ),
                     ],
                   ),
                 ),
-
               ],
             ),
           ),
 
           Text(
             "초등부 프로그램 개요",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+            style: TextStyle(
+                fontFamily: "Jalnan",
+                fontSize: 15,
+                color: Palette.secondaryDark),
           ),
           SizedBox(
             height: 20,
           ),
           SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child:Column(
+              child: Column(
                 children: [
                   Container(
-                      width:700,
-                      child: Image.asset("assets/elePrep.png")),
+                      width: 700, child: Image.asset("assets/elePrep.png")),
                   Container(
-                      width: 720,
-                      child: Image.asset("assets/eleProgram.png"))
+                      width: 720, child: Image.asset("assets/eleProgram.png"))
                 ],
-              )
-          ),
+              )),
           SizedBox(height: 60),
           // Text(style: TextStyle(
           //     color: Palette.black,
@@ -286,7 +298,10 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           // ),
           Text(
             "중등부 프로그램 개요",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+            style: TextStyle(
+                fontFamily: "Jalnan",
+                fontSize: 15,
+                color: Palette.secondaryDark),
           ),
           SizedBox(
             height: 20,
@@ -338,11 +353,16 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
             // padding: EdgeInsets.all(10),
             padding: EdgeInsets.all(20),
             width: 440,
-            color: Palette.greyTenPer,
+            color: Palette.grey100,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("초등부", style: TextStyle(color: Palette.deepGreen, fontFamily: "Jalnan", fontSize: 15),
+                Text(
+                  "초등부",
+                  style: TextStyle(
+                      color: Palette.secondaryDark,
+                      fontFamily: "Jalnan",
+                      fontSize: 15),
                 ),
                 Container(width: 10),
                 Column(
@@ -358,13 +378,14 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                     SizedBox(
                       height: 10,
                     ),
-                    Text(style: TextStyle(
-                        color: Palette.black,
-                        fontFamily: "NotoSansKR",
-                        fontWeight: FontWeight.normal,
-                        fontSize: 14),
+                    Text(
+                        style: TextStyle(
+                            color: Palette.black,
+                            fontFamily: "NotoSansKR",
+                            fontWeight: FontWeight.normal,
+                            fontSize: 14),
                         "오후 2:30 ~ 오후 8:40\n"
-                            "(자세한 시간표는 커리큘럼 참조)"),
+                        "(자세한 시간표는 커리큘럼 참조)"),
                     SizedBox(
                       height: 10,
                     ),
@@ -375,11 +396,12 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                     SizedBox(
                       height: 10,
                     ),
-                    Text(style: TextStyle(
-                        color: Palette.black,
-                        fontFamily: "NotoSansKR",
-                        fontWeight: FontWeight.normal,
-                        fontSize: 14),
+                    Text(
+                        style: TextStyle(
+                            color: Palette.black,
+                            fontFamily: "NotoSansKR",
+                            fontWeight: FontWeight.normal,
+                            fontSize: 14),
                         "예비초(6~7세), 초등학교 1학년 ~ 6학년"),
                   ],
                 ),
@@ -388,61 +410,64 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                 SizedBox(height: 10),
                 Text(
                   "중등",
-                  style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+                  style: TextStyle(
+                      fontFamily: "Jalnan",
+                      fontSize: 15,
+                      color: Palette.secondaryDark),
                 ),
                 Container(width: 10),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   SizedBox(height: 10),
                   Text(
-                    "운영시간", style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+                    "운영시간",
+                    style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
                   ),
                   SizedBox(height: 10),
-                  Text(style: TextStyle(
-                      color: Palette.black,
-                      fontFamily: "NotoSansKR",
-                      fontWeight: FontWeight.normal,
-                      fontSize: 14),
-                      "오후 7:10 ~ 오후 8:40\n"
-                          "(자세한 시간표는 커리큘럼 참조)"),
-                  SizedBox(
-                      height: 10
-                  ),
                   Text(
-                      "대상", style: TextStyle(fontFamily: "Jalnan", fontSize: 15)),
+                      style: TextStyle(
+                          color: Palette.black,
+                          fontFamily: "NotoSansKR",
+                          fontWeight: FontWeight.normal,
+                          fontSize: 14),
+                      "오후 7:10 ~ 오후 8:40\n"
+                      "(자세한 시간표는 커리큘럼 참조)"),
                   SizedBox(height: 10),
-                  Text(style: TextStyle(
-                      color: Palette.black,
-                      fontFamily: "NotoSansKR",
-                      fontWeight: FontWeight.normal,
-                      fontSize: 14),
+                  Text("대상",
+                      style: TextStyle(fontFamily: "Jalnan", fontSize: 15)),
+                  SizedBox(height: 10),
+                  Text(
+                      style: TextStyle(
+                          color: Palette.black,
+                          fontFamily: "NotoSansKR",
+                          fontWeight: FontWeight.normal,
+                          fontSize: 14),
                       "14세~16세 (만13세~만15세) \n"
-                          "예비중, 중학생"),
+                      "예비중, 중학생"),
                 ]),
-
               ],
             ),
           ),
 
           Text(
             "초등부 프로그램 개요",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+            style: TextStyle(
+                fontFamily: "Jalnan",
+                fontSize: 15,
+                color: Palette.secondaryDark),
           ),
           SizedBox(
             height: 20,
           ),
           SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-              child:Column(
+              scrollDirection: Axis.horizontal,
+              child: Column(
                 children: [
                   Container(
-                      width:700,
-                      child: Image.asset("assets/elePrep.png")),
+                      width: 700, child: Image.asset("assets/elePrep.png")),
                   Container(
-                      width: 720,
-                      child: Image.asset("assets/eleProgram.png"))
+                      width: 720, child: Image.asset("assets/eleProgram.png"))
                 ],
-              )
-             ),
+              )),
           SizedBox(
             height: 60,
           ),
@@ -464,7 +489,10 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           // ),
           Text(
             "중등부 프로그램 개요",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+            style: TextStyle(
+                fontFamily: "Jalnan",
+                fontSize: 15,
+                color: Palette.secondaryDark),
           ),
           SizedBox(
             height: 20,
@@ -505,7 +533,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
         children: [
           mainImage(),
           contentGroup(),
-          SizedBox(height: 213, child: MyWidget.footer()),
+          MyWidget.footer(),
         ],
       ),
     );
@@ -541,13 +569,15 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                       backgroundColor: Palette.black,
                       foregroundColor: Palette.black,
                     ),
-                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolConsultationPage());
+                    },
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Jalnan",
-                            color: Palette.white,
-                            )),
+                          fontFamily: "Jalnan",
+                          color: Palette.white,
+                        )),
                   ),
                 ),
               ],
@@ -569,7 +599,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             mobileContent(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
+            MyWidget.mobileSchoolFooter()
           ],
         ),
       ),
@@ -616,7 +646,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
         children.add(Container(
           width: 1,
           height: 40,
-          color: Palette.mainLightPurple,
+          color: Palette.primaryLight,
         ));
       }
     }
@@ -675,7 +705,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.mainMediumPurple,
+                      backgroundColor: Palette.accent,
                       foregroundColor: Palette.black,
                     ),
                   ),

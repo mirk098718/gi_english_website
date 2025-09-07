@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
@@ -15,7 +14,6 @@ import '../class/SchoolVisitor.dart';
 import '../util/DialogUtil.dart';
 import '../util/WidgetUtil.dart';
 
-
 class SchoolConsultationPage extends StatefulWidget {
   const SchoolConsultationPage({Key? key}) : super(key: key);
 
@@ -24,7 +22,6 @@ class SchoolConsultationPage extends StatefulWidget {
 }
 
 class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
-
   late SchoolConsultationPageService s;
   late SchoolVisitor schoolVisitor;
 
@@ -39,6 +36,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
 
   @override
   void initState() {
+    super.initState();
     s = SchoolConsultationPageService(this);
     schoolVisitor = SchoolVisitor(
       childName: "",
@@ -49,7 +47,6 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
       level: levelMyGroupValue.value,
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -74,14 +71,14 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                // Container(margin:EdgeInsets.only(top:40, left: 50),width: 1,height: 520, color:Palette.greyTenPer,),
+                // Container(margin:EdgeInsets.only(top:40, left: 50),width: 1,height: 520, color:Palette.grey100,),
                 Expanded(child: calendarBox()),
-                // Container(margin:EdgeInsets.only(top:40,right:40),width: 1,height: 520, color:Palette.greyTenPer,),
+                // Container(margin:EdgeInsets.only(top:40,right:40),width: 1,height: 520, color:Palette.grey100,),
                 // Expanded(child: content()),
               ],
             ),
           ),
-          SizedBox(height: 213, child: MyWidget.footer()),
+          MyWidget.footer(),
         ],
       ),
     );
@@ -97,12 +94,13 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
             mobileLeftMenu(),
             mobileCalendarBox(),
             // mobileContent(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
+            MyWidget.mobileSchoolFooter()
           ],
         ),
       ),
     );
   }
+
   Widget content() {
     return Container(
       alignment: Alignment.topLeft,
@@ -119,62 +117,76 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
             ),
           ),
           SizedBox(height: 20),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),"입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
+              "입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
           // Divider(),
           SizedBox(height: 20),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),"아이 이름"),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
+              "아이 이름"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.childName = text;
           }),
           SizedBox(height: 20),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),"보호자님 성함"),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
+              "보호자님 성함"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.parentName = text;
           }),
           SizedBox(height: 20),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),"보호자님 연락처"),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
+              "보호자님 연락처"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.parentNumber = text;
           }),
           SizedBox(height: 20),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),"아이 연령"),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
+              "아이 연령"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
-            schoolVisitor.childAge = int.tryParse(text)??0;
+            schoolVisitor.childAge = int.tryParse(text) ?? 0;
           }),
           SizedBox(height: 20),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),"아이 레벨"),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
+              "아이 레벨"),
           WidgetUtil.myDivider(),
           levelRadio(),
           SizedBox(height: 20),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),"전화상담 희망시간"),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
+              "전화상담 희망시간"),
           WidgetUtil.myDivider(),
           timeRadio(),
           SizedBox(height: 20),
@@ -201,61 +213,75 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
             ),
           ),
           SizedBox(height: 20),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),"입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
+              "입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
           SizedBox(height: 20),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),"아이 이름"),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
+              "아이 이름"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.childName = text;
           }),
           SizedBox(height: 20),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),"보호자님 성함"),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
+              "보호자님 성함"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.parentName = text;
           }),
           SizedBox(height: 20),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),"보호자님 연락처"),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
+              "보호자님 연락처"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.parentNumber = text;
           }),
           SizedBox(height: 20),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),"아이 연령"),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
+              "아이 연령"),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
-            schoolVisitor.childAge = int.tryParse(text)??0;
+            schoolVisitor.childAge = int.tryParse(text) ?? 0;
           }),
           SizedBox(height: 20),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),"아이 레벨"),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
+              "아이 레벨"),
           WidgetUtil.myDivider(),
           levelRadio(),
           SizedBox(height: 20),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),"전화상담 희망시간"),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
+              "전화상담 희망시간"),
           WidgetUtil.myDivider(),
           timeRadio(),
           SizedBox(height: 20),
@@ -279,8 +305,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               "상담예약",
               style: TextStyle(fontFamily: "Jalnan", color: Palette.white),
             ),
-            onPressed: s.submitButtonPressed)
-    );
+            onPressed: s.submitButtonPressed));
   }
 
   Widget calendarBox() {
@@ -295,25 +320,26 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           SizedBox(height: 20),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
               // "원하시는 대면 상담 날짜를 선택해주세요."
               "• 상담 요일 : 월요일~금요일 / 토요일 오전\n"
-                  "• 상담 시간 : 오후 1시~8시40분 / 토요일 9시~12시\n"
-                  "• 상담 절차 : 031 942 0908 \n"
-                  "  대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n"
-                  "\n"
-                  "• 전화 상담 : 031 942 0908\n"
-                  "• 이메일 : gienglish.paju@gmail.com"),
+              "• 상담 시간 : 오후 1시~8시40분 / 토요일 9시~12시\n"
+              "• 상담 절차 : 031 942 0908 \n"
+              "  대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n"
+              "\n"
+              "• 전화 상담 : 031 942 0908\n"
+              "• 이메일 : gienglish.paju@gmail.com"),
           // Divider(),
           Container(
             width: 400,
-            height: 400  ,
+            height: 400,
             alignment: Alignment.center,
-            margin: EdgeInsets.only(top:40),
+            margin: EdgeInsets.only(top: 40),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
@@ -326,20 +352,18 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               onTap: (CalendarTapDetails calendarTapDetails) {
                 // DateTime dateTime = DateTime.now();
                 DateTime? dateTime = calendarTapDetails.date;
-                if (dateTime != null) {
-                  // dateTime = dateTime.subtract(Duration(hours: 1));
-                  // dateTime = dateTime.add(Duration(hours: 1));
-                  // dateTime.isAfter(other);
-                  // dateTime.isBefore(other);
+                // dateTime = dateTime.subtract(Duration(hours: 1));
+                // dateTime = dateTime.add(Duration(hours: 1));
+                // dateTime.isAfter(other);
+                // dateTime.isBefore(other);
 
-                  //마감일과 현재일을 비교. 마감일을 넘겼는가? 마감일을 넘기지 않았는가?
+                //마감일과 현재일을 비교. 마감일을 넘겼는가? 마감일을 넘기지 않았는가?
 
-                  //DateTime이라는 자료형이 있음. (dart꺼)
-                  //이 녀석이 날짜를 표현.
-                  print(
-                      "opnTap calendarTapDetails.date:${calendarTapDetails.date}");
-                }
-              },
+                //DateTime이라는 자료형이 있음. (dart꺼)
+                //이 녀석이 날짜를 표현.
+                print(
+                    "opnTap calendarTapDetails.date:${calendarTapDetails.date}");
+                            },
             ),
           ),
         ],
@@ -377,13 +401,15 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                       backgroundColor: Palette.black,
                       foregroundColor: Palette.black,
                     ),
-                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolConsultationPage());
+                    },
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Jalnan",
-                            color: Palette.white,
-                            )),
+                          fontFamily: "Jalnan",
+                          color: Palette.white,
+                        )),
                   ),
                 ),
               ],
@@ -423,8 +449,8 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 1
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           setState(() {});
         },
         onTap: () {
@@ -436,7 +462,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
         children.add(Container(
           width: 1,
           height: 40,
-          color: Palette.mainLightPurple,
+          color: Palette.primaryLight,
         ));
       }
     }
@@ -525,23 +551,25 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           SizedBox(height: 20),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
               // "원하시는 대면 상담 날짜를 선택해주세요."
               "• 상담 요일 : 월요일~금요일 / 토요일 오전\n"
-                  "• 상담 시간 : 오후 1시~8시40분 / 토요일 9시~12시\n"
-                  "• 상담 절차 : 031 942 0908 \n\n"
-                  "대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n"
-                  "\n"
-                  "• 전화 상담 : 031 942 0908\n"
-                  "• 이메일 : gienglish.paju@gmail.com"),          Container(
+              "• 상담 시간 : 오후 1시~8시40분 / 토요일 9시~12시\n"
+              "• 상담 절차 : 031 942 0908 \n\n"
+              "대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n"
+              "\n"
+              "• 전화 상담 : 031 942 0908\n"
+              "• 이메일 : gienglish.paju@gmail.com"),
+          Container(
             width: 400,
-            height: 400  ,
+            height: 400,
             alignment: Alignment.center,
-            margin: EdgeInsets.only(top:40),
+            margin: EdgeInsets.only(top: 40),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
@@ -554,20 +582,18 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               onTap: (CalendarTapDetails calendarTapDetails) {
                 // DateTime dateTime = DateTime.now();
                 DateTime? dateTime = calendarTapDetails.date;
-                if (dateTime != null) {
-                  // dateTime = dateTime.subtract(Duration(hours: 1));
-                  // dateTime = dateTime.add(Duration(hours: 1));
-                  // dateTime.isAfter(other);
-                  // dateTime.isBefore(other);
+                // dateTime = dateTime.subtract(Duration(hours: 1));
+                // dateTime = dateTime.add(Duration(hours: 1));
+                // dateTime.isAfter(other);
+                // dateTime.isBefore(other);
 
-                  //마감일과 현재일을 비교. 마감일을 넘겼는가? 마감일을 넘기지 않았는가?
+                //마감일과 현재일을 비교. 마감일을 넘겼는가? 마감일을 넘기지 않았는가?
 
-                  //DateTime이라는 자료형이 있음. (dart꺼)
-                  //이 녀석이 날짜를 표현.
-                  print(
-                      "opnTap calendarTapDetails.date:${calendarTapDetails.date}");
-                }
-              },
+                //DateTime이라는 자료형이 있음. (dart꺼)
+                //이 녀석이 날짜를 표현.
+                print(
+                    "opnTap calendarTapDetails.date:${calendarTapDetails.date}");
+                            },
             ),
           ),
         ],
@@ -581,6 +607,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
       schoolVisitor.level = levelMyGroupValue.value;
       SnackbarUtil.showSnackBar("${levelMyGroupValue.value} 선택", context);
     }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -629,6 +656,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
       schoolVisitor.time = timeMyGroupValue.value;
       SnackbarUtil.showSnackBar("${timeMyGroupValue.value} 선택", context);
     }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -636,31 +664,33 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           "오전 09am ~ 12pm",
           timeMyGroupValue,
           setState,
-          label: "오전 09am ~ 12pm",onChanged: onChanged,
+          label: "오전 09am ~ 12pm",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "오후 01pm ~ 04pm",
           timeMyGroupValue,
           setState,
-          label: "오후 01pm ~ 04pm",onChanged: onChanged,
+          label: "오후 01pm ~ 04pm",
+          onChanged: onChanged,
         ),
         EasyRadio(
           "오후 05pm ~ 08pm",
           timeMyGroupValue,
           setState,
-          label: "오후 05pm ~ 08pm",onChanged: onChanged,
+          label: "오후 05pm ~ 08pm",
+          onChanged: onChanged,
         ),
       ],
     );
   }
-
 }
 
 class SchoolConsultationPageService {
   _SchoolConsultationPageState state;
   SchoolConsultationPageService(this.state);
 
-  void submitButtonPressed()async{
+  void submitButtonPressed() async {
     var context = state.context;
 
     if (!state.schoolVisitor.isValid()) {

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
@@ -20,35 +19,32 @@ class SchoolCommunityFAQPage extends StatefulWidget {
 }
 
 class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
-
   List<ButtonState> buttonStateList = [
-    ButtonState("Notice Board", BehaviorColor.colorOnDefault, SchoolCommunityNoticePage()),
+    ButtonState("Notice Board", BehaviorColor.colorOnDefault,
+        SchoolCommunityNoticePage()),
     ButtonState("Gallery", BehaviorColor.colorOnDefault, SchoolGalleryPage()),
     ButtonState("입학상담", BehaviorColor.colorOnDefault, SchoolConsultationPage()),
     ButtonState("FAQ", BehaviorColor.colorOnClick, SchoolCommunityFAQPage()),
-
   ];
 
   @override
   Widget build(BuildContext context) {
-
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     Size size = mediaQueryData.size;
     double width = size.width;
-    if(width>768){
+    if (width > 768) {
       return desktopUi(context);
-    }
-    else{
+    } else {
       return mobileUi(context);
     }
   }
 
-  Widget desktopUi(context){
+  Widget desktopUi(context) {
     return WebSchoolLayout(content: scrollView());
   }
 
-  Widget mobileUi(context){
-    return MobileSchoolLayout(content:mobileScrollView());
+  Widget mobileUi(context) {
+    return MobileSchoolLayout(content: mobileScrollView());
   }
 
   Widget contentGroup() {
@@ -87,8 +83,8 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 3
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           print(
               "label ${buttonState.label}, selectedColorList: ${buttonState.color}");
           setState(() {});
@@ -101,7 +97,6 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
       if (!isLast) {
         children.add(Divider(height: 1));
       }
-
     }
 
     return Container(
@@ -135,8 +130,14 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
-          SizedBox(height: 20,),
-          Container(width: 600,height: 600, child: Text("게시판 필요"),)
+          SizedBox(
+            height: 20,
+          ),
+          Container(
+            width: 600,
+            height: 600,
+            child: Text("게시판 필요"),
+          )
         ],
       ),
     );
@@ -148,24 +149,21 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
         children: [
           mainImage(),
           contentGroup(),
-          SizedBox(height: 213, child: MyWidget.footer()),
+          MyWidget.footer(),
         ],
       ),
     );
-
   }
 
   Widget mainImage() {
     return Container(
-
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
           Image.asset("assets/communityMainImage.png"),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
-            child:
-            Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -184,27 +182,27 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Palette.black, backgroundColor: Palette.black,
+                      foregroundColor: Palette.black,
+                      backgroundColor: Palette.black,
                     ),
-                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolConsultationPage());
+                    },
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Jalnan",
-                            color: Palette.white,
-                            )),
+                          fontFamily: "Jalnan",
+                          color: Palette.white,
+                        )),
                   ),
                 ),
-
               ],
             ),
-
           )
         ],
       ),
     );
   }
-
 
   //mobile
 
@@ -218,7 +216,6 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
             mobileLeftMenu(),
             content(),
             SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
-
           ],
         ),
       ),
@@ -235,12 +232,15 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
 
       Widget child;
       if (isFirst) {
-        child = MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
       } else if (isLast) {
         //last
-        child = MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
       } else {
-        child = MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
       }
 
       children.add(InkWell(
@@ -249,8 +249,8 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 3
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           setState(() {});
         },
         onTap: () {
@@ -259,9 +259,12 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
       ));
 
       if (!isLast) {
-        children.add(Container(width: 1, height: 40, color: Palette.mainLightPurple,));
+        children.add(Container(
+          width: 1,
+          height: 40,
+          color: const Color.fromRGBO(96, 165, 250, 1),
+        ));
       }
-
     }
 
     return Container(
@@ -314,13 +317,14 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
                     child: Text(
                       "상담신청",
                       style:
-                      TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Palette.black, backgroundColor: Palette.mainMediumPurple,
+                      foregroundColor: Palette.black,
+                      backgroundColor: Palette.accent,
                     ),
                   ),
                 ),
@@ -331,5 +335,4 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
       ),
     );
   }
-
 }

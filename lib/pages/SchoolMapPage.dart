@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolSystemPage.dart';
@@ -13,7 +12,6 @@ import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import '../util/WidgetUtil.dart';
 import 'SchoolConsultationPage.dart';
 
-
 class SchoolMapPage extends StatefulWidget {
   const SchoolMapPage({Key? key}) : super(key: key);
 
@@ -22,10 +20,9 @@ class SchoolMapPage extends StatefulWidget {
 }
 
 class _SchoolMapPageState extends State<SchoolMapPage> {
-
   List<ButtonState> buttonStateList = [
     ButtonState("Gi글림아일랜드", BehaviorColor.colorOnDefault, SchoolAboutPage()),
-    ButtonState("교원소개", BehaviorColor.colorOnDefault,SchoolTeachersPage()),
+    ButtonState("교원소개", BehaviorColor.colorOnDefault, SchoolTeachersPage()),
     ButtonState("운영시스템", BehaviorColor.colorOnDefault, SchoolSystemPage()),
     ButtonState("오시는 길", BehaviorColor.colorOnClick, SchoolMapPage()),
   ];
@@ -47,7 +44,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
   }
 
   Widget mobileUi(context) {
-    return MobileSchoolLayout(content:mobileScrollView());
+    return MobileSchoolLayout(content: mobileScrollView());
   }
 
   Widget contentGroup() {
@@ -86,8 +83,8 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 3
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           print(
               "label ${buttonState.label}, selectedColorList: ${buttonState.color}");
           setState(() {});
@@ -100,7 +97,6 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
       if (!isLast) {
         children.add(Divider(height: 1));
       }
-
     }
 
     return Container(
@@ -155,7 +151,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
         children: [
           mainImage(),
           contentGroup(),
-          SizedBox(height: 213, child: MyWidget.footer()),
+          MyWidget.footer(),
         ],
       ),
     );
@@ -188,15 +184,18 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Palette.black, backgroundColor: Palette.black,
+                      foregroundColor: Palette.black,
+                      backgroundColor: Palette.black,
                     ),
-                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolConsultationPage());
+                    },
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Jalnan",
-                            color: Palette.white,
-                            )),
+                          fontFamily: "Jalnan",
+                          color: Palette.white,
+                        )),
                   ),
                 ),
               ],
@@ -206,8 +205,6 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
       ),
     );
   }
-
-
 
   //mobile
 
@@ -220,8 +217,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
-
+            MyWidget.mobileSchoolFooter()
           ],
         ),
       ),
@@ -238,12 +234,15 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
 
       Widget child;
       if (isFirst) {
-        child = MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
       } else if (isLast) {
         //last
-        child = MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
       } else {
-        child = MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
       }
 
       children.add(InkWell(
@@ -252,8 +251,8 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 3
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           setState(() {});
         },
         onTap: () {
@@ -262,9 +261,12 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
       ));
 
       if (!isLast) {
-        children.add(Container(width: 1, height: 40, color: Palette.mainLightPurple,));
+        children.add(Container(
+          width: 1,
+          height: 40,
+          color: Palette.primaryLight,
+        ));
       }
-
     }
 
     return Container(
@@ -308,15 +310,15 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
                     child: Text(
                       "상담신청",
                       style:
-                      TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Palette.black, backgroundColor: Palette.mainMediumPurple,
+                      foregroundColor: Palette.black,
+                      backgroundColor: Palette.accent,
                     ),
-
                   ),
                 ),
               ],

@@ -18,9 +18,11 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return RawKeyboardListener(
+    return KeyboardListener(
       focusNode: FocusNode(),
-      onKey: (event) {  if (event.isKeyPressed(LogicalKeyboardKey.enter)) {
+      onKeyEvent: (event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.enter) {
           onLogin();
         }
       },
@@ -28,7 +30,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         body: SizedBox.expand(
           child: Container(
             padding: EdgeInsets.all(50),
-            color: Palette.lightPurpleSky,
+            color: Palette.primary,
             alignment: Alignment.center,
             child: Container(
               width: 500,
@@ -47,7 +49,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   SizedBox(height: 20),
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Palette.mainMediumPurple,
+                          backgroundColor: Palette.primaryLight,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0)),
                           minimumSize: Size(100, 40)),

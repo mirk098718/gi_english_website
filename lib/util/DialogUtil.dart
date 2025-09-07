@@ -15,39 +15,40 @@ class DialogUtil {
       builder: (context) {
         return AlertDialog(
             content: Container(
-              width: 250,
-              height: 260,
-              alignment: Alignment.center,
-              padding: EdgeInsets.all(30),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 50,
-                  ),
-                  Text(
-                    content,
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(
-                    height: 60,
-                  ),
-                  Container(
-                    width: 150,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Palette.black, backgroundColor: Palette.mainLime,
-                      ),
-                      onPressed: ()=>backPage(context),
-                      child: Text(
-                        "확인",
-                        style: TextStyle(fontFamily: "Jalnan"),
-                      ),
-                    ),
-                  )
-                ],
+          width: 250,
+          height: 260,
+          alignment: Alignment.center,
+          padding: EdgeInsets.all(30),
+          child: Column(
+            children: [
+              SizedBox(
+                height: 50,
               ),
-            ));
+              Text(
+                content,
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                height: 60,
+              ),
+              Container(
+                width: 150,
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Palette.black,
+                    backgroundColor: Palette.secondary,
+                  ),
+                  onPressed: () => backPage(context),
+                  child: Text(
+                    "확인",
+                    style: TextStyle(fontFamily: "Jalnan"),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ));
       },
     );
   }

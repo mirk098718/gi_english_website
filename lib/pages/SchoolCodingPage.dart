@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
@@ -20,34 +19,29 @@ class SchoolCodingPage extends StatefulWidget {
 }
 
 class _SchoolCodingPageState extends State<SchoolCodingPage> {
-
   List<ButtonState> buttonStateList = [
     ButtonState("정규프로그램", BehaviorColor.colorOnDefault, SchoolProgramPage()),
     ButtonState("선택프로그램", BehaviorColor.colorOnClick, SchoolCodingPage()),
     ButtonState("뉴질랜드프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
-
-
   ];
   @override
   Widget build(BuildContext context) {
-
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     Size size = mediaQueryData.size;
     double width = size.width;
-    if(width>768){
+    if (width > 768) {
       return desktopUi(context);
-    }
-    else{
+    } else {
       return mobileUi(context);
     }
   }
 
-  Widget desktopUi(context){
+  Widget desktopUi(context) {
     return WebSchoolLayout(content: scrollView());
   }
 
-  Widget mobileUi(context){
-    return MobileSchoolLayout(content:mobileScrollView());
+  Widget mobileUi(context) {
+    return MobileSchoolLayout(content: mobileScrollView());
   }
 
   Widget contentGroup() {
@@ -86,8 +80,8 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 1
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           print(
               "label ${buttonState.label}, selectedColorList: ${buttonState.color}");
           setState(() {});
@@ -100,7 +94,6 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
       if (!isLast) {
         children.add(Divider(height: 1));
       }
-
     }
 
     return Container(
@@ -138,28 +131,28 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
           ),
           Text(
             "대상",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+            style: TextStyle(
+                fontFamily: "Jalnan", fontSize: 15, color: const Color.fromRGBO(4, 120, 87, 1)),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
               "1) 선택/특강 프로그램 : 이공계 / 예체능 적성의 본원 정규 초등영어 과정 수강생\n"
-                  "2) 방학특강 프로그램 : 이공계 적성의 본원 정규 중등영어 과정 수강생 또는 유학준비생"),
+              "2) 방학특강 프로그램 : 이공계 적성의 본원 정규 중등영어 과정 수강생 또는 유학준비생"),
           SizedBox(
             height: 20,
           ),
           SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Container(
-                  width: 700,
-                  child: Image.asset("assets/optionalPrograms.png")),
+            scrollDirection: Axis.horizontal,
+            child: Container(
+                width: 700, child: Image.asset("assets/optionalPrograms.png")),
           ),
-
           SizedBox(
             height: 60,
           ),
@@ -172,7 +165,6 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
           SizedBox(
             height: 50,
           ),
-
         ],
       ),
     );
@@ -184,11 +176,10 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
         children: [
           mainImage(),
           contentGroup(),
-          SizedBox(height: 213, child: MyWidget.footer()),
+          MyWidget.footer(),
         ],
       ),
     );
-
   }
 
   Widget mainImage() {
@@ -199,8 +190,7 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
           Image.asset("assets/ballPoolImage.png"),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
-            child:
-            Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -222,26 +212,24 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
                       backgroundColor: Palette.black,
                       foregroundColor: Palette.black,
                     ),
-                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolConsultationPage());
+                    },
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Jalnan",
-                            color: Palette.white,
-                            )),
+                          fontFamily: "Jalnan",
+                          color: Palette.white,
+                        )),
                   ),
                 ),
-
               ],
             ),
-
           )
         ],
       ),
-
     );
   }
-
 
   //mobile
 
@@ -255,7 +243,6 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
             mobileLeftMenu(),
             content(),
             SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
-
           ],
         ),
       ),
@@ -272,12 +259,15 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
 
       Widget child;
       if (isFirst) {
-        child = MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
       } else if (isLast) {
         //last
-        child = MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
       } else {
-        child = MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
       }
 
       children.add(InkWell(
@@ -286,8 +276,8 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 1
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           setState(() {});
         },
         onTap: () {
@@ -296,9 +286,12 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
       ));
 
       if (!isLast) {
-        children.add(Container(width: 1, height: 40, color: Palette.mainLightPurple,));
+        children.add(Container(
+          width: 1,
+          height: 40,
+          color: const Color.fromRGBO(96, 165, 250, 1),
+        ));
       }
-
     }
 
     return Container(
@@ -351,17 +344,15 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
                     child: Text(
                       "상담신청",
                       style:
-                      TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.mainMediumPurple,
+                      backgroundColor: const Color.fromRGBO(139, 92, 246, 1),
                       foregroundColor: Palette.black,
                     ),
-
-
                   ),
                 ),
               ],
@@ -371,5 +362,4 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
       ),
     );
   }
-
 }

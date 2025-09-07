@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolMapPage.dart';
@@ -13,7 +12,6 @@ import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import '../util/WidgetUtil.dart';
 import 'SchoolConsultationPage.dart';
 
-
 class SchoolSystemPage extends StatefulWidget {
   const SchoolSystemPage({Key? key}) : super(key: key);
 
@@ -22,11 +20,9 @@ class SchoolSystemPage extends StatefulWidget {
 }
 
 class _SchoolSystemPageState extends State<SchoolSystemPage> {
-
-
   List<ButtonState> buttonStateList = [
     ButtonState("Gi글림아일랜드", BehaviorColor.colorOnDefault, SchoolAboutPage()),
-    ButtonState("교원소개", BehaviorColor.colorOnDefault,SchoolTeachersPage()),
+    ButtonState("교원소개", BehaviorColor.colorOnDefault, SchoolTeachersPage()),
     ButtonState("운영시스템", BehaviorColor.colorOnClick, SchoolSystemPage()),
     ButtonState("오시는 길", BehaviorColor.colorOnDefault, SchoolMapPage()),
   ];
@@ -48,7 +44,7 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
   }
 
   Widget mobileUi(context) {
-    return MobileSchoolLayout(content:mobileScrollView());
+    return MobileSchoolLayout(content: mobileScrollView());
   }
 
   Widget contentGroup() {
@@ -87,8 +83,8 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 2
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           print(
               "label ${buttonState.label}, selectedColorList: ${buttonState.color}");
           setState(() {});
@@ -101,7 +97,6 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
       if (!isLast) {
         children.add(Divider(height: 1));
       }
-
     }
 
     return Container(
@@ -137,52 +132,65 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
               "글림아일랜드 어학원은 원장의 총괄 관리 하에 중등부와 초등부 한 해 전체 커리큘럼이 사전에 완벽하게 짜여진 상태로 진행되는 시스템으로, 담임 선생님들이 아이들을 밀착 관리하되, 수업 내용은 원장 및 교수부가 부단한 노력으로 연구 개발한 커리큘럼의 틀을 크게 벗어나지 않도록 철저히 관리합니다.\n"
-                  "글림아일랜드의 시간표는 버리는 시간이 없도록 알찬 내용으로 구성되어 있으며, 아이들이 재미와 학습을 모두 잡을 수 있도록 합니다."
-                  ),
+              "글림아일랜드의 시간표는 버리는 시간이 없도록 알찬 내용으로 구성되어 있으며, 아이들이 재미와 학습을 모두 잡을 수 있도록 합니다."),
           SizedBox(
             height: 20,
           ),
           Text(
             "정기상담",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+            style: TextStyle(
+                fontFamily: "Jalnan",
+                fontSize: 15,
+                color: Palette.secondaryDark),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
               "본원에서는 아이들의 학업 성취와 원 생활에 대한 정보을 학부모님과 보다 가깝게 소통하기 위하여 "
               "월 정기 담임 상담 1회, 레벨업 상담 1회를 진행합니다. 또한 상담실은 언제든 열려 있으며, "
-                  "원장 상담 역시 언제든 예약해주십시오."),
+              "원장 상담 역시 언제든 예약해주십시오."),
           SizedBox(
             height: 20,
           ),
-
           Text(
             "정기테스트",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+            style: TextStyle(
+                fontFamily: "Jalnan",
+                fontSize: 15,
+                color: Palette.secondaryDark),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(color: Palette.black, fontFamily: "NotoSansKR", fontWeight: FontWeight.normal,
-              fontSize: 14),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
               "• 본원에서는 아이들의 원활한 Vocabulary 습득을 위하여 정기적인 단어시험을 진행합니다.\n"
               "• 중등, 초등부 모두 매주 해당 주에 배운 단어들에 대한 쪽지 시험을 보며,\n"
               "• 매월 정기 Monthly Test, 6개월에 1회 Level Up Test 를 진행합니다\n"),
           SizedBox(
             height: 20,
           ),
-          Container(width: double.infinity,child: Image.asset("assets/tuitionFeeChart.jpeg"),),
+          Container(
+            width: double.infinity,
+            child: Image.asset("assets/tuitionFeeChart.jpeg"),
+          ),
         ],
       ),
     );
@@ -194,7 +202,7 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
         children: [
           mainImage(),
           contentGroup(),
-          SizedBox(height: 213, child: MyWidget.footer()),
+          MyWidget.footer(),
         ],
       ),
     );
@@ -230,13 +238,15 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
                       backgroundColor: Palette.black,
                       foregroundColor: Palette.black,
                     ),
-                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolConsultationPage());
+                    },
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Jalnan",
-                            color: Palette.white,
-                           )),
+                          fontFamily: "Jalnan",
+                          color: Palette.white,
+                        )),
                   ),
                 ),
               ],
@@ -246,8 +256,6 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
       ),
     );
   }
-
-
 
   //mobile
 
@@ -260,8 +268,7 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
-
+            MyWidget.mobileSchoolFooter()
           ],
         ),
       ),
@@ -278,12 +285,15 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
 
       Widget child;
       if (isFirst) {
-        child = MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
       } else if (isLast) {
         //last
-        child = MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
       } else {
-        child = MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
       }
 
       children.add(InkWell(
@@ -292,8 +302,8 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 2
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           setState(() {});
         },
         onTap: () {
@@ -302,9 +312,12 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
       ));
 
       if (!isLast) {
-        children.add(Container(width: 1, height: 40, color: Palette.mainLightPurple,));
+        children.add(Container(
+          width: 1,
+          height: 40,
+          color: Palette.primaryLight,
+        ));
       }
-
     }
 
     return Container(
@@ -348,17 +361,15 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
                     child: Text(
                       "상담신청",
                       style:
-                      TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.mainMediumPurple,
+                      backgroundColor: Palette.accent,
                       foregroundColor: Palette.black,
                     ),
-
-
                   ),
                 ),
               ],

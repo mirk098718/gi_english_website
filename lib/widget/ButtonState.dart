@@ -1,15 +1,14 @@
-
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
 class BehaviorColor {
-  static const Color colorOnClick = Palette.mainLightGrey;
-  static const Color colorOnDefault = Palette.white;
-  static const Color colorOnHover = Palette.lightestEarth;
+  static const Color colorOnClick = Palette.primaryLight;
+  static const Color colorOnDefault = Palette.surface;
+  static const Color colorOnHover = Palette.grey100;
 
-  static const Color colorOnClickCafe = Palette.mainLime;
-  static const Color colorOnDefaultCafe = Palette.white;
-  static const Color colorOnHoverCafe = Palette.lightLime;
+  static const Color colorOnClickCafe = Palette.secondary;
+  static const Color colorOnDefaultCafe = Palette.surface;
+  static const Color colorOnHoverCafe = Palette.secondaryLight;
 }
 
 class ButtonState {
@@ -25,8 +24,5 @@ class NoticeBoardEntry {
   String title;
   Color color;
 
-
-  NoticeBoardEntry(this.entryNumber, this.title,this.color);
+  NoticeBoardEntry(this.entryNumber, this.title, this.color);
 }
-
-

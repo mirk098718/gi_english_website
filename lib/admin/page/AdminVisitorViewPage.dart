@@ -1,4 +1,4 @@
-//TODO:카페 비지터, 스쿨 비지터를 분리해서 이 페이지에 저장한다. jsonstring 으로 저장해서 여기 보여주면 될듯??
+//카페 비지터, 스쿨 비지터를 분리해서 이 페이지에 저장한다. jsonstring 으로 저장해서 여기 보여주면 될듯??
 
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/SchoolVisitor.dart';
@@ -45,7 +45,7 @@ class _AdminVisitorViewPageState extends State<AdminVisitorViewPage> {
         children: [
           Container(
               alignment: Alignment.center,
-              color: Palette.mainLightGrey,
+              color: Palette.grey100,
               width: 200,
               height: 50,
               child: Text("School Visitor")),

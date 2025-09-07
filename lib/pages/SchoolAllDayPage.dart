@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
@@ -20,34 +19,29 @@ class SchoolAllDayPage extends StatefulWidget {
 }
 
 class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
-
   List<ButtonState> buttonStateList = [
     ButtonState("정규프로그램", BehaviorColor.colorOnDefault, SchoolProgramPage()),
     ButtonState("올데이케어", BehaviorColor.colorOnClick, SchoolAllDayPage()),
     ButtonState("뉴질랜드프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
-
-
   ];
   @override
   Widget build(BuildContext context) {
-
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     Size size = mediaQueryData.size;
     double width = size.width;
-    if(width>768){
+    if (width > 768) {
       return desktopUi(context);
-    }
-    else{
+    } else {
       return mobileUi(context);
     }
   }
 
-  Widget desktopUi(context){
+  Widget desktopUi(context) {
     return WebSchoolLayout(content: scrollView());
   }
 
-  Widget mobileUi(context){
-    return MobileSchoolLayout(content:mobileScrollView());
+  Widget mobileUi(context) {
+    return MobileSchoolLayout(content: mobileScrollView());
   }
 
   Widget contentGroup() {
@@ -86,8 +80,8 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 1
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           print(
               "label ${buttonState.label}, selectedColorList: ${buttonState.color}");
           setState(() {});
@@ -100,7 +94,6 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
       if (!isLast) {
         children.add(Divider(height: 1));
       }
-
     }
 
     return Container(
@@ -138,57 +131,62 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
           ),
           Text(
             "운영시간",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+            style: TextStyle(
+                fontFamily: "Jalnan", fontSize: 15, color: const Color.fromRGBO(3, 96, 70, 1)),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
               "오후 2시 20분 ~ 오후 6시 까지 (6시 이전 픽업 가능)"),
           SizedBox(
             height: 20,
           ),
           Text(
             "대상",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+            style: TextStyle(
+                fontFamily: "Jalnan", fontSize: 15, color: const Color.fromRGBO(4, 120, 87, 1)),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
               "2시에 수업을 마치는 본원 유치부 학생, 학부모님 픽업이 가능한 시간까지 돌봄 서비스"),
           SizedBox(
             height: 20,
           ),
           Text(
             "프로그램",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 15, color: Palette.deepGreen),
+            style: TextStyle(
+                fontFamily: "Jalnan", fontSize: 15, color: const Color.fromRGBO(4, 120, 87, 1)),
           ),
           SizedBox(
             height: 20,
           ),
-          Text(style: TextStyle(
-              color: Palette.black,
-              fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.normal,
-              fontSize: 14),
+          Text(
+              style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
               "영어로 진행되는 다양한 놀이 수업:\n"
-                  "1. Origami : 영어 종이접기 놀이 수업\n"
-                  "2. Mini Golf : 안전한 유아용 골프채 이용 간단한 골프 기초 놀이 수업\n"
-                  "3. Media : 영상 자료를 활용한 재미있는 Theme play\n"
-                  "4. Chinese : 유아를 위한 아주 쉬운 기초 중국어 놀이 수업"),
+              "1. Origami : 영어 종이접기 놀이 수업\n"
+              "2. Mini Golf : 안전한 유아용 골프채 이용 간단한 골프 기초 놀이 수업\n"
+              "3. Media : 영상 자료를 활용한 재미있는 Theme play\n"
+              "4. Chinese : 유아를 위한 아주 쉬운 기초 중국어 놀이 수업"),
           SizedBox(
             height: 50,
           ),
-
         ],
       ),
     );
@@ -200,11 +198,10 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
         children: [
           mainImage(),
           contentGroup(),
-          SizedBox(height: 213, child: MyWidget.footer()),
+          MyWidget.footer(),
         ],
       ),
     );
-
   }
 
   Widget mainImage() {
@@ -215,8 +212,7 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
           Image.asset("assets/ballPoolImage.png"),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
-            child:
-            Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -238,26 +234,24 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
                       backgroundColor: Palette.black,
                       foregroundColor: Palette.black,
                     ),
-                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolConsultationPage());
+                    },
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Jalnan",
-                            color: Palette.white,
-                            )),
+                          fontFamily: "Jalnan",
+                          color: Palette.white,
+                        )),
                   ),
                 ),
-
               ],
             ),
-
           )
         ],
       ),
-
     );
   }
-
 
   //mobile
 
@@ -270,8 +264,7 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
-
+            MyWidget.mobileSchoolFooter()
           ],
         ),
       ),
@@ -288,12 +281,15 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
 
       Widget child;
       if (isFirst) {
-        child = MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
       } else if (isLast) {
         //last
-        child = MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
       } else {
-        child = MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
       }
 
       children.add(InkWell(
@@ -302,8 +298,8 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 1
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           setState(() {});
         },
         onTap: () {
@@ -312,9 +308,12 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
       ));
 
       if (!isLast) {
-        children.add(Container(width: 1, height: 40, color: Palette.mainLightPurple,));
+        children.add(Container(
+          width: 1,
+          height: 40,
+          color: const Color.fromRGBO(96, 165, 250, 1),
+        ));
       }
-
     }
 
     return Container(
@@ -367,17 +366,15 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
                     child: Text(
                       "상담신청",
                       style:
-                      TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.mainMediumPurple,
+                      backgroundColor: const Color.fromRGBO(139, 92, 246, 1),
                       foregroundColor: Palette.black,
                     ),
-
-
                   ),
                 ),
               ],
@@ -387,5 +384,4 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
       ),
     );
   }
-
 }

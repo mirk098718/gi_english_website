@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -19,42 +18,43 @@ import 'package:flutter/services.dart';
 //var listener = EasyKeyboardListener();
 //listener.눈 = "";
 
-class EasyKeyboardListener extends StatelessWidget {
-  //static을 붙이면 클래스 필드 메소드가 된다.
-  //(기본값)인스턴스 필드->변수를빌림 (정적속성)
-  final focusNode = FocusNode();
+class EasyKeyboardListener extends StatefulWidget {
   final ValueChanged<String> onValue;
   final Widget child;
   final int inputLimit;
-  String input = "";
 
-  //(기본값)인스턴스 메소드->함수를빌림 (동적속성)
-  //생성자(특별한 함수(메소드))
-  //1. 클래스와 이름이 같다.
-  //2. 반환자료형이 없다.
-  EasyKeyboardListener(
+  const EasyKeyboardListener(
       {Key? key,
-        required this.child,
-        required this.inputLimit,
-        required this.onValue})
+      required this.child,
+      required this.inputLimit,
+      required this.onValue})
       : super(key: key);
 
   @override
+  State<EasyKeyboardListener> createState() => _EasyKeyboardListenerState();
+}
+
+class _EasyKeyboardListenerState extends State<EasyKeyboardListener> {
+  final focusNode = FocusNode();
+  String input = "";
+
+  @override
   Widget build(BuildContext context) {
-    FocusScope.of(context).requestFocus(focusNode); // Add this line
+    FocusScope.of(context).requestFocus(focusNode);
     return KeyboardListener(
       focusNode: focusNode,
       onKeyEvent: (keyEvent) {
         if (keyEvent is KeyDownEvent) {
-          input += keyEvent.character ?? "";
-          if (input.length >= (inputLimit + 1)) {
-            input = input.substring(1);
-          }
-
-          onValue(input);
+          setState(() {
+            input += keyEvent.character ?? "";
+            if (input.length >= (widget.inputLimit + 1)) {
+              input = input.substring(1);
+            }
+          });
+          widget.onValue(input);
         }
       },
-      child: child,
+      child: widget.child,
     );
   }
 }

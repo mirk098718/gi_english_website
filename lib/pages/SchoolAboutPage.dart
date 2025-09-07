@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolMapPage.dart';
 import 'package:gi_english_website/pages/SchoolSystemPage.dart';
@@ -13,7 +12,6 @@ import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import '../util/WidgetUtil.dart';
 import 'SchoolConsultationPage.dart';
 
-
 class SchoolAboutPage extends StatefulWidget {
   const SchoolAboutPage({Key? key}) : super(key: key);
 
@@ -22,10 +20,9 @@ class SchoolAboutPage extends StatefulWidget {
 }
 
 class _SchoolAboutPageState extends State<SchoolAboutPage> {
-
   List<ButtonState> buttonStateList = [
     ButtonState("Gi글림아일랜드", BehaviorColor.colorOnClick, SchoolAboutPage()),
-    ButtonState("교원소개", BehaviorColor.colorOnDefault,SchoolTeachersPage()),
+    ButtonState("교원소개", BehaviorColor.colorOnDefault, SchoolTeachersPage()),
     ButtonState("운영시스템", BehaviorColor.colorOnDefault, SchoolSystemPage()),
     ButtonState("오시는 길", BehaviorColor.colorOnDefault, SchoolMapPage()),
   ];
@@ -47,7 +44,7 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
   }
 
   Widget mobileUi(context) {
-    return MobileSchoolLayout(content:mobileScrollView());
+    return MobileSchoolLayout(content: mobileScrollView());
   }
 
   Widget contentGroup() {
@@ -100,7 +97,6 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
       if (!isLast) {
         children.add(Divider(height: 1));
       }
-
     }
 
     return Container(
@@ -157,7 +153,7 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
           //     style: TextStyle(
           //         fontFamily: "Jalnan",
           //         fontSize: 15,
-          //         color: Palette.deepGreen)),
+          //         color: Palette.secondaryDark)),
           // SizedBox(
           //   height: 20,
           // ),
@@ -173,7 +169,6 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
           // SizedBox(
           //   height: 20,
           // ),
-
         ],
       ),
     );
@@ -185,7 +180,7 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
         children: [
           mainImage(),
           contentGroup(),
-          SizedBox(height: 213, child: MyWidget.footer()),
+          MyWidget.footer(),
         ],
       ),
     );
@@ -193,7 +188,6 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
 
   Widget mainImage() {
     return Container(
-
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
@@ -222,13 +216,15 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
                       backgroundColor: Palette.black,
                       foregroundColor: Palette.black,
                     ),
-                    onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolConsultationPage());
+                    },
                     child: Text("상담신청",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontFamily: "Jalnan",
-                            color: Palette.white,
-                            )),
+                          fontFamily: "Jalnan",
+                          color: Palette.white,
+                        )),
                   ),
                 ),
               ],
@@ -238,8 +234,6 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
       ),
     );
   }
-
-
 
   //mobile
 
@@ -252,8 +246,7 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             mobileContent(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
-
+            MyWidget.mobileSchoolFooter()
           ],
         ),
       ),
@@ -296,12 +289,15 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
 
       Widget child;
       if (isFirst) {
-        child = MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
       } else if (isLast) {
         //last
-        child = MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
       } else {
-        child = MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
+        child =
+            MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
       }
 
       children.add(InkWell(
@@ -310,8 +306,8 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
               : (i == 0
-              ? BehaviorColor.colorOnClick
-              : BehaviorColor.colorOnDefault);
+                  ? BehaviorColor.colorOnClick
+                  : BehaviorColor.colorOnDefault);
           setState(() {});
         },
         onTap: () {
@@ -320,9 +316,12 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
       ));
 
       if (!isLast) {
-        children.add(Container(width: 1, height: 40, color: Palette.mainLightPurple,));
+        children.add(Container(
+          width: 1,
+          height: 40,
+          color: const Color.fromARGB(255, 96, 165, 250),
+        ));
       }
-
     }
 
     return Container(
@@ -366,17 +365,15 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
                     child: Text(
                       "상담신청",
                       style:
-                      TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.mainMediumPurple,
+                      backgroundColor: const Color.fromARGB(255, 139, 92, 246),
                       foregroundColor: Palette.black,
                     ),
-
-
                   ),
                 ),
               ],

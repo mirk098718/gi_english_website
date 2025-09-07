@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/School1on1Page.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
@@ -19,9 +18,8 @@ import 'package:gi_english_website/pages/SchoolTeachersPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
-
 class WebSchoolLayout extends StatefulWidget {
-  Widget content;
+  final Widget content;
   final double height = 51;
 
   WebSchoolLayout({Key? key, required this.content}) : super(key: key);
@@ -59,7 +57,11 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
         Container(
             height: widget.height,
             alignment: Alignment.center,
-            child: Text(menuStr,style: TextStyle(color: Palette.white, fontWeight: FontWeight.bold),)),
+            child: Text(
+              menuStr,
+              style:
+                  TextStyle(color: Palette.white, fontWeight: FontWeight.bold),
+            )),
         menuColumn
       ],
     );
@@ -82,19 +84,30 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           InkWell(
-            onTap: (){MenuUtil.push(context, SchoolAboutPage());},
-            child: labelInColorContainer(Palette.violet, "Gi글림아일랜드"),),
-         InkWell(
-           onTap: (){MenuUtil.push(context, SchoolTeachersPage());},
-            child: labelInColorContainer(Palette.mediumViolet, "교원소개"),
-         ),
+            onTap: () {
+              MenuUtil.push(context, SchoolAboutPage());
+            },
+            child: labelInColorContainer(Palette.accent, "Gi글림아일랜드"),
+          ),
           InkWell(
-            onTap: (){MenuUtil.push(context, SchoolSystemPage());},
-            child: labelInColorContainer(Palette.violet, "운영System"),),
+            onTap: () {
+              MenuUtil.push(context, SchoolTeachersPage());
+            },
+            child: labelInColorContainer(Palette.accent, "교원소개"),
+          ),
           InkWell(
-            onTap: (){MenuUtil.push(context, SchoolMapPage());},
-            child: labelInColorContainer(Palette.mediumViolet, "오시는 길"),)
-       ],
+            onTap: () {
+              MenuUtil.push(context, SchoolSystemPage());
+            },
+            child: labelInColorContainer(Palette.accent, "운영System"),
+          ),
+          InkWell(
+            onTap: () {
+              MenuUtil.push(context, SchoolMapPage());
+            },
+            child: labelInColorContainer(Palette.accent, "오시는 길"),
+          )
+        ],
       ),
     );
   }
@@ -106,39 +119,57 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           InkWell(
-            onTap: (){MenuUtil.push(context, SchoolProgramPage());},
-            child: labelInColorContainer(Palette.violet, "정규프로그램"),),
-          InkWell(
-            onTap: (){MenuUtil.push(context, SchoolAllDayPage());},
-            child: labelInColorContainer(Palette.mediumViolet, "올데이케어"),
+            onTap: () {
+              MenuUtil.push(context, SchoolProgramPage());
+            },
+            child: labelInColorContainer(Palette.accent, "정규프로그램"),
           ),
           InkWell(
-            onTap: (){MenuUtil.push(context, SchoolCampPage());},
-            child: labelInColorContainer(Palette.violet, "방학캠프"),),
+            onTap: () {
+              MenuUtil.push(context, SchoolAllDayPage());
+            },
+            child: labelInColorContainer(Palette.accent, "올데이케어"),
+          ),
           InkWell(
-            onTap: (){MenuUtil.push(context, SchoolNZPage());},
-            child: labelInColorContainer(Palette.mediumViolet, "뉴질랜드프로그램"),),
+            onTap: () {
+              MenuUtil.push(context, SchoolCampPage());
+            },
+            child: labelInColorContainer(Palette.accent, "방학캠프"),
+          ),
           InkWell(
-            onTap: (){MenuUtil.push(context, School1on1Page());},
-            child: labelInColorContainer(Palette.mediumViolet, "1ON1프로그램"),)
+            onTap: () {
+              MenuUtil.push(context, SchoolNZPage());
+            },
+            child: labelInColorContainer(Palette.accent, "뉴질랜드프로그램"),
+          ),
+          InkWell(
+            onTap: () {
+              MenuUtil.push(context, School1on1Page());
+            },
+            child: labelInColorContainer(Palette.accent, "1ON1프로그램"),
+          )
         ],
       ),
     );
   }
 
   Widget menu3Column() {
-
     return Opacity(
       opacity: menu3Transparent ? 0 : 1,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           InkWell(
-            onTap: (){MenuUtil.push(context, SchoolCurriculumMiddleSchoolPage());},
-            child: labelInColorContainer(Palette.violet, "정규 중등부"),),
+            onTap: () {
+              MenuUtil.push(context, SchoolCurriculumMiddleSchoolPage());
+            },
+            child: labelInColorContainer(Palette.accent, "정규 중등부"),
+          ),
           InkWell(
-            onTap: (){MenuUtil.push(context, SchoolCurriculumElePage());},
-            child: labelInColorContainer(Palette.mediumViolet, "정규 초등부"),
+            onTap: () {
+              MenuUtil.push(context, SchoolCurriculumElePage());
+            },
+            child: labelInColorContainer(Palette.accent, "정규 초등부"),
           ),
         ],
       ),
@@ -146,164 +177,198 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
   }
 
   Widget menu4Column() {
-
     return Opacity(
       opacity: menu4Transparent ? 0 : 1,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           InkWell(
-            onTap: (){MenuUtil.push(context, SchoolCommunityNoticePage());},
-            child: labelInColorContainer(Palette.violet, "Notice Board"),),
-          InkWell(
-            onTap: (){MenuUtil.push(context, SchoolGalleryPage());},
-            child: labelInColorContainer(Palette.mediumViolet, "Gallery"),
+            onTap: () {
+              MenuUtil.push(context, SchoolCommunityNoticePage());
+            },
+            child: labelInColorContainer(Palette.accent, "Notice Board"),
           ),
           InkWell(
-            onTap: (){MenuUtil.push(context, SchoolConsultationPage());},
-            child: labelInColorContainer(Palette.violet, "입학상담"),),
+            onTap: () {
+              MenuUtil.push(context, SchoolGalleryPage());
+            },
+            child: labelInColorContainer(Palette.accent, "Gallery"),
+          ),
           InkWell(
-            onTap: (){MenuUtil.push(context, SchoolCommunityFAQPage());},
-            child: labelInColorContainer(Palette.mediumViolet, "FAQ"),)
+            onTap: () {
+              MenuUtil.push(context, SchoolConsultationPage());
+            },
+            child: labelInColorContainer(Palette.accent, "입학상담"),
+          ),
+          InkWell(
+            onTap: () {
+              MenuUtil.push(context, SchoolCommunityFAQPage());
+            },
+            child: labelInColorContainer(Palette.accent, "FAQ"),
+          )
         ],
       ),
     );
   }
 
   Widget appBar(BuildContext context) {
-    return Stack(children: [
-      Container(
-        height: 80,
-        alignment: Alignment.center,
-        color: Palette.white,
-      ),
-
-      Container(
-        color: Colors.transparent,
-        padding: EdgeInsets.only(top:25),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            InkWell(
-              onTap: (){MenuUtil.push(context, SchoolAboutPage());},
-              child: Text("About",
-                style: TextStyle(color: Palette.black,
-                    fontFamily: "NotoSansKR",
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20),
+    return Stack(
+      children: [
+        Container(
+          height: 80,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                spreadRadius: 0,
+                blurRadius: 4,
+                offset: Offset(0, 2),
               ),
-            ),
+            ],
+          ),
+        ),
 
-            Container(
-              margin: EdgeInsets.only(left: 10,right: 10,top:5,bottom: 5),
-              width: 0.5,
-              height: 10,
-              color: Palette.mainGrey,
-            ),
-            InkWell(
-                onTap: (){MenuUtil.push(context, SchoolProgramPage());},
-                child: Text("Program",
-                  style: TextStyle(color: Palette.black,
+        Container(
+          color: Colors.transparent,
+          padding: EdgeInsets.only(top: 25),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              InkWell(
+                onTap: () {
+                  MenuUtil.push(context, SchoolAboutPage());
+                },
+                child: Text(
+                  "About",
+                  style: TextStyle(
+                      color: Colors.black,
                       fontFamily: "NotoSansKR",
                       fontWeight: FontWeight.bold,
                       fontSize: 20),
-                )
-            ),
-            Container(
-              margin: EdgeInsets.only(left: 10,right: 10,top:5,bottom: 5),
-              width: 0.5,
-              height: 10,
-              color: Palette.mainGrey,
-            ),
-            InkWell(
-                onTap: (){MenuUtil.push(context, SchoolCurriculumElePage());},
-                child: Text("Curriculum", style: TextStyle(color: Palette.black,
-                    fontFamily: "NotoSansKR",
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20),)
-            ),
-            Container(
-              margin: EdgeInsets.only(left: 10,right: 10,top:5,bottom: 5),
-              width: 0.5,
-              height: 10,
-              color: Palette.mainGrey,
-            ),
-            InkWell(
-                onTap: (){
-                  MenuUtil.push(context, SchoolGalleryPage());
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+                width: 0.5,
+                height: 10,
+                color: Colors.grey.withOpacity(0.5),
+              ),
+              InkWell(
+                  onTap: () {
+                    MenuUtil.push(context, SchoolProgramPage());
                   },
-                child: Text("Community", style: TextStyle(color: Palette.black,
-                    fontFamily: "NotoSansKR",
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20),)
-            ),
-            SizedBox(width: 20)
-          ],
+                  child: Text(
+                    "Program",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: "NotoSansKR",
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20),
+                  )),
+              Container(
+                margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+                width: 0.5,
+                height: 10,
+                color: Colors.grey.withOpacity(0.5),
+              ),
+              InkWell(
+                  onTap: () {
+                    MenuUtil.push(context, SchoolCurriculumElePage());
+                  },
+                  child: Text(
+                    "Curriculum",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: "NotoSansKR",
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20),
+                  )),
+              Container(
+                margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+                width: 0.5,
+                height: 10,
+                color: Colors.grey.withOpacity(0.5),
+              ),
+              InkWell(
+                  onTap: () {
+                    MenuUtil.push(context, SchoolGalleryPage());
+                  },
+                  child: Text(
+                    "Community",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: "NotoSansKR",
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20),
+                  )),
+              SizedBox(width: 20)
+            ],
+          ),
         ),
-      ),
-      Container(
-        padding: EdgeInsets.only(top: 20),
-        width: 300,
-        alignment: Alignment.topLeft,
-        child:
-            InkWell(
-              child: Container(height: 40,child: Image.asset("assets/schoolLogo.png")),
-              onTap: () {
-                MenuUtil.push(context, SchoolMainPage());
-              },
-            ),
+        Container(
+          padding: EdgeInsets.only(top: 20),
+          width: 300,
+          alignment: Alignment.topLeft,
+          child: InkWell(
+            child: Container(
+                height: 40, child: Image.asset("assets/schoolLogo.png")),
+            onTap: () {
+              MenuUtil.push(context, SchoolMainPage());
+            },
+          ),
         ),
-      // Positioned(
-      //   right:5, top: 5,
-      //   child: Container(
-      //     alignment: Alignment.topRight,
-      //     padding: EdgeInsets.only(top: 5, bottom: 5, right: 10),
-      //     child:InkWell(
-      //       child: Container(width:30, height: 30, child: Image.asset("assets/loginButton.png")),
-      //       onTap: () {
-      //         showDialog(
-      //             context: context,
-      //             builder: (context) {
-      //               return AlertDialog(
-      //                   title: Text("로그인", textAlign: TextAlign.center,),
-      //                   content: Container(
-      //                     width: 280,
-      //                     height: 240,
-      //                     child: Column(
-      //                       children: [
-      //                         Divider(),
-      //                         SizedBox(height: 10),
-      //                         Expanded(
-      //                           child: MyWidget.roundEdgeTextField(
-      //                               "ID를 입력해주세요", idController),
-      //                         ),
-      //                         Expanded(
-      //                           child: MyWidget.roundEdgeTextField(
-      //                               "Password를 입력해주세요", pwController),
-      //                         ),
-      //                         SizedBox(height: 10),
-      //                         Container(
-      //                           width: 150,
-      //                           height: 50,
-      //                           child: ElevatedButton(
-      //                             style: ElevatedButton.styleFrom(
-      //                               primary: Palette.mainMediumPurple,
-      //                               onPrimary: Palette.black,),
-      //                             onPressed: () {},
-      //                             child: Text("Login", style: TextStyle(fontFamily: "Jalnan"),),
-      //                           ),
-      //                         )
-      //                       ],
-      //                     ),
-      //                   ));
-      //             });
-      //       },
-      //     ),
-      //   ),
-      // ),
-    ],
+        // Positioned(
+        //   right:5, top: 5,
+        //   child: Container(
+        //     alignment: Alignment.topRight,
+        //     padding: EdgeInsets.only(top: 5, bottom: 5, right: 10),
+        //     child:InkWell(
+        //       child: Container(width:30, height: 30, child: Image.asset("assets/loginButton.png")),
+        //       onTap: () {
+        //         showDialog(
+        //             context: context,
+        //             builder: (context) {
+        //               return AlertDialog(
+        //                   title: Text("로그인", textAlign: TextAlign.center,),
+        //                   content: Container(
+        //                     width: 280,
+        //                     height: 240,
+        //                     child: Column(
+        //                       children: [
+        //                         Divider(),
+        //                         SizedBox(height: 10),
+        //                         Expanded(
+        //                           child: MyWidget.roundEdgeTextField(
+        //                               "ID를 입력해주세요", idController),
+        //                         ),
+        //                         Expanded(
+        //                           child: MyWidget.roundEdgeTextField(
+        //                               "Password를 입력해주세요", pwController),
+        //                         ),
+        //                         SizedBox(height: 10),
+        //                         Container(
+        //                           width: 150,
+        //                           height: 50,
+        //                           child: ElevatedButton(
+        //                             style: ElevatedButton.styleFrom(
+        //                               primary: Palette.accent,
+        //                               onPrimary: Palette.black,),
+        //                             onPressed: () {},
+        //                             child: Text("Login", style: TextStyle(fontFamily: "Jalnan"),),
+        //                           ),
+        //                         )
+        //                       ],
+        //                     ),
+        //                   ));
+        //             });
+        //       },
+        //     ),
+        //   ),
+        // ),
+      ],
     );
   }
-
 }

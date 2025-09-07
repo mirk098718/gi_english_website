@@ -1,9 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
-import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/util/ModernWidgets.dart';
 import 'package:gi_english_website/widget/EasyKeyboardListener.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
@@ -59,39 +58,51 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
   Widget mainImage() {
     return Container(
         child: Stack(alignment: Alignment.centerLeft, children: [
-          Image.asset("assets/mainGateImageBlack.png"),
-          Container(
-            width: 500,
-            padding: EdgeInsets.only(left: 20),
-            child: Text(
-              "",
-              style: TextStyle(fontFamily: "Lovingu", fontSize: 30),
-            ),
-          ),
-          Positioned(
-            bottom: 20,
-            right: 40,
-            child: Container(
-              width: 150,
-              height: 40,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.black,
-                  foregroundColor: Palette.black,
-                ),
-                onPressed: () {
-                  MenuUtil.push(context, SchoolConsultationPage());
-                },
-                child: Text("상담신청",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: "Jalnan",
-                      color: Palette.white,
-                    )),
+      Image.asset("assets/mainGateImageMiddleSchool.png"),
+      Container(
+        width: 500,
+        padding: EdgeInsets.only(left: 20),
+        child: Text(
+          "Gleam Island School",
+          style: TextStyle(
+            fontFamily: "Lovingu",
+            fontSize: 50,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            shadows: [
+              Shadow(
+                offset: Offset(2.0, 2.0),
+                blurRadius: 4.0,
+                color: Colors.black54,
               ),
+            ],
+          ),
+        ),
+      ),
+      Positioned(
+        bottom: 20,
+        right: 40,
+        child: Container(
+          width: 150,
+          height: 40,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Palette.black,
+              foregroundColor: Palette.black,
             ),
-          )
-        ]));
+            onPressed: () {
+              MenuUtil.push(context, SchoolConsultationPage());
+            },
+            child: Text("상담신청",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: "Jalnan",
+                  color: Palette.white,
+                )),
+          ),
+        ),
+      )
+    ]));
   }
 
   Widget urlMenu() {
@@ -103,9 +114,9 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
           Expanded(
             flex: 1,
             child: Container(
-             height: 120,
+              height: 120,
               decoration: BoxDecoration(
-                border: Border.all(color: Palette.lightestEarth, width: 5),
+                border: Border.all(color: Palette.grey200, width: 5),
                 // borderRadius: BorderRadius.circular(5),
               ),
               child: Row(
@@ -130,7 +141,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                     margin: EdgeInsets.all(5),
                     width: 0.5,
                     height: 40,
-                    color: Palette.mainGrey,
+                    color: Palette.grey500,
                   ),
                   Expanded(
                       flex: 1,
@@ -141,7 +152,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                         alignment: Alignment.center,
                         child: InkWell(
                             onTap: () async {
-                              UrlUtil.open('https://www.instagram.com/gleam_island_school/');
+                              UrlUtil.open(
+                                  'https://www.instagram.com/gleam_island_school/');
                             },
                             child: Image.asset("assets/instaLogo.png")),
                       )),
@@ -149,7 +161,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                     margin: EdgeInsets.all(5),
                     width: 0.5,
                     height: 40,
-                    color: Palette.mainGrey,
+                    color: Palette.grey500,
                   ),
                   Expanded(
                       flex: 1,
@@ -159,11 +171,13 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                         padding: EdgeInsets.all(10),
                         alignment: Alignment.center,
                         child: InkWell(
-                            onTap: () async {
-                              UrlUtil.open('https://blog.naver.com/gleam-island-paju');
-                            },
+                          onTap: () async {
+                            UrlUtil.open(
+                                'https://blog.naver.com/gleam-island-paju');
+                          },
                           child: Container(
-                              width:40,child: Image.asset("assets/naverBlogLogo.png")),
+                              width: 40,
+                              child: Image.asset("assets/naverBlogLogo.png")),
                         ),
                       )),
                 ],
@@ -175,9 +189,10 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
               child: Container(
                 height: 120,
                 decoration: BoxDecoration(
-                  border: Border(top: BorderSide(color: Palette.lightestEarth, width:5),
-                      bottom: BorderSide(color: Palette.lightestEarth, width:5),
-                      right: BorderSide(color: Palette.lightestEarth, width:5)),
+                  border: Border(
+                      top: BorderSide(color: Palette.grey200, width: 5),
+                      bottom: BorderSide(color: Palette.grey200, width: 5),
+                      right: BorderSide(color: Palette.grey200, width: 5)),
                   // borderRadius: BorderRadius.circular(5),
                 ),
                 child: Row(
@@ -185,7 +200,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                     Expanded(
                       flex: 3,
                       child: Container(
-                        margin: EdgeInsets.only(top:15, bottom: 15),
+                        margin: EdgeInsets.only(top: 15, bottom: 15),
                         child: InkWell(
                           child: Image.asset("assets/middleOnlineLink.png"),
                           onTap: () async {
@@ -198,7 +213,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                       margin: EdgeInsets.all(5),
                       width: 0.5,
                       height: 40,
-                      color: Palette.mainGrey,
+                      color: Palette.grey500,
                     ),
                     Expanded(
                       flex: 3,
@@ -207,7 +222,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                         child: InkWell(
                           child: Image.asset("assets/eleOnlineLink.png"),
                           onTap: () async {
-                            UrlUtil.open('https://www.trophy9.com/account/account.do?stdcmd=sign&url=%2Fdefault%2Edo%3F');
+                            UrlUtil.open(
+                                'https://www.trophy9.com/account/account.do?stdcmd=sign&url=%2Fdefault%2Edo%3F');
                           },
                         ),
                       ),
@@ -224,76 +240,79 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
     double eachBoardHeight = 500;
 
     return Container(
-      decoration: BoxDecoration(image: DecorationImage(image: AssetImage("assets/bulletinBoardBG.png"), fit: BoxFit.fill)),
-      padding: EdgeInsets.only(top: 20, bottom: 200),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Palette.background, Palette.grey50],
+        ),
+      ),
+      padding: EdgeInsets.symmetric(vertical: 80, horizontal: 40),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Spacer(),
           Expanded(
             flex: 5,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Palette.mainLightGrey, width: 3),
-                borderRadius: BorderRadius.circular(20),
-              ),
+            child: ModernWidgets.modernCard(
+              padding: EdgeInsets.zero,
               child: SizedBox(
                 height: eachBoardHeight,
                 child: Column(
                   children: [
                     Container(
-                      height: 50,
+                      height: 60,
                       width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: Palette.primaryGradient,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(16),
+                            topRight: Radius.circular(16)),
+                      ),
                       child: TextButton(
                         child: Text("Notice Board",
                             style: TextStyle(
-                                color: Palette.black, fontFamily: "Jalnan")),
+                                color: Palette.white,
+                                fontFamily: "NotoSansKR",
+                                fontWeight: FontWeight.w700,
+                                fontSize: 18)),
                         onPressed: () {
                           // MenuUtil.push(context, SchoolCommunityNoticePage());
                         },
                       ),
-                      decoration: BoxDecoration(
-                        color: Palette.mainLightGrey,
-                        border:
-                            Border.all(color: Palette.mainLightGrey, width: 3),
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(18),
-                            topRight: Radius.circular(18)),
-                      ),
                     ),
-                    Container(
-                    color: Colors.white,
-                    alignment: Alignment.topLeft,
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                              style: TextStyle(
-                                  color: Palette.black,
-                                  fontFamily: "NotoSansKR",
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14),
-                              "글림아일랜드 소식"),
-                          WidgetUtil.myDivider(),
-                          Text(
-                              style: TextStyle(
-                                  color: Palette.black,
-                                  fontFamily: "NotoSansKR",
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 14),
-                              "* 글림아일랜드 2024년 신학기 개강 일정 :\n"
-                                  "- 월수금반 : 3월 6일  /  화목반 : 3월 5일\n"
-                                  "* 신규 Prep(파닉스)반 2반 신설 및 중등부 신설"),]
-                    ),
-                  ),
                     Container(
                       color: Colors.white,
                       alignment: Alignment.topLeft,
                       padding: EdgeInsets.all(20),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                style: TextStyle(
+                                    color: Palette.black,
+                                    fontFamily: "NotoSansKR",
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14),
+                                "글림아일랜드 소식"),
+                            WidgetUtil.myDivider(),
+                            Text(
+                                style: TextStyle(
+                                    color: Palette.black,
+                                    fontFamily: "NotoSansKR",
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14),
+                                "* 글림아일랜드 2024년 신학기 개강 일정 :\n"
+                                "- 월수금반 : 3월 6일  /  화목반 : 3월 5일\n"
+                                "* 신규 Prep(파닉스)반 2반 신설 및 중등부 신설"),
+                          ]),
+                    ),
+                    Container(
+                      color: Colors.white,
+                      alignment: Alignment.topLeft,
+                      padding: EdgeInsets.all(20),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                                 style: TextStyle(
@@ -310,8 +329,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
                                 "- 글림아일랜드의 모든 수업은 체험 수업이 가능합니다. "
-                                    "아이가 직접 수업을 참여해보고 결정할 수 있도록 해 주십시오.(일일 수강료 발생)"),]
-                      ),
+                                "아이가 직접 수업을 참여해보고 결정할 수 있도록 해 주십시오.(일일 수강료 발생)"),
+                          ]),
                     ),
                     Container(
                       color: Colors.white,
@@ -319,23 +338,23 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                       padding: EdgeInsets.all(20),
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                              style: TextStyle(
-                                  color: Palette.black,
-                                  fontFamily: "NotoSansKR",
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14),
-                              "학원 차량 노선"),
-                          WidgetUtil.myDivider(),
-                          Text(
-                            style: TextStyle(
-                                color: Palette.black,
-                                fontFamily: "NotoSansKR",
-                                fontWeight: FontWeight.normal,
-                                fontSize: 14),
-                            "본원에서는 초등, 중등반 수업 스케줄에 따른 학원 차량을 운행하며 자세한 내용은 상담시 차량 노선과 함께 제공합니다."),]
-                      ),
+                          children: [
+                            Text(
+                                style: TextStyle(
+                                    color: Palette.black,
+                                    fontFamily: "NotoSansKR",
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14),
+                                "학원 차량 노선"),
+                            WidgetUtil.myDivider(),
+                            Text(
+                                style: TextStyle(
+                                    color: Palette.black,
+                                    fontFamily: "NotoSansKR",
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14),
+                                "본원에서는 초등, 중등반 수업 스케줄에 따른 학원 차량을 운행하며 자세한 내용은 상담시 차량 노선과 함께 제공합니다."),
+                          ]),
                     )
                   ],
                 ),
@@ -345,34 +364,31 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
           Spacer(),
           Expanded(
             flex: 5,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Palette.mainLightGrey, width: 3),
-                borderRadius: BorderRadius.circular(20),
-              ),
+            child: ModernWidgets.modernCard(
+              padding: EdgeInsets.zero,
               child: SizedBox(
                 height: eachBoardHeight,
                 child: Column(
                   children: [
                     Container(
-                      height: 50,
+                      height: 60,
                       width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: Palette.secondaryGradient,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(16),
+                            topRight: Radius.circular(16)),
+                      ),
                       child: TextButton(
                         child: Text(
                           "FAQ",
                           style: TextStyle(
-                              color: Palette.black, fontFamily: "Jalnan"),
+                              color: Palette.white,
+                              fontFamily: "NotoSansKR",
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18),
                         ),
                         onPressed: () {},
-                      ),
-                      decoration: BoxDecoration(
-                        color: Palette.mainLightGrey,
-                        border:
-                            Border.all(color: Palette.mainLightGrey, width: 3),
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(18),
-                            topRight: Radius.circular(18)),
                       ),
                     ),
                     Container(
@@ -398,8 +414,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
                                 "A: 글림아일랜드 2024년 신학기 개강 일정 :\n"
-                                    "- 월수금반 : 3월 6일\n"
-                                    "- 화목반 : 3월 5일"),
+                                "- 월수금반 : 3월 6일\n"
+                                "- 화목반 : 3월 5일"),
                           ]),
                     ),
                     Container(
@@ -429,7 +445,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                     fontWeight: FontWeight.normal,
                                     fontSize: 14),
                                 "A: 초등부, 중등부 정원은 한 반에 8명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, "
-                                    "최소 주 1회 원어민 선생님 수업이 있습니다."),
+                                "최소 주 1회 원어민 선생님 수업이 있습니다."),
                           ]),
                     ),
                     Container(
@@ -476,18 +492,37 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
   Widget scrollView() {
     return SingleChildScrollView(
       child: Container(
-        color: Palette.white,
+        color: Palette.background,
         child: Column(
           children: [
             mainImage(),
             SizedBox(height: 120, child: urlMenu()),
-            Container(width:double.infinity,child: InkWell(child: Image.asset("assets/mainBannerOpening.png")
-            , onTap: () async {
-                UrlUtil.open('https://blog.naver.com/gleam-island-paju/223029184863');
-              },)),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Palette.grey200.withOpacity(0.5),
+                    spreadRadius: 0,
+                    blurRadius: 8,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: InkWell(
+                  child: Image.asset("assets/mainBannerOpening.png"),
+                  onTap: () async {
+                    UrlUtil.open(
+                        'https://blog.naver.com/gleam-island-paju/223029184863');
+                  },
+                ),
+              ),
+            ),
             bulletinBoard(),
-            SizedBox(height: 213, child: MyWidget.footer()),
-
+            ModernWidgets.modernFooter(),
           ],
         ),
       ),
@@ -501,14 +536,17 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
       child: Container(
         child: Column(
           children: [
-            InkWell(child: Image.asset("assets/mainBannerOpening.png"),
+            InkWell(
+              child: Image.asset("assets/mainBannerOpening.png"),
               onTap: () async {
-                UrlUtil.open('https://blog.naver.com/gleam-island-paju/223029184863');
-              },),
+                UrlUtil.open(
+                    'https://blog.naver.com/gleam-island-paju/223029184863');
+              },
+            ),
             // mobileMenuList(),
             mobileUrlMenu(),
             mobileBulletinBoard(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
+            ModernWidgets.modernMobileFooter()
           ],
         ),
       ),
@@ -544,7 +582,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
       margin: EdgeInsets.all(20),
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20), color: Palette.greyTenPer),
+          borderRadius: BorderRadius.circular(20), color: Palette.grey100),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -556,7 +594,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             children: [
               InkWell(
                   onTap: () async {
-                    UrlUtil.open('https://www.instagram.com/gleam_island_school/');
+                    UrlUtil.open(
+                        'https://www.instagram.com/gleam_island_school/');
                   },
                   child: Image.asset("assets/instaLogo.png")),
               Spacer(),
@@ -571,7 +610,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   width: 40,
                   child: InkWell(
                       onTap: () async {
-                        UrlUtil.open('https://blog.naver.com/gleam-island-paju');
+                        UrlUtil.open(
+                            'https://blog.naver.com/gleam-island-paju');
                       },
                       child: Image.asset("assets/naverBlogLogo.png"))),
               Spacer(),
@@ -607,24 +647,24 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                     MenuUtil.push(context, SchoolConsultationPage());
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.deepGreen,
+                    backgroundColor: Palette.secondaryDark,
                     foregroundColor: Palette.black,
                   ),
                 ),
               )
             ],
           ),
-
           SizedBox(
             height: 10,
           ),
-
           Row(
             children: [
               Expanded(
                 flex: 3,
                 child: InkWell(
-                  child: Container(height: 55, child: Image.asset("assets/middleOnlineLink.png")),
+                  child: Container(
+                      height: 55,
+                      child: Image.asset("assets/middleOnlineLink.png")),
                   onTap: () async {
                     UrlUtil.open('http://gienglish.theclip.net/');
                   },
@@ -634,18 +674,23 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                 margin: EdgeInsets.all(5),
                 width: 0.5,
                 height: 40,
-                color: Palette.mainGrey,
+                color: Palette.grey500,
               ),
               Expanded(
                 flex: 3,
                 child: InkWell(
-                  child: Container(height: 55,child: Image.asset("assets/eleOnlineLink.png")),
+                  child: Container(
+                      height: 55,
+                      child: Image.asset("assets/eleOnlineLink.png")),
                   onTap: () async {
-                    UrlUtil.open('https://www.trophy9.com/account/account.do?stdcmd=sign&url=%2Fdefault%2Edo%3F');
+                    UrlUtil.open(
+                        'https://www.trophy9.com/account/account.do?stdcmd=sign&url=%2Fdefault%2Edo%3F');
                   },
                 ),
               ),
-              SizedBox(width: 20,)
+              SizedBox(
+                width: 20,
+              )
             ],
           ),
         ],
@@ -661,7 +706,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         children: [
           Container(
             decoration: BoxDecoration(
-              border: Border.all(color: Palette.mainLightGrey, width: 3),
+              border: Border.all(color: Palette.grey100, width: 3),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -672,14 +717,14 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                     child: Text(
                       "Notice Board",
                       style:
-                      TextStyle(color: Palette.black, fontFamily: "Jalnan"),
+                          TextStyle(color: Palette.black, fontFamily: "Jalnan"),
                     ),
                     onPressed: () {},
                   ),
                   height: 50,
                   decoration: BoxDecoration(
-                    color: Palette.mainLightGrey,
-                    border: Border.all(color: Palette.mainLightGrey, width: 3),
+                    color: Palette.grey100,
+                    border: Border.all(color: Palette.grey100, width: 3),
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(18),
                         topRight: Radius.circular(18)),
@@ -707,10 +752,10 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
                             "* 글림아일랜드 2024년 신학기 개강 일정 :\n"
-                                "- 월수금반 : 3월 6일\n"
-                                "- 화목반 : 3월 5일\n"
-                                "* 신규 Prep(파닉스)반 2반 신설 및 중등부 신설"),]
-                  ),
+                            "- 월수금반 : 3월 6일\n"
+                            "- 화목반 : 3월 5일\n"
+                            "* 신규 Prep(파닉스)반 2반 신설 및 중등부 신설"),
+                      ]),
                 ),
                 Container(
                   color: Colors.white,
@@ -734,17 +779,17 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
                             "- 글림아일랜드의 모든 수업은 체험 수업이 가능합니다. "
-                                "아이가 직접 수업을 참여해보고 결정할 수 있도록 해 주십시오.(일일 수강료 발생)"),]
-                  ),
+                            "아이가 직접 수업을 참여해보고 결정할 수 있도록 해 주십시오.(일일 수강료 발생)"),
+                      ]),
                 ),
                 Container(
-
                   alignment: Alignment.topLeft,
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(20),bottomRight: Radius.circular(20))),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20))),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -763,8 +808,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
                             "- 본원에서는 초등, 중등반 수업 스케줄에 따른 학원 차량을 "
-                                "운행하며 자세한 내용은 상담시 차량 노선과 함께 제공합니다."),]
-                  ),
+                            "운행하며 자세한 내용은 상담시 차량 노선과 함께 제공합니다."),
+                      ]),
                 )
               ],
             ),
@@ -772,7 +817,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
           SizedBox(height: 20),
           Container(
             decoration: BoxDecoration(
-              border: Border.all(color: Palette.mainLightGrey, width: 3),
+              border: Border.all(color: Palette.grey100, width: 3),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -789,8 +834,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   ),
                   height: 50,
                   decoration: BoxDecoration(
-                    color: Palette.mainLightGrey,
-                    border: Border.all(color: Palette.mainLightGrey, width: 3),
+                    color: Palette.grey100,
+                    border: Border.all(color: Palette.grey100, width: 3),
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(18),
                         topRight: Radius.circular(18)),
@@ -850,7 +895,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
                             "A: 초등부, 중등부 정원은 한 반에 8명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, "
-                                "최소 주 1회 원어민 선생님 수업이 있습니다."),
+                            "최소 주 1회 원어민 선생님 수업이 있습니다."),
                       ]),
                 ),
                 Container(
@@ -864,7 +909,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20),bottomRight: Radius.circular(20))),
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20))),
                   child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -884,7 +930,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                                 fontWeight: FontWeight.normal,
                                 fontSize: 14),
                             "A: 예비초, 초등부는 연령을 고려하되,\n"
-                                "실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다. 중등부는 연령과 실력에 따라 반 배정이 되며 학교도 되도록이면 통일합니다."),
+                            "실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다. 중등부는 연령과 실력에 따라 반 배정이 되며 학교도 되도록이면 통일합니다."),
                       ]),
                 ),
               ],
@@ -905,7 +951,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
 //       color: Palette.white,
 //       size: 20,
 //     ),
-//     tileColor: Palette.mainMediumPurple,
+//     tileColor: Palette.accent,
 //   );
 // }
 
