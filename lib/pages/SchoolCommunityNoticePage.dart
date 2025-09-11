@@ -354,6 +354,9 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
       headers: ["번호", "제목", "작성자", "작성일"],
       onItemTap: (item) => _navigateToDetail(item['id']),
       emptyMessage: "등록된 공지사항이 없습니다.",
+      isAdmin: _isAdmin,
+      onEditTap: _isAdmin ? (item) => _editNotice(item['id']) : null,
+      onDeleteTap: _isAdmin ? (item) => _deleteNotice(item['id'], item['title']) : null,
     );
   }
 
@@ -432,6 +435,117 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
           backgroundColor: Colors.red,
         ),
       );
+    }
+  }
+
+  Future<void> _editNotice(String? noticeId) async {
+    if (noticeId == null) return;
+
+    try {
+      Notice? notice = await NoticeService.getNotice(noticeId);
+      if (notice == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('공지사항을 찾을 수 없습니다.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AdminNoticeWritePage(notice: notice),
+          fullscreenDialog: true,
+        ),
+      );
+
+      if (result == true) {
+        // 수정 완료 후 목록 새로고침
+        setState(() {});
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('공지사항 수정 중 오류가 발생했습니다: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _deleteNotice(String? noticeId, String? noticeTitle) async {
+    if (noticeId == null) return;
+
+    bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          "공지사항 삭제",
+          style: TextStyle(fontFamily: "NotoSansKR"),
+        ),
+        content: Text(
+          "공지사항 '$noticeTitle'을(를) 삭제하시겠습니까?\n삭제된 공지사항은 복구할 수 없습니다.",
+          style: TextStyle(fontFamily: "NotoSansKR"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(
+              "취소",
+              style: TextStyle(fontFamily: "NotoSansKR"),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text(
+              "삭제",
+              style: TextStyle(fontFamily: "NotoSansKR"),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        bool success = await NoticeService.deleteNotice(noticeId);
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '공지사항이 삭제되었습니다.',
+                style: TextStyle(fontFamily: "NotoSansKR"),
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
+          // 삭제 완료 후 목록 새로고침
+          setState(() {});
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '공지사항 삭제에 실패했습니다.',
+                style: TextStyle(fontFamily: "NotoSansKR"),
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '공지사항 삭제 중 오류가 발생했습니다: $e',
+              style: TextStyle(fontFamily: "NotoSansKR"),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 }

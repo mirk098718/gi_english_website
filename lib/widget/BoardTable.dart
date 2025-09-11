@@ -6,6 +6,9 @@ class BoardTable extends StatelessWidget {
   final List<String> headers;
   final Function(Map<String, dynamic>) onItemTap;
   final String emptyMessage;
+  final bool isAdmin;
+  final Function(Map<String, dynamic>)? onEditTap;
+  final Function(Map<String, dynamic>)? onDeleteTap;
 
   const BoardTable({
     Key? key,
@@ -13,6 +16,9 @@ class BoardTable extends StatelessWidget {
     required this.headers,
     required this.onItemTap,
     this.emptyMessage = "등록된 게시글이 없습니다.",
+    this.isAdmin = false,
+    this.onEditTap,
+    this.onDeleteTap,
   }) : super(key: key);
 
   @override
@@ -81,6 +87,16 @@ class BoardTable extends StatelessWidget {
         );
       }
       cells.add(cell);
+    }
+
+    // 관리자일 때 액션 헤더 추가
+    if (isAdmin && (onEditTap != null || onDeleteTap != null)) {
+      cells.add(
+        SizedBox(
+          width: 80,
+          child: Text("관리", style: _headerTextStyle()),
+        ),
+      );
     }
 
     return cells;
@@ -289,6 +305,53 @@ class BoardTable extends StatelessWidget {
               color: Palette.grey600,
             ),
             textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    // 관리자일 때 액션 버튼 추가
+    if (isAdmin && (onEditTap != null || onDeleteTap != null)) {
+      cells.add(
+        SizedBox(
+          width: 80,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (onEditTap != null)
+                InkWell(
+                  onTap: () => onEditTap!(item),
+                  child: Container(
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Palette.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Icon(
+                      Icons.edit,
+                      size: 16,
+                      color: Palette.primary,
+                    ),
+                  ),
+                ),
+              if (onEditTap != null && onDeleteTap != null) SizedBox(width: 4),
+              if (onDeleteTap != null)
+                InkWell(
+                  onTap: () => onDeleteTap!(item),
+                  child: Container(
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Icon(
+                      Icons.delete,
+                      size: 16,
+                      color: Colors.red,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       );

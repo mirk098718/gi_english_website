@@ -184,6 +184,9 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
           headers: ["카테고리", "질문", "작성일"],
           onItemTap: (item) => _showFAQDialog(item),
           emptyMessage: "등록된 FAQ가 없습니다.",
+          isAdmin: _isAdmin,
+          onEditTap: _isAdmin ? (item) => _editFAQ(item['id']) : null,
+          onDeleteTap: _isAdmin ? (item) => _deleteFAQ(item['id'], item['title']) : null,
         );
       },
     );
@@ -267,6 +270,26 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
             ),
           ),
           actions: [
+            if (_isAdmin) ...[
+              TextButton.icon(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _editFAQ(faq['id']);
+                },
+                icon: Icon(Icons.edit, size: 16),
+                label: Text("수정", style: TextStyle(fontFamily: "NotoSansKR")),
+                style: TextButton.styleFrom(foregroundColor: Palette.primary),
+              ),
+              TextButton.icon(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _deleteFAQ(faq['id'], faq['title']);
+                },
+                icon: Icon(Icons.delete, size: 16),
+                label: Text("삭제", style: TextStyle(fontFamily: "NotoSansKR")),
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+              ),
+            ],
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text("닫기", style: TextStyle(fontFamily: "NotoSansKR")),
@@ -341,6 +364,105 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
           backgroundColor: Colors.red,
         ),
       );
+    }
+  }
+
+  Future<void> _editFAQ(String? faqId) async {
+    if (faqId == null) return;
+
+    try {
+      FAQ? faq = await FAQService.getFAQById(faqId);
+      if (faq == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('FAQ를 찾을 수 없습니다.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AdminFAQWritePage(faq: faq),
+          fullscreenDialog: true,
+        ),
+      );
+
+      if (result == true) {
+        // 수정 완료 후 목록 새로고침
+        setState(() {});
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('FAQ 수정 중 오류가 발생했습니다: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _deleteFAQ(String? faqId, String? faqTitle) async {
+    if (faqId == null) return;
+
+    bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          "FAQ 삭제",
+          style: TextStyle(fontFamily: "NotoSansKR"),
+        ),
+        content: Text(
+          "FAQ '$faqTitle'을(를) 삭제하시겠습니까?\n삭제된 FAQ는 복구할 수 없습니다.",
+          style: TextStyle(fontFamily: "NotoSansKR"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(
+              "취소",
+              style: TextStyle(fontFamily: "NotoSansKR"),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text(
+              "삭제",
+              style: TextStyle(fontFamily: "NotoSansKR"),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await FAQService.deleteFAQ(faqId);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'FAQ가 삭제되었습니다.',
+              style: TextStyle(fontFamily: "NotoSansKR"),
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // 삭제 완료 후 목록 새로고침
+        setState(() {});
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'FAQ 삭제에 실패했습니다: $e',
+              style: TextStyle(fontFamily: "NotoSansKR"),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 }
