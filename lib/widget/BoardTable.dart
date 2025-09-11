@@ -25,16 +25,24 @@ class BoardTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(20),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(width: 1, color: Palette.black),
-        ),
-        child: Column(
-          children: [
-            _buildHeader(),
-            ..._buildRows(),
-          ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minWidth: MediaQuery.of(context).size.width - 40,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(width: 1, color: Palette.black),
+            ),
+            child: Column(
+              children: [
+                _buildHeader(),
+                ..._buildRows(),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -51,6 +59,7 @@ class BoardTable extends StatelessWidget {
         ),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.max,
         children: _buildHeaderCells(),
       ),
     );
@@ -151,6 +160,7 @@ class BoardTable extends StatelessWidget {
               : null,
         ),
         child: Row(
+          mainAxisSize: MainAxisSize.max,
           children: _buildRowCells(item, index),
         ),
       ),
@@ -181,6 +191,7 @@ class BoardTable extends StatelessWidget {
         Expanded(
           flex: 4,
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               if (item['isImportant'] ?? false) ...[
                 Icon(Icons.star, color: Palette.primary, size: 16),
@@ -198,6 +209,8 @@ class BoardTable extends StatelessWidget {
                         : FontWeight.normal,
                   ),
                   overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  softWrap: false,
                 ),
               ),
             ],
@@ -217,6 +230,8 @@ class BoardTable extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            softWrap: false,
           ),
         ),
       );
@@ -232,6 +247,9 @@ class BoardTable extends StatelessWidget {
               color: Palette.grey600,
             ),
             textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            softWrap: false,
           ),
         ),
       );
@@ -270,6 +288,7 @@ class BoardTable extends StatelessWidget {
         Expanded(
           flex: 4,
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               if (item['isImportant'] ?? false) ...[
                 Icon(Icons.star, color: Palette.primary, size: 16),
@@ -287,6 +306,8 @@ class BoardTable extends StatelessWidget {
                         : FontWeight.normal,
                   ),
                   overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  softWrap: false,
                 ),
               ),
             ],
@@ -305,6 +326,9 @@ class BoardTable extends StatelessWidget {
               color: Palette.grey600,
             ),
             textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            softWrap: false,
           ),
         ),
       );
@@ -313,10 +337,11 @@ class BoardTable extends StatelessWidget {
     // 관리자일 때 액션 버튼 추가
     if (isAdmin && (onEditTap != null || onDeleteTap != null)) {
       cells.add(
-        SizedBox(
+        Container(
           width: 80,
           child: Row(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (onEditTap != null)
                 InkWell(
