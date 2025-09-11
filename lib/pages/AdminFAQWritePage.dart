@@ -117,6 +117,10 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
           border-radius: 8px;
           outline: none;
           font-family: 'NotoSansKR', sans-serif;
+          user-select: text;
+          -webkit-user-select: text;
+          -moz-user-select: text;
+          -ms-user-select: text;
         ''';
 
         categoryInput.onInput.listen((event) {
@@ -133,6 +137,19 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
 
         categoryInput.onBlur.listen((event) {
           categoryInput.style.borderColor = '#ccc';
+        });
+
+        // 키보드 단축키 지원 (Ctrl+A: 전체 선택)
+        categoryInput.onKeyDown.listen((event) {
+          if (event.ctrlKey && event.keyCode == 65) { // Ctrl+A
+            event.preventDefault();
+            categoryInput.select();
+          }
+        });
+
+        // 더블클릭으로 전체 선택
+        categoryInput.onDoubleClick.listen((event) {
+          categoryInput.select();
         });
 
         return categoryInput;
@@ -156,6 +173,10 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
           border-radius: 8px;
           outline: none;
           font-family: 'NotoSansKR', sans-serif;
+          user-select: text;
+          -webkit-user-select: text;
+          -moz-user-select: text;
+          -ms-user-select: text;
         ''';
 
         questionInput.onInput.listen((event) {
@@ -172,6 +193,19 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
 
         questionInput.onBlur.listen((event) {
           questionInput.style.borderColor = '#ccc';
+        });
+
+        // 키보드 단축키 지원 (Ctrl+A: 전체 선택)
+        questionInput.onKeyDown.listen((event) {
+          if (event.ctrlKey && event.keyCode == 65) { // Ctrl+A
+            event.preventDefault();
+            questionInput.select();
+          }
+        });
+
+        // 더블클릭으로 전체 선택
+        questionInput.onDoubleClick.listen((event) {
+          questionInput.select();
         });
 
         return questionInput;
@@ -195,6 +229,10 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
           outline: none;
           font-family: 'NotoSansKR', sans-serif;
           resize: vertical;
+          user-select: text;
+          -webkit-user-select: text;
+          -moz-user-select: text;
+          -ms-user-select: text;
         ''';
 
         answerInput.onInput.listen((event) {
@@ -211,6 +249,19 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
 
         answerInput.onBlur.listen((event) {
           answerInput.style.borderColor = '#ccc';
+        });
+
+        // 키보드 단축키 지원 (Ctrl+A: 전체 선택)
+        answerInput.onKeyDown.listen((event) {
+          if (event.ctrlKey && event.keyCode == 65) { // Ctrl+A
+            event.preventDefault();
+            answerInput.select();
+          }
+        });
+
+        // 더블클릭으로 단어 선택, 트리플클릭으로 전체 선택
+        answerInput.onDoubleClick.listen((event) {
+          answerInput.select();
         });
 
         return answerInput;
