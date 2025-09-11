@@ -15,7 +15,6 @@ import 'package:gi_english_website/class/Notice.dart';
 import 'package:gi_english_website/class/FAQ.dart';
 import '../admin/page/AdminLoginPage.dart';
 import '../util/UrlIUtil.dart';
-import '../util/WidgetUtil.dart';
 import 'package:intl/intl.dart';
 
 class SchoolMainPage extends StatefulWidget {
@@ -849,6 +848,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
       margin: EdgeInsets.only(left: 20, right: 20),
       child: Column(
         children: [
+          // Notice Board Section
           Container(
             decoration: BoxDecoration(
               border: Border.all(color: Palette.grey100, width: 3),
@@ -861,10 +861,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   child: TextButton(
                     child: Text(
                       "Notice Board",
-                      style:
-                          TextStyle(color: Palette.black, fontFamily: "Jalnan"),
+                      style: TextStyle(color: Palette.black, fontFamily: "Jalnan"),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolCommunityNoticePage());
+                    },
                   ),
                   height: 50,
                   decoration: BoxDecoration(
@@ -876,90 +877,14 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   ),
                 ),
                 Container(
-                  color: Colors.white,
-                  alignment: Alignment.topLeft,
-                  padding: EdgeInsets.all(20),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                            style: TextStyle(
-                                color: Palette.black,
-                                fontFamily: "NotoSansKR",
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14),
-                            "글림아일랜드 소식"),
-                        WidgetUtil.myDivider(),
-                        Text(
-                            style: TextStyle(
-                                color: Palette.black,
-                                fontFamily: "NotoSansKR",
-                                fontWeight: FontWeight.normal,
-                                fontSize: 14),
-                            "* 글림아일랜드 2024년 신학기 개강 일정 :\n"
-                            "- 월수금반 : 3월 6일\n"
-                            "- 화목반 : 3월 5일\n"
-                            "* 신규 Prep(파닉스)반 2반 신설 및 중등부 신설"),
-                      ]),
+                  height: 200, // 고정 높이 설정
+                  child: _buildMobileNoticeList(),
                 ),
-                Container(
-                  color: Colors.white,
-                  alignment: Alignment.topLeft,
-                  padding: EdgeInsets.all(20),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                            style: TextStyle(
-                                color: Palette.black,
-                                fontFamily: "NotoSansKR",
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14),
-                            "글림아일랜드어학원 초등부 체험수업"),
-                        WidgetUtil.myDivider(),
-                        Text(
-                            style: TextStyle(
-                                color: Palette.black,
-                                fontFamily: "NotoSansKR",
-                                fontWeight: FontWeight.normal,
-                                fontSize: 14),
-                            "- 글림아일랜드의 모든 수업은 체험 수업이 가능합니다. "
-                            "아이가 직접 수업을 참여해보고 결정할 수 있도록 해 주십시오.(일일 수강료 발생)"),
-                      ]),
-                ),
-                Container(
-                  alignment: Alignment.topLeft,
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20),
-                          bottomRight: Radius.circular(20))),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                            style: TextStyle(
-                                color: Palette.black,
-                                fontFamily: "NotoSansKR",
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14),
-                            "학원 차량 노선"),
-                        WidgetUtil.myDivider(),
-                        Text(
-                            style: TextStyle(
-                                color: Palette.black,
-                                fontFamily: "NotoSansKR",
-                                fontWeight: FontWeight.normal,
-                                fontSize: 14),
-                            "- 본원에서는 초등, 중등반 수업 스케줄에 따른 학원 차량을 "
-                            "운행하며 자세한 내용은 상담시 차량 노선과 함께 제공합니다."),
-                      ]),
-                )
               ],
             ),
           ),
           SizedBox(height: 20),
+          // FAQ Section
           Container(
             decoration: BoxDecoration(
               border: Border.all(color: Palette.grey100, width: 3),
@@ -972,10 +897,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   child: TextButton(
                     child: Text(
                       "FAQ",
-                      style:
-                          TextStyle(color: Palette.black, fontFamily: "Jalnan"),
+                      style: TextStyle(color: Palette.black, fontFamily: "Jalnan"),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      MenuUtil.push(context, SchoolCommunityBoardPage());
+                    },
                   ),
                   height: 50,
                   decoration: BoxDecoration(
@@ -987,102 +913,311 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   ),
                 ),
                 Container(
-                  color: Colors.white,
-                  alignment: Alignment.topLeft,
-                  padding: EdgeInsets.all(20),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                            style: TextStyle(
-                                color: Palette.black,
-                                fontFamily: "NotoSansKR",
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14),
-                            "Q: 글림아일랜드 24년도 개강일은?"),
-                        WidgetUtil.myDivider(),
-                        Text(
-                            style: TextStyle(
-                                color: Palette.black,
-                                fontFamily: "NotoSansKR",
-                                fontWeight: FontWeight.normal,
-                                fontSize: 14),
-                            "A: 글림아일랜드 2024년 신학기 개강 일정 :\n"
-                            "- 월수금반 : 3월 6일\n"
-                            "- 화목반 : 3월 5일"),
-                      ]),
-                ),
-                Container(
-                  height: 1,
-                  margin: EdgeInsets.only(right: 10, left: 10),
-                ),
-                Container(
-                  color: Colors.white,
-                  alignment: Alignment.topLeft,
-                  padding: EdgeInsets.all(20),
-                  child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                            style: TextStyle(
-                                color: Palette.black,
-                                fontFamily: "NotoSansKR",
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14),
-                            "Q: 예비초, 초등, 중등부 각반 정원은 몇명인가요?"),
-                        WidgetUtil.myDivider(),
-                        Text(
-                            style: TextStyle(
-                                color: Palette.black,
-                                fontFamily: "NotoSansKR",
-                                fontWeight: FontWeight.normal,
-                                fontSize: 14),
-                            "A: 초등부, 중등부 정원은 한 반에 8명이며 bilingual 선생님께서 담임을 맡아 주실 것이고, "
-                            "최소 주 1회 원어민 선생님 수업이 있습니다."),
-                      ]),
-                ),
-                Container(
-                  color: Colors.white,
-                  height: 1,
-                  margin: EdgeInsets.only(right: 10, left: 10),
-                ),
-                Container(
-                  alignment: Alignment.topLeft,
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20),
-                          bottomRight: Radius.circular(20))),
-                  child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                            style: TextStyle(
-                                color: Palette.black,
-                                fontFamily: "NotoSansKR",
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14),
-                            "Q: 연령별로 반이 나뉘나요?"),
-                        WidgetUtil.myDivider(),
-                        Text(
-                            style: TextStyle(
-                                color: Palette.black,
-                                fontFamily: "NotoSansKR",
-                                fontWeight: FontWeight.normal,
-                                fontSize: 14),
-                            "A: 예비초, 초등부는 연령을 고려하되,\n"
-                            "실력 테스트를 거친 후 레벨 별로 반 배정이 됩니다. 중등부는 연령과 실력에 따라 반 배정이 되며 학교도 되도록이면 통일합니다."),
-                      ]),
+                  height: 200, // 고정 높이 설정
+                  child: _buildMobileFAQList(),
                 ),
               ],
             ),
           ),
           Container(height: 20)
         ],
+      ),
+    );
+  }
+
+  Widget _buildMobileNoticeList() {
+    return StreamBuilder<List<Notice>>(
+      stream: NoticeService.getNoticesStreamSorted(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Container(
+            color: Colors.white,
+            padding: EdgeInsets.all(20),
+            child: Center(
+              child: Text(
+                '공지사항을 불러오는데 오류가 발생했습니다.',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.red,
+                  fontFamily: "NotoSansKR",
+                ),
+              ),
+            ),
+          );
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Container(
+            color: Colors.white,
+            padding: EdgeInsets.all(20),
+            child: Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Palette.primary),
+                strokeWidth: 2,
+              ),
+            ),
+          );
+        }
+
+        List<Notice> notices = snapshot.data ?? [];
+        // 최대 2개까지만 표시 (모바일에서는 공간이 제한적)
+        List<Notice> displayNotices = notices.take(2).toList();
+
+        if (displayNotices.isEmpty) {
+          return Container(
+            color: Colors.white,
+            padding: EdgeInsets.all(20),
+            child: Center(
+              child: Text(
+                '등록된 공지사항이 없습니다.',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Palette.grey600,
+                  fontFamily: "NotoSansKR",
+                ),
+              ),
+            ),
+          );
+        }
+
+        return Container(
+          color: Colors.white,
+          child: ListView.separated(
+            padding: EdgeInsets.all(0),
+            itemCount: displayNotices.length,
+            separatorBuilder: (context, index) => Container(
+              height: 1,
+              color: Palette.grey200,
+            ),
+            itemBuilder: (context, index) {
+              Notice notice = displayNotices[index];
+              return _buildMobileNoticeItem(notice);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMobileNoticeItem(Notice notice) {
+    // 미리보기 텍스트 생성 (40자 제한 - 모바일에서는 더 짧게)
+    String preview = notice.content.length > 40 
+        ? '${notice.content.substring(0, 40)}...' 
+        : notice.content;
+    
+    return InkWell(
+      onTap: () {
+        if (notice.id != null) {
+          MenuUtil.push(context, NoticeDetailPage(noticeId: notice.id!));
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                if (notice.isImportant) ...[
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                    child: Text(
+                      "중요",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 8,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "NotoSansKR",
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 6),
+                ],
+                Expanded(
+                  child: Text(
+                    notice.title,
+                    style: TextStyle(
+                      color: Palette.black,
+                      fontFamily: "NotoSansKR",
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Text(
+                  DateFormat('MM.dd').format(notice.createdAt),
+                  style: TextStyle(
+                    color: Palette.grey600,
+                    fontFamily: "NotoSansKR",
+                    fontSize: 10,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 6),
+            Text(
+              preview,
+              style: TextStyle(
+                color: Palette.grey700,
+                fontFamily: "NotoSansKR",
+                fontSize: 12,
+                height: 1.3,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileFAQList() {
+    return StreamBuilder<List<FAQ>>(
+      stream: FAQService.getFAQsStreamSorted(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Container(
+            color: Colors.white,
+            padding: EdgeInsets.all(20),
+            child: Center(
+              child: Text(
+                'FAQ를 불러오는데 오류가 발생했습니다.',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.red,
+                  fontFamily: "NotoSansKR",
+                ),
+              ),
+            ),
+          );
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Container(
+            color: Colors.white,
+            padding: EdgeInsets.all(20),
+            child: Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Palette.primary),
+                strokeWidth: 2,
+              ),
+            ),
+          );
+        }
+
+        List<FAQ> faqs = snapshot.data ?? [];
+        // 최대 2개까지만 표시 (모바일에서는 공간이 제한적)
+        List<FAQ> displayFAQs = faqs.take(2).toList();
+
+        if (displayFAQs.isEmpty) {
+          return Container(
+            color: Colors.white,
+            padding: EdgeInsets.all(20),
+            child: Center(
+              child: Text(
+                '등록된 FAQ가 없습니다.',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Palette.grey600,
+                  fontFamily: "NotoSansKR",
+                ),
+              ),
+            ),
+          );
+        }
+
+        return Container(
+          color: Colors.white,
+          child: ListView.separated(
+            padding: EdgeInsets.all(0),
+            itemCount: displayFAQs.length,
+            separatorBuilder: (context, index) => Container(
+              height: 1,
+              color: Palette.grey200,
+            ),
+            itemBuilder: (context, index) {
+              FAQ faq = displayFAQs[index];
+              return _buildMobileFAQItem(faq);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMobileFAQItem(FAQ faq) {
+    // 미리보기 텍스트 생성 (30자 제한 - 모바일에서는 더 짧게)
+    String preview = faq.answer.length > 30 
+        ? '${faq.answer.substring(0, 30)}...' 
+        : faq.answer;
+    
+    return InkWell(
+      onTap: () {
+        MenuUtil.push(context, SchoolCommunityBoardPage());
+      },
+      child: Container(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: faq.isImportant ? Palette.primary : Palette.grey300,
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                  child: Text(
+                    faq.category,
+                    style: TextStyle(
+                      color: faq.isImportant ? Colors.white : Palette.grey700,
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: "NotoSansKR",
+                    ),
+                  ),
+                ),
+                SizedBox(width: 6),
+                if (faq.isImportant) ...[
+                  Icon(Icons.star, color: Palette.primary, size: 12),
+                  SizedBox(width: 4),
+                ],
+              ],
+            ),
+            SizedBox(height: 6),
+            Text(
+              "Q: ${faq.question}",
+              style: TextStyle(
+                color: Palette.black,
+                fontFamily: "NotoSansKR",
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            SizedBox(height: 4),
+            Text(
+              "A: $preview",
+              style: TextStyle(
+                color: Palette.grey700,
+                fontFamily: "NotoSansKR",
+                fontSize: 12,
+                height: 1.3,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }
