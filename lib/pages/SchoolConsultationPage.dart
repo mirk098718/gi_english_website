@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
+import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
+import 'package:gi_english_website/pages/SchoolCommunityBoardPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -29,7 +31,10 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
   MyGroupValue timeMyGroupValue = MyGroupValue("오전 09am ~ 12pm");
 
   List<ButtonState> buttonStateList = [
-    //ButtonState("Notice Board", BehaviorColor.colorOnDefault, SchoolConsultationPage()),
+    ButtonState("Notice Board", BehaviorColor.colorOnDefault,
+        SchoolCommunityNoticePage()),
+    ButtonState(
+        "FAQ", BehaviorColor.colorOnDefault, SchoolCommunityBoardPage()),
     ButtonState("Gallery", BehaviorColor.colorOnDefault, SchoolGalleryPage()),
     ButtonState("입학상담", BehaviorColor.colorOnClick, SchoolConsultationPage()),
   ];
@@ -363,7 +368,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                 //이 녀석이 날짜를 표현.
                 print(
                     "opnTap calendarTapDetails.date:${calendarTapDetails.date}");
-                            },
+              },
             ),
           ),
         ],
@@ -448,7 +453,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
         onHover: (value) {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
-              : (i == 1
+              : (i == 3
                   ? BehaviorColor.colorOnClick
                   : BehaviorColor.colorOnDefault);
           setState(() {});
@@ -593,7 +598,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                 //이 녀석이 날짜를 표현.
                 print(
                     "opnTap calendarTapDetails.date:${calendarTapDetails.date}");
-                            },
+              },
             ),
           ),
         ],

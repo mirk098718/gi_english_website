@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
+import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
+import 'package:gi_english_website/pages/SchoolCommunityBoardPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -18,7 +20,10 @@ class SchoolGalleryPage extends StatefulWidget {
 
 class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
   List<ButtonState> buttonStateList = [
-    //ButtonState("Notice Board", BehaviorColor.colorOnDefault, SchoolCommunityNoticePage()),
+    ButtonState("Notice Board", BehaviorColor.colorOnDefault,
+        SchoolCommunityNoticePage()),
+    ButtonState(
+        "FAQ", BehaviorColor.colorOnDefault, SchoolCommunityBoardPage()),
     ButtonState("Gallery", BehaviorColor.colorOnClick, SchoolGalleryPage()),
     ButtonState("입학상담", BehaviorColor.colorOnDefault, SchoolConsultationPage()),
   ];
@@ -78,7 +83,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
         onHover: (value) {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
-              : (i == 0
+              : (i == 2
                   ? BehaviorColor.colorOnClick
                   : BehaviorColor.colorOnDefault);
           print(
@@ -526,7 +531,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
         onHover: (value) {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
-              : (i == 0
+              : (i == 2
                   ? BehaviorColor.colorOnClick
                   : BehaviorColor.colorOnDefault);
           setState(() {});

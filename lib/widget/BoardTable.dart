@@ -1,0 +1,308 @@
+import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/Palette.dart';
+
+class BoardTable extends StatelessWidget {
+  final List<Map<String, dynamic>> items;
+  final List<String> headers;
+  final Function(Map<String, dynamic>) onItemTap;
+  final String emptyMessage;
+
+  const BoardTable({
+    Key? key,
+    required this.items,
+    required this.headers,
+    required this.onItemTap,
+    this.emptyMessage = "등록된 게시글이 없습니다.",
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(20),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(width: 1, color: Palette.black),
+        ),
+        child: Column(
+          children: [
+            _buildHeader(),
+            ..._buildRows(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: Palette.grey100,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+        ),
+      ),
+      child: Row(
+        children: _buildHeaderCells(),
+      ),
+    );
+  }
+
+  List<Widget> _buildHeaderCells() {
+    List<Widget> cells = [];
+
+    for (int i = 0; i < headers.length; i++) {
+      Widget cell;
+      if (i == 0) {
+        // 첫 번째 컬럼 (번호 또는 카테고리)
+        cell = SizedBox(
+          width: headers[0] == "번호" ? 60 : 80,
+          child: Text(headers[i], style: _headerTextStyle()),
+        );
+      } else if (i == headers.length - 2) {
+        // 끝에서 두 번째 컬럼 (작성자)
+        cell = SizedBox(
+          width: 100,
+          child: Text(headers[i], style: _headerTextStyle()),
+        );
+      } else if (i == headers.length - 1) {
+        // 마지막 컬럼 (작성일)
+        cell = SizedBox(
+          width: 120,
+          child: Text(headers[i], style: _headerTextStyle()),
+        );
+      } else {
+        // 제목 컬럼
+        cell = Expanded(
+          flex: 4,
+          child: Text(headers[i], style: _headerTextStyle()),
+        );
+      }
+      cells.add(cell);
+    }
+
+    return cells;
+  }
+
+  List<Widget> _buildRows() {
+    if (items.isEmpty) {
+      return [
+        Container(
+          padding: EdgeInsets.all(40),
+          child: Center(
+            child: Text(
+              emptyMessage,
+              style: TextStyle(
+                fontSize: 14,
+                color: Palette.grey600,
+                fontFamily: "NotoSansKR",
+              ),
+            ),
+          ),
+        ),
+      ];
+    }
+
+    List<Widget> rows = [];
+    for (int i = 0; i < items.length; i++) {
+      final item = items[i];
+      final isLast = i == items.length - 1;
+
+      rows.add(_buildRow(item, i, isLast));
+
+      if (!isLast) {
+        rows.add(Divider(height: 1, color: Palette.grey200));
+      }
+    }
+
+    return rows;
+  }
+
+  Widget _buildRow(Map<String, dynamic> item, int index, bool isLast) {
+    return InkWell(
+      onTap: () => onItemTap(item),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: isLast
+              ? BorderRadius.only(
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10),
+                )
+              : null,
+        ),
+        child: Row(
+          children: _buildRowCells(item, index),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildRowCells(Map<String, dynamic> item, int index) {
+    List<Widget> cells = [];
+
+    if (headers[0] == "번호") {
+      // Notice Board 스타일
+      cells.add(
+        SizedBox(
+          width: 60,
+          child: Text(
+            "${items.length - index}",
+            style: TextStyle(
+              fontSize: 14,
+              fontFamily: "NotoSansKR",
+              color: Palette.grey600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+
+      cells.add(
+        Expanded(
+          flex: 4,
+          child: Row(
+            children: [
+              if (item['isImportant'] ?? false) ...[
+                Icon(Icons.star, color: Palette.primary, size: 16),
+                SizedBox(width: 4),
+              ],
+              Expanded(
+                child: Text(
+                  item['title'] ?? '',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontFamily: "NotoSansKR",
+                    color: Palette.black,
+                    fontWeight: (item['isImportant'] ?? false)
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      cells.add(
+        SizedBox(
+          width: 100,
+          child: Text(
+            item['author'] ?? '',
+            style: TextStyle(
+              fontSize: 14,
+              fontFamily: "NotoSansKR",
+              color: Palette.grey600,
+            ),
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      );
+
+      cells.add(
+        SizedBox(
+          width: 120,
+          child: Text(
+            item['date'] ?? '',
+            style: TextStyle(
+              fontSize: 14,
+              fontFamily: "NotoSansKR",
+              color: Palette.grey600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    } else {
+      // FAQ Board 스타일
+      cells.add(
+        SizedBox(
+          width: 80,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: (item['isImportant'] ?? false)
+                  ? Palette.primary.withOpacity(0.1)
+                  : Palette.grey100,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              item['category'] ?? 'FAQ',
+              style: TextStyle(
+                fontSize: 12,
+                fontFamily: "NotoSansKR",
+                color: (item['isImportant'] ?? false)
+                    ? Palette.primary
+                    : Palette.grey600,
+              ),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+      );
+
+      cells.add(SizedBox(width: 10));
+
+      cells.add(
+        Expanded(
+          flex: 4,
+          child: Row(
+            children: [
+              if (item['isImportant'] ?? false) ...[
+                Icon(Icons.star, color: Palette.primary, size: 16),
+                SizedBox(width: 4),
+              ],
+              Expanded(
+                child: Text(
+                  item['title'] ?? '',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontFamily: "NotoSansKR",
+                    color: Palette.black,
+                    fontWeight: (item['isImportant'] ?? false)
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      cells.add(
+        SizedBox(
+          width: 120,
+          child: Text(
+            item['date'] ?? '',
+            style: TextStyle(
+              fontSize: 14,
+              fontFamily: "NotoSansKR",
+              color: Palette.grey600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    return cells;
+  }
+
+  TextStyle _headerTextStyle() {
+    return TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.bold,
+      fontFamily: "NotoSansKR",
+      color: Palette.grey700,
+    );
+  }
+}

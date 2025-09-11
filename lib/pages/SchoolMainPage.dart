@@ -237,7 +237,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
   }
 
   Widget bulletinBoard() {
-    double eachBoardHeight = 500;
+    double eachBoardHeight = 550;
 
     return Container(
       decoration: BoxDecoration(
