@@ -25,24 +25,16 @@ class BoardTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(20),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minWidth: MediaQuery.of(context).size.width - 40,
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(width: 1, color: Palette.black),
-            ),
-            child: Column(
-              children: [
-                _buildHeader(),
-                ..._buildRows(),
-              ],
-            ),
-          ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(width: 1, color: Palette.black),
+        ),
+        child: Column(
+          children: [
+            _buildHeader(),
+            ..._buildRows(),
+          ],
         ),
       ),
     );
@@ -189,31 +181,31 @@ class BoardTable extends StatelessWidget {
 
       cells.add(
         Expanded(
-          flex: 4,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (item['isImportant'] ?? false) ...[
-                Icon(Icons.star, color: Palette.primary, size: 16),
-                SizedBox(width: 4),
-              ],
-              Expanded(
-                child: Text(
-                  item['title'] ?? '',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontFamily: "NotoSansKR",
-                    color: Palette.black,
-                    fontWeight: (item['isImportant'] ?? false)
-                        ? FontWeight.bold
-                        : FontWeight.normal,
+          flex: 3,
+          child: Container(
+            child: Row(
+              children: [
+                if (item['isImportant'] ?? false) ...[
+                  Icon(Icons.star, color: Palette.primary, size: 16),
+                  SizedBox(width: 4),
+                ],
+                Expanded(
+                  child: Text(
+                    item['title'] ?? '',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontFamily: "NotoSansKR",
+                      color: Palette.black,
+                      fontWeight: (item['isImportant'] ?? false)
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  softWrap: false,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );
@@ -231,7 +223,6 @@ class BoardTable extends StatelessWidget {
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
-            softWrap: false,
           ),
         ),
       );
@@ -249,7 +240,6 @@ class BoardTable extends StatelessWidget {
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
-            softWrap: false,
           ),
         ),
       );
@@ -286,31 +276,31 @@ class BoardTable extends StatelessWidget {
 
       cells.add(
         Expanded(
-          flex: 4,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (item['isImportant'] ?? false) ...[
-                Icon(Icons.star, color: Palette.primary, size: 16),
-                SizedBox(width: 4),
-              ],
-              Expanded(
-                child: Text(
-                  item['title'] ?? '',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontFamily: "NotoSansKR",
-                    color: Palette.black,
-                    fontWeight: (item['isImportant'] ?? false)
-                        ? FontWeight.bold
-                        : FontWeight.normal,
+          flex: 3,
+          child: Container(
+            child: Row(
+              children: [
+                if (item['isImportant'] ?? false) ...[
+                  Icon(Icons.star, color: Palette.primary, size: 16),
+                  SizedBox(width: 4),
+                ],
+                Expanded(
+                  child: Text(
+                    item['title'] ?? '',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontFamily: "NotoSansKR",
+                      color: Palette.black,
+                      fontWeight: (item['isImportant'] ?? false)
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  softWrap: false,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );
@@ -328,7 +318,6 @@ class BoardTable extends StatelessWidget {
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
-            softWrap: false,
           ),
         ),
       );
