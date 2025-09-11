@@ -6,6 +6,8 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
+import 'dart:html' as html;
+import 'dart:ui_web' as ui;
 
 class AdminFAQWritePage extends StatefulWidget {
   final FAQ? faq; // 수정 모드일 때 사용
@@ -26,19 +28,58 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
   bool _isLoading = false;
   bool _isEditMode = false;
 
+  // HTML input 관련
+  String questionValue = '';
+  String answerValue = '';
+  String categoryValue = '';
+  late html.InputElement questionInput;
+  late html.TextAreaElement answerInput;
+  late html.InputElement categoryInput;
+  String questionViewType = '';
+  String answerViewType = '';
+  String categoryViewType = '';
+
   @override
   void initState() {
     super.initState();
     _isEditMode = widget.faq != null;
+    
+    // 고유한 viewType 생성 (수정 시 새로운 input을 만들기 위해)
+    final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    questionViewType = 'question-input-$timestamp';
+    answerViewType = 'answer-input-$timestamp';
+    categoryViewType = 'category-input-$timestamp';
+    
     _checkAdminStatus();
+    _registerHtmlInputs();
 
     if (_isEditMode) {
       _questionController.text = widget.faq!.question;
       _answerController.text = widget.faq!.answer;
       _categoryController.text = widget.faq!.category;
+      questionValue = widget.faq!.question;
+      answerValue = widget.faq!.answer;
+      categoryValue = widget.faq!.category;
       _isImportant = widget.faq!.isImportant;
+
+      // HTML input에도 값 설정 (약간의 지연 후)
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          questionInput.value = questionValue;
+          answerInput.value = answerValue;
+          categoryInput.value = categoryValue;
+        }
+      });
     } else {
       _categoryController.text = '일반';
+      categoryValue = '일반';
+      
+      // HTML input에도 값 설정 (약간의 지연 후)
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          categoryInput.value = categoryValue;
+        }
+      });
     }
   }
 
@@ -56,6 +97,125 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
         Navigator.pop(context);
       });
     }
+  }
+
+  void _registerHtmlInputs() {
+    // 카테고리 입력 필드 등록
+    ui.platformViewRegistry.registerViewFactory(
+      categoryViewType,
+      (int viewId) {
+        categoryInput = html.InputElement();
+        categoryInput.type = 'text';
+        categoryInput.placeholder = '카테고리를 입력하세요 (예: 일반, 수업, 교재)';
+        categoryInput.value = categoryValue;
+        categoryInput.style.cssText = '''
+          width: 100%;
+          height: 50px;
+          font-size: 16px;
+          padding: 12px 16px;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          outline: none;
+          font-family: 'NotoSansKR', sans-serif;
+        ''';
+
+        categoryInput.onInput.listen((event) {
+          if (mounted) {
+            setState(() {
+              categoryValue = categoryInput.value ?? '';
+            });
+          }
+        });
+
+        categoryInput.onFocus.listen((event) {
+          categoryInput.style.borderColor = '#4F46E5';
+        });
+
+        categoryInput.onBlur.listen((event) {
+          categoryInput.style.borderColor = '#ccc';
+        });
+
+        return categoryInput;
+      },
+    );
+
+    // 질문 입력 필드 등록
+    ui.platformViewRegistry.registerViewFactory(
+      questionViewType,
+      (int viewId) {
+        questionInput = html.InputElement();
+        questionInput.type = 'text';
+        questionInput.placeholder = '자주 묻는 질문을 입력하세요';
+        questionInput.value = questionValue;
+        questionInput.style.cssText = '''
+          width: 100%;
+          height: 50px;
+          font-size: 16px;
+          padding: 12px 16px;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          outline: none;
+          font-family: 'NotoSansKR', sans-serif;
+        ''';
+
+        questionInput.onInput.listen((event) {
+          if (mounted) {
+            setState(() {
+              questionValue = questionInput.value ?? '';
+            });
+          }
+        });
+
+        questionInput.onFocus.listen((event) {
+          questionInput.style.borderColor = '#4F46E5';
+        });
+
+        questionInput.onBlur.listen((event) {
+          questionInput.style.borderColor = '#ccc';
+        });
+
+        return questionInput;
+      },
+    );
+
+    // 답변 입력 필드 등록 (TextArea)
+    ui.platformViewRegistry.registerViewFactory(
+      answerViewType,
+      (int viewId) {
+        answerInput = html.TextAreaElement();
+        answerInput.placeholder = '질문에 대한 답변을 입력하세요';
+        answerInput.value = answerValue;
+        answerInput.style.cssText = '''
+          width: 100%;
+          height: 400px;
+          font-size: 16px;
+          padding: 16px;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          outline: none;
+          font-family: 'NotoSansKR', sans-serif;
+          resize: vertical;
+        ''';
+
+        answerInput.onInput.listen((event) {
+          if (mounted) {
+            setState(() {
+              answerValue = answerInput.value ?? '';
+            });
+          }
+        });
+
+        answerInput.onFocus.listen((event) {
+          answerInput.style.borderColor = '#4F46E5';
+        });
+
+        answerInput.onBlur.listen((event) {
+          answerInput.style.borderColor = '#ccc';
+        });
+
+        return answerInput;
+      },
+    );
   }
 
   @override
@@ -182,27 +342,12 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
             ),
           ),
           SizedBox(height: 8),
-          TextFormField(
-            controller: _categoryController,
-            decoration: InputDecoration(
-              hintText: "카테고리를 입력하세요 (예: 일반, 수업, 교재)",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Palette.grey300),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Palette.primary, width: 2),
-              ),
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          Container(
+            height: 50,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
             ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return '카테고리를 입력해주세요.';
-              }
-              return null;
-            },
+            child: HtmlElementView(viewType: categoryViewType),
           ),
           SizedBox(height: 24),
 
@@ -216,27 +361,12 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
             ),
           ),
           SizedBox(height: 8),
-          TextFormField(
-            controller: _questionController,
-            decoration: InputDecoration(
-              hintText: "자주 묻는 질문을 입력하세요",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Palette.grey300),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Palette.primary, width: 2),
-              ),
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          Container(
+            height: 50,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
             ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return '질문을 입력해주세요.';
-              }
-              return null;
-            },
+            child: HtmlElementView(viewType: questionViewType),
           ),
           SizedBox(height: 24),
 
@@ -274,27 +404,12 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
             ),
           ),
           SizedBox(height: 8),
-          TextFormField(
-            controller: _answerController,
-            maxLines: 15,
-            decoration: InputDecoration(
-              hintText: "질문에 대한 답변을 입력하세요",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Palette.grey300),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Palette.primary, width: 2),
-              ),
-              contentPadding: EdgeInsets.all(16),
+          Container(
+            height: 400,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
             ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return '답변을 입력해주세요.';
-              }
-              return null;
-            },
+            child: HtmlElementView(viewType: answerViewType),
           ),
           SizedBox(height: 40),
 
@@ -370,7 +485,34 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
   }
 
   Future<void> _saveFAQ() async {
-    if (!_formKey.currentState!.validate()) {
+    // HTML input 값으로 유효성 검사
+    if (categoryValue.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('카테고리를 입력해주세요.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (questionValue.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('질문을 입력해주세요.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (answerValue.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('답변을 입력해주세요.'),
+          backgroundColor: Colors.red,
+        ),
+      );
       return;
     }
 
@@ -393,9 +535,9 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
     try {
       FAQ faq = FAQ(
         id: _isEditMode ? widget.faq!.id : '',
-        question: _questionController.text.trim(),
-        answer: _answerController.text.trim(),
-        category: _categoryController.text.trim(),
+        question: questionValue.trim(),
+        answer: answerValue.trim(),
+        category: categoryValue.trim(),
         createdAt: _isEditMode ? widget.faq!.createdAt : DateTime.now(),
         updatedAt: DateTime.now(),
         isImportant: _isImportant,

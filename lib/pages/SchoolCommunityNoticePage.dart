@@ -356,7 +356,8 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
       emptyMessage: "등록된 공지사항이 없습니다.",
       isAdmin: _isAdmin,
       onEditTap: _isAdmin ? (item) => _editNotice(item['id']) : null,
-      onDeleteTap: _isAdmin ? (item) => _deleteNotice(item['id'], item['title']) : null,
+      onDeleteTap:
+          _isAdmin ? (item) => _deleteNotice(item['id'], item['title']) : null,
     );
   }
 

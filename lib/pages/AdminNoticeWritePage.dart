@@ -32,11 +32,19 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
   String contentValue = '';
   late html.InputElement titleInput;
   late html.TextAreaElement contentInput;
+  String titleViewType = '';
+  String contentViewType = '';
 
   @override
   void initState() {
     super.initState();
     _isEditMode = widget.notice != null;
+    
+    // 고유한 viewType 생성 (수정 시 새로운 input을 만들기 위해)
+    final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    titleViewType = 'title-input-$timestamp';
+    contentViewType = 'content-input-$timestamp';
+    
     _checkAdminStatus();
     _registerHtmlInputs();
 
@@ -60,7 +68,7 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
   void _registerHtmlInputs() {
     // 제목 입력 필드 등록
     ui.platformViewRegistry.registerViewFactory(
-      'title-input',
+      titleViewType,
       (int viewId) {
         titleInput = html.InputElement();
         titleInput.type = 'text';
@@ -99,7 +107,7 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
 
     // 내용 입력 필드 등록 (TextArea)
     ui.platformViewRegistry.registerViewFactory(
-      'content-input',
+      contentViewType,
       (int viewId) {
         contentInput = html.TextAreaElement();
         contentInput.placeholder = '공지사항 내용을 입력하세요';
@@ -281,7 +289,7 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
             ),
-            child: HtmlElementView(viewType: 'title-input'),
+            child: HtmlElementView(viewType: titleViewType),
           ),
           SizedBox(height: 24),
 
@@ -324,7 +332,7 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
             ),
-            child: HtmlElementView(viewType: 'content-input'),
+            child: HtmlElementView(viewType: contentViewType),
           ),
           SizedBox(height: 40),
 
