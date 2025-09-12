@@ -39,19 +39,12 @@ class _CommunityPageLayoutState extends State<CommunityPageLayout> {
 
   Widget _buildScrollView() {
     return SingleChildScrollView(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: MediaQuery.of(context).size.height,
-        ),
-        child: IntrinsicHeight(
-          child: Column(
-            children: [
-              _buildMainImage(),
-              Expanded(child: _buildContentGroup()),
-              MyWidget.footer(),
-            ],
-          ),
-        ),
+      child: Column(
+        children: [
+          _buildMainImage(),
+          _buildContentGroup(),
+          MyWidget.footer(),
+        ],
       ),
     );
   }
@@ -59,9 +52,6 @@ class _CommunityPageLayoutState extends State<CommunityPageLayout> {
   Widget _buildContentGroup() {
     return Container(
       color: Palette.white,
-      constraints: BoxConstraints(
-        minHeight: 600, // 최소 높이 설정
-      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -175,25 +165,15 @@ class _CommunityPageLayoutState extends State<CommunityPageLayout> {
 
   Widget _buildMobileScrollView() {
     return SingleChildScrollView(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: MediaQuery.of(context).size.height,
-        ),
-        child: IntrinsicHeight(
-          child: Column(
-            children: [
-              _buildMobileLeftMenu(),
-              Expanded(
-                child: Container(
-                  color: Colors.white,
-                  constraints: BoxConstraints(minHeight: 500),
-                  child: widget.content,
-                ),
-              ),
-              SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
-            ],
+      child: Column(
+        children: [
+          _buildMobileLeftMenu(),
+          Container(
+            color: Colors.white,
+            child: widget.content,
           ),
-        ),
+          SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
+        ],
       ),
     );
   }

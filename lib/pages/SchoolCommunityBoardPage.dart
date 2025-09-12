@@ -3,7 +3,6 @@ import 'package:gi_english_website/class/FAQ.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
-import 'package:gi_english_website/pages/WorkingAdminLoginPage.dart';
 import 'package:gi_english_website/pages/AdminFAQWritePage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/FAQService.dart';
@@ -76,47 +75,17 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
                 "FAQ",
                 style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
               ),
-              Row(
-                children: [
-                  if (!_isAdmin)
-                    ElevatedButton.icon(
-                      onPressed: () => _navigateToLogin(),
-                      icon: Icon(Icons.login, size: 16),
-                      label: Text("관리자 로그인"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[600],
-                        foregroundColor: Palette.white,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      ),
-                    ),
-                  if (_isAdmin) ...[
-                    ElevatedButton.icon(
-                      onPressed: () => _navigateToWritePage(),
-                      icon: Icon(Icons.edit, size: 16),
-                      label: Text("글쓰기"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.primary,
-                        foregroundColor: Palette.white,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    ElevatedButton.icon(
-                      onPressed: () => _logout(),
-                      icon: Icon(Icons.logout, size: 16),
-                      label: Text("로그아웃"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red[600],
-                        foregroundColor: Palette.white,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
+              if (_isAdmin)
+                ElevatedButton.icon(
+                  onPressed: () => _navigateToWritePage(),
+                  icon: Icon(Icons.edit, size: 16),
+                  label: Text("글쓰기"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.primary,
+                    foregroundColor: Palette.white,
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  ),
+                ),
             ],
           ),
           WidgetUtil.myDivider(),
@@ -186,7 +155,8 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
           emptyMessage: "등록된 FAQ가 없습니다.",
           isAdmin: _isAdmin,
           onEditTap: _isAdmin ? (item) => _editFAQ(item['id']) : null,
-          onDeleteTap: _isAdmin ? (item) => _deleteFAQ(item['id'], item['title']) : null,
+          onDeleteTap:
+              _isAdmin ? (item) => _deleteFAQ(item['id'], item['title']) : null,
         );
       },
     );
@@ -300,20 +270,8 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
     );
   }
 
-  void _navigateToLogin() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => WorkingAdminLoginPage(category: 'faq'),
-      ),
-    ).then((_) {
-      // 로그인 후 돌아왔을 때 관리자 상태 다시 확인
-      _checkAdminStatus();
-    });
-  }
-
   void _navigateToWritePage() async {
-    // 이미 로그인된 상태면 바로 FAQ 글쓰기 페이지로
+    // 관리자만 FAQ 글쓰기 페이지로 이동
     bool isAdmin = await AuthService.isAdmin();
     if (isAdmin) {
       Navigator.push(
@@ -328,42 +286,6 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
           setState(() {});
         }
       });
-    } else {
-      // 로그인이 안된 상태면 로그인 페이지로
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => WorkingAdminLoginPage(category: 'faq'),
-        ),
-      ).then((_) {
-        // 로그인 후 돌아왔을 때 관리자 상태 다시 확인
-        _checkAdminStatus();
-      });
-    }
-  }
-
-  Future<void> _logout() async {
-    try {
-      // AuthService를 통해 로그아웃 (SharedPreferences도 함께 정리됨)
-      await AuthService.signOut();
-
-      setState(() {
-        _isAdmin = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('로그아웃되었습니다.'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('로그아웃 중 오류가 발생했습니다.'),
-          backgroundColor: Colors.red,
-        ),
-      );
     }
   }
 

@@ -1,0 +1,28 @@
+rules_version = '2';
+
+// Firebase Storage 보안 규칙
+service firebase.storage {
+  match /b/{bucket}/o {
+    // 갤러리 이미지에 대한 규칙
+    match /gallery/{allPaths=**} {
+      // 모든 사용자가 읽기 가능
+      allow read: if true;
+      // 모든 사용자가 쓰기 가능 (개발/테스트용)
+      allow write: if true;
+    }
+    
+    // 테스트 파일에 대한 규칙
+    match /test/{allPaths=**} {
+      // 모든 사용자가 읽기/쓰기 가능 (테스트용)
+      allow read, write: if true;
+    }
+    
+    // 기타 모든 파일에 대한 기본 규칙
+    match /{allPaths=**} {
+      // 모든 사용자가 읽기 가능
+      allow read: if true;
+      // 모든 사용자가 쓰기 가능 (개발/테스트용)
+      allow write: if true;
+    }
+  }
+}

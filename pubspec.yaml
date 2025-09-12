@@ -33,9 +33,13 @@ dependencies:
   firebase_core: ^3.13.1
   cloud_firestore: ^5.6.8
   firebase_auth: ^5.5.4
+  firebase_storage: ^12.4.6
   url_launcher: ^6.1.7
   url_launcher_web: ^2.0.13
   intl: ^0.18.1
+  image_picker: ^0.8.7+4
+  photo_view: ^0.14.0
+  file_picker: ^5.3.2
 
 
 dev_dependencies:
@@ -107,6 +111,7 @@ flutter:
      - assets/naverBlogLogo.png
      - assets/mainGateImageSimple.png
      - assets/mainGateImageBlack.png
+     - assets/gleamIslandLogo.jpeg
      - assets/gleamIslandMoto.png
      - assets/middleTimetableTTS.png
      - assets/middleTimetableMWF.png

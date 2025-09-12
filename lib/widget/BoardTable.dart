@@ -68,12 +68,6 @@ class BoardTable extends StatelessWidget {
           width: headers[0] == "번호" ? 60 : 80,
           child: Text(headers[i], style: _headerTextStyle()),
         );
-      } else if (i == headers.length - 2) {
-        // 끝에서 두 번째 컬럼 (작성자)
-        cell = SizedBox(
-          width: 100,
-          child: Text(headers[i], style: _headerTextStyle()),
-        );
       } else if (i == headers.length - 1) {
         // 마지막 컬럼 (작성일)
         cell = SizedBox(
@@ -81,9 +75,8 @@ class BoardTable extends StatelessWidget {
           child: Text(headers[i], style: _headerTextStyle()),
         );
       } else {
-        // 제목 컬럼
+        // 제목 컬럼 (Notice Board의 제목 또는 FAQ의 질문)
         cell = Expanded(
-          flex: 4,
           child: Text(headers[i], style: _headerTextStyle()),
         );
       }
@@ -181,7 +174,6 @@ class BoardTable extends StatelessWidget {
 
       cells.add(
         Expanded(
-          flex: 3,
           child: Container(
             child: Row(
               children: [
@@ -206,23 +198,6 @@ class BoardTable extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        ),
-      );
-
-      cells.add(
-        SizedBox(
-          width: 100,
-          child: Text(
-            item['author'] ?? '',
-            style: TextStyle(
-              fontSize: 14,
-              fontFamily: "NotoSansKR",
-              color: Palette.grey600,
-            ),
-            textAlign: TextAlign.center,
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
           ),
         ),
       );
@@ -276,7 +251,6 @@ class BoardTable extends StatelessWidget {
 
       cells.add(
         Expanded(
-          flex: 3,
           child: Container(
             child: Row(
               children: [

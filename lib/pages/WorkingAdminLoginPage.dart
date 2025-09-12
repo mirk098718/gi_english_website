@@ -266,9 +266,11 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
 
         _showSnackBar('관리자 로그인에 성공했습니다.', Colors.green);
 
-        // 글쓰기 다이얼로그 표시
+        // 글쓰기 다이얼로그 표시 (카테고리에 따라 처리)
         Navigator.pop(context); // 로그인 페이지 닫기
-        _showWriteDialog();
+        if (widget.category != 'general') {
+          _showWriteDialog();
+        }
       } else {
         _showSnackBar('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.', Colors.red);
       }
