@@ -90,8 +90,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         bottom: 20,
         right: 40,
         child: Container(
-          width: 150,
-          height: 40,
+          width: 120,
+          height: 50,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Palette.black,
@@ -100,12 +100,19 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             onPressed: () {
               MenuUtil.push(context, SchoolConsultationPage());
             },
-            child: Text("상담신청",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: "Jalnan",
-                  color: Palette.white,
-                )),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "상담",
+                  style: TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                ),
+                Text(
+                  "신청",
+                  style: TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                ),
+              ],
+            ),
           ),
         ),
       )
@@ -413,10 +420,10 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
 
   Widget _buildNoticeItem(Notice notice) {
     // 미리보기 텍스트 생성 (60자 제한)
-    String preview = notice.content.length > 60 
-        ? '${notice.content.substring(0, 60)}...' 
+    String preview = notice.content.length > 60
+        ? '${notice.content.substring(0, 60)}...'
         : notice.content;
-    
+
     return InkWell(
       onTap: () {
         if (notice.id != null) {
@@ -565,10 +572,10 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
 
   Widget _buildFAQItem(FAQ faq) {
     // 미리보기 텍스트 생성 (50자 제한)
-    String preview = faq.answer.length > 50 
-        ? '${faq.answer.substring(0, 50)}...' 
+    String preview = faq.answer.length > 50
+        ? '${faq.answer.substring(0, 50)}...'
         : faq.answer;
-    
+
     return InkWell(
       onTap: () {
         MenuUtil.push(context, SchoolCommunityBoardPage());
@@ -778,14 +785,26 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
               Spacer(),
               Container(
                 width: 80,
-                height: 40,
+                height: 50,
                 child: ElevatedButton(
-                  child: Text(
-                    "상담신청",
-                    style: TextStyle(
-                        fontFamily: "Jalnan",
-                        fontSize: 10,
-                        color: Palette.white),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "상담",
+                        style: TextStyle(
+                            fontFamily: "Jalnan",
+                            fontSize: 10,
+                            color: Palette.white),
+                      ),
+                      Text(
+                        "신청",
+                        style: TextStyle(
+                            fontFamily: "Jalnan",
+                            fontSize: 10,
+                            color: Palette.white),
+                      ),
+                    ],
                   ),
                   onPressed: () {
                     MenuUtil.push(context, SchoolConsultationPage());
@@ -861,7 +880,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   child: TextButton(
                     child: Text(
                       "Notice Board",
-                      style: TextStyle(color: Palette.black, fontFamily: "Jalnan"),
+                      style:
+                          TextStyle(color: Palette.black, fontFamily: "Jalnan"),
                     ),
                     onPressed: () {
                       MenuUtil.push(context, SchoolCommunityNoticePage());
@@ -897,7 +917,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   child: TextButton(
                     child: Text(
                       "FAQ",
-                      style: TextStyle(color: Palette.black, fontFamily: "Jalnan"),
+                      style:
+                          TextStyle(color: Palette.black, fontFamily: "Jalnan"),
                     ),
                     onPressed: () {
                       MenuUtil.push(context, SchoolCommunityBoardPage());
@@ -1001,10 +1022,10 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
 
   Widget _buildMobileNoticeItem(Notice notice) {
     // 미리보기 텍스트 생성 (40자 제한 - 모바일에서는 더 짧게)
-    String preview = notice.content.length > 40 
-        ? '${notice.content.substring(0, 40)}...' 
+    String preview = notice.content.length > 40
+        ? '${notice.content.substring(0, 40)}...'
         : notice.content;
-    
+
     return InkWell(
       onTap: () {
         if (notice.id != null) {
@@ -1154,10 +1175,10 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
 
   Widget _buildMobileFAQItem(FAQ faq) {
     // 미리보기 텍스트 생성 (30자 제한 - 모바일에서는 더 짧게)
-    String preview = faq.answer.length > 30 
-        ? '${faq.answer.substring(0, 30)}...' 
+    String preview = faq.answer.length > 30
+        ? '${faq.answer.substring(0, 30)}...'
         : faq.answer;
-    
+
     return InkWell(
       onTap: () {
         MenuUtil.push(context, SchoolCommunityBoardPage());

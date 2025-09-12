@@ -572,7 +572,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -580,14 +580,14 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                     children: [
                       Icon(
                         Icons.admin_panel_settings,
-                        color: Colors.green[600],
+                        color: Colors.white,
                         size: 14,
                       ),
                       SizedBox(width: 2),
                       Text(
                         "관리자",
                         style: TextStyle(
-                          color: Colors.green[600],
+                          color: Colors.white,
                           fontSize: 10,
                           fontFamily: "NotoSansKR",
                         ),
