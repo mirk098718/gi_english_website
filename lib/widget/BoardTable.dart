@@ -60,18 +60,23 @@ class BoardTable extends StatelessWidget {
   List<Widget> _buildHeaderCells() {
     List<Widget> cells = [];
 
+    // 모바일 감지
+    bool isMobile = MediaQuery.of(context).size.width <= 768;
+
     for (int i = 0; i < headers.length; i++) {
       Widget cell;
       if (i == 0) {
         // 첫 번째 컬럼 (번호 또는 카테고리)
         cell = SizedBox(
-          width: headers[0] == "번호" ? 60 : 80,
+          width: isMobile
+              ? (headers[0] == "번호" ? 40 : 50) // 모바일에서는 더 작게
+              : (headers[0] == "번호" ? 60 : 80),
           child: Text(headers[i], style: _headerTextStyle()),
         );
       } else if (i == headers.length - 1) {
         // 마지막 컬럼 (작성일)
         cell = SizedBox(
-          width: 120,
+          width: isMobile ? 70 : 120, // 모바일에서는 더 작게
           child: Text(headers[i], style: _headerTextStyle()),
         );
       } else {
@@ -155,15 +160,18 @@ class BoardTable extends StatelessWidget {
   List<Widget> _buildRowCells(Map<String, dynamic> item, int index) {
     List<Widget> cells = [];
 
+    // 모바일 감지
+    bool isMobile = MediaQuery.of(context).size.width <= 768;
+
     if (headers[0] == "번호") {
       // Notice Board 스타일
       cells.add(
         SizedBox(
-          width: 60,
+          width: isMobile ? 40 : 60, // 모바일에서는 더 작게
           child: Text(
             "${items.length - index}",
             style: TextStyle(
-              fontSize: 14,
+              fontSize: isMobile ? 12 : 14, // 모바일에서는 폰트 크기도 작게
               fontFamily: "NotoSansKR",
               color: Palette.grey600,
             ),
@@ -178,14 +186,15 @@ class BoardTable extends StatelessWidget {
             child: Row(
               children: [
                 if (item['isImportant'] ?? false) ...[
-                  Icon(Icons.star, color: Palette.primary, size: 16),
+                  Icon(Icons.star,
+                      color: Palette.primary, size: isMobile ? 14 : 16),
                   SizedBox(width: 4),
                 ],
                 Expanded(
                   child: Text(
                     item['title'] ?? '',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: isMobile ? 12 : 14, // 모바일에서는 폰트 크기 작게
                       fontFamily: "NotoSansKR",
                       color: Palette.black,
                       fontWeight: (item['isImportant'] ?? false)
@@ -193,7 +202,7 @@ class BoardTable extends StatelessWidget {
                           : FontWeight.normal,
                     ),
                     overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                    maxLines: isMobile ? 2 : 1, // 모바일에서는 두 줄로 표시
                   ),
                 ),
               ],
@@ -204,11 +213,11 @@ class BoardTable extends StatelessWidget {
 
       cells.add(
         SizedBox(
-          width: 120,
+          width: isMobile ? 70 : 120, // 모바일에서는 더 작게
           child: Text(
             item['date'] ?? '',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: isMobile ? 10 : 14, // 모바일에서는 폰트 크기 작게
               fontFamily: "NotoSansKR",
               color: Palette.grey600,
             ),
@@ -222,9 +231,10 @@ class BoardTable extends StatelessWidget {
       // FAQ Board 스타일
       cells.add(
         SizedBox(
-          width: 80,
+          width: isMobile ? 50 : 80, // 모바일에서는 더 작게
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding:
+                EdgeInsets.symmetric(horizontal: isMobile ? 4 : 8, vertical: 4),
             decoration: BoxDecoration(
               color: (item['isImportant'] ?? false)
                   ? Palette.primary.withOpacity(0.1)
@@ -234,7 +244,7 @@ class BoardTable extends StatelessWidget {
             child: Text(
               item['category'] ?? 'FAQ',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: isMobile ? 10 : 12, // 모바일에서는 폰트 크기 작게
                 fontFamily: "NotoSansKR",
                 color: (item['isImportant'] ?? false)
                     ? Palette.primary
@@ -255,14 +265,15 @@ class BoardTable extends StatelessWidget {
             child: Row(
               children: [
                 if (item['isImportant'] ?? false) ...[
-                  Icon(Icons.star, color: Palette.primary, size: 16),
+                  Icon(Icons.star,
+                      color: Palette.primary, size: isMobile ? 14 : 16),
                   SizedBox(width: 4),
                 ],
                 Expanded(
                   child: Text(
                     item['title'] ?? '',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: isMobile ? 12 : 14, // 모바일에서는 폰트 크기 작게
                       fontFamily: "NotoSansKR",
                       color: Palette.black,
                       fontWeight: (item['isImportant'] ?? false)
@@ -270,7 +281,7 @@ class BoardTable extends StatelessWidget {
                           : FontWeight.normal,
                     ),
                     overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                    maxLines: isMobile ? 2 : 1, // 모바일에서는 두 줄로 표시
                   ),
                 ),
               ],
@@ -281,11 +292,11 @@ class BoardTable extends StatelessWidget {
 
       cells.add(
         SizedBox(
-          width: 120,
+          width: isMobile ? 70 : 120, // 모바일에서는 더 작게
           child: Text(
             item['date'] ?? '',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: isMobile ? 10 : 14, // 모바일에서는 폰트 크기 작게
               fontFamily: "NotoSansKR",
               color: Palette.grey600,
             ),
