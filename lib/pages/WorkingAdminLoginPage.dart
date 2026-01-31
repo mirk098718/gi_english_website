@@ -262,7 +262,19 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
       // 하드코딩된 관리자 계정 확인
       if (emailValue.trim() == "gienglish.paju@gmail.com" &&
           passwordValue.trim() == "gleam701") {
-        // AuthService를 통해 로그인 상태 저장 (관리자 이름도 함께 저장)
+        // Firebase Auth 로그인 (FAQ/공지 저장 시 Firestore 권한에 필요)
+        final cred = await AuthService.signInWithEmailAndPassword(
+          emailValue.trim(),
+          passwordValue.trim(),
+        );
+        if (cred != null) {
+          await AuthService.ensureAdminDoc(emailValue.trim(), "관리자");
+        } else {
+          _showSnackBar(
+            'FAQ/공지 저장을 사용하려면 Firebase 콘솔 → Authentication에서 이 이메일(gienglish.paju@gmail.com)로 사용자를 추가해 주세요.',
+            Colors.orange,
+          );
+        }
         await AuthService.saveAdminSession(emailValue.trim(), name: "관리자");
 
         _showSnackBar('관리자 로그인에 성공했습니다.', Colors.green);

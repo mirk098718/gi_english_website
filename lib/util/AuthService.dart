@@ -159,4 +159,22 @@ class AuthService {
       print('관리자 세션 저장 오류: $e');
     }
   }
+
+  /// Firebase 로그인 후 Firestore admins 문서가 있도록 보장 (FAQ/공지 저장 권한용)
+  static Future<bool> ensureAdminDoc(String email, String name) async {
+    try {
+      User? user = currentUser;
+      if (user == null) return false;
+      await _firestore.collection('admins').doc(user.uid).set({
+        'email': email,
+        'name': name,
+        'isActive': true,
+        'createdAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      return true;
+    } catch (e) {
+      print('관리자 문서 설정 오류: $e');
+      return false;
+    }
+  }
 }

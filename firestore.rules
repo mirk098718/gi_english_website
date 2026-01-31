@@ -26,6 +26,14 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isActive == true;
     }
 
+    // 입학상담/질문(SchoolVisitor): 누구나 제출(create) 가능, 읽기/수정/삭제는 관리자만
+    match /SchoolVisitor/{visitorId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isActive == true;
+    }
+
     // admins: 본인 문서만 읽기 (관리자 여부 확인용)
     // 생성은 로그인한 사용자가 본인 uid로만 가능 (최초 관리자 등록용)
     match /admins/{userId} {
