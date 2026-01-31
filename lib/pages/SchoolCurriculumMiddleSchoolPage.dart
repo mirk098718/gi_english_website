@@ -108,7 +108,6 @@ class _SchoolCurriculumMiddleSchoolPageState
 
   Widget content() {
     return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
       child: Container(
         width: MediaQuery.of(context).size.width,
         alignment: Alignment.topLeft,
@@ -123,32 +122,20 @@ class _SchoolCurriculumMiddleSchoolPageState
             ),
             WidgetUtil.myDivider(),
             SizedBox(height: 20),
-            Container(
-                width: 700, child: Image.asset("assets/giProgramPeriod.png")),
-            SizedBox(height: 20),
-            Text(
-              "월수금반",
-              style: TextStyle(
-                fontFamily: "Jalnan",
-                fontSize: 15,
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 700,
+                  child: Image.asset("assets/middleschoolNewTimetable.png"),
+                ),
+                SizedBox(height: 20),
+                Container(
+                  width: 700,
+                  child: Image.asset("assets/middleschoolNewMainImage.png"),
+                ),
+              ],
             ),
-            SizedBox(height: 20),
-            Container(
-                width: 700,
-                child: Image.asset("assets/middleTimetableMWF.png")),
-
-            SizedBox(height: 20),
-            Text(
-              "화목반",
-              style: TextStyle(
-                fontFamily: "Jalnan",
-                fontSize: 15,
-              ),
-            ),
-            SizedBox(height: 20),
-            Container(
-                width: 700, child: Image.asset("assets/middleTimetableTT.png")),
 
             // SizedBox(height: 40),
             // Text(
@@ -201,18 +188,6 @@ class _SchoolCurriculumMiddleSchoolPageState
             // //     "자녀의 Lexile 수준을 알면 이 수준에 맞는 책을 검색하여 가정 도서관을 확장하고 가정에서 매일 읽기 연습을 장려할 수 있습니다.\n"
             // //     "Lexile 데이터베이스를 사용하여 Lexile 수준, 제목 또는 주제별로 검색하여 자녀가 좋아하고 읽기 성취도에 낙담하지 않고 읽을 수 있는 책을 찾으십시오.\n"
             // //     "아래 차트를 사용하여 Lexile 수준을 다른 수준별 읽기 시스템과 비교하십시오:"),
-            SizedBox(height: 40),
-            Text(
-              "NIE 영자신문 수업",
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
-            ),
-            WidgetUtil.myDivider(),
-            SizedBox(height: 5),
-            Container(
-                margin: EdgeInsets.only(top: 20),
-                width: 1000,
-                child: Image.asset("assets/nie.png")),
-            SizedBox(height: 20),
           ],
         ),
       ),

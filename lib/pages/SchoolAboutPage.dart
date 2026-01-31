@@ -146,9 +146,18 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
           //     "GLEAM ISLAND 는 놀이와 학습 현장이 적절히 배분되어 있어, \n"
           //         "아이들이 지루할 틈이 없는 활기 넘치는 공간일 것입니다."
           //     ),
-          SizedBox(
-            height: 20,
+          SizedBox(height: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.asset("assets/eleInfo.png"),
+              SizedBox(height: 20),
+              Image.asset("assets/middleschoolNewMainImage.png"),
+              SizedBox(height: 20),
+              Image.asset("assets/highInfo.png"),
+            ],
           ),
+          SizedBox(height: 20),
           // Text("GLEAM ISLAND 어학원",
           //     style: TextStyle(
           //         fontFamily: "Jalnan",
@@ -271,9 +280,18 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
           ),
           Image.asset("assets/gleamIslandMoto1.png"),
           Image.asset("assets/gleamIslandMoto2.png"),
-          SizedBox(
-            height: 20,
+          SizedBox(height: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.asset("assets/eleInfo.png"),
+              SizedBox(height: 20),
+              Image.asset("assets/middleschoolNewMainImage.png"),
+              SizedBox(height: 20),
+              Image.asset("assets/highInfo.png"),
+            ],
           ),
+          SizedBox(height: 20),
         ],
       ),
     );
