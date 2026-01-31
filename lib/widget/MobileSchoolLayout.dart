@@ -47,14 +47,30 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
 
   @override
   Widget build(BuildContext context) {
+    // 모바일에서 스크롤이 동작하려면 Stack에 명시적 높이가 필요함.
+    // 자식이 모두 Positioned일 때 Stack이 0 높이로 줄어들어 스크롤 영역이 사라지는 문제 방지.
+    final viewportHeight = MediaQuery.sizeOf(context).height;
+    const topBarHeight = 111.0;
+
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned(
-              top: 111, bottom: 0, left: 0, right: 0, child: widget.content),
-          Positioned(top: 60, left: 0, right: 0, child: appBar2(context)),
-          Positioned(top: 0, left: 0, right: 0, child: appBar1(context))
-        ],
+      body: SizedBox(
+        height: viewportHeight,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned(
+              top: topBarHeight,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: ClipRect(
+                child: widget.content,
+              ),
+            ),
+            Positioned(top: 60, left: 0, right: 0, child: appBar2(context)),
+            Positioned(top: 0, left: 0, right: 0, child: appBar1(context)),
+          ],
+        ),
       ),
     );
   }

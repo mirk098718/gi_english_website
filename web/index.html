@@ -25,6 +25,11 @@
 
   <title>gi_english_website</title>
   <link rel="manifest" href="manifest.json">
+  <!-- 모바일에서 Flutter 스크롤이 정상 동작하도록 뷰포트 고정 -->
+  <style>
+    html, body { height: 100%; margin: 0; overflow: hidden; position: fixed; width: 100%; }
+    body { touch-action: pan-y; -webkit-overflow-scrolling: touch; }
+  </style>
 </head>
 <body>
 <script src="flutter_bootstrap.js" async></script>
