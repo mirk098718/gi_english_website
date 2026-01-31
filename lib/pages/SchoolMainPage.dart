@@ -379,8 +379,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         }
 
         List<Notice> notices = snapshot.data ?? [];
-        // 최대 3개까지만 표시
-        List<Notice> displayNotices = notices.take(3).toList();
+        // 최대 5개까지만 표시
+        List<Notice> displayNotices = notices.take(5).toList();
 
         if (displayNotices.isEmpty) {
           return Container(
@@ -531,8 +531,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         }
 
         List<FAQ> faqs = snapshot.data ?? [];
-        // 최대 3개까지만 표시
-        List<FAQ> displayFAQs = faqs.take(3).toList();
+        // 최대 5개까지만 표시
+        List<FAQ> displayFAQs = faqs.take(5).toList();
 
         if (displayFAQs.isEmpty) {
           return Container(
@@ -897,7 +897,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   ),
                 ),
                 Container(
-                  height: 200, // 고정 높이 설정
+                  height: 350, // 공지 5개 표시 시 스크롤 가능한 높이
                   child: _buildMobileNoticeList(),
                 ),
               ],
@@ -934,7 +934,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   ),
                 ),
                 Container(
-                  height: 200, // 고정 높이 설정
+                  height: 350, // FAQ 5개 표시 시 스크롤 가능한 높이
                   child: _buildMobileFAQList(),
                 ),
               ],
@@ -981,8 +981,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         }
 
         List<Notice> notices = snapshot.data ?? [];
-        // 최대 2개까지만 표시 (모바일에서는 공간이 제한적)
-        List<Notice> displayNotices = notices.take(2).toList();
+        // 최대 5개까지만 표시
+        List<Notice> displayNotices = notices.take(5).toList();
 
         if (displayNotices.isEmpty) {
           return Container(
@@ -1134,8 +1134,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         }
 
         List<FAQ> faqs = snapshot.data ?? [];
-        // 최대 2개까지만 표시 (모바일에서는 공간이 제한적)
-        List<FAQ> displayFAQs = faqs.take(2).toList();
+        // 최대 5개까지만 표시
+        List<FAQ> displayFAQs = faqs.take(5).toList();
 
         if (displayFAQs.isEmpty) {
           return Container(

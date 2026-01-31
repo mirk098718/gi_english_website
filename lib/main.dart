@@ -20,12 +20,8 @@ Future<void> main() async {
   // 달력 등 한글 로케일(요일/월 이름) 사용을 위한 초기화
   await initializeDateFormatting('ko_KR', null);
 
-  // 임시: 더미 데이터 추가 (개발용 - 한 번만 실행)
-  try {
-    await _addDummyData();
-  } catch (e) {
-    print('더미 데이터 추가 중 오류: $e');
-  }
+  // 더미 데이터는 앱 시작 시마다 추가하지 않음 (추가할 때마다 Firestore에 중복 저장되어 게시글이 2개씩 보이는 문제 발생)
+  // try { await _addDummyData(); } catch (e) { print('더미 데이터 추가 중 오류: $e'); }
 
   runApp(MyApp());
 }

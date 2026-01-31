@@ -55,8 +55,18 @@ class FAQService {
         return b.createdAt.compareTo(a.createdAt);
       });
 
-      print('🎯 FAQService: 정렬 완료 - ${faqs.length}개');
-      return faqs;
+      // 과거 앱 시작 시마다 더미 데이터가 반복 추가되어 같은 질문이 여러 문서로 남은 경우, 표시는 질문당 하나만
+      List<FAQ> deduped = [];
+      Set<String> seenQuestions = {};
+      for (FAQ f in faqs) {
+        if (!seenQuestions.contains(f.question)) {
+          seenQuestions.add(f.question);
+          deduped.add(f);
+        }
+      }
+
+      print('🎯 FAQService: 정렬 완료 - ${deduped.length}개 (중복 제거 후)');
+      return deduped;
     });
   }
 

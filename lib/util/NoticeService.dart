@@ -82,8 +82,18 @@ class NoticeService {
         return b.createdAt.compareTo(a.createdAt);
       });
 
-      print('🎯 NoticeService: 정렬 완료 - ${notices.length}개');
-      return notices;
+      // 과거 앱 시작 시마다 더미 데이터가 반복 추가되어 같은 제목이 여러 문서로 남은 경우, 표시는 제목당 하나만
+      List<Notice> deduped = [];
+      Set<String> seenTitles = {};
+      for (Notice n in notices) {
+        if (!seenTitles.contains(n.title)) {
+          seenTitles.add(n.title);
+          deduped.add(n);
+        }
+      }
+
+      print('🎯 NoticeService: 정렬 완료 - ${deduped.length}개');
+      return deduped;
     });
   }
 
