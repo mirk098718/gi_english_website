@@ -193,7 +193,7 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
                       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: (faq['isImportant'] ?? false)
-                            ? Palette.primary.withOpacity(0.1)
+                            ? Palette.primary.withValues(alpha:0.1)
                             : Palette.grey100,
                         borderRadius: BorderRadius.circular(4),
                       ),

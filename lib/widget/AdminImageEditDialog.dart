@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/GalleryService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/class/GalleryImage.dart';
+// ignore: deprecated_member_use
 import 'dart:html' as html;
 import 'dart:ui_web' as ui;
 

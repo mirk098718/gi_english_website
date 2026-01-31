@@ -107,348 +107,6 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
     }
   }
 
-  void _showSimpleAlert(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('관리자 로그인', style: TextStyle(fontFamily: "NotoSansKR")),
-        content: Text('개발 중입니다. 임시로 자동 로그인됩니다.',
-            style: TextStyle(fontFamily: "NotoSansKR")),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _performLogin(context, "gienglish.paju@gmail.com", "gleam701");
-            },
-            child: Text('확인', style: TextStyle(fontFamily: "NotoSansKR")),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showSimpleLoginDialog(BuildContext context) {
-    print('📋 WebSchoolLayout: _showSimpleLoginDialog 시작');
-    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-    String email = '';
-    String password = '';
-
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        print('🎨 WebSchoolLayout: Dialog builder 호출됨');
-        return Dialog(
-          child: Container(
-            width: 400,
-            padding: EdgeInsets.all(24),
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.admin_panel_settings, color: Palette.primary),
-                      SizedBox(width: 8),
-                      Text(
-                        '관리자 로그인',
-                        style: TextStyle(
-                          fontFamily: "NotoSansKR",
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 24),
-                  TextFormField(
-                    autofocus: true,
-                    initialValue: '',
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      labelText: '이메일',
-                      hintText: 'gienglish.paju@gmail.com',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.email),
-                    ),
-                    style: TextStyle(fontFamily: "NotoSansKR"),
-                    onChanged: (value) {
-                      print('📧 WebSchoolLayout: 이메일 입력됨 - "$value"');
-                      email = value.trim();
-                    },
-                    onTap: () {
-                      print('👆 WebSchoolLayout: 이메일 필드 클릭됨');
-                    },
-                    onFieldSubmitted: (value) {
-                      print('⏎ WebSchoolLayout: 이메일 필드에서 Enter 키 눌림');
-                    },
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return '이메일을 입력해주세요';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    initialValue: '',
-                    obscureText: true,
-                    textInputAction: TextInputAction.done,
-                    decoration: InputDecoration(
-                      labelText: '비밀번호',
-                      hintText: 'gleam701',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.lock),
-                    ),
-                    style: TextStyle(fontFamily: "NotoSansKR"),
-                    onChanged: (value) {
-                      print(
-                          '🔐 WebSchoolLayout: 비밀번호 입력됨 - "${value.length}자"');
-                      password = value.trim();
-                    },
-                    onTap: () {
-                      print('👆 WebSchoolLayout: 비밀번호 필드 클릭됨');
-                    },
-                    onFieldSubmitted: (value) {
-                      print('⏎ WebSchoolLayout: 비밀번호 필드에서 Enter 키 눌림');
-                      if (formKey.currentState!.validate()) {
-                        Navigator.of(context).pop();
-                        _performLogin(context, email, password);
-                      }
-                    },
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return '비밀번호를 입력해주세요';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          print('❌ WebSchoolLayout: 취소 버튼 클릭됨');
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(
-                          '취소',
-                          style: TextStyle(
-                            fontFamily: "NotoSansKR",
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      ElevatedButton(
-                        onPressed: () {
-                          print('✅ WebSchoolLayout: 로그인 버튼 클릭됨');
-                          print('📧 현재 이메일: "$email"');
-                          print('🔐 현재 비밀번호: "${password.length}자"');
-                          if (formKey.currentState!.validate()) {
-                            Navigator.of(context).pop();
-                            _performLogin(context, email, password);
-                          } else {
-                            print('❌ WebSchoolLayout: 폼 유효성 검사 실패');
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Palette.primary,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: Text(
-                          '로그인',
-                          style: TextStyle(fontFamily: "NotoSansKR"),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _oldShowAdminLoginDialog(BuildContext context) {
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
-    final FocusNode emailFocusNode = FocusNode();
-    final FocusNode passwordFocusNode = FocusNode();
-
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        // 다이얼로그가 빌드된 후 즉시 포커스 설정
-        Future.delayed(Duration(milliseconds: 100), () {
-          emailFocusNode.requestFocus();
-        });
-
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Row(
-                children: [
-                  Icon(Icons.admin_panel_settings, color: Palette.primary),
-                  SizedBox(width: 8),
-                  Text(
-                    '관리자 로그인',
-                    style: TextStyle(
-                      fontFamily: "NotoSansKR",
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              content: Container(
-                width: 300,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Focus(
-                      autofocus: true,
-                      child: TextFormField(
-                        controller: emailController,
-                        focusNode: emailFocusNode,
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.next,
-                        autofocus: true,
-                        decoration: InputDecoration(
-                          labelText: '이메일',
-                          hintText: 'gienglish.paju@gmail.com',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.email),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        style: TextStyle(fontFamily: "NotoSansKR"),
-                        onFieldSubmitted: (value) {
-                          passwordFocusNode.requestFocus();
-                        },
-                        onTap: () {
-                          // 클릭 시에도 포커스 강제 설정
-                          emailFocusNode.requestFocus();
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    TextFormField(
-                      controller: passwordController,
-                      focusNode: passwordFocusNode,
-                      obscureText: true,
-                      textInputAction: TextInputAction.done,
-                      decoration: InputDecoration(
-                        labelText: '비밀번호',
-                        hintText: 'gleam701',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.lock),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      style: TextStyle(fontFamily: "NotoSansKR"),
-                      onFieldSubmitted: (value) {
-                        // Enter 키로 로그인 실행
-                        _performLogin(context, emailController.text.trim(),
-                            passwordController.text.trim());
-                      },
-                      onTap: () {
-                        // 클릭 시에도 포커스 강제 설정
-                        passwordFocusNode.requestFocus();
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(
-                    '취소',
-                    style: TextStyle(
-                      fontFamily: "NotoSansKR",
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    _performLogin(context, emailController.text.trim(),
-                        passwordController.text.trim());
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: Text(
-                    '로그인',
-                    style: TextStyle(fontFamily: "NotoSansKR"),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _performLogin(
-      BuildContext context, String email, String password) async {
-    print('🚀 WebSchoolLayout: _performLogin 시작');
-    print('📧 받은 이메일: "$email"');
-    print('🔐 받은 비밀번호: "${password.length}자"');
-
-    if (email.isEmpty || password.isEmpty) {
-      print('❌ WebSchoolLayout: 빈 필드 감지');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('이메일과 비밀번호를 입력해주세요.'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    try {
-      print('🔍 WebSchoolLayout: 로그인 정보 확인 중...');
-      if (email == "gienglish.paju@gmail.com" && password == "gleam701") {
-        print('✅ WebSchoolLayout: 로그인 정보 일치!');
-        await AuthService.saveAdminSession(email, name: "관리자");
-        print('💾 WebSchoolLayout: 관리자 세션 저장 완료');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('관리자 로그인에 성공했습니다!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        print('❌ WebSchoolLayout: 로그인 정보 불일치');
-        print('🔍 예상 이메일: "gienglish.paju@gmail.com"');
-        print('🔍 예상 비밀번호: "gleam701"');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('로그인 정보가 올바르지 않습니다.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } catch (e) {
-      print('💥 WebSchoolLayout: 로그인 오류 - $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('로그인 중 오류가 발생했습니다.'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
   Widget menuItem(String menuStr, Widget menuColumn) {
     return Column(
       children: [
@@ -623,7 +281,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.3),
+                color: Colors.grey.withValues(alpha:0.3),
                 spreadRadius: 0,
                 blurRadius: 4,
                 offset: Offset(0, 2),
@@ -656,7 +314,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                 margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
                 width: 0.5,
                 height: 10,
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha:0.3),
               ),
               InkWell(
                   onTap: () {
@@ -674,7 +332,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                 margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
                 width: 0.5,
                 height: 10,
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha:0.3),
               ),
               InkWell(
                   onTap: () {
@@ -692,7 +350,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                 margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
                 width: 0.5,
                 height: 10,
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha:0.3),
               ),
               InkWell(
                   onTap: () {
@@ -716,7 +374,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                   child: Container(
                     padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha:0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Icon(
@@ -734,7 +392,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha:0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -762,7 +420,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha:0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(

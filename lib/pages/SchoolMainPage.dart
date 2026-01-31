@@ -654,7 +654,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Palette.grey200.withOpacity(0.5),
+                    color: Palette.grey200.withValues(alpha:0.5),
                     spreadRadius: 0,
                     blurRadius: 8,
                     offset: Offset(0, 4),

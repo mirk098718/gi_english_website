@@ -304,7 +304,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha:0.1),
               blurRadius: 8,
               offset: Offset(0, 2),
             ),
@@ -358,7 +358,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          Colors.black.withOpacity(0.7),
+                          Colors.black.withValues(alpha:0.7),
                         ],
                         stops: [0.6, 1.0],
                       ),
@@ -395,7 +395,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                 child: Container(
                   padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha:0.5),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Icon(
@@ -416,7 +416,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                       Container(
                         padding: EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.5),
+                          color: Colors.black.withValues(alpha:0.5),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: InkWell(
@@ -567,7 +567,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha:0.1),
               blurRadius: 4,
               offset: Offset(0, 2),
             ),
@@ -614,7 +614,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                 child: Container(
                   padding: EdgeInsets.all(3),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha:0.5),
                     borderRadius: BorderRadius.circular(3),
                   ),
                   child: Icon(
@@ -633,7 +633,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                   child: Container(
                     padding: EdgeInsets.all(3),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
+                      color: Colors.black.withValues(alpha:0.5),
                       borderRadius: BorderRadius.circular(3),
                     ),
                     child: InkWell(

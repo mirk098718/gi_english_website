@@ -18,7 +18,7 @@ class ModernWidgets {
         borderRadius: borderRadius ?? BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Palette.grey200.withOpacity(0.5),
+            color: Palette.grey200.withValues(alpha:0.5),
             spreadRadius: 0,
             blurRadius: elevation ?? 8,
             offset: Offset(0, 4),
@@ -91,7 +91,7 @@ class ModernWidgets {
           borderRadius: BorderRadius.circular(borderRadius ?? 12),
         ),
         elevation: 2,
-        shadowColor: bgColor.withOpacity(0.3),
+        shadowColor: bgColor.withValues(alpha:0.3),
       ),
       child: buttonChild,
     );
@@ -170,7 +170,7 @@ class ModernWidgets {
     final color =
         isSelected ? (selectedColor ?? Palette.primary) : Palette.grey600;
     final bgColor = isSelected
-        ? (selectedColor ?? Palette.primary).withOpacity(0.1)
+        ? (selectedColor ?? Palette.primary).withValues(alpha:0.1)
         : Colors.transparent;
 
     return Container(
@@ -284,7 +284,7 @@ class ModernWidgets {
                 Container(
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: (accentColor ?? Palette.primary).withOpacity(0.1),
+                    color: (accentColor ?? Palette.primary).withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -361,7 +361,7 @@ class ModernWidgets {
           ),
           SizedBox(height: 16),
           modernDivider(
-            color: Palette.white.withOpacity(0.3),
+            color: Palette.white.withValues(alpha:0.3),
             margin: EdgeInsets.symmetric(vertical: 8),
           ),
           Text(

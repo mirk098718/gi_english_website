@@ -1,0 +1,37 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 공지(notices): 누구나 읽기 가능, 쓰기는 관리자만
+    match /notices/{noticeId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isActive == true;
+    }
+
+    // FAQ: 누구나 읽기 가능, 쓰기는 관리자만
+    match /faqs/{faqId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isActive == true;
+    }
+
+    // 갤러리(gallery_images): 누구나 읽기 가능, 쓰기는 관리자만
+    match /gallery_images/{imageId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isActive == true;
+    }
+
+    // admins: 본인 문서만 읽기 (관리자 여부 확인용)
+    // 생성은 로그인한 사용자가 본인 uid로만 가능 (최초 관리자 등록용)
+    match /admins/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update, delete: if false;  // 수정/삭제는 Firebase 콘솔에서만
+    }
+  }
+}

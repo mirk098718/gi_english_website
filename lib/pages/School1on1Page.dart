@@ -167,7 +167,7 @@ class _School1on1PageState extends State<School1on1Page> {
             end: Alignment.bottomCenter,
             colors: [
               Colors.transparent,
-              Colors.black.withOpacity(0.6),
+              Colors.black.withValues(alpha:0.6),
             ],
           ),
           borderRadius: BorderRadius.only(
@@ -186,7 +186,7 @@ class _School1on1PageState extends State<School1on1Page> {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Palette.primary.withOpacity(0.9),
+                      color: Palette.primary.withValues(alpha:0.9),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -211,7 +211,7 @@ class _School1on1PageState extends State<School1on1Page> {
                         Shadow(
                           offset: Offset(0, 2),
                           blurRadius: 4,
-                          color: Colors.black.withOpacity(0.5),
+                          color: Colors.black.withValues(alpha:0.5),
                         ),
                       ],
                     ),
@@ -220,14 +220,14 @@ class _School1on1PageState extends State<School1on1Page> {
                   Text(
                     "개인 맞춤형 특별 보충 수업",
                     style: TextStyle(
-                      color: Palette.white.withOpacity(0.9),
+                      color: Palette.white.withValues(alpha:0.9),
                       fontSize: 16,
                       fontFamily: "NotoSansKR",
                       shadows: [
                         Shadow(
                           offset: Offset(0, 1),
                           blurRadius: 2,
-                          color: Colors.black.withOpacity(0.5),
+                          color: Colors.black.withValues(alpha:0.5),
                         ),
                       ],
                     ),

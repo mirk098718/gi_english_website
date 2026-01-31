@@ -3,6 +3,7 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/pages/AdminNoticeWritePage.dart';
 import 'package:gi_english_website/pages/AdminFAQWritePage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
+// ignore: deprecated_member_use
 import 'dart:html' as html;
 import 'dart:ui_web' as ui;
 

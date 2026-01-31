@@ -11,7 +11,7 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/EasyRadio.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
-import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:table_calendar/table_calendar.dart';
 import '../class/SchoolVisitor.dart';
 import '../util/DialogUtil.dart';
 import '../util/WidgetUtil.dart';
@@ -29,6 +29,9 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
 
   MyGroupValue levelMyGroupValue = MyGroupValue("Level0");
   MyGroupValue timeMyGroupValue = MyGroupValue("오전 09am ~ 12pm");
+
+  DateTime _selectedDay = DateTime.now();
+  DateTime _focusedDay = DateTime.now();
 
   List<ButtonState> buttonStateList = [
     ButtonState("Notice Board", BehaviorColor.colorOnDefault,
@@ -342,8 +345,6 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           // Divider(),
           Container(
             width: 400,
-            height: 400,
-            alignment: Alignment.center,
             margin: EdgeInsets.only(top: 40),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
@@ -352,23 +353,26 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                 color: Colors.grey,
               ),
             ),
-            child: SfCalendar(
-              view: CalendarView.month,
-              onTap: (CalendarTapDetails calendarTapDetails) {
-                // DateTime dateTime = DateTime.now();
-                DateTime? dateTime = calendarTapDetails.date;
-                // dateTime = dateTime.subtract(Duration(hours: 1));
-                // dateTime = dateTime.add(Duration(hours: 1));
-                // dateTime.isAfter(other);
-                // dateTime.isBefore(other);
-
-                //마감일과 현재일을 비교. 마감일을 넘겼는가? 마감일을 넘기지 않았는가?
-
-                //DateTime이라는 자료형이 있음. (dart꺼)
-                //이 녀석이 날짜를 표현.
-                print(
-                    "opnTap calendarTapDetails.date:${calendarTapDetails.date}");
+            child: TableCalendar(
+              firstDay: DateTime.utc(2020, 1, 1),
+              lastDay: DateTime.utc(2030, 12, 31),
+              focusedDay: _focusedDay,
+              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+              onDaySelected: (selectedDay, focusedDay) {
+                setState(() {
+                  _selectedDay = selectedDay;
+                  _focusedDay = focusedDay;
+                });
+                SnackbarUtil.showSnackBar(
+                    '${selectedDay.year}.${selectedDay.month}.${selectedDay.day} 선택됨 · 전화 예약 031 942 0908',
+                    context);
               },
+              calendarFormat: CalendarFormat.month,
+              locale: 'ko_KR',
+              headerStyle: HeaderStyle(
+                formatButtonVisible: false,
+                titleCentered: true,
+              ),
             ),
           ),
         ],
@@ -572,8 +576,6 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               "• 이메일 : gienglish.paju@gmail.com"),
           Container(
             width: 400,
-            height: 400,
-            alignment: Alignment.center,
             margin: EdgeInsets.only(top: 40),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
@@ -582,23 +584,26 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                 color: Colors.grey,
               ),
             ),
-            child: SfCalendar(
-              view: CalendarView.month,
-              onTap: (CalendarTapDetails calendarTapDetails) {
-                // DateTime dateTime = DateTime.now();
-                DateTime? dateTime = calendarTapDetails.date;
-                // dateTime = dateTime.subtract(Duration(hours: 1));
-                // dateTime = dateTime.add(Duration(hours: 1));
-                // dateTime.isAfter(other);
-                // dateTime.isBefore(other);
-
-                //마감일과 현재일을 비교. 마감일을 넘겼는가? 마감일을 넘기지 않았는가?
-
-                //DateTime이라는 자료형이 있음. (dart꺼)
-                //이 녀석이 날짜를 표현.
-                print(
-                    "opnTap calendarTapDetails.date:${calendarTapDetails.date}");
+            child: TableCalendar(
+              firstDay: DateTime.utc(2020, 1, 1),
+              lastDay: DateTime.utc(2030, 12, 31),
+              focusedDay: _focusedDay,
+              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+              onDaySelected: (selectedDay, focusedDay) {
+                setState(() {
+                  _selectedDay = selectedDay;
+                  _focusedDay = focusedDay;
+                });
+                SnackbarUtil.showSnackBar(
+                    '${selectedDay.year}.${selectedDay.month}.${selectedDay.day} 선택됨 · 전화 예약 031 942 0908',
+                    context);
               },
+              calendarFormat: CalendarFormat.month,
+              locale: 'ko_KR',
+              headerStyle: HeaderStyle(
+                formatButtonVisible: false,
+                titleCentered: true,
+              ),
             ),
           ),
         ],
@@ -607,86 +612,48 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
   }
 
   Widget levelRadio() {
-    void onChanged(MyGroupValue myGroupValue) {
-      levelMyGroupValue = myGroupValue;
-      schoolVisitor.level = levelMyGroupValue.value;
-      SnackbarUtil.showSnackBar("${levelMyGroupValue.value} 선택", context);
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        EasyRadio(
-          "Level0",
-          levelMyGroupValue,
-          setState,
-          label: "Level 0 알파벳 단계               ",
-          onChanged: onChanged,
-        ),
-        EasyRadio(
-          "Level1",
-          levelMyGroupValue,
-          setState,
-          label: "Level 1 파닉스 단계               ",
-          onChanged: onChanged,
-        ),
-        EasyRadio(
-          "Level2",
-          levelMyGroupValue,
-          setState,
-          label: "Level 2 리딩 / 문법 초보 단계",
-          onChanged: onChanged,
-        ),
-        EasyRadio(
-          "Level3",
-          levelMyGroupValue,
-          setState,
-          label: "Level 3 리딩 / 문법 중급 단계",
-          onChanged: onChanged,
-        ),
-        EasyRadio(
-          "Level4",
-          levelMyGroupValue,
-          setState,
-          label: "Level 4 리딩 / 문법 고급 단계",
-          onChanged: onChanged,
-        ),
-      ],
+    return RadioGroup<String>(
+      groupValue: levelMyGroupValue.value as String?,
+      onChanged: (value) {
+        if (value != null) {
+          levelMyGroupValue.value = value;
+          schoolVisitor.level = value;
+          SnackbarUtil.showSnackBar("$value 선택", context);
+          setState(() {});
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          EasyRadio("Level0", label: "Level 0 알파벳 단계               "),
+          EasyRadio("Level1", label: "Level 1 파닉스 단계               "),
+          EasyRadio("Level2", label: "Level 2 리딩 / 문법 초보 단계"),
+          EasyRadio("Level3", label: "Level 3 리딩 / 문법 중급 단계"),
+          EasyRadio("Level4", label: "Level 4 리딩 / 문법 고급 단계"),
+        ],
+      ),
     );
   }
 
   Widget timeRadio() {
-    void onChanged(MyGroupValue myGroupValue) {
-      timeMyGroupValue = myGroupValue;
-      schoolVisitor.time = timeMyGroupValue.value;
-      SnackbarUtil.showSnackBar("${timeMyGroupValue.value} 선택", context);
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        EasyRadio(
-          "오전 09am ~ 12pm",
-          timeMyGroupValue,
-          setState,
-          label: "오전 09am ~ 12pm",
-          onChanged: onChanged,
-        ),
-        EasyRadio(
-          "오후 01pm ~ 04pm",
-          timeMyGroupValue,
-          setState,
-          label: "오후 01pm ~ 04pm",
-          onChanged: onChanged,
-        ),
-        EasyRadio(
-          "오후 05pm ~ 08pm",
-          timeMyGroupValue,
-          setState,
-          label: "오후 05pm ~ 08pm",
-          onChanged: onChanged,
-        ),
-      ],
+    return RadioGroup<String>(
+      groupValue: timeMyGroupValue.value as String?,
+      onChanged: (value) {
+        if (value != null) {
+          timeMyGroupValue.value = value;
+          schoolVisitor.time = value;
+          SnackbarUtil.showSnackBar("$value 선택", context);
+          setState(() {});
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          EasyRadio("오전 09am ~ 12pm", label: "오전 09am ~ 12pm"),
+          EasyRadio("오후 01pm ~ 04pm", label: "오후 01pm ~ 04pm"),
+          EasyRadio("오후 05pm ~ 08pm", label: "오후 05pm ~ 08pm"),
+        ],
+      ),
     );
   }
 }

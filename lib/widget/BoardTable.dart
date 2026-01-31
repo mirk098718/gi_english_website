@@ -32,15 +32,15 @@ class BoardTable extends StatelessWidget {
         ),
         child: Column(
           children: [
-            _buildHeader(),
-            ..._buildRows(),
+            _buildHeader(context),
+            ..._buildRows(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
@@ -52,12 +52,12 @@ class BoardTable extends StatelessWidget {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.max,
-        children: _buildHeaderCells(),
+        children: _buildHeaderCells(context),
       ),
     );
   }
 
-  List<Widget> _buildHeaderCells() {
+  List<Widget> _buildHeaderCells(BuildContext context) {
     List<Widget> cells = [];
 
     // 모바일 감지
@@ -101,7 +101,7 @@ class BoardTable extends StatelessWidget {
     return cells;
   }
 
-  List<Widget> _buildRows() {
+  List<Widget> _buildRows(BuildContext context) {
     if (items.isEmpty) {
       return [
         Container(
@@ -125,7 +125,7 @@ class BoardTable extends StatelessWidget {
       final item = items[i];
       final isLast = i == items.length - 1;
 
-      rows.add(_buildRow(item, i, isLast));
+      rows.add(_buildRow(context, item, i, isLast));
 
       if (!isLast) {
         rows.add(Divider(height: 1, color: Palette.grey200));
@@ -135,7 +135,7 @@ class BoardTable extends StatelessWidget {
     return rows;
   }
 
-  Widget _buildRow(Map<String, dynamic> item, int index, bool isLast) {
+  Widget _buildRow(BuildContext context, Map<String, dynamic> item, int index, bool isLast) {
     return InkWell(
       onTap: () => onItemTap(item),
       child: Container(
@@ -151,13 +151,13 @@ class BoardTable extends StatelessWidget {
         ),
         child: Row(
           mainAxisSize: MainAxisSize.max,
-          children: _buildRowCells(item, index),
+          children: _buildRowCells(context, item, index),
         ),
       ),
     );
   }
 
-  List<Widget> _buildRowCells(Map<String, dynamic> item, int index) {
+  List<Widget> _buildRowCells(BuildContext context, Map<String, dynamic> item, int index) {
     List<Widget> cells = [];
 
     // 모바일 감지
@@ -237,7 +237,7 @@ class BoardTable extends StatelessWidget {
                 EdgeInsets.symmetric(horizontal: isMobile ? 4 : 8, vertical: 4),
             decoration: BoxDecoration(
               color: (item['isImportant'] ?? false)
-                  ? Palette.primary.withOpacity(0.1)
+                  ? Palette.primary.withValues(alpha: 0.1)
                   : Palette.grey100,
               borderRadius: BorderRadius.circular(4),
             ),
@@ -323,7 +323,7 @@ class BoardTable extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: Palette.primary.withOpacity(0.1),
+                      color: Palette.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Icon(
@@ -340,7 +340,7 @@ class BoardTable extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: Colors.red.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Icon(

@@ -10,13 +10,6 @@ class SfCanlendarExamplePage extends StatelessWidget {
       body:SfCalendar(
         view: CalendarView.month,
         onTap: (CalendarTapDetails calendarTapDetails){
-          // DateTime dateTime = DateTime.now();
-          DateTime? dateTime = calendarTapDetails.date;
-          // dateTime = dateTime.subtract(Duration(hours: 1));
-          // dateTime = dateTime.add(Duration(hours: 1));
-          // dateTime.isAfter(other);
-          // dateTime.isBefore(other);
-
           //마감일과 현재일을 비교. 마감일을 넘겼는가? 마감일을 넘기지 않았는가?
 
 

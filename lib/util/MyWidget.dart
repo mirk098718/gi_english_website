@@ -47,7 +47,7 @@ class MyWidget {
                 gradient: LinearGradient(
                   colors: [
                     Colors.transparent,
-                    Palette.white.withOpacity(0.3),
+                    Palette.white.withValues(alpha:0.3),
                     Colors.transparent,
                   ],
                 ),
@@ -95,7 +95,7 @@ class MyWidget {
             "사업자 등록번호 : 346 - 86 - 00782 제1461호\n"
             "신고번호 : J1518020200003",
             style: TextStyle(
-                color: Palette.white.withOpacity(0.9),
+                color: Palette.white.withValues(alpha:0.9),
                 fontFamily: "NotoSansKR",
                 fontSize: 14,
                 height: 1.5),
@@ -107,7 +107,7 @@ class MyWidget {
               gradient: LinearGradient(
                 colors: [
                   Colors.transparent,
-                  Palette.white.withOpacity(0.3),
+                  Palette.white.withValues(alpha:0.3),
                   Colors.transparent,
                 ],
               ),
@@ -117,7 +117,7 @@ class MyWidget {
           Text(
             "Copyright ⓒ 글림아일랜드교육",
             style: TextStyle(
-                color: Palette.white.withOpacity(0.7),
+                color: Palette.white.withValues(alpha:0.7),
                 fontFamily: "NotoSansKR",
                 fontSize: 12),
           ),

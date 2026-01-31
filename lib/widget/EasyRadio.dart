@@ -3,18 +3,13 @@ import 'package:gi_english_website/util/Palette.dart';
 
 class EasyRadio extends StatelessWidget {
   final String label;
-  final dynamic uniqueValue;
-  final MyGroupValue myGroupValue;
-  final void Function(VoidCallback fn) setStateOfParent;
-  final void Function(MyGroupValue myGroupValue) onChanged;
+  final String value;
 
-  EasyRadio(this.uniqueValue, this.myGroupValue, this.setStateOfParent,
-      {Key? key, required this.onChanged, this.label = ""})
-      : super(key: key);
+  /// RadioGroup과 함께 사용. RadioGroup이 groupValue와 onChanged를 관리합니다.
+  EasyRadio(this.value, {Key? key, this.label = ""}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    //widget. 위에 StatefulWidget에 접근하는 방법.
     return Row(
       children: [
         Text(label,
@@ -23,17 +18,7 @@ class EasyRadio extends StatelessWidget {
                 fontFamily: "NotoSansKR",
                 fontWeight: FontWeight.normal,
                 fontSize: 14)),
-        Radio(
-            value: uniqueValue, //고유값. (체크박스랑 다름)
-            groupValue: myGroupValue.value, //공유값
-            onChanged: (dynamic value) {
-              //클릭되었을때,
-              if (uniqueValue != null) {
-                myGroupValue.value = uniqueValue;
-                onChanged(myGroupValue);
-                setStateOfParent(() {});
-              }
-            }),
+        Radio<String>(value: value),
       ],
     );
   }

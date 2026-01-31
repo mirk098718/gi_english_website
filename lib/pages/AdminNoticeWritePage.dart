@@ -6,6 +6,7 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
+// ignore: deprecated_member_use
 import 'dart:html' as html;
 import 'dart:ui_web' as ui;
 

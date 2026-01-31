@@ -105,7 +105,7 @@ class _ImageViewerState extends State<ImageViewer> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withOpacity(0.7),
+                      Colors.black.withValues(alpha:0.7),
                       Colors.transparent,
                     ],
                   ),
@@ -156,7 +156,7 @@ class _ImageViewerState extends State<ImageViewer> {
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
                       colors: [
-                        Colors.black.withOpacity(0.7),
+                        Colors.black.withValues(alpha:0.7),
                         Colors.transparent,
                       ],
                     ),
@@ -177,7 +177,7 @@ class _ImageViewerState extends State<ImageViewer> {
                       Text(
                         widget.images[currentIndex].fileName,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha:0.7),
                           fontSize: 12,
                           fontFamily: "NotoSansKR",
                         ),
@@ -198,7 +198,7 @@ class _ImageViewerState extends State<ImageViewer> {
               child: Center(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha:0.5),
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: IconButton(
@@ -227,7 +227,7 @@ class _ImageViewerState extends State<ImageViewer> {
               child: Center(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha:0.5),
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: IconButton(

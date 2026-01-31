@@ -2,7 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/firebase_options.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:gi_english_website/util/NoticeService.dart';
+import 'package:gi_english_website/util/FAQService.dart';
 
 import 'pages/SchoolMainPage.dart';
 
@@ -15,7 +17,30 @@ Future<void> main() async {
   // Firestore 설정 초기화
   NoticeService.initializeFirestore();
 
+  // 달력 등 한글 로케일(요일/월 이름) 사용을 위한 초기화
+  await initializeDateFormatting('ko_KR', null);
+
+  // 임시: 더미 데이터 추가 (개발용 - 한 번만 실행)
+  try {
+    await _addDummyData();
+  } catch (e) {
+    print('더미 데이터 추가 중 오류: $e');
+  }
+
   runApp(MyApp());
+}
+
+// 임시: 더미 데이터 추가 함수
+Future<void> _addDummyData() async {
+  try {
+    // Notice 더미 데이터 추가
+    await NoticeService.addDummyNotices();
+    // FAQ 더미 데이터 추가
+    await FAQService.addDummyFAQs();
+    print('✅ 모든 더미 데이터가 추가되었습니다.');
+  } catch (e) {
+    print('❌ 더미 데이터 추가 실패: $e');
+  }
 }
 
 class MyApp extends StatelessWidget {
