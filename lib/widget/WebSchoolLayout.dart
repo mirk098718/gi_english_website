@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/pages/School1on1Page.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolAllDayPage.dart';
 import 'package:gi_english_website/pages/SchoolCampPage.dart';
@@ -198,12 +197,6 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             },
             child: labelInColorContainer(Palette.accent, "뉴질랜드프로그램"),
           ),
-          InkWell(
-            onTap: () {
-              MenuUtil.push(context, School1on1Page());
-            },
-            child: labelInColorContainer(Palette.accent, "1ON1프로그램"),
-          )
         ],
       ),
     );

@@ -9,7 +9,6 @@ import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 import '../util/WidgetUtil.dart';
-import 'SchoolCodingPage.dart';
 
 class SchoolProgramPage extends StatefulWidget {
   const SchoolProgramPage({Key? key}) : super(key: key);
@@ -21,7 +20,6 @@ class SchoolProgramPage extends StatefulWidget {
 class _SchoolProgramPageState extends State<SchoolProgramPage> {
   List<ButtonState> buttonStateList = [
     ButtonState("정규프로그램", BehaviorColor.colorOnClick, SchoolProgramPage()),
-    ButtonState("선택프로그램", BehaviorColor.colorOnDefault, SchoolCodingPage()),
     ButtonState("뉴질랜드프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
   ];
 
