@@ -5,25 +5,25 @@ class MyWidget {
   static Widget footer() {
     return Container(
         width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Palette.secondaryDark, Color(0xFF022C22)],
-          ),
-        ),
-        padding: EdgeInsets.all(24),
+        color: Palette.grey900,
+        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 40),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Container(
+              width: 32,
+              height: 2,
+              color: Palette.secondary,
+              margin: EdgeInsets.only(bottom: 20),
+            ),
             Text(
               "Gi Gleam Island 어학원 파주",
               style: TextStyle(
                   color: Palette.white,
                   fontFamily: "NotoSansKR",
-                  fontWeight: FontWeight.w700,
-                  fontSize: 18),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16),
             ),
             SizedBox(
               height: 12,
@@ -34,32 +34,20 @@ class MyWidget {
               "email : gienglish.paju@gmail.com\n"
               "사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희",
               style: TextStyle(
-                  color: Palette.grey300,
+                  color: Palette.grey400,
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
-                  fontSize: 14,
-                  height: 1.5),
+                  fontSize: 13,
+                  height: 1.7),
             ),
-            SizedBox(height: 16),
-            Container(
-              height: 1,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.transparent,
-                    Palette.white.withValues(alpha:0.3),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 8),
+            SizedBox(height: 24),
             Text(
               "Copyright ⓒ 글림아일랜드어학원",
               style: TextStyle(
-                  color: Palette.grey400,
-                  fontFamily: "NotoSansKR",
-                  fontSize: 12),
+                color: Palette.grey500,
+                fontFamily: "NotoSansKR",
+                fontSize: 12,
+              ),
             ),
           ],
         ));
@@ -129,20 +117,16 @@ class MyWidget {
   static Widget mobileSchoolFooter() {
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Palette.darkTeal, Palette.darkTealDark],
-        ),
-      ),
-      padding: EdgeInsets.all(16),
+      color: Palette.grey900,
+      padding: EdgeInsets.all(24),
       child: Text(
         "ⓒ 글림아일랜드교육",
         textAlign: TextAlign.center,
         style: TextStyle(
-          color: Palette.white,
+          color: Palette.grey400,
           fontFamily: "NotoSansKR",
-          fontWeight: FontWeight.w600,
-          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          fontSize: 12,
         ),
       ),
     );

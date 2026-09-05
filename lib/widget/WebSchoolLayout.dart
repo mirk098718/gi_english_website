@@ -63,7 +63,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
       body: Stack(
         children: [
           Positioned(
-              top: 80, bottom: 0, left: 0, right: 0, child: widget.content),
+              top: 72, bottom: 0, left: 0, right: 0, child: widget.content),
           Positioned(top: 0, left: 0, right: 0, child: appBar(context)),
         ],
       ),
@@ -262,271 +262,123 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
     );
   }
 
-  Widget appBar(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          height: 80,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Palette.secondaryDark, Color(0xFF022C22)],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withValues(alpha: 0.3),
-                spreadRadius: 0,
-                blurRadius: 4,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-        ),
+  Widget _navLabel(String label) {
+    return Text(
+      label,
+      style: TextStyle(
+        color: Palette.grey800,
+        fontFamily: "NotoSansKR",
+        fontWeight: FontWeight.w500,
+        fontSize: 15,
+        letterSpacing: -0.2,
+      ),
+    );
+  }
 
-        Container(
-          color: Colors.transparent,
-          padding: EdgeInsets.only(top: 25),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              InkWell(
-                onTap: () {
-                  MenuUtil.push(context, SchoolAboutPage());
-                },
-                child: Text(
-                  "About",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: "NotoSansKR",
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
-                width: 0.5,
-                height: 10,
-                color: Colors.white.withValues(alpha: 0.3),
-              ),
-              InkWell(
-                  onTap: () {
-                    MenuUtil.push(context, SchoolProgramPage());
-                  },
-                  child: Text(
-                    "Program",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: "NotoSansKR",
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20),
-                  )),
-              Container(
-                margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
-                width: 0.5,
-                height: 10,
-                color: Colors.white.withValues(alpha: 0.3),
-              ),
-              InkWell(
-                  onTap: () {
-                    MenuUtil.push(context, SchoolCurriculumElePage());
-                  },
-                  child: Text(
-                    "Curriculum",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: "NotoSansKR",
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20),
-                  )),
-              Container(
-                margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
-                width: 0.5,
-                height: 10,
-                color: Colors.white.withValues(alpha: 0.3),
-              ),
-              InkWell(
-                  onTap: () {
-                    MenuUtil.push(context, SchoolOnlineProgramPage());
-                  },
-                  child: Text(
-                    "Online Program",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: "NotoSansKR",
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20),
-                  )),
-              Container(
-                margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
-                width: 0.5,
-                height: 10,
-                color: Colors.white.withValues(alpha: 0.3),
-              ),
-              InkWell(
-                  onTap: () {
-                    MenuUtil.push(context, SchoolGalleryPage());
-                  },
-                  child: Text(
-                    "Community",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: "NotoSansKR",
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20),
-                  )),
-              SizedBox(width: 20),
-              // 관리자 로그인/로그아웃 버튼
-              if (!_isAdmin)
-                InkWell(
-                  onTap: () {
-                    _showAdminLoginDialog(context);
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Icon(
-                      Icons.admin_panel_settings,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-              if (_isAdmin) ...[
-                InkWell(
-                  onTap: () {
-                    _logout();
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.logout,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          "로그아웃",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontFamily: "NotoSansKR",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8),
-                InkWell(
-                  onTap: () {
-                    MenuUtil.push(context, AdminOnlineHubPage());
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.admin_panel_settings,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          "관리자",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontFamily: "NotoSansKR",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-              SizedBox(width: 20),
-            ],
-          ),
+  Widget appBar(BuildContext context) {
+    return Container(
+      height: 72,
+      padding: EdgeInsets.symmetric(horizontal: 28),
+      decoration: BoxDecoration(
+        color: Palette.white,
+        border: Border(
+          top: BorderSide(color: Palette.secondary, width: 3),
+          bottom: BorderSide(color: Palette.grey200, width: 1),
         ),
-        Container(
-          padding: EdgeInsets.only(top: 15.5, bottom: 15.5, left: 15),
-          width: 300,
-          alignment: Alignment.centerLeft,
-          child: InkWell(
-            child: Container(
-                height: 49, child: Image.asset("assets/giEmblem.png")),
+      ),
+      child: Row(
+        children: [
+          InkWell(
             onTap: () {
               MenuUtil.push(context, SchoolMainPage());
             },
+            child: SizedBox(
+              height: 36,
+              child: ColorFiltered(
+                colorFilter: const ColorFilter.matrix(<double>[
+                  -1, 0, 0, 0, 255,
+                  0, -1, 0, 0, 255,
+                  0, 0, -1, 0, 255,
+                  0, 0, 0, 1, 0,
+                ]),
+                child: Image.asset("assets/giEmblem.png", fit: BoxFit.contain),
+              ),
+            ),
           ),
-        ),
-        // Positioned(
-        //   right:5, top: 5,
-        //   child: Container(
-        //     alignment: Alignment.topRight,
-        //     padding: EdgeInsets.only(top: 5, bottom: 5, right: 10),
-        //     child:InkWell(
-        //       child: Container(width:30, height: 30, child: Image.asset("assets/loginButton.png")),
-        //       onTap: () {
-        //         showDialog(
-        //             context: context,
-        //             builder: (context) {
-        //               return AlertDialog(
-        //                   title: Text("로그인", textAlign: TextAlign.center,),
-        //                   content: Container(
-        //                     width: 280,
-        //                     height: 240,
-        //                     child: Column(
-        //                       children: [
-        //                         Divider(),
-        //                         SizedBox(height: 10),
-        //                         Expanded(
-        //                           child: MyWidget.roundEdgeTextField(
-        //                               "ID를 입력해주세요", idController),
-        //                         ),
-        //                         Expanded(
-        //                           child: MyWidget.roundEdgeTextField(
-        //                               "Password를 입력해주세요", pwController),
-        //                         ),
-        //                         SizedBox(height: 10),
-        //                         Container(
-        //                           width: 150,
-        //                           height: 50,
-        //                           child: ElevatedButton(
-        //                             style: ElevatedButton.styleFrom(
-        //                               primary: Palette.accent,
-        //                               onPrimary: Palette.black,),
-        //                             onPressed: () {},
-        //                             child: Text("Login", style: TextStyle(fontFamily: "Jalnan"),),
-        //                           ),
-        //                         )
-        //                       ],
-        //                     ),
-        //                   ));
-        //             });
-        //       },
-        //     ),
-        //   ),
-        // ),
-      ],
+          Spacer(),
+          InkWell(
+            onTap: () {
+              MenuUtil.push(context, SchoolAboutPage());
+            },
+            child: _navLabel("About"),
+          ),
+          SizedBox(width: 28),
+          InkWell(
+            onTap: () {
+              MenuUtil.push(context, SchoolProgramPage());
+            },
+            child: _navLabel("Program"),
+          ),
+          SizedBox(width: 28),
+          InkWell(
+            onTap: () {
+              MenuUtil.push(context, SchoolCurriculumElePage());
+            },
+            child: _navLabel("Curriculum"),
+          ),
+          SizedBox(width: 28),
+          InkWell(
+            onTap: () {
+              MenuUtil.push(context, SchoolOnlineProgramPage());
+            },
+            child: _navLabel("Online"),
+          ),
+          SizedBox(width: 28),
+          InkWell(
+            onTap: () {
+              MenuUtil.push(context, SchoolGalleryPage());
+            },
+            child: _navLabel("Community"),
+          ),
+          SizedBox(width: 20),
+          if (!_isAdmin)
+            IconButton(
+              tooltip: '관리자 로그인',
+              onPressed: () {
+                _showAdminLoginDialog(context);
+              },
+              icon: Icon(Icons.admin_panel_settings_outlined,
+                  color: Palette.grey500, size: 20),
+            ),
+          if (_isAdmin) ...[
+            TextButton(
+              onPressed: _logout,
+              child: Text(
+                "로그아웃",
+                style: TextStyle(
+                  color: Palette.grey600,
+                  fontSize: 13,
+                  fontFamily: "NotoSansKR",
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                MenuUtil.push(context, AdminOnlineHubPage());
+              },
+              child: Text(
+                "관리자",
+                style: TextStyle(
+                  color: Palette.secondaryDark,
+                  fontSize: 13,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

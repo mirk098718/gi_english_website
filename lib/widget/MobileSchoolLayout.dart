@@ -52,7 +52,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
     // 모바일에서 스크롤이 동작하려면 Stack에 명시적 높이가 필요함.
     // 자식이 모두 Positioned일 때 Stack이 0 높이로 줄어들어 스크롤 영역이 사라지는 문제 방지.
     final viewportHeight = MediaQuery.sizeOf(context).height;
-    const topBarHeight = 111.0;
+    const topBarHeight = 108.0;
 
     return Scaffold(
       body: SizedBox(
@@ -69,7 +69,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                 child: widget.content,
               ),
             ),
-            Positioned(top: 60, left: 0, right: 0, child: appBar2(context)),
+            Positioned(top: 56, left: 0, right: 0, child: appBar2(context)),
             Positioned(top: 0, left: 0, right: 0, child: appBar1(context)),
           ],
         ),
@@ -116,135 +116,72 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
   }
 
   Widget appBar1(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          height: 60,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Palette.secondaryDark, Color(0xFF022C22)],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withValues(alpha: 0.3),
-                spreadRadius: 0,
-                blurRadius: 4,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
+    return Container(
+      height: 56,
+      padding: EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Palette.white,
+        border: Border(
+          top: BorderSide(color: Palette.secondary, width: 3),
+          bottom: BorderSide(color: Palette.grey200, width: 1),
         ),
-        Container(
-          padding: EdgeInsets.symmetric(vertical: 4),
-          width: double.maxFinite,
-          alignment: Alignment.center,
-          child: InkWell(
-            child: Container(
-                height: 49, child: Image.asset("assets/giEmblem.png")),
-            onTap: () {
-              MenuUtil.push(context, SchoolMainPage());
-            },
-          ),
-        ),
-        // 관리자 로그인/로그아웃 버튼 (모바일)
-        if (!_isAdmin)
-          Positioned(
-            top: 15,
-            right: 15,
+      ),
+      child: Row(
+        children: [
+          Expanded(
             child: InkWell(
               onTap: () {
-                _showAdminLoginDialog(context);
+                MenuUtil.push(context, SchoolMainPage());
               },
-              child: Container(
-                padding: EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Icon(
-                  Icons.admin_panel_settings,
-                  color: Colors.white,
-                  size: 18,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: SizedBox(
+                  height: 32,
+                  child: ColorFiltered(
+                    colorFilter: const ColorFilter.matrix(<double>[
+                      -1, 0, 0, 0, 255,
+                      0, -1, 0, 0, 255,
+                      0, 0, -1, 0, 255,
+                      0, 0, 0, 1, 0,
+                    ]),
+                    child: Image.asset("assets/giEmblem.png",
+                        fit: BoxFit.contain),
+                  ),
                 ),
               ),
             ),
           ),
-        if (_isAdmin)
-          Positioned(
-            top: 15,
-            right: 15,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                InkWell(
-                  onTap: () {
-                    _logout();
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.logout,
-                          color: Colors.white,
-                          size: 14,
-                        ),
-                        SizedBox(width: 2),
-                        Text(
-                          "로그아웃",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontFamily: "NotoSansKR",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(width: 6),
-                InkWell(
-                  onTap: () {
-                    MenuUtil.push(context, AdminOnlineHubPage());
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.admin_panel_settings,
-                          color: Colors.white,
-                          size: 14,
-                        ),
-                        SizedBox(width: 2),
-                        Text(
-                          "관리자",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontFamily: "NotoSansKR",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+          if (!_isAdmin)
+            IconButton(
+              onPressed: () {
+                _showAdminLoginDialog(context);
+              },
+              icon: Icon(Icons.admin_panel_settings_outlined,
+                  color: Palette.grey500, size: 20),
             ),
-          ),
-      ],
+          if (_isAdmin) ...[
+            TextButton(
+              onPressed: _logout,
+              child: Text("로그아웃",
+                  style: TextStyle(
+                      fontFamily: "NotoSansKR",
+                      fontSize: 12,
+                      color: Palette.grey600)),
+            ),
+            TextButton(
+              onPressed: () {
+                MenuUtil.push(context, AdminOnlineHubPage());
+              },
+              child: Text("관리자",
+                  style: TextStyle(
+                      fontFamily: "NotoSansKR",
+                      fontSize: 12,
+                      color: Palette.secondaryDark,
+                      fontWeight: FontWeight.w600)),
+            ),
+          ],
+        ],
+      ),
     );
   }
 
@@ -255,14 +192,9 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
           height: widget.height,
           decoration: BoxDecoration(
             color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withValues(alpha: 0.3),
-                spreadRadius: 0,
-                blurRadius: 4,
-                offset: Offset(0, 2),
-              ),
-            ],
+            border: Border(
+              bottom: BorderSide(color: Palette.grey200, width: 1),
+            ),
           ),
         ),
         SizedBox(
@@ -329,9 +261,10 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                     child: Text(
                       "About GI",
                       style: TextStyle(
-                          color: Colors.black,
-                          fontFamily: "Jalnan",
-                          fontSize: 14),
+                          color: Palette.grey800,
+                          fontFamily: "NotoSansKR",
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13),
                     ),
                   ),
                 ),
@@ -346,10 +279,10 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                     child: Text(
                       "Program",
                       style: TextStyle(
-                          color: Colors.black,
-                          fontFamily: "Jalnan",
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14),
+                          color: Palette.grey800,
+                          fontFamily: "NotoSansKR",
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13),
                     ),
                   ),
                 ),
@@ -364,10 +297,10 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                       child: Text(
                         "Curriculum",
                         style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: "Jalnan",
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14),
+                            color: Palette.grey800,
+                            fontFamily: "NotoSansKR",
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13),
                       )),
                 ),
                 SizedBox(width: 30),
@@ -381,10 +314,10 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                       child: Text(
                         "Online Program",
                         style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: "Jalnan",
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14),
+                            color: Palette.grey800,
+                            fontFamily: "NotoSansKR",
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13),
                       )),
                 ),
                 SizedBox(width: 30),
@@ -398,10 +331,10 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                       child: Text(
                         "Community",
                         style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: "Jalnan",
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14),
+                            color: Palette.grey800,
+                            fontFamily: "NotoSansKR",
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13),
                       )),
                 ),
                 SizedBox(width: 30),

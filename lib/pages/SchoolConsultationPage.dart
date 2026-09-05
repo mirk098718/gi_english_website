@@ -11,7 +11,6 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/EasyRadio.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
-import 'package:table_calendar/table_calendar.dart';
 import '../class/SchoolVisitor.dart';
 import '../util/DialogUtil.dart';
 import '../util/WidgetUtil.dart';
@@ -29,9 +28,6 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
 
   MyGroupValue levelMyGroupValue = MyGroupValue("Level0");
   MyGroupValue timeMyGroupValue = MyGroupValue("오전 09am ~ 12pm");
-
-  DateTime _selectedDay = DateTime.now();
-  DateTime _focusedDay = DateTime.now();
 
   List<ButtonState> buttonStateList = [
     ButtonState("Notice Board", BehaviorColor.colorOnDefault,
@@ -342,39 +338,6 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               "\n"
               "• 전화 상담 : 031 942 0908\n"
               "• 이메일 : gienglish.paju@gmail.com"),
-          // Divider(),
-          Container(
-            width: 400,
-            margin: EdgeInsets.only(top: 40),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                width: 1,
-                color: Colors.grey,
-              ),
-            ),
-            child: TableCalendar(
-              firstDay: DateTime.utc(2020, 1, 1),
-              lastDay: DateTime.utc(2030, 12, 31),
-              focusedDay: _focusedDay,
-              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-              onDaySelected: (selectedDay, focusedDay) {
-                setState(() {
-                  _selectedDay = selectedDay;
-                  _focusedDay = focusedDay;
-                });
-                SnackbarUtil.showSnackBar(
-                    '${selectedDay.year}.${selectedDay.month}.${selectedDay.day} 선택됨 · 전화 예약 031 942 0908',
-                    context);
-              },
-              calendarFormat: CalendarFormat.month,
-              locale: 'ko_KR',
-              headerStyle: HeaderStyle(
-                formatButtonVisible: false,
-                titleCentered: true,
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -574,38 +537,6 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               "\n"
               "• 전화 상담 : 031 942 0908\n"
               "• 이메일 : gienglish.paju@gmail.com"),
-          Container(
-            width: 400,
-            margin: EdgeInsets.only(top: 40),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                width: 1,
-                color: Colors.grey,
-              ),
-            ),
-            child: TableCalendar(
-              firstDay: DateTime.utc(2020, 1, 1),
-              lastDay: DateTime.utc(2030, 12, 31),
-              focusedDay: _focusedDay,
-              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-              onDaySelected: (selectedDay, focusedDay) {
-                setState(() {
-                  _selectedDay = selectedDay;
-                  _focusedDay = focusedDay;
-                });
-                SnackbarUtil.showSnackBar(
-                    '${selectedDay.year}.${selectedDay.month}.${selectedDay.day} 선택됨 · 전화 예약 031 942 0908',
-                    context);
-              },
-              calendarFormat: CalendarFormat.month,
-              locale: 'ko_KR',
-              headerStyle: HeaderStyle(
-                formatButtonVisible: false,
-                titleCentered: true,
-              ),
-            ),
-          ),
         ],
       ),
     );

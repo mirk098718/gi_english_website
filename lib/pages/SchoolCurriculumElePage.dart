@@ -173,7 +173,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
         children: [
           mainImage(),
           contentGroup(),
-          SizedBox(height: 213, child: MyWidget.footer()),
+          MyWidget.footer(),
         ],
       ),
     );

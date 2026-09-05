@@ -63,60 +63,74 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
   }
 
   Widget mainImage() {
-    return Container(
-        child: Stack(alignment: Alignment.centerLeft, children: [
-      Image.asset("assets/mainGateImageMiddleSchool.png"),
-      Container(
-        width: 500,
-        padding: EdgeInsets.only(left: 20),
-        child: Text(
-          "Gleam Island School",
-          style: TextStyle(
-            fontFamily: "Lovingu",
-            fontSize: 50,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            shadows: [
-              Shadow(
-                offset: Offset(2.0, 2.0),
-                blurRadius: 4.0,
-                color: Colors.black54,
+    final screen = MediaQuery.sizeOf(context);
+    final heroHeight = (screen.height - 72).clamp(480.0, 780.0);
+    return SizedBox(
+      width: double.infinity,
+      height: heroHeight,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            "assets/mainGateImageMiddleSchool.png",
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: EdgeInsets.only(left: 48),
+              child: Text(
+                "Gleam Island School",
+                style: TextStyle(
+                  fontFamily: "Lovingu",
+                  fontSize: 56,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  shadows: [
+                    Shadow(
+                      offset: Offset(1.0, 1.0),
+                      blurRadius: 8.0,
+                      color: Colors.black45,
+                    ),
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            bottom: 32,
+            right: 40,
+            child: SizedBox(
+              height: 44,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.black.withValues(alpha: 0.78),
+                  foregroundColor: Palette.white,
+                  elevation: 0,
+                  padding: EdgeInsets.symmetric(horizontal: 22),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                onPressed: () {
+                  MenuUtil.push(context, SchoolConsultationPage());
+                },
+                child: Text(
+                  "상담 신청",
+                  style: TextStyle(
+                    fontFamily: "NotoSansKR",
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: Palette.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
-      Positioned(
-        bottom: 20,
-        right: 40,
-        child: Container(
-          width: 120,
-          height: 50,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Palette.black,
-              foregroundColor: Palette.black,
-            ),
-            onPressed: () {
-              MenuUtil.push(context, SchoolConsultationPage());
-            },
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "상담",
-                  style: TextStyle(fontFamily: "Jalnan", color: Palette.white),
-                ),
-                Text(
-                  "신청",
-                  style: TextStyle(fontFamily: "Jalnan", color: Palette.white),
-                ),
-              ],
-            ),
-          ),
-        ),
-      )
-    ]));
+    );
   }
 
   Widget urlMenu() {
@@ -129,10 +143,6 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             flex: 1,
             child: Container(
               height: 120,
-              decoration: BoxDecoration(
-                border: Border.all(color: Palette.grey200, width: 5),
-                // borderRadius: BorderRadius.circular(5),
-              ),
               child: Row(
                 children: [
                   Expanded(
@@ -202,13 +212,6 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
               flex: 1,
               child: Container(
                 height: 120,
-                decoration: BoxDecoration(
-                  border: Border(
-                      top: BorderSide(color: Palette.grey200, width: 5),
-                      bottom: BorderSide(color: Palette.grey200, width: 5),
-                      right: BorderSide(color: Palette.grey200, width: 5)),
-                  // borderRadius: BorderRadius.circular(5),
-                ),
                 child: Row(
                   children: [
                     Expanded(
@@ -254,92 +257,80 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
     double eachBoardHeight = 550;
 
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Palette.background, Palette.grey50],
-        ),
-      ),
-      padding: EdgeInsets.symmetric(vertical: 80, horizontal: 40),
+      color: Colors.white,
+      padding: EdgeInsets.symmetric(vertical: 56, horizontal: 40),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Spacer(),
           Expanded(
             flex: 5,
-            child: ModernWidgets.modernCard(
-              padding: EdgeInsets.zero,
-              child: SizedBox(
-                height: eachBoardHeight,
-                child: Column(
-                  children: [
-                    Container(
-                      height: 60,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: Palette.primaryGradient,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(16),
-                            topRight: Radius.circular(16)),
-                      ),
-                      child: TextButton(
-                        child: Text("Notice Board",
-                            style: TextStyle(
-                                color: Palette.white,
-                                fontFamily: "NotoSansKR",
-                                fontWeight: FontWeight.w700,
-                                fontSize: 18)),
-                        onPressed: () {
-                          MenuUtil.push(context, SchoolCommunityNoticePage());
-                        },
-                      ),
-                    ),
-                    Expanded(child: _buildNoticeList()),
-                  ],
-                ),
-              ),
+            child: _desktopGrayBoard(
+              title: "Notice Board",
+              height: eachBoardHeight,
+              onTitlePressed: () {
+                MenuUtil.push(context, SchoolCommunityNoticePage());
+              },
+              child: _buildNoticeList(),
             ),
           ),
           Spacer(),
           Expanded(
             flex: 5,
-            child: ModernWidgets.modernCard(
-              padding: EdgeInsets.zero,
-              child: SizedBox(
-                height: eachBoardHeight,
-                child: Column(
-                  children: [
-                    Container(
-                      height: 60,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: Palette.secondaryGradient,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(16),
-                            topRight: Radius.circular(16)),
-                      ),
-                      child: TextButton(
-                        child: Text(
-                          "FAQ",
-                          style: TextStyle(
-                              color: Palette.white,
-                              fontFamily: "NotoSansKR",
-                              fontWeight: FontWeight.w700,
-                              fontSize: 18),
-                        ),
-                        onPressed: () {
-                          MenuUtil.push(context, SchoolCommunityBoardPage());
-                        },
-                      ),
-                    ),
-                    Expanded(child: _buildFAQList()),
-                  ],
+            child: _desktopGrayBoard(
+              title: "FAQ",
+              height: eachBoardHeight,
+              onTitlePressed: () {
+                MenuUtil.push(context, SchoolCommunityBoardPage());
+              },
+              child: _buildFAQList(),
+            ),
+          ),
+          Spacer(),
+        ],
+      ),
+    );
+  }
+
+  Widget _desktopGrayBoard({
+    required String title,
+    required double height,
+    required VoidCallback onTitlePressed,
+    required Widget child,
+  }) {
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Palette.grey100, width: 3),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          Container(
+            height: 50,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Palette.grey100,
+              border: Border.all(color: Palette.grey100, width: 3),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(18),
+                topRight: Radius.circular(18),
+              ),
+            ),
+            child: TextButton(
+              onPressed: onTitlePressed,
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: "Jalnan",
                 ),
               ),
             ),
           ),
-          Spacer(),
+          Expanded(child: child),
         ],
       ),
     );
@@ -647,30 +638,17 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         child: Column(
           children: [
             mainImage(),
-            SizedBox(height: 120, child: urlMenu()),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Palette.grey200.withValues(alpha:0.5),
-                    spreadRadius: 0,
-                    blurRadius: 8,
-                    offset: Offset(0, 4),
-                  ),
-                ],
+            SizedBox(height: 100, child: urlMenu()),
+            InkWell(
+              child: Image.asset(
+                "assets/mainBannerOpening.png",
+                width: double.infinity,
+                fit: BoxFit.cover,
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: InkWell(
-                  child: Image.asset("assets/mainBannerOpening.png"),
-                  onTap: () async {
-                    UrlUtil.open(
-                        'https://blog.naver.com/gleam-island-paju/223029184863');
-                  },
-                ),
-              ),
+              onTap: () async {
+                UrlUtil.open(
+                    'https://blog.naver.com/gleam-island-paju/223029184863');
+              },
             ),
             bulletinBoard(),
             ModernWidgets.modernFooter(),
@@ -706,35 +684,23 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
   }
 
   Widget mobileMainImage() {
-    return Stack(alignment: Alignment.bottomRight, children: [
-      Container(child: Image.asset("assets/mainGateImageMiddleSchool.png")),
-      // Container(
-      //   margin: EdgeInsets.all(20),
-      //   width: 150,
-      //   height: 40,
-      //   child: ElevatedButton(
-      //     style: ElevatedButton.styleFrom(
-      //       primary: Palette.black,
-      //       onPrimary: Palette.black,
-      //     ),
-      //     onPressed: () {MenuUtil.push(context, SchoolConsultationPage());},
-      //     child: Text("상담신청",
-      //         textAlign: TextAlign.center,
-      //         style: TextStyle(
-      //           fontFamily: "Jalnan",
-      //           color: Palette.white,
-      //         )),
-      //   ),
-      // ),
-    ]);
+    final screen = MediaQuery.sizeOf(context);
+    final heroHeight = (screen.height - 108).clamp(320.0, 560.0);
+    return SizedBox(
+      width: double.infinity,
+      height: heroHeight,
+      child: Image.asset(
+        "assets/mainGateImageMiddleSchool.png",
+        fit: BoxFit.cover,
+        alignment: Alignment.center,
+      ),
+    );
   }
 
   Widget mobileUrlMenu() {
     return Container(
-      margin: EdgeInsets.all(20),
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20), color: Palette.grey100),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      color: Palette.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

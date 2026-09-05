@@ -659,7 +659,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
         children: [
           mainImage(),
           contentGroup(),
-          SizedBox(height: 213, child: MyWidget.footer()),
+          MyWidget.footer(),
         ],
       ),
     );
