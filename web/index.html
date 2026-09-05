@@ -25,6 +25,25 @@
 
   <title>gi_english_website</title>
   <link rel="manifest" href="manifest.json">
+  <!-- 토스페이먼츠 결제창 SDK -->
+  <script src="https://js.tosspayments.com/v2/standard"></script>
+  <script>
+    // Flutter(Web)에서 호출하는 토스 결제창 진입점
+    window.gleamTossPay = async function (opts) {
+      const tossPayments = TossPayments(opts.clientKey);
+      const payment = tossPayments.payment({ customerKey: opts.customerKey });
+      await payment.requestPayment({
+        method: "CARD",
+        amount: { currency: "KRW", value: opts.amount },
+        orderId: opts.orderId,
+        orderName: opts.orderName,
+        successUrl: opts.successUrl,
+        failUrl: opts.failUrl,
+        customerEmail: opts.customerEmail || undefined,
+        customerName: opts.customerName || undefined,
+      });
+    };
+  </script>
   <!-- 모바일에서 Flutter 스크롤이 정상 동작하도록 뷰포트 고정 -->
   <style>
     html, body { height: 100%; margin: 0; overflow: hidden; position: fixed; width: 100%; }

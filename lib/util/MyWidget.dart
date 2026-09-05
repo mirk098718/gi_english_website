@@ -191,7 +191,7 @@ class MyWidget {
 
   static Widget roundEdgeTextField(
       String hintText, TextEditingController controller,
-      {bool obscureText = false}) {
+      {bool obscureText = false, bool autofocus = false}) {
     return Container(
       margin: EdgeInsets.only(top: 20, bottom: 20),
       padding: EdgeInsets.all(10),
@@ -199,6 +199,7 @@ class MyWidget {
       child: TextField(
         controller: controller,
         obscureText: obscureText,
+        autofocus: autofocus,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.white,

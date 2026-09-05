@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/util/Palette.dart';
-import 'package:gi_english_website/pages/AdminNoticeWritePage.dart';
 import 'package:gi_english_website/pages/AdminFAQWritePage.dart';
+import 'package:gi_english_website/pages/AdminNoticeWritePage.dart';
+import 'package:gi_english_website/pages/AdminOnlineHubPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
-// ignore: deprecated_member_use
-import 'dart:html' as html;
-import 'dart:ui_web' as ui;
+import 'package:gi_english_website/util/Palette.dart';
 
 class WorkingAdminLoginPage extends StatefulWidget {
   final String category; // 게시판 타입 ('notice' 또는 'faq')
@@ -18,98 +16,20 @@ class WorkingAdminLoginPage extends StatefulWidget {
 }
 
 class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
-  String emailValue = '';
-  String passwordValue = '';
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final emailFocus = FocusNode();
+  final passwordFocus = FocusNode();
   bool _isLoading = false;
   bool _obscurePassword = true;
 
-  late html.InputElement emailInput;
-  late html.InputElement passwordInput;
-
   @override
-  void initState() {
-    super.initState();
-    _registerHtmlInputs();
-  }
-
-  void _registerHtmlInputs() {
-    // 이메일 입력 필드 등록
-    ui.platformViewRegistry.registerViewFactory(
-      'email-input',
-      (int viewId) {
-        emailInput = html.InputElement();
-        emailInput.type = 'email';
-        emailInput.placeholder = 'gienglish.paju@gmail.com';
-        emailInput.style.cssText = '''
-          width: 100%;
-          height: 50px;
-          font-size: 16px;
-          padding: 12px 16px;
-          border: 1px solid #ccc;
-          border-radius: 8px;
-          outline: none;
-          font-family: 'NotoSansKR', sans-serif;
-        ''';
-
-        emailInput.onInput.listen((event) {
-          if (mounted) {
-            setState(() {
-              emailValue = emailInput.value ?? '';
-            });
-            print('📧 이메일 입력: ${emailInput.value}');
-          }
-        });
-
-        emailInput.onFocus.listen((event) {
-          emailInput.style.borderColor = '#4F46E5';
-        });
-
-        emailInput.onBlur.listen((event) {
-          emailInput.style.borderColor = '#ccc';
-        });
-
-        return emailInput;
-      },
-    );
-
-    // 비밀번호 입력 필드 등록
-    ui.platformViewRegistry.registerViewFactory(
-      'password-input',
-      (int viewId) {
-        passwordInput = html.InputElement();
-        passwordInput.type = _obscurePassword ? 'password' : 'text';
-        passwordInput.placeholder = '비밀번호를 입력하세요';
-        passwordInput.style.cssText = '''
-          width: 100%;
-          height: 50px;
-          font-size: 16px;
-          padding: 12px 16px;
-          border: 1px solid #ccc;
-          border-radius: 8px;
-          outline: none;
-          font-family: 'NotoSansKR', sans-serif;
-        ''';
-
-        passwordInput.onInput.listen((event) {
-          if (mounted) {
-            setState(() {
-              passwordValue = passwordInput.value ?? '';
-            });
-            print('🔒 비밀번호 입력: ${passwordInput.value}');
-          }
-        });
-
-        passwordInput.onFocus.listen((event) {
-          passwordInput.style.borderColor = '#4F46E5';
-        });
-
-        passwordInput.onBlur.listen((event) {
-          passwordInput.style.borderColor = '#ccc';
-        });
-
-        return passwordInput;
-      },
-    );
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    emailFocus.dispose();
+    passwordFocus.dispose();
+    super.dispose();
   }
 
   @override
@@ -148,8 +68,6 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
                   ),
                 ),
                 SizedBox(height: 40),
-
-                // 이메일 입력
                 Text(
                   "이메일",
                   style: TextStyle(
@@ -159,52 +77,65 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
                   ),
                 ),
                 SizedBox(height: 8),
-                Container(
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
+                TextField(
+                  controller: emailController,
+                  focusNode: emailFocus,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.username],
+                  onSubmitted: (_) => passwordFocus.requestFocus(),
+                  decoration: InputDecoration(
+                    hintText: '관리자 또는 강사 이메일',
+                    hintStyle: TextStyle(fontFamily: "NotoSansKR"),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   ),
-                  child: HtmlElementView(viewType: 'email-input'),
+                  style: TextStyle(fontFamily: "NotoSansKR", fontSize: 16),
                 ),
                 SizedBox(height: 20),
-
-                // 비밀번호 입력
-                Row(
-                  children: [
-                    Text(
-                      "비밀번호",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "NotoSansKR",
-                      ),
+                Text(
+                  "비밀번호",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: "NotoSansKR",
+                  ),
+                ),
+                SizedBox(height: 8),
+                TextField(
+                  controller: passwordController,
+                  focusNode: passwordFocus,
+                  obscureText: _obscurePassword,
+                  textInputAction: TextInputAction.done,
+                  autofillHints: const [AutofillHints.password],
+                  onSubmitted: (_) {
+                    if (!_isLoading) _login();
+                  },
+                  decoration: InputDecoration(
+                    hintText: '비밀번호를 입력하세요',
+                    hintStyle: TextStyle(fontFamily: "NotoSansKR"),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    Spacer(),
-                    IconButton(
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    suffixIcon: IconButton(
                       icon: Icon(_obscurePassword
                           ? Icons.visibility_off
                           : Icons.visibility),
                       onPressed: () {
                         setState(() {
                           _obscurePassword = !_obscurePassword;
-                          passwordInput.type =
-                              _obscurePassword ? 'password' : 'text';
                         });
                       },
                     ),
-                  ],
-                ),
-                SizedBox(height: 8),
-                Container(
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: HtmlElementView(viewType: 'password-input'),
+                  style: TextStyle(fontFamily: "NotoSansKR", fontSize: 16),
                 ),
                 SizedBox(height: 32),
-
-                // 로그인 버튼
                 ElevatedButton(
                   onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
@@ -243,13 +174,15 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
   }
 
   Future<void> _login() async {
-    // 유효성 검사
-    if (emailValue.trim().isEmpty) {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (email.isEmpty) {
       _showSnackBar('이메일을 입력해주세요.', Colors.red);
       return;
     }
 
-    if (passwordValue.trim().isEmpty) {
+    if (password.isEmpty) {
       _showSnackBar('비밀번호를 입력해주세요.', Colors.red);
       return;
     }
@@ -259,40 +192,76 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
     });
 
     try {
-      // 하드코딩된 관리자 계정 확인
-      if (emailValue.trim() == "gienglish.paju@gmail.com" &&
-          passwordValue.trim() == "gleam701") {
-        // Firebase Auth 로그인 (FAQ/공지 저장 시 Firestore 권한에 필요)
+      // 1) 메인 관리자 (기존 하드코딩 계정)
+      if (email.toLowerCase() == AuthService.ownerEmail &&
+          password == "gleam701") {
         final cred = await AuthService.signInWithEmailAndPassword(
-          emailValue.trim(),
-          passwordValue.trim(),
+          email,
+          password,
         );
         if (cred != null) {
-          await AuthService.ensureAdminDoc(emailValue.trim(), "관리자");
+          await AuthService.ensureAdminDoc(email, "관리자", role: 'owner');
+          await AuthService.saveAdminSession(
+            email,
+            name: "관리자",
+            role: AdminRole.owner,
+            uid: cred.user?.uid,
+          );
         } else {
+          await AuthService.saveAdminSession(
+            email,
+            name: "관리자",
+            role: AdminRole.owner,
+          );
           _showSnackBar(
-            'FAQ/공지 저장을 사용하려면 Firebase 콘솔 → Authentication에서 이 이메일(gienglish.paju@gmail.com)로 사용자를 추가해 주세요.',
+            'FAQ/공지 저장을 사용하려면 Firebase 콘솔 → Authentication에서 이 이메일로 사용자를 추가해 주세요.',
             Colors.orange,
           );
         }
-        await AuthService.saveAdminSession(emailValue.trim(), name: "관리자");
 
         _showSnackBar('관리자 로그인에 성공했습니다.', Colors.green);
-
-        // 글쓰기 다이얼로그 표시 (카테고리에 따라 처리)
-        Navigator.pop(context); // 로그인 페이지 닫기
-        if (widget.category != 'general') {
+        Navigator.pop(context);
+        if (widget.category == 'general') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AdminOnlineHubPage()),
+          );
+        } else {
           _showWriteDialog();
         }
-      } else {
-        _showSnackBar('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.', Colors.red);
+        return;
       }
+
+      if (widget.category != 'general') {
+        _showSnackBar('게시판 관리는 메인 관리자만 가능합니다.', Colors.red);
+        return;
+      }
+
+      final error =
+          await AuthService.signInAsStaff(email: email, password: password);
+      if (error != null) {
+        _showSnackBar(error, Colors.red);
+        return;
+      }
+
+      final role = await AuthService.getAdminRole();
+      _showSnackBar(
+        role == AdminRole.teacher ? '강사 로그인에 성공했습니다.' : '관리자 로그인에 성공했습니다.',
+        Colors.green,
+      );
+      Navigator.pop(context);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AdminOnlineHubPage()),
+      );
     } catch (e) {
       _showSnackBar('로그인 중 오류가 발생했습니다: $e', Colors.red);
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 

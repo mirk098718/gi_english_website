@@ -687,6 +687,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
       child: Container(
         child: Column(
           children: [
+            mobileMainImage(),
             InkWell(
               child: Image.asset("assets/mainBannerOpening.png"),
               onTap: () async {
@@ -706,7 +707,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
 
   Widget mobileMainImage() {
     return Stack(alignment: Alignment.bottomRight, children: [
-      Container(child: Image.asset("assets/mainGateImageLightBlue.png")),
+      Container(child: Image.asset("assets/mainGateImageMiddleSchool.png")),
       // Container(
       //   margin: EdgeInsets.all(20),
       //   width: 150,

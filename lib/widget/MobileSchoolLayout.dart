@@ -3,8 +3,10 @@ import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumElePage.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
 import 'package:gi_english_website/pages/SchoolMainPage.dart';
+import 'package:gi_english_website/pages/SchoolOnlineProgramPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
 import 'package:gi_english_website/pages/WorkingAdminLoginPage.dart';
+import 'package:gi_english_website/pages/AdminOnlineHubPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -37,10 +39,10 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
   }
 
   Future<void> _checkAdminStatus() async {
-    bool isAdmin = await AuthService.isAdmin();
+    bool isStaff = await AuthService.isStaff();
     if (mounted) {
       setState(() {
-        _isAdmin = isAdmin;
+        _isAdmin = isStaff;
       });
     }
   }
@@ -126,7 +128,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withValues(alpha:0.3),
+                color: Colors.grey.withValues(alpha: 0.3),
                 spreadRadius: 0,
                 blurRadius: 4,
                 offset: Offset(0, 2),
@@ -158,7 +160,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
               child: Container(
                 padding: EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha:0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Icon(
@@ -183,7 +185,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha:0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -208,30 +210,35 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                   ),
                 ),
                 SizedBox(width: 6),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha:0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.admin_panel_settings,
-                        color: Colors.white,
-                        size: 14,
-                      ),
-                      SizedBox(width: 2),
-                      Text(
-                        "관리자",
-                        style: TextStyle(
+                InkWell(
+                  onTap: () {
+                    MenuUtil.push(context, AdminOnlineHubPage());
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.admin_panel_settings,
                           color: Colors.white,
-                          fontSize: 10,
-                          fontFamily: "NotoSansKR",
+                          size: 14,
                         ),
-                      ),
-                    ],
+                        SizedBox(width: 2),
+                        Text(
+                          "관리자",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontFamily: "NotoSansKR",
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -250,7 +257,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withValues(alpha:0.3),
+                color: Colors.grey.withValues(alpha: 0.3),
                 spreadRadius: 0,
                 blurRadius: 4,
                 offset: Offset(0, 2),
@@ -356,6 +363,23 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                       alignment: Alignment.center,
                       child: Text(
                         "Curriculum",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: "Jalnan",
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14),
+                      )),
+                ),
+                SizedBox(width: 30),
+                InkWell(
+                  onTap: () {
+                    MenuUtil.push(context, SchoolOnlineProgramPage());
+                  },
+                  child: Container(
+                      height: widget.height,
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Online Program",
                         style: TextStyle(
                             color: Colors.black,
                             fontFamily: "Jalnan",

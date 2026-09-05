@@ -1,0 +1,14 @@
+{
+  "name": "functions",
+  "description": "Gleam Island Cloud Functions (Toss Payments confirm)",
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "@google-cloud/firestore": "^6.8.0",
+    "firebase-admin": "^11.11.1",
+    "firebase-functions": "^4.9.0"
+  },
+  "private": true
+}

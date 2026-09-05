@@ -11,10 +11,12 @@ import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
 import 'package:gi_english_website/pages/SchoolMainPage.dart';
 import 'package:gi_english_website/pages/SchoolMapPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
+import 'package:gi_english_website/pages/SchoolOnlineProgramPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
 import 'package:gi_english_website/pages/SchoolSystemPage.dart';
 import 'package:gi_english_website/pages/SchoolTeachersPage.dart';
 import 'package:gi_english_website/pages/WorkingAdminLoginPage.dart';
+import 'package:gi_english_website/pages/AdminOnlineHubPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -47,10 +49,10 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
   }
 
   Future<void> _checkAdminStatus() async {
-    bool isAdmin = await AuthService.isAdmin();
+    bool isStaff = await AuthService.isStaff();
     if (mounted) {
       setState(() {
-        _isAdmin = isAdmin;
+        _isAdmin = isStaff;
       });
     }
   }
@@ -274,7 +276,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withValues(alpha:0.3),
+                color: Colors.grey.withValues(alpha: 0.3),
                 spreadRadius: 0,
                 blurRadius: 4,
                 offset: Offset(0, 2),
@@ -307,7 +309,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                 margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
                 width: 0.5,
                 height: 10,
-                color: Colors.white.withValues(alpha:0.3),
+                color: Colors.white.withValues(alpha: 0.3),
               ),
               InkWell(
                   onTap: () {
@@ -325,7 +327,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                 margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
                 width: 0.5,
                 height: 10,
-                color: Colors.white.withValues(alpha:0.3),
+                color: Colors.white.withValues(alpha: 0.3),
               ),
               InkWell(
                   onTap: () {
@@ -343,7 +345,25 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                 margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
                 width: 0.5,
                 height: 10,
-                color: Colors.white.withValues(alpha:0.3),
+                color: Colors.white.withValues(alpha: 0.3),
+              ),
+              InkWell(
+                  onTap: () {
+                    MenuUtil.push(context, SchoolOnlineProgramPage());
+                  },
+                  child: Text(
+                    "Online Program",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: "NotoSansKR",
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20),
+                  )),
+              Container(
+                margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+                width: 0.5,
+                height: 10,
+                color: Colors.white.withValues(alpha: 0.3),
               ),
               InkWell(
                   onTap: () {
@@ -367,7 +387,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                   child: Container(
                     padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha:0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Icon(
@@ -385,7 +405,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha:0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -410,30 +430,35 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                   ),
                 ),
                 SizedBox(width: 8),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha:0.2),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.admin_panel_settings,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                      SizedBox(width: 4),
-                      Text(
-                        "관리자",
-                        style: TextStyle(
+                InkWell(
+                  onTap: () {
+                    MenuUtil.push(context, AdminOnlineHubPage());
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.admin_panel_settings,
                           color: Colors.white,
-                          fontSize: 12,
-                          fontFamily: "NotoSansKR",
+                          size: 16,
                         ),
-                      ),
-                    ],
+                        SizedBox(width: 4),
+                        Text(
+                          "관리자",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontFamily: "NotoSansKR",
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

@@ -12,13 +12,25 @@ import 'package:url_launcher/url_launcher.dart';
 
 
 class UrlUtil {
-  // 필드(정적속성) -> 변수를 빌림.
-  // 메소드(동적속성) -> 함수(기능)를 빌림.
+  /// YouTube 스튜디오 수정 주소를 학생이 볼 수 있는 시청 주소로 바꾼다.
+  static String normalizeVideoUrl(String url) {
+    final trimmed = url.trim();
+    if (trimmed.isEmpty) return trimmed;
 
-  //주소를 실행하는 기능
+    final studio = RegExp(r'studio\.youtube\.com/video/([A-Za-z0-9_-]{6,})');
+    final watch = RegExp(
+        r'(?:youtube\.com/watch\?[^#]*v=|youtu\.be/|youtube\.com/embed/)([A-Za-z0-9_-]{6,})');
+    final match = studio.firstMatch(trimmed) ?? watch.firstMatch(trimmed);
+    if (match != null) {
+      return 'https://youtu.be/${match.group(1)}';
+    }
+    return trimmed;
+  }
+
   static Future<void> open(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunch(url)) {
+    final normalized = normalizeVideoUrl(url);
+    final uri = Uri.parse(normalized);
+    if (await canLaunch(normalized)) {
       await launchUrl(uri);
     }
   }
