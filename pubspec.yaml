@@ -117,6 +117,10 @@ flutter:
      - assets/eleInfo.png
      - assets/onlineProgramClasses.png
      - assets/nativeTeacherPortrait.png
+     - assets/nativeTeacher01.png
+     - assets/nativeTeacher02.png
+     - assets/nativeTeacher03.png
+     - assets/nativeTeacher04.png
 
 
 

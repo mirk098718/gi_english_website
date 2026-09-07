@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
+import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 // ignore: avoid_web_libraries_in_flutter, deprecated_member_use
 import 'dart:js' as js;
@@ -22,6 +23,7 @@ class PaymentService {
   /// 결제 주문을 생성하고 orderId를 반환한다.
   static Future<PaymentOrder?> createOrder({
     required OnlineCourse course,
+    OnlineNativeTeacher? nativeTeacher,
     int? totalSessions,
   }) async {
     final user = AuthService.currentUser;
@@ -41,6 +43,8 @@ class PaymentService {
       amount: amount,
       totalSessions: sessions,
       status: 'pending',
+      nativeTeacherId: nativeTeacher?.id ?? '',
+      nativeTeacherName: nativeTeacher?.name ?? '',
     );
 
     await _firestore.collection('payments').doc(orderId).set({
@@ -53,6 +57,8 @@ class PaymentService {
       'amount': order.amount,
       'totalSessions': order.totalSessions,
       'status': 'pending',
+      'nativeTeacherId': order.nativeTeacherId,
+      'nativeTeacherName': order.nativeTeacherName,
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
@@ -212,6 +218,8 @@ class PaymentService {
         'isPaid': true,
         'paidAmount': amount,
         'paymentNote': '관리자 수동확정 / 토스 인증',
+        'nativeTeacherId': payment['nativeTeacherId']?.toString() ?? '',
+        'nativeTeacherName': payment['nativeTeacherName']?.toString() ?? '',
         'paidAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       };
@@ -243,6 +251,16 @@ class PaymentService {
         'paidAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
+
+      final nativeTeacherId = payment['nativeTeacherId']?.toString() ?? '';
+      final nativeTeacherName = payment['nativeTeacherName']?.toString() ?? '';
+      if (nativeTeacherId.isNotEmpty) {
+        await _firestore.collection('members').doc(userId).set({
+          'nativeTeacherId': nativeTeacherId,
+          'nativeTeacherName': nativeTeacherName,
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+      }
       return null;
     } catch (e) {
       print('관리자 결제 확정 오류: $e');
@@ -327,6 +345,8 @@ class PaymentOrder {
   final String? method;
   final DateTime? createdAt;
   final DateTime? paidAt;
+  final String nativeTeacherId;
+  final String nativeTeacherName;
 
   PaymentOrder({
     required this.orderId,
@@ -342,6 +362,8 @@ class PaymentOrder {
     this.method,
     this.createdAt,
     this.paidAt,
+    this.nativeTeacherId = '',
+    this.nativeTeacherName = '',
   });
 
   OnlineCourse? get course => OnlineCourse.findById(courseId);
@@ -391,6 +413,8 @@ class PaymentOrder {
       method: data['method']?.toString(),
       createdAt: toDate(data['createdAt']),
       paidAt: toDate(data['paidAt']),
+      nativeTeacherId: data['nativeTeacherId']?.toString() ?? '',
+      nativeTeacherName: data['nativeTeacherName']?.toString() ?? '',
     );
   }
 }

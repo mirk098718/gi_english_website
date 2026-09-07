@@ -170,6 +170,8 @@ exports.confirmTossPayment = functions
       isPaid: true,
       paidAmount: amountNum,
       paymentNote: "토스페이먼츠 자동결제",
+      nativeTeacherId: payment.nativeTeacherId || "",
+      nativeTeacherName: payment.nativeTeacherName || "",
       paidAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
@@ -204,6 +206,17 @@ exports.confirmTossPayment = functions
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       awaitingServerConfirm: false,
     });
+
+    if (payment.nativeTeacherId) {
+      await db.collection("members").doc(userId).set(
+        {
+          nativeTeacherId: payment.nativeTeacherId || "",
+          nativeTeacherName: payment.nativeTeacherName || "",
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+    }
 
     return { ok: true, message: "결제가 완료되었고 수강이 배정되었습니다." };
   });

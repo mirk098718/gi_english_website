@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
+import 'package:gi_english_website/pages/OnlineTeacherSelectPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
@@ -12,7 +13,8 @@ import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 import '../util/WidgetUtil.dart';
 
-/// 온라인 프로그램 결제(과정 선택 + 토스페이먼츠) 페이지.
+/// 온라인 프로그램 결제(과정 선택) 페이지.
+/// 과정 선택 후 원어민 강사 선택 화면으로 이동한다.
 class OnlineCheckoutPage extends StatefulWidget {
   final String? initialCourseId;
 
@@ -24,7 +26,6 @@ class OnlineCheckoutPage extends StatefulWidget {
 
 class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
   OnlineCourse? _selected;
-  bool _paying = false;
   List<PaymentOrder> _myPayments = [];
 
   @override
@@ -44,41 +45,22 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
     setState(() => _myPayments = list);
   }
 
-  Future<void> _startPayment() async {
+  void _goTeacherSelect() {
     if (AuthService.currentUser == null) {
       MenuUtil.push(context, MemberLoginPage());
       return;
     }
     if (_selected == null) {
-      _toast('과정을 선택해주세요.', error: true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('과정을 선택해주세요.',
+              style: TextStyle(fontFamily: "NotoSansKR")),
+          backgroundColor: Palette.danger,
+        ),
+      );
       return;
     }
-
-    setState(() => _paying = true);
-    final order = await PaymentService.createOrder(course: _selected!);
-    if (order == null) {
-      if (!mounted) return;
-      setState(() => _paying = false);
-      _toast('주문을 생성하지 못했습니다. 로그인 상태를 확인해주세요.', error: true);
-      return;
-    }
-
-    final error = await PaymentService.requestTossPayment(order);
-    if (!mounted) return;
-    setState(() => _paying = false);
-    if (error != null) {
-      _toast(error, error: true);
-    }
-    // 성공 시 토스가 successUrl로 리다이렉트하므로 여기서는 대기
-  }
-
-  void _toast(String message, {bool error = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
-        backgroundColor: error ? Palette.danger : Palette.success,
-      ),
-    );
+    MenuUtil.push(context, OnlineTeacherSelectPage(course: _selected!));
   }
 
   @override
@@ -147,7 +129,7 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
           WidgetUtil.myDivider(),
           SizedBox(height: 12),
           Text(
-            '수강할 과정을 선택한 뒤 토스페이먼츠로 결제하세요.\n'
+            '수강할 과정을 선택한 뒤, 원어민 메인 강사를 고르고 결제합니다.\n'
             '결제 완료 시 내 강의실에 과정이 자동으로 배정됩니다. (테스트 결제: 실제 출금되지 않습니다)',
             style: TextStyle(
                 fontFamily: "NotoSansKR",
@@ -206,10 +188,10 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8)),
                 ),
-                onPressed: _paying ? null : _startPayment,
-                icon: Icon(Icons.payment, color: Palette.white),
+                onPressed: _goTeacherSelect,
+                icon: Icon(Icons.arrow_forward, color: Palette.white),
                 label: Text(
-                  _paying ? '결제창 여는 중...' : '토스페이먼츠로 결제하기',
+                  '다음 · 원어민 강사 선택',
                   style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
                 ),
               ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/ClassPlacementQuiz.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
-import 'package:gi_english_website/pages/OnlineCheckoutPage.dart';
+import 'package:gi_english_website/pages/OnlineTeacherSelectPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
@@ -24,7 +24,7 @@ class SchoolOnlineCurriculumPage extends StatefulWidget {
 
 class _SchoolOnlineCurriculumPageState
     extends State<SchoolOnlineCurriculumPage> {
-  String? _highlightedCourseId;
+  OnlineCourse? _selectedCourse = OnlineCourse.all.first;
   final GlobalKey _courseListKey = GlobalKey();
 
   void _openPlacementTest() {
@@ -32,7 +32,7 @@ class _SchoolOnlineCurriculumPageState
       context,
       onViewCourse: (course) {
         Navigator.of(context).pop();
-        setState(() => _highlightedCourseId = course.id);
+        setState(() => _selectedCourse = course);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           final target = _courseListKey.currentContext;
           if (target != null) {
@@ -45,6 +45,25 @@ class _SchoolOnlineCurriculumPageState
         });
       },
     );
+  }
+
+  void _goTeacherSelect() {
+    if (AuthService.currentUser == null) {
+      MenuUtil.push(context, MemberLoginPage());
+      return;
+    }
+    final course = _selectedCourse;
+    if (course == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('과정을 선택해주세요.',
+              style: TextStyle(fontFamily: 'NotoSansKR')),
+          backgroundColor: Palette.danger,
+        ),
+      );
+      return;
+    }
+    MenuUtil.push(context, OnlineTeacherSelectPage(course: course));
   }
 
   @override
@@ -155,66 +174,12 @@ class _SchoolOnlineCurriculumPageState
             child: sectionTitle("단계별 커리큘럼 · 수강료"),
           ),
           SizedBox(height: 16),
-          ...OnlineCourse.all.map((course) {
-            return Container(
-              width: double.maxFinite,
-              margin: EdgeInsets.only(bottom: 12),
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: _highlightedCourseId == course.id
-                      ? Palette.secondary
-                      : Palette.grey200,
-                  width: _highlightedCourseId == course.id ? 2 : 1,
-                ),
-                color: _highlightedCourseId == course.id
-                    ? Palette.secondary.withValues(alpha: 0.04)
-                    : Palette.white,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('${course.order}. ${course.title}',
-                            style: TextStyle(
-                                fontFamily: "NotoSansKR",
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14)),
-                        SizedBox(height: 4),
-                        Text(
-                            '${course.subtitle} · 화상 ${course.defaultSessions}회',
-                            style: TextStyle(
-                                fontFamily: "NotoSansKR",
-                                fontSize: 12,
-                                color: Palette.grey600)),
-                      ],
-                    ),
-                  ),
-                  Text(course.priceLabel,
-                      style: TextStyle(
-                          fontFamily: "Jalnan",
-                          fontSize: 14,
-                          color: Palette.secondaryDark)),
-                ],
-              ),
-            );
-          }),
-          SizedBox(height: 28),
-          sectionTitle("수업 진행 방식"),
-          SizedBox(height: 16),
-          bodyText(
-            "1. 원하는 과정을 결제합니다.\n"
-            "2. 배정된 강의를 내 강의실에서 수강합니다.\n"
-            "3. 회차별 화상수업과 YouTube 인강으로 학습합니다.",
-          ),
-          SizedBox(height: 36),
+          ...OnlineCourse.all.map(_courseRadioOption),
+          SizedBox(height: 20),
           SizedBox(
-            width: 260,
-            height: 48,
-            child: ElevatedButton(
+            width: double.maxFinite,
+            height: 52,
+            child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Palette.secondaryDark,
                 foregroundColor: Palette.white,
@@ -222,26 +187,79 @@ class _SchoolOnlineCurriculumPageState
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: () {
-                if (AuthService.currentUser == null) {
-                  MenuUtil.push(context, MemberLoginPage());
-                } else {
-                  MenuUtil.push(context, OnlineCheckoutPage());
-                }
-              },
-              child: Text(
-                "프로그램 결제하기",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: "Jalnan",
-                  color: Palette.white,
-                  fontSize: 15,
-                ),
+              onPressed: _goTeacherSelect,
+              icon: Icon(Icons.arrow_forward, color: Palette.white),
+              label: Text(
+                '다음 · 원어민 강사 선택',
+                style: TextStyle(fontFamily: 'Jalnan', fontSize: 15),
               ),
             ),
           ),
+          SizedBox(height: 28),
+          sectionTitle("수업 진행 방식"),
+          SizedBox(height: 16),
+          bodyText(
+            "1. 이 페이지에서 원하는 과정을 선택합니다.\n"
+            "2. 메인 원어민 강사를 고릅니다.\n"
+            "3. 결제 후 내 강의실에서 인강·화상수업을 진행합니다.",
+          ),
           SizedBox(height: 40),
         ],
+      ),
+    );
+  }
+
+  Widget _courseRadioOption(OnlineCourse course) {
+    final selected = _selectedCourse?.id == course.id;
+    return InkWell(
+      onTap: () => setState(() => _selectedCourse = course),
+      child: Container(
+        width: double.maxFinite,
+        margin: EdgeInsets.only(bottom: 12),
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: selected ? Palette.secondary : Palette.grey200,
+            width: selected ? 2 : 1,
+          ),
+          color: selected
+              ? Palette.secondary.withValues(alpha: 0.04)
+              : Palette.white,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              selected ? Icons.radio_button_checked : Icons.radio_button_off,
+              color: selected ? Palette.secondary : Palette.grey400,
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('${course.order}. ${course.title}',
+                      style: TextStyle(
+                          fontFamily: "NotoSansKR",
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14)),
+                  SizedBox(height: 4),
+                  Text(
+                      '${course.subtitle} · 화상 ${course.defaultSessions}회',
+                      style: TextStyle(
+                          fontFamily: "NotoSansKR",
+                          fontSize: 12,
+                          color: Palette.grey600)),
+                ],
+              ),
+            ),
+            Text(course.priceLabel,
+                style: TextStyle(
+                    fontFamily: "Jalnan",
+                    fontSize: 14,
+                    color: Palette.secondaryDark)),
+          ],
+        ),
       ),
     );
   }
