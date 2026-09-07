@@ -137,117 +137,82 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
     return Container(
       alignment: Alignment.center,
       color: Palette.white,
+      height: 88,
+      padding: EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
+          _socialLogoBlock(),
+          SizedBox(width: 16),
           Expanded(
-            flex: 1,
-            child: Container(
-              height: 120,
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Container(
-                      padding: EdgeInsets.only(top: 5, bottom: 5),
-                      alignment: Alignment.center,
-                      child: Image.asset("assets/giAppBannerFinal.png"),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    child: InkWell(
+                      child: Image.asset("assets/middleOnlineLink.png",
+                          fit: BoxFit.contain),
+                      onTap: () async {
+                        UrlUtil.open('http://gienglish.theclip.net/');
+                      },
                     ),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      height: 60,
-                      alignment: Alignment.center,
-                      child: Image.asset("assets/giAppDownload.png"),
+                ),
+                Container(width: 0.5, height: 40, color: Palette.grey500),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    child: InkWell(
+                      child: Image.asset("assets/eleOnlineLink.png",
+                          fit: BoxFit.contain),
+                      onTap: () async {
+                        UrlUtil.open(
+                            'https://www.trophy9.com/account/account.do?stdcmd=sign&url=%2Fdefault%2Edo%3F');
+                      },
                     ),
                   ),
-                  Container(
-                    margin: EdgeInsets.all(5),
-                    width: 0.5,
-                    height: 40,
-                    color: Palette.grey500,
-                  ),
-                  Expanded(
-                      flex: 1,
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        padding: EdgeInsets.all(10),
-                        alignment: Alignment.center,
-                        child: InkWell(
-                            onTap: () async {
-                              UrlUtil.open(
-                                  'https://www.instagram.com/gleam_island_school/');
-                            },
-                            child: Image.asset("assets/instaLogo.png")),
-                      )),
-                  Container(
-                    margin: EdgeInsets.all(5),
-                    width: 0.5,
-                    height: 40,
-                    color: Palette.grey500,
-                  ),
-                  Expanded(
-                      flex: 1,
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        padding: EdgeInsets.all(10),
-                        alignment: Alignment.center,
-                        child: InkWell(
-                          onTap: () async {
-                            UrlUtil.open(
-                                'https://blog.naver.com/gleam-island-paju');
-                          },
-                          child: Container(
-                              width: 40,
-                              child: Image.asset("assets/naverBlogLogo.png")),
-                        ),
-                      )),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          Expanded(
-              flex: 1,
-              child: Container(
-                height: 120,
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: Container(
-                        margin: EdgeInsets.only(top: 15, bottom: 15),
-                        child: InkWell(
-                          child: Image.asset("assets/middleOnlineLink.png"),
-                          onTap: () async {
-                            UrlUtil.open('http://gienglish.theclip.net/');
-                          },
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(5),
-                      width: 0.5,
-                      height: 40,
-                      color: Palette.grey500,
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Container(
-                        margin: EdgeInsets.all(10),
-                        child: InkWell(
-                          child: Image.asset("assets/eleOnlineLink.png"),
-                          onTap: () async {
-                            UrlUtil.open(
-                                'https://www.trophy9.com/account/account.do?stdcmd=sign&url=%2Fdefault%2Edo%3F');
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ))
+        ],
+      ),
+    );
+  }
+
+  Widget _socialLogoBlock() {
+    return Container(
+      height: 64,
+      padding: EdgeInsets.symmetric(horizontal: 18),
+      decoration: BoxDecoration(
+        color: Palette.grey50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Palette.grey200),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: () async {
+              UrlUtil.open('https://www.instagram.com/gleam_island_school/');
+            },
+            child: SizedBox(
+              width: 40,
+              height: 40,
+              child: Image.asset("assets/instaLogo.png"),
+            ),
+          ),
+          SizedBox(width: 16),
+          InkWell(
+            onTap: () async {
+              UrlUtil.open('https://blog.naver.com/gleam-island-paju');
+            },
+            child: SizedBox(
+              width: 36,
+              height: 36,
+              child: Image.asset("assets/naverBlogLogo.png"),
+            ),
+          ),
         ],
       ),
     );
@@ -638,18 +603,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         child: Column(
           children: [
             mainImage(),
-            SizedBox(height: 100, child: urlMenu()),
-            InkWell(
-              child: Image.asset(
-                "assets/mainBannerOpening.png",
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-              onTap: () async {
-                UrlUtil.open(
-                    'https://blog.naver.com/gleam-island-paju/223029184863');
-              },
-            ),
+            urlMenu(),
             bulletinBoard(),
             ModernWidgets.modernFooter(),
           ],
@@ -666,14 +620,6 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         child: Column(
           children: [
             mobileMainImage(),
-            InkWell(
-              child: Image.asset("assets/mainBannerOpening.png"),
-              onTap: () async {
-                UrlUtil.open(
-                    'https://blog.naver.com/gleam-island-paju/223029184863');
-              },
-            ),
-            // mobileMenuList(),
             mobileUrlMenu(),
             mobileBulletinBoard(),
             ModernWidgets.modernMobileFooter()
@@ -704,53 +650,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            height: 10,
-          ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              InkWell(
-                  onTap: () async {
-                    UrlUtil.open(
-                        'https://www.instagram.com/gleam_island_school/');
-                  },
-                  child: Image.asset("assets/instaLogo.png")),
+              _socialLogoBlock(),
               Spacer(),
-              Container(
-                margin: EdgeInsets.all(5),
-                width: 1,
-                height: 40,
-                color: Colors.black54,
-              ),
-              Spacer(),
-              Container(
-                  width: 40,
-                  child: InkWell(
-                      onTap: () async {
-                        UrlUtil.open(
-                            'https://blog.naver.com/gleam-island-paju');
-                      },
-                      child: Image.asset("assets/naverBlogLogo.png"))),
-              Spacer(),
-              Container(
-                margin: EdgeInsets.all(5),
-                width: 1,
-                height: 40,
-                color: Colors.black54,
-              ),
-              Spacer(),
-              Container(
-                  width: 70, child: Image.asset("assets/giAppDownload.png")),
-              Spacer(),
-              Container(
-                margin: EdgeInsets.all(5),
-                width: 1,
-                height: 40,
-                color: Colors.black54,
-              ),
-              Spacer(),
-              Container(
+              SizedBox(
                 width: 80,
                 height: 50,
                 child: ElevatedButton(
@@ -784,9 +688,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
               )
             ],
           ),
-          SizedBox(
-            height: 10,
-          ),
+          SizedBox(height: 16),
           Row(
             children: [
               Expanded(

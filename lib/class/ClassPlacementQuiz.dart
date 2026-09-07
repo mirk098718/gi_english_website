@@ -182,39 +182,40 @@ class ClassPlacementQuiz {
     ),
   ];
 
+  /// 정답 번호가 한쪽에 몰리지 않도록 보기 순서를 섞음 (①×4, ②×4, ③×4, ④×3).
   static const List<Part2Question> part2Questions = [
     Part2Question(
       category: '기초 영문법',
       prompt: 'She ________ to the gym every morning.',
       choices: [
         PlacementChoice(number: 1, text: 'go'),
-        PlacementChoice(number: 2, text: 'goes'),
-        PlacementChoice(number: 3, text: 'going'),
+        PlacementChoice(number: 2, text: 'going'),
+        PlacementChoice(number: 3, text: 'goes'),
         PlacementChoice(number: 4, text: 'gone'),
       ],
-      correctChoice: 2,
+      correctChoice: 3,
     ),
     Part2Question(
       category: '기초 회화',
       prompt: '"오늘 저녁에 뭐 할 예정인가요?"',
       choices: [
         PlacementChoice(number: 1, text: 'What do you do tonight?'),
-        PlacementChoice(number: 2, text: 'What are you doing tonight?'),
-        PlacementChoice(number: 3, text: 'What did you do tonight?'),
-        PlacementChoice(number: 4, text: 'What are you do tonight?'),
+        PlacementChoice(number: 2, text: 'What did you do tonight?'),
+        PlacementChoice(number: 3, text: 'What are you do tonight?'),
+        PlacementChoice(number: 4, text: 'What are you doing tonight?'),
       ],
-      correctChoice: 2,
+      correctChoice: 4,
     ),
     Part2Question(
       category: '기초 영문법',
       prompt: 'I have a meeting ________ 2 PM ________ Monday.',
       choices: [
-        PlacementChoice(number: 1, text: 'at / on'),
-        PlacementChoice(number: 2, text: 'in / at'),
+        PlacementChoice(number: 1, text: 'in / at'),
+        PlacementChoice(number: 2, text: 'at / on'),
         PlacementChoice(number: 3, text: 'on / in'),
         PlacementChoice(number: 4, text: 'at / in'),
       ],
-      correctChoice: 1,
+      correctChoice: 2,
     ),
     Part2Question(
       category: '중급 영문법',
@@ -222,126 +223,126 @@ class ClassPlacementQuiz {
       choices: [
         PlacementChoice(number: 1, text: 'live'),
         PlacementChoice(number: 2, text: 'am living'),
-        PlacementChoice(number: 3, text: 'had lived'),
-        PlacementChoice(number: 4, text: 'have lived'),
+        PlacementChoice(number: 3, text: 'have lived'),
+        PlacementChoice(number: 4, text: 'had lived'),
       ],
-      correctChoice: 3,
+      correctChoice: 4,
     ),
     Part2Question(
       category: '중급 회화',
       prompt: 'Take an umbrella ________ it rains.',
       choices: [
-        PlacementChoice(number: 1, text: 'in case'),
-        PlacementChoice(number: 2, text: 'although'),
-        PlacementChoice(number: 3, text: 'unless'),
+        PlacementChoice(number: 1, text: 'although'),
+        PlacementChoice(number: 2, text: 'unless'),
+        PlacementChoice(number: 3, text: 'in case'),
         PlacementChoice(number: 4, text: 'despite'),
       ],
-      correctChoice: 1,
+      correctChoice: 3,
     ),
     Part2Question(
       category: '중급 영문법',
       prompt: 'The manager ________ is in charge of this project is away today.',
       choices: [
-        PlacementChoice(number: 1, text: 'which'),
-        PlacementChoice(number: 2, text: 'who'),
+        PlacementChoice(number: 1, text: 'who'),
+        PlacementChoice(number: 2, text: 'which'),
         PlacementChoice(number: 3, text: 'whom'),
         PlacementChoice(number: 4, text: 'whose'),
       ],
-      correctChoice: 2,
+      correctChoice: 1,
     ),
     Part2Question(
       category: '비즈니스',
       prompt: '예의 바르게 동의하지 않을 때',
       choices: [
         PlacementChoice(number: 1, text: 'You are wrong about this.'),
+        PlacementChoice(number: 2, text: "I don't care about that idea."),
+        PlacementChoice(number: 3, text: 'Shut up and listen to me.'),
         PlacementChoice(
-          number: 2,
+          number: 4,
           text: 'I see your point, but I have a slightly different view.',
         ),
-        PlacementChoice(number: 3, text: "I don't care about that idea."),
-        PlacementChoice(number: 4, text: 'Shut up and listen to me.'),
       ],
-      correctChoice: 2,
+      correctChoice: 4,
     ),
     Part2Question(
       category: '비즈니스',
       prompt: '첨부 파일 보고서',
       choices: [
-        PlacementChoice(number: 1, text: 'Look at the attached report.'),
-        PlacementChoice(number: 2, text: 'You can see the report I attached.'),
         PlacementChoice(
-          number: 3,
+          number: 1,
           text: 'Please find the attached report for your review.',
         ),
+        PlacementChoice(number: 2, text: 'Look at the attached report.'),
+        PlacementChoice(number: 3, text: 'You can see the report I attached.'),
         PlacementChoice(number: 4, text: 'Attachment is there for report.'),
       ],
-      correctChoice: 3,
+      correctChoice: 1,
     ),
     Part2Question(
       category: '비즈니스',
       prompt: 'We need to ________ the deadline for this project.',
       choices: [
-        PlacementChoice(number: 1, text: 'postpone'),
-        PlacementChoice(number: 2, text: 'cancel'),
+        PlacementChoice(number: 1, text: 'cancel'),
+        PlacementChoice(number: 2, text: 'postpone'),
         PlacementChoice(number: 3, text: 'finish'),
         PlacementChoice(number: 4, text: 'accelerate'),
       ],
-      correctChoice: 1,
+      correctChoice: 2,
     ),
     Part2Question(
       category: '비즈니스 회화',
       prompt: 'I will review the proposal and ________ to you soon.',
       choices: [
-        PlacementChoice(number: 1, text: 'get back'),
-        PlacementChoice(number: 2, text: 'call out'),
-        PlacementChoice(number: 3, text: 'turn off'),
+        PlacementChoice(number: 1, text: 'call out'),
+        PlacementChoice(number: 2, text: 'turn off'),
+        PlacementChoice(number: 3, text: 'get back'),
         PlacementChoice(number: 4, text: 'look down'),
       ],
-      correctChoice: 1,
+      correctChoice: 3,
     ),
     Part2Question(
       category: '고급 회화',
       prompt: '그의 행동은 말보다 더 큰 설득력',
       choices: [
-        PlacementChoice(number: 1, text: 'Words are better than actions.'),
-        PlacementChoice(number: 2, text: 'Actions speak louder than words.'),
+        PlacementChoice(number: 1, text: 'Actions speak louder than words.'),
+        PlacementChoice(number: 2, text: 'Words are better than actions.'),
         PlacementChoice(number: 3, text: 'Talking is doing.'),
         PlacementChoice(number: 4, text: 'Big mouth makes big things.'),
       ],
-      correctChoice: 2,
+      correctChoice: 1,
     ),
     Part2Question(
       category: '고급 뉘앙스',
       prompt: 'The negotiation requires a very ________ approach.',
       choices: [
-        PlacementChoice(number: 1, text: 'delicate'),
-        PlacementChoice(number: 2, text: 'easy'),
+        PlacementChoice(number: 1, text: 'easy'),
+        PlacementChoice(number: 2, text: 'delicate'),
         PlacementChoice(number: 3, text: 'simple'),
         PlacementChoice(number: 4, text: 'rough'),
       ],
-      correctChoice: 1,
+      correctChoice: 2,
     ),
     Part2Question(
       category: '고급/시사',
       prompt: '"유연하고 적응력이 뛰어난"',
       choices: [
         PlacementChoice(number: 1, text: 'rigid'),
-        PlacementChoice(number: 2, text: 'versatile'),
-        PlacementChoice(number: 3, text: 'stubborn'),
+        PlacementChoice(number: 2, text: 'stubborn'),
+        PlacementChoice(number: 3, text: 'versatile'),
         PlacementChoice(number: 4, text: 'obsolete'),
       ],
-      correctChoice: 2,
+      correctChoice: 3,
     ),
     Part2Question(
       category: '고급 가정법',
       prompt: 'If I ________ about the risks, I would have made a different decision.',
       choices: [
         PlacementChoice(number: 1, text: 'know'),
-        PlacementChoice(number: 2, text: 'knew'),
-        PlacementChoice(number: 3, text: 'have known'),
-        PlacementChoice(number: 4, text: 'had known'),
+        PlacementChoice(number: 2, text: 'had known'),
+        PlacementChoice(number: 3, text: 'knew'),
+        PlacementChoice(number: 4, text: 'have known'),
       ],
-      correctChoice: 4,
+      correctChoice: 2,
     ),
     Part2Question(
       category: '고급 표현',
@@ -375,11 +376,13 @@ class ClassPlacementQuiz {
     return correct;
   }
 
-  /// 0~3 기초, 4~7 중급, 8~11 비즈니스, 12+ 고급.
+  /// 4지선다 15문항의 무작위 기대값이 약 3.75이므로,
+  /// 찍어서 올라가지 않도록 기초 구간을 넓게 잡는다.
+  /// 0~5 기초, 6~9 중급, 10~12 비즈니스, 13+ 고급.
   static OnlineCourse courseForPart2Score(int correct) {
-    if (correct <= 3) return OnlineCourse.all[1];
-    if (correct <= 7) return OnlineCourse.all[2];
-    if (correct <= 11) return OnlineCourse.all[3];
+    if (correct <= 5) return OnlineCourse.all[1];
+    if (correct <= 9) return OnlineCourse.all[2];
+    if (correct <= 12) return OnlineCourse.all[3];
     return OnlineCourse.all[4];
   }
 

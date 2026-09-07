@@ -13,7 +13,6 @@ class StackRatioTestPage extends StatelessWidget {
             heightFactor: 0.5,
             child: Image.asset("assets/schoolMainImage.png"),
           ),
-          Image.asset("assets/schoolMainCatch.png"),
         ],
       ),
     );

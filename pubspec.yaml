@@ -68,7 +68,6 @@ flutter:
      - assets/curriculumImage.png
      - assets/communityMainImage.png
      - assets/giAppDownload.png
-     - assets/schoolMainCatch.png
      - assets/ballPoolImage.png
      - assets/giEmblem.png
      - assets/aucklandView.png
@@ -84,7 +83,6 @@ flutter:
      - assets/juniorTimesLogo.png
      - assets/eleOnlineLink.png
      - assets/middleOnlineLink.png
-     - assets/mainBannerOpening.png
      - assets/naverBlogLogo.png
      - assets/gleamIslandLogo.jpeg
      - assets/gleamIslandMoto.png

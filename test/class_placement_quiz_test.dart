@@ -12,18 +12,29 @@ void main() {
     expect(skipped.course.order, 1);
   });
 
-  test('Part 2 score bands include 0 correct as 기초', () {
+  test('Part 2 score bands keep random guessing in 기초', () {
     final answers = List<int>.filled(15, 0);
     expect(ClassPlacementQuiz.scorePart2(answers), 0);
 
     expect(ClassPlacementQuiz.courseForPart2Score(0).id, 'basic_grammar_speaking');
-    expect(ClassPlacementQuiz.courseForPart2Score(3).id, 'basic_grammar_speaking');
-    expect(ClassPlacementQuiz.courseForPart2Score(4).id, 'intermediate_grammar_speaking');
-    expect(ClassPlacementQuiz.courseForPart2Score(7).id, 'intermediate_grammar_speaking');
-    expect(ClassPlacementQuiz.courseForPart2Score(8).id, 'business_english');
-    expect(ClassPlacementQuiz.courseForPart2Score(11).id, 'business_english');
-    expect(ClassPlacementQuiz.courseForPart2Score(12).id, 'advanced_premium_speaking');
+    expect(ClassPlacementQuiz.courseForPart2Score(5).id, 'basic_grammar_speaking');
+    expect(ClassPlacementQuiz.courseForPart2Score(6).id, 'intermediate_grammar_speaking');
+    expect(ClassPlacementQuiz.courseForPart2Score(9).id, 'intermediate_grammar_speaking');
+    expect(ClassPlacementQuiz.courseForPart2Score(10).id, 'business_english');
+    expect(ClassPlacementQuiz.courseForPart2Score(12).id, 'business_english');
+    expect(ClassPlacementQuiz.courseForPart2Score(13).id, 'advanced_premium_speaking');
     expect(ClassPlacementQuiz.courseForPart2Score(15).id, 'advanced_premium_speaking');
+  });
+
+  test('Part 2 correct answers are spread across 1-4', () {
+    final counts = <int, int>{1: 0, 2: 0, 3: 0, 4: 0};
+    for (final q in ClassPlacementQuiz.part2Questions) {
+      counts[q.correctChoice] = (counts[q.correctChoice] ?? 0) + 1;
+    }
+    expect(counts[1], 4);
+    expect(counts[2], 4);
+    expect(counts[3], 4);
+    expect(counts[4], 3);
   });
 
   test('Part 2 correct answers score 15', () {
