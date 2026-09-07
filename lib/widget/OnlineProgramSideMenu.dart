@@ -29,8 +29,8 @@ class _OnlineProgramSideMenuState extends State<OnlineProgramSideMenu> {
   void initState() {
     super.initState();
     buttonStateList = [
-      ButtonState("내 강의실", _colorFor(0), SchoolOnlineClassroomPage()),
-      ButtonState("커리큘럼", _colorFor(1), SchoolOnlineCurriculumPage()),
+      ButtonState("커리큘럼", _colorFor(0), SchoolOnlineCurriculumPage()),
+      ButtonState("내 강의실", _colorFor(1), SchoolOnlineClassroomPage()),
     ];
   }
 

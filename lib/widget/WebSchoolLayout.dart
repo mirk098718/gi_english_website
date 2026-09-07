@@ -11,7 +11,7 @@ import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
 import 'package:gi_english_website/pages/SchoolMainPage.dart';
 import 'package:gi_english_website/pages/SchoolMapPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
-import 'package:gi_english_website/pages/SchoolOnlineProgramPage.dart';
+import 'package:gi_english_website/pages/SchoolOnlineCurriculumPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
 import 'package:gi_english_website/pages/SchoolSystemPage.dart';
 import 'package:gi_english_website/pages/SchoolTeachersPage.dart';
@@ -329,7 +329,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
           SizedBox(width: 28),
           InkWell(
             onTap: () {
-              MenuUtil.push(context, SchoolOnlineProgramPage());
+              MenuUtil.push(context, SchoolOnlineCurriculumPage());
             },
             child: _navLabel("Online"),
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/class/ClassPlacementQuiz.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
 import 'package:gi_english_website/pages/OnlineCheckoutPage.dart';
@@ -6,6 +7,7 @@ import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/ClassPlacementDialog.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
@@ -22,6 +24,29 @@ class SchoolOnlineCurriculumPage extends StatefulWidget {
 
 class _SchoolOnlineCurriculumPageState
     extends State<SchoolOnlineCurriculumPage> {
+  String? _highlightedCourseId;
+  final GlobalKey _courseListKey = GlobalKey();
+
+  void _openPlacementTest() {
+    ClassPlacementDialog.show(
+      context,
+      onViewCourse: (course) {
+        Navigator.of(context).pop();
+        setState(() => _highlightedCourseId = course.id);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final target = _courseListKey.currentContext;
+          if (target != null) {
+            Scrollable.ensureVisible(
+              target,
+              duration: const Duration(milliseconds: 400),
+              alignment: 0.12,
+            );
+          }
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     MediaQueryData mediaQueryData = MediaQuery.of(context);
@@ -51,7 +76,7 @@ class _SchoolOnlineCurriculumPageState
         color: Palette.white,
         child: Column(
           children: [
-            OnlineProgramSideMenu(selectedIndex: 1, isMobile: true),
+            OnlineProgramSideMenu(selectedIndex: 0, isMobile: true),
             content(),
             SizedBox(height: 51, child: MyWidget.mobileSchoolFooter()),
           ],
@@ -68,7 +93,7 @@ class _SchoolOnlineCurriculumPageState
         children: [
           SizedBox(
             width: 232,
-            child: OnlineProgramSideMenu(selectedIndex: 1),
+            child: OnlineProgramSideMenu(selectedIndex: 0),
           ),
           Expanded(child: content()),
         ],
@@ -115,6 +140,8 @@ class _SchoolOnlineCurriculumPageState
           ),
           WidgetUtil.myDivider(),
           SizedBox(height: 20),
+          _placementSection(),
+          SizedBox(height: 28),
           sectionTitle("과정 구성"),
           SizedBox(height: 16),
           bodyText(
@@ -123,7 +150,10 @@ class _SchoolOnlineCurriculumPageState
             "수강생의 레벨 진단 후 적합한 과정을 배정해 드립니다.",
           ),
           SizedBox(height: 28),
-          sectionTitle("단계별 커리큘럼 · 수강료"),
+          KeyedSubtree(
+            key: _courseListKey,
+            child: sectionTitle("단계별 커리큘럼 · 수강료"),
+          ),
           SizedBox(height: 16),
           ...OnlineCourse.all.map((course) {
             return Container(
@@ -131,7 +161,15 @@ class _SchoolOnlineCurriculumPageState
               margin: EdgeInsets.only(bottom: 12),
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                border: Border.all(color: Palette.grey200),
+                border: Border.all(
+                  color: _highlightedCourseId == course.id
+                      ? Palette.secondary
+                      : Palette.grey200,
+                  width: _highlightedCourseId == course.id ? 2 : 1,
+                ),
+                color: _highlightedCourseId == course.id
+                    ? Palette.secondary.withValues(alpha: 0.04)
+                    : Palette.white,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
@@ -203,6 +241,66 @@ class _SchoolOnlineCurriculumPageState
             ),
           ),
           SizedBox(height: 40),
+        ],
+      ),
+    );
+  }
+
+  Widget _placementSection() {
+    return Container(
+      width: double.maxFinite,
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Palette.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Palette.grey200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '「나에게 맞는 클래스 선택하기」',
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontWeight: FontWeight.w700,
+              fontSize: 16,
+              color: Palette.grey900,
+            ),
+          ),
+          SizedBox(height: 10),
+          Text(
+            ClassPlacementQuiz.skipNotice,
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontSize: 13,
+              height: 1.55,
+              color: Palette.grey600,
+            ),
+          ),
+          SizedBox(height: 16),
+          SizedBox(
+            height: 44,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Palette.secondary,
+                foregroundColor: Palette.white,
+                elevation: 0,
+                padding: EdgeInsets.symmetric(horizontal: 28),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: _openPlacementTest,
+              child: Text(
+                'Test',
+                style: TextStyle(
+                  fontFamily: 'NotoSansKR',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

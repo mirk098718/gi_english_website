@@ -69,7 +69,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
         color: Palette.white,
         child: Column(
           children: [
-            OnlineProgramSideMenu(selectedIndex: 0, isMobile: true),
+            OnlineProgramSideMenu(selectedIndex: 1, isMobile: true),
             content(),
             SizedBox(height: 51, child: MyWidget.mobileSchoolFooter()),
           ],
@@ -86,7 +86,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
         children: [
           SizedBox(
             width: 232,
-            child: OnlineProgramSideMenu(selectedIndex: 0),
+            child: OnlineProgramSideMenu(selectedIndex: 1),
           ),
           Expanded(child: content()),
         ],

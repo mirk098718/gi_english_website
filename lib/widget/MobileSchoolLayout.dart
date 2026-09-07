@@ -3,7 +3,7 @@ import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumElePage.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
 import 'package:gi_english_website/pages/SchoolMainPage.dart';
-import 'package:gi_english_website/pages/SchoolOnlineProgramPage.dart';
+import 'package:gi_english_website/pages/SchoolOnlineCurriculumPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
 import 'package:gi_english_website/pages/WorkingAdminLoginPage.dart';
 import 'package:gi_english_website/pages/AdminOnlineHubPage.dart';
@@ -306,7 +306,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                 SizedBox(width: 30),
                 InkWell(
                   onTap: () {
-                    MenuUtil.push(context, SchoolOnlineProgramPage());
+                    MenuUtil.push(context, SchoolOnlineCurriculumPage());
                   },
                   child: Container(
                       height: widget.height,
