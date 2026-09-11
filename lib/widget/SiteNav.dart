@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/pages/AdminOnlineHubPage.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
-import 'package:gi_english_website/pages/OnlineCourseDetailPage.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolCodingPage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityFAQPage.dart';
@@ -69,14 +68,16 @@ class SiteNav {
     MenuUtil.push(context, const SchoolAboutPage());
   }
 
-  static void goCourses(BuildContext context) {
+  static void goCourses(BuildContext context, {String? courseId}) {
     if (!isMemberLoggedIn) return;
-    MenuUtil.push(context, const SchoolOnlineCurriculumPage());
+    MenuUtil.push(
+      context,
+      SchoolOnlineCurriculumPage(initialCourseId: courseId),
+    );
   }
 
   static void goCourse(BuildContext context, OnlineCourse course) {
-    if (!isMemberLoggedIn) return;
-    MenuUtil.push(context, OnlineCourseDetailPage(course: course));
+    goCourses(context, courseId: course.id);
   }
 
   static void goClassroom(BuildContext context) {
@@ -119,7 +120,7 @@ class SiteNav {
       context,
       onViewCourse: (course) {
         Navigator.of(context).pop();
-        MenuUtil.push(context, OnlineCourseDetailPage(course: course));
+        goCourse(context, course);
       },
     );
   }

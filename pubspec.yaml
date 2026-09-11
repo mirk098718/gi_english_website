@@ -77,6 +77,7 @@ flutter:
      - assets/academy-hero-high.png
      - assets/academy-hero-community.png
      - assets/hero-device-mockups-16x9.png
+     - assets/online-class-alert.png
      - assets/audience-beginner.png
      - assets/audience-basic.png
      - assets/audience-intermediate.png
@@ -84,6 +85,7 @@ flutter:
      - assets/audience-advanced.png
      - assets/audience-campus.png
      - assets/curriculumImage.png
+     - assets/curriculum-service-overview.jpg
      - assets/communityMainImage.png
      - assets/giAppDownload.png
      - assets/ballPoolImage.png

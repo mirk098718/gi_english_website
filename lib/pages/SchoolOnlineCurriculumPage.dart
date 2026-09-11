@@ -15,7 +15,10 @@ import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import '../util/WidgetUtil.dart';
 
 class SchoolOnlineCurriculumPage extends StatefulWidget {
-  const SchoolOnlineCurriculumPage({Key? key}) : super(key: key);
+  final String? initialCourseId;
+
+  const SchoolOnlineCurriculumPage({Key? key, this.initialCourseId})
+      : super(key: key);
 
   @override
   _SchoolOnlineCurriculumPageState createState() =>
@@ -24,8 +27,36 @@ class SchoolOnlineCurriculumPage extends StatefulWidget {
 
 class _SchoolOnlineCurriculumPageState
     extends State<SchoolOnlineCurriculumPage> {
-  OnlineCourse? _selectedCourse = OnlineCourse.all.first;
+  late OnlineCourse? _selectedCourse;
   final GlobalKey _courseListKey = GlobalKey();
+  final Map<String, GlobalKey> _courseKeys = {
+    for (final course in OnlineCourse.all) course.id: GlobalKey(),
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedCourse = OnlineCourse.findById(widget.initialCourseId ?? '') ??
+        OnlineCourse.all.first;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.initialCourseId != null) {
+        _scrollToSelectedCourse();
+      }
+    });
+  }
+
+  void _scrollToSelectedCourse() {
+    final id = _selectedCourse?.id;
+    final target = id == null
+        ? _courseListKey.currentContext
+        : (_courseKeys[id]?.currentContext ?? _courseListKey.currentContext);
+    if (target == null) return;
+    Scrollable.ensureVisible(
+      target,
+      duration: const Duration(milliseconds: 420),
+      alignment: 0.08,
+    );
+  }
 
   void _openPlacementTest() {
     ClassPlacementDialog.show(
@@ -34,14 +65,7 @@ class _SchoolOnlineCurriculumPageState
         Navigator.of(context).pop();
         setState(() => _selectedCourse = course);
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          final target = _courseListKey.currentContext;
-          if (target != null) {
-            Scrollable.ensureVisible(
-              target,
-              duration: const Duration(milliseconds: 400),
-              alignment: 0.12,
-            );
-          }
+          _scrollToSelectedCourse();
         });
       },
     );
@@ -96,7 +120,7 @@ class _SchoolOnlineCurriculumPageState
         child: Column(
           children: [
             OnlineProgramSideMenu(selectedIndex: 0, isMobile: true),
-            content(),
+            content(compact: true),
           ],
         ),
       ),
@@ -143,21 +167,23 @@ class _SchoolOnlineCurriculumPageState
     );
   }
 
-  Widget content() {
+  Widget content({bool compact = false}) {
     return Container(
       alignment: Alignment.topLeft,
       width: double.maxFinite,
-      padding: EdgeInsets.all(20),
+      padding: EdgeInsets.all(compact ? 20 : 28),
       color: Palette.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "온라인 프로그램 커리큘럼",
+            "수강과정 전체보기",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
           SizedBox(height: 20),
+          _serviceOverview(compact: compact),
+          SizedBox(height: 28),
           _placementSection(),
           SizedBox(height: 28),
           sectionTitle("과정 구성"),
@@ -170,10 +196,26 @@ class _SchoolOnlineCurriculumPageState
           SizedBox(height: 28),
           KeyedSubtree(
             key: _courseListKey,
-            child: sectionTitle("단계별 커리큘럼 · 수강료"),
+            child: sectionTitle("과정을 선택하세요"),
           ),
+          SizedBox(height: 8),
+          bodyText('각 과정의 이미지와 설명을 보고, 맞는 과정을 선택해 주세요.'),
           SizedBox(height: 16),
-          ...OnlineCourse.all.map(_courseRadioOption),
+          RadioGroup<String>(
+            groupValue: _selectedCourse?.id,
+            onChanged: (id) {
+              final course = OnlineCourse.findById(id ?? '');
+              if (course != null) {
+                setState(() => _selectedCourse = course);
+              }
+            },
+            child: Column(
+              children: [
+                for (final course in OnlineCourse.all)
+                  _courseRadioOption(course, compact: compact),
+              ],
+            ),
+          ),
           SizedBox(height: 20),
           SizedBox(
             width: double.maxFinite,
@@ -208,58 +250,186 @@ class _SchoolOnlineCurriculumPageState
     );
   }
 
-  Widget _courseRadioOption(OnlineCourse course) {
+  Widget _courseRadioOption(OnlineCourse course, {required bool compact}) {
     final selected = _selectedCourse?.id == course.id;
+    final image = ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Image.asset(
+        course.imageAsset,
+        width: compact ? double.infinity : 260,
+        height: compact ? 188 : 200,
+        fit: BoxFit.cover,
+        alignment: Alignment.center,
+      ),
+    );
+    final details = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${course.order}. ${course.title}',
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontWeight: FontWeight.w800,
+            fontSize: compact ? 18 : 20,
+            color: Palette.grey900,
+          ),
+        ),
+        SizedBox(height: 4),
+        Text(
+          '${course.subtitle} · 화상 ${course.defaultSessions}회',
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            color: Palette.darkTeal,
+          ),
+        ),
+        SizedBox(height: 10),
+        Text(
+          course.description,
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: 14,
+            height: 1.6,
+            color: Palette.grey700,
+          ),
+        ),
+        SizedBox(height: 12),
+        ...course.highlights.map(
+          (item) => Padding(
+            padding: EdgeInsets.only(bottom: 6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 2),
+                  child: Icon(Icons.check_circle,
+                      size: 16, color: Palette.darkTeal),
+                ),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    item,
+                    style: TextStyle(
+                      fontFamily: 'NotoSansKR',
+                      fontSize: 13,
+                      height: 1.45,
+                      color: Palette.grey700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(height: 8),
+        Text(
+          course.priceLabel,
+          style: TextStyle(
+            fontFamily: 'Jalnan',
+            fontSize: 18,
+            color: Palette.secondaryDark,
+          ),
+        ),
+      ],
+    );
+
     return InkWell(
+      key: _courseKeys[course.id],
       onTap: () => setState(() => _selectedCourse = course),
-      child: Container(
+      borderRadius: BorderRadius.circular(16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
         width: double.maxFinite,
-        margin: EdgeInsets.only(bottom: 12),
-        padding: EdgeInsets.all(16),
+        margin: EdgeInsets.only(bottom: 18),
+        padding: EdgeInsets.all(compact ? 16 : 20),
         decoration: BoxDecoration(
           border: Border.all(
-            color: selected ? Palette.secondary : Palette.grey200,
+            color: selected ? Palette.darkTeal : Palette.grey200,
             width: selected ? 2 : 1,
           ),
           color: selected
-              ? Palette.secondary.withValues(alpha: 0.04)
+              ? Palette.darkTeal.withValues(alpha: 0.04)
               : Palette.white,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(16),
         ),
-        child: Row(
-          children: [
-            Icon(
-              selected ? Icons.radio_button_checked : Icons.radio_button_off,
-              color: selected ? Palette.secondary : Palette.grey400,
-            ),
-            SizedBox(width: 12),
-            Expanded(
-              child: Column(
+        child: compact
+            ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${course.order}. ${course.title}',
-                      style: TextStyle(
-                          fontFamily: "NotoSansKR",
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14)),
-                  SizedBox(height: 4),
-                  Text(
-                      '${course.subtitle} · 화상 ${course.defaultSessions}회',
-                      style: TextStyle(
-                          fontFamily: "NotoSansKR",
-                          fontSize: 12,
-                          color: Palette.grey600)),
+                  _courseRadioHeader(course, selected),
+                  SizedBox(height: 12),
+                  image,
+                  SizedBox(height: 14),
+                  details,
+                ],
+              )
+            : Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _courseRadio(course),
+                  SizedBox(width: 8),
+                  image,
+                  SizedBox(width: 20),
+                  Expanded(child: details),
                 ],
               ),
-            ),
-            Text(course.priceLabel,
-                style: TextStyle(
-                    fontFamily: "Jalnan",
-                    fontSize: 14,
-                    color: Palette.secondaryDark)),
-          ],
-        ),
       ),
+    );
+  }
+
+  Widget _courseRadioHeader(OnlineCourse course, bool selected) {
+    return Row(
+      children: [
+        _courseRadio(course),
+        SizedBox(width: 4),
+        Text(
+          selected ? '선택됨' : '이 과정 선택',
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+            color: selected ? Palette.darkTeal : Palette.grey500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _courseRadio(OnlineCourse course) {
+    return Radio<String>(
+      value: course.id,
+      fillColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) return Palette.darkTeal;
+        return Palette.grey400;
+      }),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    );
+  }
+
+  Widget _serviceOverview({required bool compact}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Image.asset(
+            'assets/curriculum-service-overview.jpg',
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
+        ),
+        SizedBox(height: 10),
+        Text(
+          '인강 · 디지털 교재 · 실시간 화상수업 · 피드백 체크리스트가 한 화면에서 이어집니다.',
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: compact ? 12 : 13,
+            height: 1.5,
+            color: Palette.grey600,
+          ),
+        ),
+      ],
     );
   }
 

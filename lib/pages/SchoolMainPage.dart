@@ -4,6 +4,7 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/ModernWidgets.dart';
 import 'package:gi_english_website/widget/EasyKeyboardListener.dart';
 import 'package:gi_english_website/widget/HomeAudienceCards.dart';
+import 'package:gi_english_website/widget/HomeClassAlertBand.dart';
 import 'package:gi_english_website/widget/HomeTrustBand.dart';
 import 'package:gi_english_website/widget/HomeWeeklyLoopBand.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
@@ -61,34 +62,38 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
   Widget mainImage() {
     final screen = MediaQuery.sizeOf(context);
     final heroHeight = (screen.height - 72).clamp(520.0, 720.0);
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: heroHeight,
-      color: Palette.navyDark,
-      child: Row(
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          Expanded(
-            flex: 5,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(56, 40, 32, 40),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 520),
-                  child: _heroCopy(compact: false),
+          ColoredBox(color: Palette.navyDark),
+          _heroDeviceShot(scale: 1.18, alignment: Alignment(0.78, 0)),
+          IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Palette.navyDark,
+                    Palette.navyDark.withValues(alpha: 0.82),
+                    Palette.navyDark.withValues(alpha: 0.18),
+                    Palette.navyDark.withValues(alpha: 0),
+                  ],
+                  stops: const [0.0, 0.22, 0.42, 0.58],
                 ),
               ),
             ),
           ),
-          Expanded(
-            flex: 6,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 16, 28, 16),
-              child: Image.asset(
-                _heroAsset,
-                fit: BoxFit.cover,
-                alignment: Alignment(0.72, 0),
-                filterQuality: FilterQuality.high,
+          Padding(
+            padding: EdgeInsets.fromLTRB(56, 40, 32, 40),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: 520),
+                child: _heroCopy(compact: false),
               ),
             ),
           ),
@@ -109,14 +114,31 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             child: _heroCopy(compact: true),
           ),
           AspectRatio(
-            aspectRatio: 16 / 10,
-            child: Image.asset(
-              _heroAsset,
-              fit: BoxFit.cover,
-              alignment: Alignment(0.72, 0),
+            aspectRatio: 1.4,
+            child: _heroDeviceShot(
+              scale: 1.52,
+              alignment: Alignment(0.86, 0),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _heroDeviceShot({
+    required double scale,
+    required Alignment alignment,
+  }) {
+    return ClipRect(
+      child: Transform.scale(
+        scale: scale,
+        alignment: alignment,
+        child: Image.asset(
+          _heroAsset,
+          fit: BoxFit.cover,
+          alignment: alignment,
+          filterQuality: FilterQuality.high,
+        ),
       ),
     );
   }
@@ -222,6 +244,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
           children: [
             mainImage(),
             HomeWeeklyLoopBand(),
+            HomeClassAlertBand(),
             HomeAudienceCards(),
             HomeTrustBand(),
             ModernWidgets.modernFooter(),
@@ -240,6 +263,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
           children: [
             mobileMainImage(),
             HomeWeeklyLoopBand(compact: true),
+            HomeClassAlertBand(compact: true),
             HomeAudienceCards(compact: true),
             HomeTrustBand(compact: true),
           ],

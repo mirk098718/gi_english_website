@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/GleamMark.dart';
 import 'package:gi_english_website/widget/HeaderSocialLinks.dart';
 import 'package:gi_english_website/widget/SiteNav.dart';
 
@@ -132,16 +133,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                 alignment: Alignment.centerLeft,
                 child: SizedBox(
                   height: 32,
-                  child: ColorFiltered(
-                    colorFilter: const ColorFilter.matrix(<double>[
-                      -1, 0, 0, 0, 255,
-                      0, -1, 0, 0, 255,
-                      0, 0, -1, 0, 255,
-                      0, 0, 0, 1, 0,
-                    ]),
-                    child: Image.asset("assets/giEmblem.png",
-                        fit: BoxFit.contain),
-                  ),
+                  child: GleamMark(height: 32),
                 ),
               ),
             ),

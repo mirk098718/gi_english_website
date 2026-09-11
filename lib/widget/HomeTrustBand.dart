@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/GleamMark.dart';
 
 /// 홈: 캠퍼스·원어민 강사 신뢰 밴드.
 class HomeTrustBand extends StatelessWidget {
@@ -129,18 +130,10 @@ class HomeTrustBand extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(compact ? 12 : 14),
             decoration: BoxDecoration(
-              color: Color(0xFFF7F4EA),
+              color: Palette.white,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: SizedBox(
-              height: compact ? 88 : 112,
-              width: compact ? 92 : 118,
-              child: Image.asset(
-                'assets/gleamEducationLogo.png',
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.high,
-              ),
-            ),
+            child: GleamMark(height: compact ? 40 : 48),
           ),
           SizedBox(height: 14),
           Text(

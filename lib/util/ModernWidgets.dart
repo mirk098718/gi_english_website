@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/widget/GleamMark.dart';
 import 'Palette.dart';
 
 class ModernWidgets {
@@ -338,6 +339,8 @@ class ModernWidgets {
             color: Palette.secondary,
             margin: EdgeInsets.only(bottom: 20),
           ),
+          GleamMark(height: 36, lightPlate: true),
+          SizedBox(height: 16),
           Text(
             "글림교육",
             style: TextStyle(
@@ -393,6 +396,8 @@ class ModernWidgets {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          GleamMark(height: 32, lightPlate: true),
+          SizedBox(height: 16),
           Text(
             "글림교육",
             style: TextStyle(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/GleamMark.dart';
 
 class MyWidget {
   static Widget footer() {
@@ -17,6 +18,8 @@ class MyWidget {
               color: Palette.secondary,
               margin: EdgeInsets.only(bottom: 20),
             ),
+            GleamMark(height: 36, lightPlate: true),
+            SizedBox(height: 16),
             Text(
               "글림교육",
               style: TextStyle(
