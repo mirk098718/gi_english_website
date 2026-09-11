@@ -6,7 +6,7 @@ import 'package:gi_english_website/pages/PaymentResultPage.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:gi_english_website/util/NoticeService.dart';
 
-import 'pages/SchoolMainPage.dart';
+import 'pages/SchoolAboutPage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
     if (path.contains('/payment/fail')) {
       return PaymentResultPage.fromUri(uri, success: false);
     }
-    return SchoolMainPage();
+    return const SchoolAboutPage();
   }
 }
 

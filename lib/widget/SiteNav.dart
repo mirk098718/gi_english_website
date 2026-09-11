@@ -11,7 +11,6 @@ import 'package:gi_english_website/pages/SchoolCurriculumElePage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumHighSchoolPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumMiddleSchoolPage.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
-import 'package:gi_english_website/pages/SchoolMainPage.dart';
 import 'package:gi_english_website/pages/SchoolMapPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineClassroomPage.dart';
@@ -64,23 +63,24 @@ class SiteNav {
     ]),
   ];
 
+  static bool get isMemberLoggedIn => AuthService.currentUser != null;
+
   static void goHome(BuildContext context) {
-    MenuUtil.push(context, const SchoolMainPage());
+    MenuUtil.push(context, const SchoolAboutPage());
   }
 
   static void goCourses(BuildContext context) {
+    if (!isMemberLoggedIn) return;
     MenuUtil.push(context, const SchoolOnlineCurriculumPage());
   }
 
   static void goCourse(BuildContext context, OnlineCourse course) {
+    if (!isMemberLoggedIn) return;
     MenuUtil.push(context, OnlineCourseDetailPage(course: course));
   }
 
   static void goClassroom(BuildContext context) {
-    if (AuthService.currentUser == null) {
-      MenuUtil.push(context, const MemberLoginPage());
-      return;
-    }
+    if (!isMemberLoggedIn) return;
     MenuUtil.push(context, const SchoolOnlineClassroomPage());
   }
 
@@ -114,6 +114,7 @@ class SiteNav {
   }
 
   static void openPlacement(BuildContext context) {
+    if (!isMemberLoggedIn) return;
     ClassPlacementDialog.show(
       context,
       onViewCourse: (course) {

@@ -142,7 +142,7 @@ class SchoolAboutPage extends StatelessWidget {
         ),
         SizedBox(height: compact ? 12 : 16),
         Text(
-          '초등·중등 정규 수업과 원어민 회화, 소수정예로\n놀이와 학습이 함께하는 현장입니다.',
+          '초등·중등·고등 대상 원어민 회화,\n학습과 액티비티, 그리고 내신 및 입시가 함께하는 현장입니다.',
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: compact ? 14 : 16,

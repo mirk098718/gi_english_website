@@ -37,6 +37,9 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
       if (mounted) {
         setState(() {
           _isMemberLoggedIn = user != null;
+          if (user == null && _menu == _HeaderMenu.courses) {
+            _menu = _HeaderMenu.none;
+          }
         });
       }
     });
@@ -204,10 +207,12 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                   _navItem(
                     label: '과정',
                     menu: _HeaderMenu.courses,
+                    enabled: _isMemberLoggedIn,
                   ),
                   SizedBox(width: 8),
                   _navItem(
                     label: '레벨 진단',
+                    enabled: _isMemberLoggedIn,
                     onTap: () {
                       _closeMenu();
                       SiteNav.openPlacement(context);
@@ -216,6 +221,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                   SizedBox(width: 8),
                   _navItem(
                     label: '내 강의실',
+                    enabled: _isMemberLoggedIn,
                     onTap: () {
                       _closeMenu();
                       SiteNav.goClassroom(context);
@@ -270,12 +276,17 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
     _HeaderMenu? menu,
     Duration? hoverDelay,
     Color? color,
+    bool enabled = true,
   }) {
-    final selected = menu != null && _menu == menu;
-    final idle = color ?? Palette.black;
+    final selected = enabled && menu != null && _menu == menu;
+    final idle = enabled ? (color ?? Palette.black) : Palette.grey400;
     final active = color ?? Palette.navy;
     return MouseRegion(
       onEnter: (_) {
+        if (!enabled) {
+          _scheduleClose();
+          return;
+        }
         if (menu != null) {
           if (hoverDelay != null) {
             _scheduleOpen(menu, hoverDelay);
@@ -287,19 +298,21 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
         }
       },
       child: InkWell(
-        onTap: () {
-          if (onTap != null) {
-            onTap();
-            return;
-          }
-          if (menu != null) {
-            if (_menu == menu) {
-              _closeMenu();
-            } else {
-              _openMenu(menu);
-            }
-          }
-        },
+        onTap: enabled
+            ? () {
+                if (onTap != null) {
+                  onTap();
+                  return;
+                }
+                if (menu != null) {
+                  if (_menu == menu) {
+                    _closeMenu();
+                  } else {
+                    _openMenu(menu);
+                  }
+                }
+              }
+            : null,
         borderRadius: BorderRadius.circular(6),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -321,7 +334,9 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                 Icon(
                   Icons.keyboard_arrow_down,
                   size: 16,
-                  color: selected ? active : Palette.grey500,
+                  color: selected
+                      ? active
+                      : (enabled ? Palette.grey500 : Palette.grey400),
                 ),
               ],
             ],

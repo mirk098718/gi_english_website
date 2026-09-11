@@ -237,9 +237,21 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
         padding: EdgeInsets.symmetric(horizontal: 10),
         child: Row(
           children: [
-            _navLink('과정', () => SiteNav.goCourses(context)),
-            _navLink('레벨 진단', () => SiteNav.openPlacement(context)),
-            _navLink('내 강의실', () => SiteNav.goClassroom(context)),
+            _navLink(
+              '과정',
+              () => SiteNav.goCourses(context),
+              enabled: _isMemberLoggedIn,
+            ),
+            _navLink(
+              '레벨 진단',
+              () => SiteNav.openPlacement(context),
+              enabled: _isMemberLoggedIn,
+            ),
+            _navLink(
+              '내 강의실',
+              () => SiteNav.goClassroom(context),
+              enabled: _isMemberLoggedIn,
+            ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 6),
               child: Container(width: 1, height: 16, color: Palette.grey300),
@@ -255,9 +267,14 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
     );
   }
 
-  Widget _navLink(String label, VoidCallback onTap, {Color? color}) {
+  Widget _navLink(
+    String label,
+    VoidCallback onTap, {
+    Color? color,
+    bool enabled = true,
+  }) {
     return InkWell(
-      onTap: onTap,
+      onTap: enabled ? onTap : null,
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 12),
         child: SizedBox(
@@ -266,7 +283,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
             child: Text(
               label,
               style: TextStyle(
-                color: color ?? Palette.black,
+                color: enabled ? (color ?? Palette.black) : Palette.grey400,
                 fontFamily: "NotoSansKR",
                 fontWeight: FontWeight.w500,
                 fontSize: 13,
