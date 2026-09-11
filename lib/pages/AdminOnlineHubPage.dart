@@ -21,7 +21,7 @@ import 'package:gi_english_website/widget/TeacherPhotoCropDialog.dart';
 
 /// 관리자/강사용 온라인 프로그램 관리 허브.
 /// - 메인 관리자: 수강·결제, 스케줄, 강사 관리, 강의 업로드, 주간 학습
-/// - 원어민 강사: 스케줄·예약 컨펌, 회원관리(피드백), 화상수업
+/// - 원어민 강사: 스케줄·예약 컨펌, 회원관리(화상 입장·종료·피드백)
 class AdminOnlineHubPage extends StatefulWidget {
   const AdminOnlineHubPage({Key? key}) : super(key: key);
 
@@ -69,7 +69,7 @@ class _AdminOnlineHubPageState extends State<AdminOnlineHubPage>
       return;
     }
 
-    final tabCount = role == AdminRole.owner ? 7 : 3;
+    final tabCount = role == AdminRole.owner ? 7 : 2;
     _tabController?.dispose();
     _tabController = TabController(length: tabCount, vsync: this);
 
@@ -125,7 +125,6 @@ class _AdminOnlineHubPageState extends State<AdminOnlineHubPage>
               : [
                   Tab(text: '스케줄 · 예약'),
                   Tab(text: '회원관리'),
-                  Tab(text: '화상수업'),
                 ],
         ),
       ),
@@ -144,7 +143,6 @@ class _AdminOnlineHubPageState extends State<AdminOnlineHubPage>
             : [
                 AdminTeacherScheduleTab(),
                 TeacherRosterPage(embedded: true),
-                AdminSessionTab(),
               ],
       ),
     );
@@ -2800,7 +2798,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
           Text('등록된 강사', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           SizedBox(height: 8),
           Text(
-            '강사를 클릭하면 프로필, 담당 회원, 화상수업 이력과 주차별 피드백을 확인하고 작성할 수 있습니다.',
+            '강사를 클릭하면 프로필, 담당 회원, 화상수업 입장·종료와 회차별 피드백을 확인하고 작성할 수 있습니다.',
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),

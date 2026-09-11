@@ -29,10 +29,20 @@ class UrlUtil {
 
   static Future<void> open(String url) async {
     final normalized = normalizeVideoUrl(url);
+    if (normalized.isEmpty) return;
     final uri = Uri.parse(normalized);
-    if (await canLaunch(normalized)) {
-      await launchUrl(uri);
-    }
+    try {
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.platformDefault,
+        webOnlyWindowName: '_blank',
+      );
+      if (launched) return;
+    } catch (_) {}
+    // 일부 웹/브라우저에서 canLaunchUrl이 false여도 실제로는 열 수 있다.
+    try {
+      await launchUrl(uri, webOnlyWindowName: '_blank');
+    } catch (_) {}
   }
 
   //주소가 실행 가능한지 확인하는 기능.

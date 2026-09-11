@@ -93,16 +93,37 @@ class EnrollmentService {
       '${courseId}_week_$weekNumber';
 
   static OnlineWeek defaultWeek1(String courseId) {
+    return defaultWeek(courseId, 1);
+  }
+
+  /// 아직 관리자가 등록하지 않은 회차도 예약·학습 UI가 보이도록 하는 자리표시.
+  static OnlineWeek defaultWeek(String courseId, int weekNumber) {
+    if (weekNumber <= 1) {
+      return OnlineWeek(
+        id: defaultWeekId(courseId, 1),
+        courseId: courseId,
+        weekNumber: 1,
+        title: '1회차 인강: 관사의 쓰임',
+        description: '이번 주 인강을 시청한 뒤 체크리스트를 직접 확인하세요.',
+        videoUrl: defaultWeek1VideoUrl,
+        problemLinks: const [
+          WeekProblemLink(title: '리뷰 및 문제풀이', url: ''),
+        ],
+        checklistItems: const [
+          WeekChecklistItem(id: 'watch_video', label: '인강 시청하기'),
+          WeekChecklistItem(id: 'solve_problems', label: '문제풀이 하기'),
+        ],
+      );
+    }
     return OnlineWeek(
-      id: defaultWeekId(courseId, 1),
+      id: defaultWeekId(courseId, weekNumber),
       courseId: courseId,
-      weekNumber: 1,
-      title: '1회차 인강: 관사의 쓰임',
-      description: '이번 주 인강을 시청한 뒤 체크리스트를 직접 확인하세요.',
-      videoUrl: defaultWeek1VideoUrl,
-      problemLinks: const [
-        WeekProblemLink(title: '리뷰 및 문제풀이', url: ''),
-      ],
+      weekNumber: weekNumber,
+      title: '$weekNumber회차 학습',
+      description: '인강과 문제풀이가 등록되면 여기에 표시됩니다. '
+          '화상수업 예약은 아래에서 진행할 수 있습니다.',
+      videoUrl: '',
+      problemLinks: const [],
       checklistItems: const [
         WeekChecklistItem(id: 'watch_video', label: '인강 시청하기'),
         WeekChecklistItem(id: 'solve_problems', label: '문제풀이 하기'),
@@ -249,7 +270,8 @@ class EnrollmentService {
   // ----- 회차별 화상수업 -----
 
   /// 과정의 화상수업 회차 목록 (회차 순).
-  /// [userId]가 있으면 그 수강생 수업과 예전 공통 회차만 보여 준다.
+  /// [userId]가 있으면 그 수강생 수업만 보여 준다.
+  /// 예약(컨펌) 회차가 있으면 예전 수동 'N회차 화상수업' 자리는 숨긴다.
   static Future<List<OnlineSession>> sessions(
     String courseId, {
     String? userId,
@@ -268,6 +290,7 @@ class EnrollmentService {
             .where((session) =>
                 session.userId.isEmpty || session.userId == userId)
             .toList();
+        list = filterSessionsForStudent(list);
       }
 
       list.sort(_compareSessions);
@@ -276,6 +299,29 @@ class EnrollmentService {
       print('화상수업 회차 조회 오류: $e');
       return [];
     }
+  }
+
+  /// 수강생 화면: 컨펌된 예약 회차만 노출. 수동으로 미리 만든 빈 회차는 숨김.
+  static List<OnlineSession> filterSessionsForStudent(
+      List<OnlineSession> sessions) {
+    final booked =
+        sessions.where((session) => session.bookingId.isNotEmpty).toList();
+    if (booked.isNotEmpty) return booked;
+
+    // 예약 회차가 하나도 없으면 예전 수동 회차 중 '종료/진행 중'만 보여 준다.
+    return sessions
+        .where((session) =>
+            session.isFinished || session.isLiveNow || session.isStale)
+        .toList();
+  }
+
+  /// UI 문구용: "1주차" → "1회차"
+  static String normalizeSessionLabel(String text) {
+    if (text.isEmpty) return text;
+    return text.replaceAllMapped(
+      RegExp(r'(\d+)\s*주차'),
+      (match) => '${match.group(1)}회차',
+    );
   }
 
   static Future<List<OnlineSession>> sessionsForTeacher(
@@ -331,7 +377,8 @@ class EnrollmentService {
       final courseId = data['courseId']?.toString() ?? '';
       final weekNumber = _intValue(data['weekNumber']);
       final memberName = data['memberName']?.toString().trim() ?? '';
-      final weekTitle = data['weekTitle']?.toString().trim() ?? '';
+      final weekTitle = normalizeSessionLabel(
+          data['weekTitle']?.toString().trim() ?? '');
       final order = weekNumber > 0 ? weekNumber : 1;
       final titleParts = <String>[];
       if (memberName.isNotEmpty) titleParts.add(memberName);
@@ -349,8 +396,7 @@ class EnrollmentService {
         'order': order,
         'meetingUrl': '$_jitsiBaseUrl/GleamIsland-$courseId-$bookingId',
         'isLive': false,
-        'scheduledAt':
-            scheduled == null ? null : Timestamp.fromDate(scheduled),
+        if (scheduled != null) 'scheduledAt': Timestamp.fromDate(scheduled),
         'bookingId': bookingId,
         'userId': data['userId']?.toString() ?? '',
         'teacherId': teacherUid,
@@ -476,8 +522,8 @@ class EnrollmentService {
         'order': order,
         'meetingUrl': url,
         'isLive': false,
-        'scheduledAt':
-            scheduledAt == null ? null : Timestamp.fromDate(scheduledAt),
+        if (scheduledAt != null)
+          'scheduledAt': Timestamp.fromDate(scheduledAt),
         'createdAt': FieldValue.serverTimestamp(),
       });
       return null;
@@ -527,8 +573,8 @@ class EnrollmentService {
         'order': order,
         'meetingUrl': url,
         'isLive': false,
-        'scheduledAt':
-            scheduledAt == null ? null : Timestamp.fromDate(scheduledAt),
+        if (scheduledAt != null)
+          'scheduledAt': Timestamp.fromDate(scheduledAt),
         'createdAt': FieldValue.serverTimestamp(),
       });
       return ref.id;
@@ -539,12 +585,19 @@ class EnrollmentService {
   }
 
   /// 수업 시작/종료. 시작 시 회원 화면의 입장 버튼이 활성화된다.
+  ///
+  /// Flutter Web에서는 map에 `null`을 넣으면 Firestore 쓰기가 실패하므로
+  /// 종료 시각 초기화는 [FieldValue.delete]를 쓴다.
   static Future<String?> setSessionLive({
     required String sessionId,
     required bool isLive,
     String hostName = '',
   }) async {
+    if (sessionId.trim().isEmpty) {
+      return '수업 회차 정보가 없습니다. 새로고침 후 다시 시도해주세요.';
+    }
     try {
+      final ref = _firestore.collection('online_sessions').doc(sessionId);
       final payload = <String, dynamic>{
         'isLive': isLive,
         'hostName': hostName,
@@ -552,19 +605,118 @@ class EnrollmentService {
       };
       if (isLive) {
         payload['startedAt'] = FieldValue.serverTimestamp();
-        payload['endedAt'] = null;
+        // null 대신 delete — 웹에서 "수업 상태 변경에 실패"의 흔한 원인
+        payload['endedAt'] = FieldValue.delete();
       } else {
         payload['endedAt'] = FieldValue.serverTimestamp();
       }
 
-      await _firestore
-          .collection('online_sessions')
-          .doc(sessionId)
-          .update(payload);
+      // update는 문서가 없으면 실패하므로, 없으면 merge set으로 보정
+      final existing = await ref.get();
+      if (existing.exists) {
+        await ref.update(payload);
+      } else {
+        await ref.set(payload, SetOptions(merge: true));
+      }
+
+      // 종료 시 진도 반영(클라우드 함수 백업). 이미 반영됐으면 건너뛴다.
+      if (!isLive) {
+        final data = (await ref.get()).data() ?? existing.data() ?? {};
+        await _creditEnrollmentAfterSessionEnd(
+          sessionId: sessionId,
+          data: data,
+        );
+      }
       return null;
+    } on FirebaseException catch (e) {
+      print('화상수업 상태 변경 오류: ${e.code} ${e.message}');
+      if (e.code == 'permission-denied') {
+        return '수업 상태 변경 권한이 없습니다. 강사 계정으로 다시 로그인해 주세요.';
+      }
+      if (e.code == 'not-found') {
+        return '수업 회차를 찾을 수 없습니다. 새로고침 후 다시 시도해주세요.';
+      }
+      return '수업 상태 변경에 실패했습니다. (${e.code})';
     } catch (e) {
       print('화상수업 상태 변경 오류: $e');
       return '수업 상태 변경에 실패했습니다.';
+    }
+  }
+
+  /// 화상수업 종료 후 이수 횟수를 +1 한다. sessionCredited로 중복 방지.
+  /// Cloud Function(onOnlineSessionUpdated)과 같은 로직의 클라이언트 백업.
+  static Future<void> _creditEnrollmentAfterSessionEnd({
+    required String sessionId,
+    required Map<String, dynamic> data,
+  }) async {
+    final userId = data['userId']?.toString() ?? '';
+    final courseId = data['courseId']?.toString() ?? '';
+    if (userId.isEmpty || courseId.isEmpty) return;
+
+    try {
+      final sessionRef =
+          _firestore.collection('online_sessions').doc(sessionId);
+      final enrollSnap = await _firestore
+          .collection('enrollments')
+          .where('userId', isEqualTo: userId)
+          .get();
+      DocumentReference<Map<String, dynamic>>? enrollmentRef;
+      for (final doc in enrollSnap.docs) {
+        if (doc.data()['courseId']?.toString() == courseId) {
+          enrollmentRef = doc.reference;
+          break;
+        }
+      }
+      if (enrollmentRef == null) return;
+
+      await _firestore.runTransaction((transaction) async {
+        final sessionSnap = await transaction.get(sessionRef);
+        final session = sessionSnap.data() ?? {};
+        if (session['sessionCredited'] == true) return;
+
+        final enrollSnapTx = await transaction.get(enrollmentRef!);
+        if (!enrollSnapTx.exists) return;
+        final enroll = enrollSnapTx.data() ?? {};
+        final total = _intValue(enroll['totalSessions']);
+        final current = _intValue(enroll['completedSessions']);
+        if (total <= 0 || current >= total) {
+          transaction.set(
+            sessionRef,
+            {
+              'sessionCredited': true,
+              'creditedAt': FieldValue.serverTimestamp(),
+            },
+            SetOptions(merge: true),
+          );
+          return;
+        }
+
+        final next = current + 1;
+        transaction.update(enrollmentRef, {
+          'completedSessions': next,
+          'remainingSessions': total - next,
+          'lastSessionAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+        transaction.set(enrollmentRef.collection('session_logs').doc(), {
+          'delta': 1,
+          'completedAfter': next,
+          'totalSessions': total,
+          'adminName': '화상수업 종료',
+          'sessionId': sessionId,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+        transaction.set(
+          sessionRef,
+          {
+            'sessionCredited': true,
+            'creditedAt': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
+      });
+    } catch (e) {
+      print('수업 종료 진도 반영 오류: $e');
     }
   }
 
@@ -583,8 +735,9 @@ class EnrollmentService {
         'title': title.trim(),
         'order': order,
         'meetingUrl': meetingUrl.trim(),
-        'scheduledAt':
-            scheduledAt == null ? null : Timestamp.fromDate(scheduledAt),
+        'scheduledAt': scheduledAt == null
+            ? FieldValue.delete()
+            : Timestamp.fromDate(scheduledAt),
         'updatedAt': FieldValue.serverTimestamp(),
       });
       return null;
@@ -838,9 +991,10 @@ class EnrollmentService {
   /// delta는 보통 1(완료) 또는 -1(되돌리기).
   ///
   /// [adminName]은 이력에 남길 처리자 이름이다.
+  /// [sessionId]가 있으면 이력에 남겨 추적용으로 쓴다.
   static Future<SessionUpdateResult> adjustCompletedSessions(
       String enrollmentId, int delta,
-      {String adminName = ''}) async {
+      {String adminName = '', String sessionId = ''}) async {
     try {
       final ref = _firestore.collection('enrollments').doc(enrollmentId);
       final logRef = ref.collection('session_logs').doc();
@@ -882,6 +1036,7 @@ class EnrollmentService {
           'completedAfter': next,
           'totalSessions': total,
           'adminName': adminName,
+          if (sessionId.isNotEmpty) 'sessionId': sessionId,
           'createdAt': FieldValue.serverTimestamp(),
         });
 
@@ -1062,7 +1217,10 @@ class EnrollmentService {
     return null;
   }
 
-  static Future<List<OnlineWeek>> weeks(String courseId) async {
+  static Future<List<OnlineWeek>> weeks(
+    String courseId, {
+    int ensureThrough = 1,
+  }) async {
     try {
       final snapshot = await _firestore
           .collection('online_weeks')
@@ -1072,8 +1230,11 @@ class EnrollmentService {
       final weeks = snapshot.docs
           .map((doc) => OnlineWeek.fromMap(doc.id, doc.data()))
           .toList();
-      if (!weeks.any((week) => week.weekNumber == 1)) {
-        weeks.add(defaultWeek1(courseId));
+      final through = ensureThrough < 1 ? 1 : ensureThrough;
+      for (var n = 1; n <= through; n++) {
+        if (!weeks.any((week) => week.weekNumber == n)) {
+          weeks.add(defaultWeek(courseId, n));
+        }
       }
       weeks.sort((a, b) => a.weekNumber.compareTo(b.weekNumber));
       return weeks;

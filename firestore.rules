@@ -14,7 +14,7 @@ service cloud.firestore {
     function isOwner() {
       return isLoggedIn()
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
-        && adminDoc().isActive == true
+        && (!('isActive' in adminDoc()) || adminDoc().isActive != false)
         && (!('role' in adminDoc()) || adminDoc().role == 'owner');
     }
 
@@ -22,7 +22,7 @@ service cloud.firestore {
     function isTeacher() {
       return isLoggedIn()
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
-        && adminDoc().isActive == true
+        && (!('isActive' in adminDoc()) || adminDoc().isActive != false)
         && adminDoc().role == 'teacher';
     }
 
@@ -37,7 +37,8 @@ service cloud.firestore {
     function isAssignedTeacher(memberId) {
       return isTeacher()
         && exists(/databases/$(database)/documents/members/$(memberId))
-        && memberDoc(memberId).teacherId == request.auth.uid;
+        && (memberDoc(memberId).teacherId == request.auth.uid
+            || memberDoc(memberId).nativeTeacherUid == request.auth.uid);
     }
 
     // 공지(notices): 누구나 읽기, 쓰기는 메인 관리자만
@@ -72,7 +73,14 @@ service cloud.firestore {
 
       allow create: if isOwner();
 
-      allow update, delete: if isOwner();
+      // 담당 강사는 화상수업 종료 시 진도(completedSessions)만 갱신할 수 있다.
+      allow update: if isOwner()
+        || (isAssignedTeacher(resource.data.userId)
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['completedSessions', 'remainingSessions',
+                        'lastSessionAt', 'updatedAt']));
+
+      allow delete: if isOwner();
 
       match /session_logs/{logId} {
         allow read: if isOwner()
@@ -81,7 +89,11 @@ service cloud.firestore {
           || isAssignedTeacher(
               get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId);
 
-        allow create, update, delete: if isOwner();
+        allow create: if isOwner()
+          || isAssignedTeacher(
+              get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId);
+
+        allow update, delete: if isOwner();
       }
 
       match /week_progress/{weekId} {
@@ -143,20 +155,15 @@ service cloud.firestore {
       allow delete: if isOwner();
     }
 
-    // 주차별 화상수업 피드백. 담당 강사/메인 관리자 작성, 해당 수강생 읽기.
+    // 회차별 화상수업 피드백. 스태프 작성/수정, 해당 수강생 읽기.
     match /lesson_feedbacks/{feedbackId} {
-      allow read: if isOwner()
-        || (isLoggedIn() && resource.data.userId == request.auth.uid)
-        || (isTeacher() && resource.data.teacherId == request.auth.uid);
+      // 없는 문서 get도 스태프는 통과해야 저장 전 조회가 가능함
+      allow read: if isStaff()
+        || (resource != null
+          && isLoggedIn()
+          && resource.data.userId == request.auth.uid);
 
-      allow create: if isOwner()
-        || (isTeacher()
-          && request.resource.data.teacherId == request.auth.uid);
-
-      allow update: if isOwner()
-        || (isTeacher()
-          && resource.data.teacherId == request.auth.uid
-          && request.resource.data.teacherId == request.auth.uid);
+      allow create, update: if isStaff();
 
       allow delete: if isOwner();
     }

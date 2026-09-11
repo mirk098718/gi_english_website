@@ -63,7 +63,6 @@ flutter:
   assets:
      - assets/schoolMainImage.png
      - assets/instaLogo.png
-     - assets/aboutMainImage.png
      - assets/mainGateImageMiddleSchool.png
      - assets/academy-hero-about.png
      - assets/academy-hero-teachers.png
@@ -87,21 +86,17 @@ flutter:
      - assets/curriculumImage.png
      - assets/curriculum-service-overview.jpg
      - assets/communityMainImage.png
-     - assets/giAppDownload.png
-     - assets/ballPoolImage.png
      - assets/giEmblem.png
      - assets/aucklandView.png
      - assets/eleTimetableTuesThurs.png
      - assets/eleTimetableMWF.png
      - assets/giAppBannerFinal.png
-     - assets/map.jpg
      - assets/whyChooseNzClip.png
      - assets/schoolList.png
      - assets/schoolSelection.png
      - assets/whyTaurangaClipWeb.png
      - assets/kinderTimesLogo.png
      - assets/juniorTimesLogo.png
-     - assets/eleOnlineLink.png
      - assets/middleOnlineLink.png
      - assets/naverBlogLogo.png
      - assets/gleamIslandLogo.jpeg

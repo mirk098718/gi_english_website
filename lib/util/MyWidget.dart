@@ -248,7 +248,8 @@ class MyWidget {
     return Container(
       alignment: Alignment.center,
       width: 192,
-      height: 40,
+      constraints: BoxConstraints(minHeight: 40),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
             topLeft: Radius.circular(10), topRight: Radius.circular(10)),
@@ -257,7 +258,8 @@ class MyWidget {
       child: Text(
         content,
         textAlign: TextAlign.center,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        style: TextStyle(
+            color: Palette.black, fontWeight: FontWeight.bold, fontSize: 13),
       ),
     );
   }
@@ -267,10 +269,13 @@ class MyWidget {
       color: menuColor,
       alignment: Alignment.center,
       width: 192,
-      height: 40,
+      constraints: BoxConstraints(minHeight: 40),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: Text(
         menuContent,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            color: Palette.black, fontWeight: FontWeight.bold, fontSize: 13),
       ),
     );
   }
@@ -279,7 +284,8 @@ class MyWidget {
     return Container(
       alignment: Alignment.center,
       width: 192,
-      height: 40,
+      constraints: BoxConstraints(minHeight: 40),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(10),
@@ -287,7 +293,9 @@ class MyWidget {
           color: menuColor),
       child: Text(
         content,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            color: Palette.black, fontWeight: FontWeight.bold, fontSize: 13),
       ),
     );
   }
@@ -389,8 +397,9 @@ class MyWidget {
   static Widget mobileLeftMenuStart(Color selectedMenuColor, String content) {
     return Container(
       alignment: Alignment.center,
-      width: 150,
-      height: 40,
+      width: 210,
+      constraints: BoxConstraints(minHeight: 40),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
             topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
@@ -399,7 +408,8 @@ class MyWidget {
       child: Text(
         content,
         textAlign: TextAlign.center,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        style: TextStyle(
+            color: Palette.black, fontWeight: FontWeight.bold, fontSize: 12),
       ),
     );
   }
@@ -408,11 +418,14 @@ class MyWidget {
     return Container(
       color: menuColor,
       alignment: Alignment.center,
-      width: 150,
-      height: 40,
+      width: 210,
+      constraints: BoxConstraints(minHeight: 40),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: Text(
         menuContent,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            color: Palette.black, fontWeight: FontWeight.bold, fontSize: 12),
       ),
     );
   }
@@ -420,15 +433,18 @@ class MyWidget {
   static Widget mobileLeftMenuEnd(Color menuColor, String content) {
     return Container(
       alignment: Alignment.center,
-      width: 150,
-      height: 40,
+      width: 210,
+      constraints: BoxConstraints(minHeight: 40),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
               topRight: Radius.circular(10), bottomRight: Radius.circular(10)),
           color: menuColor),
       child: Text(
         content,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            color: Palette.black, fontWeight: FontWeight.bold, fontSize: 12),
       ),
     );
   }

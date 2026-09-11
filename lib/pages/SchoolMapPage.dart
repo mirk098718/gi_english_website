@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
-import 'package:gi_english_website/pages/SchoolSystemPage.dart';
 import 'package:gi_english_website/pages/SchoolTeachersPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
@@ -24,8 +23,8 @@ class SchoolMapPage extends StatefulWidget {
 class _SchoolMapPageState extends State<SchoolMapPage> {
   List<ButtonState> buttonStateList = [
     ButtonState("Gi글림아일랜드", BehaviorColor.colorOnDefault, SchoolAboutPage()),
-    ButtonState("교원소개", BehaviorColor.colorOnDefault, SchoolTeachersPage()),
-    ButtonState("운영시스템", BehaviorColor.colorOnDefault, SchoolSystemPage()),
+    ButtonState(
+        "교원/운영시스템 소개", BehaviorColor.colorOnDefault, SchoolTeachersPage()),
     ButtonState("상담/오시는 길", BehaviorColor.colorOnClick, SchoolMapPage()),
   ];
 
@@ -84,7 +83,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
         onHover: (value) {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
-              : (i == 3
+              : (i == 2
                   ? BehaviorColor.colorOnClick
                   : BehaviorColor.colorOnDefault);
           print(
@@ -276,7 +275,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
         onHover: (value) {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
-              : (i == 3
+              : (i == 2
                   ? BehaviorColor.colorOnClick
                   : BehaviorColor.colorOnDefault);
           setState(() {});

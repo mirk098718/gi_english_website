@@ -709,7 +709,9 @@ async function ensureSessionForBooking(bookingId, data) {
   const courseId = String((data && data.courseId) || "");
   const weekNumber = Number((data && data.weekNumber) || 0);
   const memberName = String((data && data.memberName) || "").trim();
-  const weekTitle = String((data && data.weekTitle) || "").trim();
+  const weekTitle = String((data && data.weekTitle) || "")
+    .trim()
+    .replace(/(\d+)\s*주차/g, "$1회차");
   const teacherUid = String((data && (data.teacherId || data.nativeTeacherUid)) || "");
   const titleParts = [];
   if (memberName) titleParts.push(memberName);

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
+import 'package:gi_english_website/util/LessonFeedbackService.dart';
 import 'package:gi_english_website/util/NotificationService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/util/TeacherScheduleService.dart';
+import 'package:gi_english_website/util/UrlIUtil.dart';
 
 /// 강사 스케줄(불가 시간)과 수업 예약을 한 화면에서 보고 컨펌한다.
 class AdminTeacherScheduleTab extends StatefulWidget {
@@ -56,24 +58,37 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   }
 
   bool _belongsOnMyCalendar(WeekBooking booking) {
-    if (booking.status == 'rejected') return false;
     if (widget.showAllBookings) return true;
     if (_teacherUid.isEmpty) return false;
     return booking.teacherId == _teacherUid ||
         booking.nativeTeacherUid == _teacherUid;
   }
 
+  bool _isSlotPast(DateTime date, String time) {
+    final at = EnrollmentService.bookingDateTime(date, time);
+    if (at == null) return false;
+    return DateTime.now()
+        .isAfter(at.add(Duration(minutes: EnrollmentService.lessonMinutes)));
+  }
+
+  bool _isBookingSettled(WeekBooking booking) {
+    if (booking.status == 'rejected') return true;
+    return booking.isConfirmed && _isSlotPast(booking.date, booking.time);
+  }
+
   WeekBooking? _bookingAt(DateTime date, String time) {
     final day = EnrollmentService.dateOnly(date);
     WeekBooking? confirmed;
+    WeekBooking? rejected;
     for (final booking in _bookings) {
       if (!_belongsOnMyCalendar(booking)) continue;
       if (EnrollmentService.dateOnly(booking.date) != day) continue;
       if (booking.time.trim() != time.trim()) continue;
       if (booking.isPending) return booking;
-      confirmed ??= booking;
+      if (booking.isConfirmed) confirmed ??= booking;
+      if (booking.status == 'rejected') rejected ??= booking;
     }
-    return confirmed;
+    return confirmed ?? rejected;
   }
 
   void _toast(String message, {bool error = false}) {
@@ -85,10 +100,95 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     );
   }
 
+  Future<void> _openVideoForBooking(WeekBooking booking) async {
+    // 이름이 보이는 칸(=대기 아님)이면 화상으로 연결한다.
+    if (booking.isPending) {
+      _toast('대기 중인 예약입니다. 아래에서 먼저 확정해 주세요.', error: true);
+      return;
+    }
+    if (booking.status == 'rejected') {
+      _toast('취소된 예약입니다.', error: true);
+      return;
+    }
+    if (_isBookingSettled(booking)) {
+      await _openPastBookingActions(booking);
+      return;
+    }
+    if (booking.courseId.trim().isEmpty || booking.id.trim().isEmpty) {
+      _toast('화상수업 정보를 찾을 수 없습니다.', error: true);
+      return;
+    }
+
+    final url = EnrollmentService.meetingUrlForBooking(
+      courseId: booking.courseId,
+      bookingId: booking.id,
+    );
+    _toast('${booking.memberName.isEmpty ? '수강생' : booking.memberName} 화상수업을 엽니다.');
+    // 팝업 차단을 피하려고 클릭 직후 바로 URL을 연다.
+    await UrlUtil.open(url);
+
+    final sessionId = booking.sessionId.trim().isNotEmpty
+        ? booking.sessionId.trim()
+        : EnrollmentService.sessionDocIdForBooking(booking.id);
+    final profile = await AuthService.currentStaffProfile();
+    final hostName = (profile?['name'] ?? '').toString().trim();
+    await EnrollmentService.setSessionLive(
+      sessionId: sessionId,
+      isLive: true,
+      hostName: hostName,
+    );
+  }
+
+  Future<void> _openPastBookingActions(WeekBooking booking) async {
+    final cancelled = booking.status == 'rejected';
+    final action = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(cancelled ? '취소된 수업' : '완료된 수업',
+            style: TextStyle(fontFamily: "Jalnan")),
+        content: Text(
+          [
+            if (booking.memberName.isNotEmpty) booking.memberName,
+            if (booking.weekNumber > 0) '${booking.weekNumber}회차',
+            '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)}',
+          ].join(' · '),
+          style: TextStyle(fontFamily: "NotoSansKR", height: 1.5),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text('닫기')),
+          if (!cancelled)
+            ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, 'feedback'),
+              child: Text('피드백'),
+            ),
+        ],
+      ),
+    );
+    if (action != 'feedback' || !mounted) return;
+    final profile = await AuthService.currentStaffProfile();
+    final teacherName = (profile?['name'] ?? '').toString().trim();
+    final existing = await LessonFeedbackService.listForTeacher(_teacherUid);
+    final saved = await LessonFeedbackService.showEditor(
+      context: context,
+      booking: booking,
+      existing: LessonFeedbackService.forBooking(existing, booking.id),
+      canWrite: true,
+      teacherId: _teacherUid,
+      teacherName: teacherName.isNotEmpty ? teacherName : '강사',
+    );
+    if (saved) _toast('피드백을 저장했습니다.');
+  }
+
   Future<void> _onCellTap(DateTime date, String time) async {
     if (_saving) return;
-    if (_bookingAt(date, time) != null ||
-        _availability.isOccupied(date, time)) {
+    final existing = _bookingAt(date, time);
+    if (existing != null) {
+      await _openVideoForBooking(existing);
+      return;
+    }
+    if (_availability.isOccupied(date, time)) {
       _toast('이미 예약이 있는 시간은 닫을 수 없습니다. 예약을 먼저 처리하세요.', error: true);
       return;
     }
@@ -529,6 +629,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                 '내 수강생 확정'),
             _legend(Palette.accent.withValues(alpha: 0.16), Palette.accent,
                 '타 수강생'),
+            _legend(Palette.grey200, Palette.grey400, '완료 · 취소'),
             _legend(Palette.grey100, Palette.grey300, '지난 시간'),
           ],
         ),
@@ -578,7 +679,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         SizedBox(height: 8),
         Text(
           widget.showAllBookings
-              ? '회원이 신청한 주차 수업입니다. 날짜·시간을 확인하고 컨펌하세요.'
+              ? '회원이 신청한 회차 수업입니다. 날짜·시간을 확인하고 컨펌하세요.'
               : '내 담당 수강생과, 다른 강사 담당이지만 내 시간에 신청한 타 수강생 예약이 함께 보입니다. 타 수강생은 보라색입니다.',
           style: TextStyle(
               fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
@@ -661,36 +762,43 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     final closed = _availability.isClosed(date, time);
     final routine = _availability.isRoutine(date, time);
     final exception = _availability.isException(date, time);
-    final past = !EnrollmentService.remainingTimeSlots(date).contains(time) &&
-        !closed &&
-        !occupied;
+    final slotPast = _isSlotPast(date, time);
+    final pastEmpty = slotPast && !closed && !occupied;
     Color fill = Palette.white;
     Color border = Palette.grey300;
     Color textColor = Palette.secondaryDark;
     String label = '열림';
-    if (past) {
+    if (booking != null && booking.status == 'rejected') {
+      fill = Palette.grey200;
+      border = Palette.grey400;
+      textColor = Palette.grey500;
+      label = '취소';
+    } else if (booking != null && booking.isPending) {
+      final guest = booking.isGuestFor(_teacherUid);
+      fill = guest
+          ? Palette.accent.withValues(alpha: 0.14)
+          : Palette.warning.withValues(alpha: 0.16);
+      border = guest ? Palette.accent : Palette.warning;
+      textColor = guest ? Palette.accent : Palette.warning;
+      label = guest ? '타·대기' : booking.calendarLabel;
+    } else if (booking != null && slotPast) {
+      fill = Palette.grey200;
+      border = Palette.grey400;
+      textColor = Palette.grey500;
+      label = '완료';
+    } else if (pastEmpty) {
       fill = Palette.grey100;
       border = Palette.grey300;
       textColor = Palette.grey500;
       label = '';
     } else if (booking != null) {
       final guest = booking.isGuestFor(_teacherUid);
-      if (booking.isPending) {
-        fill = guest
-            ? Palette.accent.withValues(alpha: 0.14)
-            : Palette.warning.withValues(alpha: 0.16);
-        border = guest ? Palette.accent : Palette.warning;
-        textColor = guest ? Palette.accent : Palette.warning;
-      } else {
-        fill = guest
-            ? Palette.accent.withValues(alpha: 0.16)
-            : Palette.primary.withValues(alpha: 0.12);
-        border = guest ? Palette.accent : Palette.primary;
-        textColor = guest ? Palette.accent : Palette.primaryDark;
-      }
-      label = guest && booking.isPending
-          ? '타·대기'
-          : booking.calendarLabel;
+      fill = guest
+          ? Palette.accent.withValues(alpha: 0.16)
+          : Palette.primary.withValues(alpha: 0.12);
+      border = guest ? Palette.accent : Palette.primary;
+      textColor = guest ? Palette.accent : Palette.primaryDark;
+      label = booking.calendarLabel;
     } else if (occupied) {
       fill = Palette.primary.withValues(alpha: 0.12);
       border = Palette.primary;
@@ -713,34 +821,51 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       label = '닫힘';
     }
 
+    final settled = booking != null && _isBookingSettled(booking);
+    final canOpenBooking =
+        booking != null && booking.isConfirmed && !settled;
+    final canToggleSlot = !slotPast && !occupied;
+    final tappable = canOpenBooking ||
+        canToggleSlot ||
+        booking != null ||
+        (booking != null && settled);
+
     return Padding(
       padding: EdgeInsets.all(2),
-      child: Semantics(
-        button: true,
-        excludeSemantics: true,
-        enabled: !past && !occupied,
-        label:
-            '${EnrollmentService.formatBookingDate(date)} ${EnrollmentService.formatBookingTime(time)} ${label.isEmpty ? '지난 시간' : label}',
-        child: InkWell(
-          onTap: past || occupied ? null : () => _onCellTap(date, time),
-          child: Container(
-            width: 86,
-            height: 36,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: fill,
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: border),
-            ),
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontFamily: "NotoSansKR",
-                fontSize: 10,
-                color: textColor,
+      child: Material(
+        color: Colors.transparent,
+        child: Semantics(
+          button: true,
+          excludeSemantics: true,
+          enabled: tappable,
+          label:
+              '${EnrollmentService.formatBookingDate(date)} ${EnrollmentService.formatBookingTime(time)} ${label.isEmpty ? '지난 시간' : label}${canOpenBooking ? ' · 화상수업 입장' : ''}',
+          child: InkWell(
+            onTap: !tappable ? null : () => _onCellTap(date, time),
+            borderRadius: BorderRadius.circular(6),
+            child: Container(
+              width: 86,
+              height: 36,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: fill,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: border),
+              ),
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 10,
+                  fontWeight:
+                      canOpenBooking || settled ? FontWeight.w700 : FontWeight.w400,
+                  color: textColor,
+                  decoration:
+                      canOpenBooking ? TextDecoration.underline : null,
+                ),
               ),
             ),
           ),
@@ -751,8 +876,11 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
 
   Widget _bookingCard(WeekBooking booking) {
     final course = OnlineCourse.findById(booking.courseId);
+    final settled = _isBookingSettled(booking);
+    final cancelled = booking.status == 'rejected';
     return Card(
       margin: EdgeInsets.only(bottom: 10),
+      color: settled ? Palette.grey50 : null,
       child: Padding(
         padding: EdgeInsets.all(14),
         child: Column(
@@ -766,7 +894,9 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                         ? booking.email
                         : '${booking.memberName} · ${booking.email}',
                     style: TextStyle(
-                        fontFamily: "NotoSansKR", fontWeight: FontWeight.bold),
+                        fontFamily: "NotoSansKR",
+                        fontWeight: FontWeight.bold,
+                        color: settled ? Palette.grey600 : null),
                   ),
                 ),
                 if (booking.isGuestFor(_teacherUid)) ...[
@@ -789,14 +919,18 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                   ),
                 ],
                 Text(
-                  booking.statusLabel,
+                  cancelled
+                      ? '취소'
+                      : settled
+                          ? '완료'
+                          : booking.statusLabel,
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 12,
-                    color: booking.isConfirmed
-                        ? Palette.success
-                        : booking.status == 'rejected'
-                            ? Palette.danger
+                    color: cancelled || settled
+                        ? Palette.grey500
+                        : booking.isConfirmed
+                            ? Palette.success
                             : Palette.warning,
                   ),
                 ),
@@ -804,7 +938,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
             ),
             SizedBox(height: 6),
             Text(
-              '${course?.title ?? booking.courseId} · ${booking.weekNumber}주차'
+              '${course?.title ?? booking.courseId} · ${booking.weekNumber}회차'
               '${booking.weekTitle.isEmpty ? '' : ' · ${booking.weekTitle}'}',
               style: TextStyle(
                   fontFamily: "NotoSansKR",
@@ -855,6 +989,18 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                         style: TextStyle(fontFamily: "NotoSansKR")),
                   ),
                 ],
+              ),
+            ] else ...[
+              SizedBox(height: 12),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.primary,
+                  foregroundColor: Palette.white,
+                ),
+                onPressed: () => _openVideoForBooking(booking),
+                icon: Icon(Icons.videocam, size: 18),
+                label: Text('화상수업 입장',
+                    style: TextStyle(fontFamily: "NotoSansKR")),
               ),
             ],
           ],

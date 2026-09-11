@@ -126,8 +126,8 @@ class AcademyHomeCards extends StatelessWidget {
   List<_AcademyItem> _guideItems(BuildContext context) {
     return [
       _AcademyItem(
-        title: '교원소개',
-        subtitle: '원어민 · 한국인 선생님',
+        title: '교원/운영시스템 소개',
+        subtitle: '원어민 · 한국인 선생님 · 운영시스템',
         imageAsset: AcademyHeroBanner.teachers,
         onTap: () => MenuUtil.push(context, SchoolTeachersPage()),
       ),

@@ -67,9 +67,12 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
       widget.course.id,
       userId: AuthService.currentUser?.uid,
     );
-    final weeks = await EnrollmentService.weeks(widget.course.id);
     final enrollment =
         await EnrollmentService.myEnrollmentForCourse(widget.course.id);
+    final weeks = await EnrollmentService.weeks(
+      widget.course.id,
+      ensureThrough: enrollment?.unlockedSessionNumber ?? 1,
+    );
     Map<String, List<String>> progress = {};
     List<WeekBooking> bookings = [];
     List<LessonFeedback> feedbacks = [];
@@ -701,7 +704,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  session.title,
+                  EnrollmentService.normalizeSessionLabel(session.title),
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 14,

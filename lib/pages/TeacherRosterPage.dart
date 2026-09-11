@@ -6,8 +6,9 @@ import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonFeedbackService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
+import 'package:gi_english_website/util/UrlIUtil.dart';
 
-/// 강사 프로필 · 담당 회원 · 화상수업 이력 · 피드백.
+/// 강사 프로필 · 담당 회원 · 화상수업 입장/종료 · 피드백.
 class TeacherRosterPage extends StatelessWidget {
   final Map<String, dynamic>? teacher;
   final bool embedded;
@@ -50,10 +51,12 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
   List<Map<String, dynamic>> _guestMembers = [];
   List<WeekBooking> _bookings = [];
   List<LessonFeedback> _feedbacks = [];
+  List<OnlineSession> _sessions = [];
   bool _loading = true;
   String _staffUid = '';
   bool _isOwner = false;
   String _writerName = '';
+  bool _busy = false;
 
   String get _teacherUid => _teacher?['uid']?.toString() ?? '';
 
@@ -80,6 +83,12 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
         ? <Map<String, dynamic>>[]
         : await AuthService.listMembers(teacherId: teacherUid);
     final bookings = await EnrollmentService.weekBookingsForTeacher(teacherUid);
+    if (teacherUid.isNotEmpty) {
+      await EnrollmentService.backfillSessionsForTeacher(teacherUid);
+    }
+    final sessions = teacherUid.isEmpty
+        ? <OnlineSession>[]
+        : await EnrollmentService.sessionsForTeacher(teacherUid);
     final byId = <String, Map<String, dynamic>>{};
     for (final member in members) {
       final id = member['uid']?.toString() ?? '';
@@ -98,26 +107,19 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
         };
       });
     }
-    final mergedMembers = byId.values.toList();
-    mergedMembers.sort((a, b) {
-      final aName = a['name']?.toString() ?? '';
-      final bName = b['name']?.toString() ?? '';
-      return aName.compareTo(bName);
-    });
-    final guestMembers = guestById.values.toList();
-    guestMembers.sort((a, b) {
-      final aName = a['name']?.toString() ?? '';
-      final bName = b['name']?.toString() ?? '';
-      return aName.compareTo(bName);
-    });
     final feedbacks = await LessonFeedbackService.listForTeacher(teacherUid);
     if (!mounted) return;
     setState(() {
       _teacher = teacher;
-      _members = mergedMembers;
-      _guestMembers = guestMembers;
+      _members = byId.values.toList()
+        ..sort((a, b) => (a['name']?.toString() ?? '')
+            .compareTo(b['name']?.toString() ?? ''));
+      _guestMembers = guestById.values.toList()
+        ..sort((a, b) => (a['name']?.toString() ?? '')
+            .compareTo(b['name']?.toString() ?? ''));
       _bookings = bookings;
       _feedbacks = feedbacks;
+      _sessions = sessions;
       _staffUid = staffUid;
       _isOwner = isOwner;
       _writerName = writerName;
@@ -138,32 +140,115 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     return _bookings.where((b) => b.userId == memberId).toList();
   }
 
-  Future<void> _openFeedback(WeekBooking booking) async {
+  OnlineSession? _sessionFor(WeekBooking booking) {
+    final expected = booking.sessionId.trim().isNotEmpty
+        ? booking.sessionId.trim()
+        : EnrollmentService.sessionDocIdForBooking(booking.id);
+    for (final session in _sessions) {
+      if (session.id == expected || session.bookingId == booking.id) {
+        return session;
+      }
+    }
+    return null;
+  }
+
+  String _sessionIdFor(WeekBooking booking) {
+    final session = _sessionFor(booking);
+    if (session != null) return session.id;
+    if (booking.sessionId.trim().isNotEmpty) return booking.sessionId.trim();
+    return EnrollmentService.sessionDocIdForBooking(booking.id);
+  }
+
+  Future<void> _openFeedback(WeekBooking booking,
+      {bool afterClass = false}) async {
     final existing =
         LessonFeedbackService.forBooking(_feedbacks, booking.id);
-    final saved = await showDialog<bool>(
+    final saved = await LessonFeedbackService.showEditor(
       context: context,
-      barrierDismissible: false,
-      builder: (_) => _FeedbackDialog(
-        booking: booking,
-        existing: existing,
-        canWrite: _canWrite,
-        onSave: (content) async {
-          return LessonFeedbackService.save(
-            booking: booking,
-            content: content,
-            teacherId: _teacherUid,
-            teacherName: (_teacher?['name']?.toString() ?? '').trim().isNotEmpty
-                ? _teacher!['name'].toString()
-                : _writerName,
-          );
-        },
-      ),
+      booking: booking,
+      existing: existing,
+      canWrite: _canWrite,
+      teacherId: _teacherUid,
+      teacherName: (_teacher?['name']?.toString() ?? '').trim().isNotEmpty
+          ? _teacher!['name'].toString()
+          : _writerName,
     );
-    if (saved == true) {
-      _toast('피드백을 저장했습니다.');
+    if (saved) {
+      _toast(afterClass ? '피드백을 저장했습니다. 수업이 마무리되었습니다.' : '피드백을 저장했습니다.');
+      await _load();
+    } else if (afterClass && mounted) {
       await _load();
     }
+  }
+
+  Future<void> _enterAsHost(WeekBooking booking) async {
+    if (_busy) return;
+    if (!booking.isConfirmed) {
+      _toast('확정된 예약만 화상수업으로 입장할 수 있습니다.', error: true);
+      return;
+    }
+    setState(() => _busy = true);
+    final url = EnrollmentService.meetingUrlForBooking(
+      courseId: booking.courseId,
+      bookingId: booking.id,
+    );
+    final session = _sessionFor(booking);
+    final openUrl =
+        (session != null && session.meetingUrl.trim().isNotEmpty)
+            ? session.meetingUrl
+            : url;
+    await UrlUtil.open(openUrl);
+    final error = await EnrollmentService.setSessionLive(
+      sessionId: _sessionIdFor(booking),
+      isLive: true,
+      hostName: _writerName,
+    );
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (error != null) {
+      _toast(error, error: true);
+      return;
+    }
+    _toast('호스트로 입장했습니다. 수강생도 입장할 수 있습니다.');
+    await _load();
+  }
+
+  Future<void> _endClass(WeekBooking booking) async {
+    if (_busy) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('수업 종료', style: TextStyle(fontFamily: "Jalnan")),
+        content: Text(
+          '이 회차 화상수업을 종료할까요?\n종료 후 바로 피드백을 작성할 수 있습니다.',
+          style: TextStyle(fontFamily: "NotoSansKR", height: 1.5),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text('취소')),
+          ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text('수업 종료')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    setState(() => _busy = true);
+    final error = await EnrollmentService.setSessionLive(
+      sessionId: _sessionIdFor(booking),
+      isLive: false,
+      hostName: _writerName,
+    );
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (error != null) {
+      _toast(error, error: true);
+      return;
+    }
+    _toast('수업을 종료했습니다. 피드백을 작성해 주세요.');
+    await _openFeedback(booking, afterClass: true);
   }
 
   @override
@@ -187,7 +272,8 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
           Text('내 수강생', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           SizedBox(height: 8),
           Text(
-            '담당으로 배정된 회원의 화상수업 이력과 주차별 피드백을 확인하고, ${_canWrite ? '피드백을 작성할 수 있습니다.' : '피드백을 확인할 수 있습니다.'}',
+            '담당 회원의 화상수업 입장·종료와 회차별 피드백을 여기서 진행합니다. '
+            '수업 종료 직후 피드백 창이 열립니다.',
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
@@ -367,7 +453,8 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
               : null,
           title: Text(
             name.isEmpty ? email : name,
-            style: TextStyle(fontFamily: "NotoSansKR", fontWeight: FontWeight.w700),
+            style:
+                TextStyle(fontFamily: "NotoSansKR", fontWeight: FontWeight.w700),
           ),
           subtitle: Text(
             [
@@ -403,6 +490,14 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     final feedback = LessonFeedbackService.forBooking(_feedbacks, booking.id);
     final written = feedback != null && feedback.hasContent;
     final course = OnlineCourse.findById(booking.courseId);
+    final session = _sessionFor(booking);
+    final live = session?.isLiveNow == true;
+    final ended = session?.isFinished == true || session?.isStale == true;
+    final canHost = _canWrite && booking.isConfirmed && !ended;
+    final canEnd = _canWrite &&
+        booking.isConfirmed &&
+        (live || (session?.isLive == true) || !ended);
+
     return Container(
       width: double.maxFinite,
       margin: EdgeInsets.only(bottom: 8),
@@ -410,14 +505,16 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       decoration: BoxDecoration(
         color: Palette.grey50,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Palette.grey200),
+        border: Border.all(
+            color: live ? Palette.success : Palette.grey200,
+            width: live ? 1.5 : 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             [
-              if (booking.weekNumber > 0) '${booking.weekNumber}주차',
+              if (booking.weekNumber > 0) '${booking.weekNumber}회차',
               if (course != null) course.title,
             ].join(' · '),
             style: TextStyle(
@@ -427,12 +524,16 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
           ),
           SizedBox(height: 4),
           Text(
-            '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)} · ${booking.statusLabel}',
+            '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)} · ${booking.statusLabel}'
+            '${live ? ' · 수업 중' : ended ? ' · 수업 종료' : ''}',
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 12, color: Palette.grey600),
           ),
           SizedBox(height: 8),
-          Row(
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -451,7 +552,25 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                   ),
                 ),
               ),
-              Spacer(),
+              if (canHost)
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.primary,
+                    foregroundColor: Palette.white,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  onPressed: _busy ? null : () => _enterAsHost(booking),
+                  icon: Icon(Icons.videocam, size: 16),
+                  label: Text('호스트로 입장',
+                      style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
+                ),
+              if (canEnd && !ended)
+                OutlinedButton.icon(
+                  onPressed: _busy ? null : () => _endClass(booking),
+                  icon: Icon(Icons.stop_circle, size: 16),
+                  label: Text('수업 종료',
+                      style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
+                ),
               TextButton(
                 onPressed: () => _openFeedback(booking),
                 child: Text(
@@ -466,142 +585,6 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _FeedbackDialog extends StatefulWidget {
-  final WeekBooking booking;
-  final LessonFeedback? existing;
-  final bool canWrite;
-  final Future<String?> Function(String content) onSave;
-
-  const _FeedbackDialog({
-    required this.booking,
-    required this.existing,
-    required this.canWrite,
-    required this.onSave,
-  });
-
-  @override
-  State<_FeedbackDialog> createState() => _FeedbackDialogState();
-}
-
-class _FeedbackDialogState extends State<_FeedbackDialog> {
-  late final TextEditingController _controller;
-  bool _saving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: widget.existing?.content ?? '');
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  Future<void> _save() async {
-    setState(() => _saving = true);
-    final error = await widget.onSave(_controller.text);
-    if (!mounted) return;
-    setState(() => _saving = false);
-    if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error, style: TextStyle(fontFamily: "NotoSansKR")),
-          backgroundColor: Palette.danger,
-        ),
-      );
-      return;
-    }
-    Navigator.pop(context, true);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final booking = widget.booking;
-    final course = OnlineCourse.findById(booking.courseId);
-    return AlertDialog(
-      backgroundColor: Palette.white,
-      surfaceTintColor: Palette.white,
-      title: Text('주차별 피드백', style: TextStyle(fontFamily: "Jalnan")),
-      content: SizedBox(
-        width: 460,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                [
-                  if (booking.memberName.isNotEmpty) booking.memberName,
-                  if (course != null) course.title,
-                  if (booking.weekNumber > 0) '${booking.weekNumber}주차',
-                ].join(' · '),
-                style: TextStyle(
-                    fontFamily: "NotoSansKR", fontWeight: FontWeight.w700),
-              ),
-              SizedBox(height: 4),
-              Text(
-                '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)}',
-                style: TextStyle(
-                    fontFamily: "NotoSansKR",
-                    fontSize: 13,
-                    color: Palette.grey600),
-              ),
-              SizedBox(height: 16),
-              if (widget.canWrite)
-                TextField(
-                  controller: _controller,
-                  maxLines: 8,
-                  decoration: InputDecoration(
-                    labelText: '수업 피드백',
-                    alignLabelWithHint: true,
-                    hintText: '오늘 수업에서 잘한 점, 고칠 점, 다음 주 과제를 적어 주세요.',
-                    border: OutlineInputBorder(),
-                  ),
-                )
-              else
-                Container(
-                  width: double.maxFinite,
-                  padding: EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Palette.grey50,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Palette.grey200),
-                  ),
-                  child: Text(
-                    (widget.existing?.content ?? '').trim().isEmpty
-                        ? '아직 작성된 피드백이 없습니다.'
-                        : widget.existing!.content,
-                    style: TextStyle(
-                        fontFamily: "NotoSansKR", fontSize: 14, height: 1.55),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: _saving ? null : () => Navigator.pop(context, false),
-          child: Text('닫기'),
-        ),
-        if (widget.canWrite)
-          ElevatedButton(
-            onPressed: _saving ? null : _save,
-            child: _saving
-                ? SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text('저장'),
-          ),
-      ],
     );
   }
 }

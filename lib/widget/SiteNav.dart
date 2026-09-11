@@ -15,7 +15,6 @@ import 'package:gi_english_website/pages/SchoolNZPage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineClassroomPage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineCurriculumPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
-import 'package:gi_english_website/pages/SchoolSystemPage.dart';
 import 'package:gi_english_website/pages/SchoolTeachersPage.dart';
 import 'package:gi_english_website/pages/WorkingAdminLoginPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -41,8 +40,7 @@ class SiteNav {
   static final List<SiteNavGroup> academyGroups = [
     SiteNavGroup('소개', [
       SiteNavItem('학원 홈', (_) => SchoolAboutPage()),
-      SiteNavItem('교원소개', (_) => SchoolTeachersPage()),
-      SiteNavItem('운영 System', (_) => SchoolSystemPage()),
+      SiteNavItem('교원/운영시스템 소개', (_) => SchoolTeachersPage()),
       SiteNavItem('상담/오시는 길', (_) => SchoolMapPage()),
     ]),
     SiteNavGroup('프로그램', [
