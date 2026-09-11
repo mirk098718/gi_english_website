@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/Notice.dart';
 import 'package:gi_english_website/pages/AdminNoticeWritePage.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
-import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityBoardPage.dart';
 import 'package:gi_english_website/pages/NoticeDetailPage.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -32,8 +31,6 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
             "FAQ", BehaviorColor.colorOnDefault, SchoolCommunityBoardPage()),
         ButtonState(
             "Gallery", BehaviorColor.colorOnDefault, SchoolGalleryPage()),
-        ButtonState(
-            "입학상담", BehaviorColor.colorOnDefault, SchoolConsultationPage()),
       ];
 
   @override

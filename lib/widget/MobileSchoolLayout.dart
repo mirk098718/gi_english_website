@@ -1,15 +1,12 @@
+import 'dart:async';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/pages/SchoolAboutPage.dart';
-import 'package:gi_english_website/pages/SchoolCurriculumElePage.dart';
-import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
-import 'package:gi_english_website/pages/SchoolMainPage.dart';
-import 'package:gi_english_website/pages/SchoolOnlineCurriculumPage.dart';
-import 'package:gi_english_website/pages/SchoolProgramPage.dart';
-import 'package:gi_english_website/pages/WorkingAdminLoginPage.dart';
-import 'package:gi_english_website/pages/AdminOnlineHubPage.dart';
-import 'package:gi_english_website/util/MenuUtil.dart';
-import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/AuthService.dart';
+import 'package:gi_english_website/util/MyWidget.dart';
+import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/HeaderSocialLinks.dart';
+import 'package:gi_english_website/widget/SiteNav.dart';
 
 class MobileSchoolLayout extends StatefulWidget {
   final Widget content;
@@ -22,24 +19,31 @@ class MobileSchoolLayout extends StatefulWidget {
 }
 
 class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
-  final idController = TextEditingController();
-  final pwController = TextEditingController();
   bool _isAdmin = false;
-
-  bool menu1Transparent = true;
-  bool menu2Transparent = true;
-  bool menu3Transparent = true;
-  bool menu4Transparent = true;
-  bool menu5Transparent = true;
+  bool _isMemberLoggedIn = AuthService.currentUser != null;
+  StreamSubscription<User?>? _authSub;
 
   @override
   void initState() {
     super.initState();
     _checkAdminStatus();
+    _authSub = AuthService.authStateChanges.listen((user) {
+      if (mounted) {
+        setState(() {
+          _isMemberLoggedIn = user != null;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _authSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _checkAdminStatus() async {
-    bool isStaff = await AuthService.isStaff();
+    final isStaff = await AuthService.isStaff();
     if (mounted) {
       setState(() {
         _isAdmin = isStaff;
@@ -47,10 +51,34 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
     }
   }
 
+  Future<void> _logout() async {
+    try {
+      await AuthService.signOut();
+      if (!mounted) return;
+      setState(() {
+        _isAdmin = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text('로그아웃되었습니다.', style: TextStyle(fontFamily: "NotoSansKR")),
+          backgroundColor: Palette.success,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('로그아웃 중 오류가 발생했습니다.',
+              style: TextStyle(fontFamily: "NotoSansKR")),
+          backgroundColor: Palette.danger,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // 모바일에서 스크롤이 동작하려면 Stack에 명시적 높이가 필요함.
-    // 자식이 모두 Positioned일 때 Stack이 0 높이로 줄어들어 스크롤 영역이 사라지는 문제 방지.
     final viewportHeight = MediaQuery.sizeOf(context).height;
     const topBarHeight = 108.0;
 
@@ -65,64 +93,33 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
               bottom: 0,
               left: 0,
               right: 0,
-              child: ClipRect(
-                child: widget.content,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ClipRect(
+                      child: widget.content,
+                    ),
+                  ),
+                  MyWidget.mobileSchoolFooter(),
+                ],
               ),
             ),
-            Positioned(top: 56, left: 0, right: 0, child: appBar2(context)),
-            Positioned(top: 0, left: 0, right: 0, child: appBar1(context)),
+            Positioned(top: 56, left: 0, right: 0, child: _navRow()),
+            Positioned(top: 0, left: 0, right: 0, child: _topBar()),
           ],
         ),
       ),
     );
   }
 
-  void _showAdminLoginDialog(BuildContext context) {
-    print('🔧 MobileSchoolLayout: 관리자 로그인 다이얼로그 호출됨');
-    // WorkingAdminLoginPage로 이동
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => WorkingAdminLoginPage(category: 'general'),
-      ),
-    ).then((_) {
-      // 로그인 후 돌아왔을 때 관리자 상태 다시 확인
-      _checkAdminStatus();
-    });
-  }
-
-  Future<void> _logout() async {
-    try {
-      await AuthService.signOut();
-      setState(() {
-        _isAdmin = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content:
-              Text('로그아웃되었습니다.', style: TextStyle(fontFamily: "NotoSansKR")),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('로그아웃 중 오류가 발생했습니다.',
-              style: TextStyle(fontFamily: "NotoSansKR")),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
-  Widget appBar1(BuildContext context) {
+  Widget _topBar() {
     return Container(
       height: 56,
       padding: EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: Palette.white,
         border: Border(
-          top: BorderSide(color: Palette.secondary, width: 3),
+          top: BorderSide(color: Palette.darkTeal, width: 3),
           bottom: BorderSide(color: Palette.grey200, width: 1),
         ),
       ),
@@ -130,9 +127,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
         children: [
           Expanded(
             child: InkWell(
-              onTap: () {
-                MenuUtil.push(context, SchoolMainPage());
-              },
+              onTap: () => SiteNav.goHome(context),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: SizedBox(
@@ -151,33 +146,76 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
               ),
             ),
           ),
-          if (!_isAdmin)
-            IconButton(
-              onPressed: () {
-                _showAdminLoginDialog(context);
-              },
-              icon: Icon(Icons.admin_panel_settings_outlined,
-                  color: Palette.grey500, size: 20),
-            ),
+          HeaderSocialLinks(compact: true),
+          SizedBox(width: 4),
           if (_isAdmin) ...[
             TextButton(
               onPressed: _logout,
-              child: Text("로그아웃",
-                  style: TextStyle(
-                      fontFamily: "NotoSansKR",
-                      fontSize: 12,
-                      color: Palette.grey600)),
+              child: Text(
+                '로그아웃',
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 12,
+                  color: Palette.grey600,
+                ),
+              ),
             ),
             TextButton(
-              onPressed: () {
-                MenuUtil.push(context, AdminOnlineHubPage());
-              },
-              child: Text("관리자",
+              onPressed: () => SiteNav.goAdminHub(context),
+              child: Text(
+                '관리자',
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 12,
+                  color: Palette.darkTeal,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ] else ...[
+            if (_isMemberLoggedIn)
+              TextButton(
+                onPressed: _logout,
+                child: Text(
+                  '로그아웃',
                   style: TextStyle(
-                      fontFamily: "NotoSansKR",
-                      fontSize: 12,
-                      color: Palette.secondaryDark,
-                      fontWeight: FontWeight.w600)),
+                    fontFamily: "NotoSansKR",
+                    fontSize: 12,
+                    color: Palette.grey600,
+                  ),
+                ),
+              )
+            else
+              TextButton(
+                onPressed: () => SiteNav.goLogin(context),
+                child: Text(
+                  '수강생 로그인',
+                  style: TextStyle(
+                    fontFamily: "NotoSansKR",
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Palette.black,
+                  ),
+                ),
+              ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 2),
+              child: Container(width: 1, height: 12, color: Palette.grey300),
+            ),
+            TextButton(
+              onPressed: () async {
+                await SiteNav.goAdminLogin(context);
+                await _checkAdminStatus();
+              },
+              child: Text(
+                '운영자 로그인',
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Palette.darkTeal,
+                ),
+              ),
             ),
           ],
         ],
@@ -185,164 +223,58 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
     );
   }
 
-  Widget appBar2(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
+  Widget _navRow() {
+    return Container(
+      height: widget.height,
+      decoration: BoxDecoration(
+        color: Palette.white,
+        border: Border(
+          bottom: BorderSide(color: Palette.grey200, width: 1),
+        ),
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        child: Row(
+          children: [
+            _navLink('과정', () => SiteNav.goCourses(context)),
+            _navLink('레벨 진단', () => SiteNav.openPlacement(context)),
+            _navLink('내 강의실', () => SiteNav.goClassroom(context)),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 6),
+              child: Container(width: 1, height: 16, color: Palette.grey300),
+            ),
+            _navLink(
+              '글림아일랜드 어학원',
+              () => SiteNav.goAcademy(context),
+              color: Palette.darkTeal,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _navLink(String label, VoidCallback onTap, {Color? color}) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 12),
+        child: SizedBox(
           height: widget.height,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border(
-              bottom: BorderSide(color: Palette.grey200, width: 1),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: color ?? Palette.black,
+                fontFamily: "NotoSansKR",
+                fontWeight: FontWeight.w500,
+                fontSize: 13,
+              ),
             ),
           ),
         ),
-        SizedBox(
-          width: 30,
-        ),
-        Container(
-          color: Colors.transparent,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                // InkWell(
-                //   child:
-                //   Container(
-                //       margin: EdgeInsets.only(left: 10, top: 10, bottom: 5),
-                //       width:30, height: 30, child: Image.asset("assets/mobileLoginButton.png")),
-                //   onTap: () {
-                //     showDialog(
-                //         context: context,
-                //         builder: (context) {
-                //           return AlertDialog(
-                //               title: Text("로그인", textAlign: TextAlign.center,),
-                //               content: Container(
-                //                 width: 280,
-                //                 height: 240,
-                //                 child: Column(
-                //                   children: [
-                //                     Divider(),
-                //                     SizedBox(height: 10),
-                //                     Expanded(
-                //                       child: MyWidget.roundEdgeTextField(
-                //                           "ID를 입력해주세요", idController),
-                //                     ),
-                //                     Expanded(
-                //                       child: MyWidget.roundEdgeTextField(
-                //                           "Password를 입력해주세요", pwController),
-                //                     ),
-                //                     SizedBox(height: 10),
-                //                     Container(
-                //                       width: 150,
-                //                       height: 50,
-                //                       child: ElevatedButton(
-                //                         style: ElevatedButton.styleFrom(
-                //                           primary: Palette.accent,
-                //                           onPrimary: Palette.black,),
-                //                         onPressed: () {},
-                //                         child: Text("Login", style: TextStyle(fontFamily: "Jalnan"),),
-                //                       ),
-                //                     )
-                //                   ],
-                //                 ),
-                //               ));
-                //         });
-                //   },
-                // ),
-                SizedBox(width: 10),
-                InkWell(
-                  onTap: () {
-                    MenuUtil.push(context, SchoolAboutPage());
-                  },
-                  child: Container(
-                    height: widget.height,
-                    alignment: Alignment.center,
-                    child: Text(
-                      "About GI",
-                      style: TextStyle(
-                          color: Palette.grey800,
-                          fontFamily: "NotoSansKR",
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 30),
-                InkWell(
-                  onTap: () {
-                    MenuUtil.push(context, SchoolProgramPage());
-                  },
-                  child: Container(
-                    height: widget.height,
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Program",
-                      style: TextStyle(
-                          color: Palette.grey800,
-                          fontFamily: "NotoSansKR",
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 30),
-                InkWell(
-                  onTap: () {
-                    MenuUtil.push(context, SchoolCurriculumElePage());
-                  },
-                  child: Container(
-                      height: widget.height,
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Curriculum",
-                        style: TextStyle(
-                            color: Palette.grey800,
-                            fontFamily: "NotoSansKR",
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13),
-                      )),
-                ),
-                SizedBox(width: 30),
-                InkWell(
-                  onTap: () {
-                    MenuUtil.push(context, SchoolOnlineCurriculumPage());
-                  },
-                  child: Container(
-                      height: widget.height,
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Online Program",
-                        style: TextStyle(
-                            color: Palette.grey800,
-                            fontFamily: "NotoSansKR",
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13),
-                      )),
-                ),
-                SizedBox(width: 30),
-                InkWell(
-                  onTap: () {
-                    MenuUtil.push(context, SchoolGalleryPage());
-                  },
-                  child: Container(
-                      height: widget.height,
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Community",
-                        style: TextStyle(
-                            color: Palette.grey800,
-                            fontFamily: "NotoSansKR",
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13),
-                      )),
-                ),
-                SizedBox(width: 30),
-              ],
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

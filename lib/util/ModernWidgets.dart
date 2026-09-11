@@ -339,12 +339,22 @@ class ModernWidgets {
             margin: EdgeInsets.only(bottom: 20),
           ),
           Text(
-            "Gi Gleam Island 어학원 파주",
+            "글림교육",
             style: TextStyle(
               color: Palette.white,
               fontFamily: "NotoSansKR",
               fontWeight: FontWeight.w600,
               fontSize: 16,
+            ),
+          ),
+          SizedBox(height: 4),
+          Text(
+            "Gleam Education",
+            style: TextStyle(
+              color: Palette.grey400,
+              fontFamily: "NotoSansKR",
+              fontWeight: FontWeight.w500,
+              fontSize: 13,
             ),
           ),
           SizedBox(height: 12),
@@ -362,7 +372,7 @@ class ModernWidgets {
           ),
           SizedBox(height: 24),
           Text(
-            "Copyright ⓒ 글림아일랜드어학원",
+            "Copyright ⓒ 글림교육",
             style: TextStyle(
               color: Palette.grey500,
               fontFamily: "NotoSansKR",
@@ -384,12 +394,23 @@ class ModernWidgets {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            "Gi Gleam Island 어학원 파주",
+            "글림교육",
             style: TextStyle(
               color: Palette.white,
               fontFamily: "NotoSansKR",
               fontWeight: FontWeight.w700,
               fontSize: 16,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 4),
+          Text(
+            "Gleam Education",
+            style: TextStyle(
+              color: Palette.grey400,
+              fontFamily: "NotoSansKR",
+              fontWeight: FontWeight.w500,
+              fontSize: 13,
             ),
             textAlign: TextAlign.center,
           ),
@@ -405,7 +426,7 @@ class ModernWidgets {
           ),
           SizedBox(height: 8),
           Text(
-            "ⓒ 글림아일랜드교육",
+            "ⓒ 글림교육",
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Palette.grey400,

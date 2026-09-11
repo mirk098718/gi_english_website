@@ -65,6 +65,24 @@ flutter:
      - assets/instaLogo.png
      - assets/aboutMainImage.png
      - assets/mainGateImageMiddleSchool.png
+     - assets/academy-hero-about.png
+     - assets/academy-hero-teachers.png
+     - assets/academy-hero-system.png
+     - assets/academy-hero-map.png
+     - assets/academy-hero-program.png
+     - assets/academy-hero-coding.png
+     - assets/academy-hero-nz.png
+     - assets/academy-hero-ele.png
+     - assets/academy-hero-middle.png
+     - assets/academy-hero-high.png
+     - assets/academy-hero-community.png
+     - assets/hero-device-mockups-16x9.png
+     - assets/audience-beginner.png
+     - assets/audience-basic.png
+     - assets/audience-intermediate.png
+     - assets/audience-business.png
+     - assets/audience-advanced.png
+     - assets/audience-campus.png
      - assets/curriculumImage.png
      - assets/communityMainImage.png
      - assets/giAppDownload.png
@@ -85,6 +103,7 @@ flutter:
      - assets/middleOnlineLink.png
      - assets/naverBlogLogo.png
      - assets/gleamIslandLogo.jpeg
+     - assets/gleamEducationLogo.png
      - assets/gleamIslandMoto.png
      - assets/gleamIslandMoto1.png
      - assets/gleamIslandMoto2.png

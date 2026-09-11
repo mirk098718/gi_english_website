@@ -5,6 +5,7 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 class CommunityPageLayout extends StatefulWidget {
@@ -118,7 +119,7 @@ class _CommunityPageLayoutState extends State<CommunityPageLayout> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/communityMainImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.community),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -172,7 +173,6 @@ class _CommunityPageLayoutState extends State<CommunityPageLayout> {
             color: Colors.white,
             child: widget.content,
           ),
-          SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
         ],
       ),
     );

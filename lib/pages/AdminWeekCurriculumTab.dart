@@ -3,7 +3,7 @@ import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
-/// 과정별 주간 학습(인강 · 문제 링크 · 체크리스트) 등록.
+/// 과정별 회차 학습(인강 · 문제 링크 · 체크리스트) 등록.
 class AdminWeekCurriculumTab extends StatefulWidget {
   @override
   _AdminWeekCurriculumTabState createState() => _AdminWeekCurriculumTabState();
@@ -51,7 +51,7 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
       ),
     );
     if (saved == true) {
-      _toast(existing == null ? '주차가 등록되었습니다.' : '주차가 수정되었습니다.');
+      _toast(existing == null ? '회차가 등록되었습니다.' : '회차가 수정되었습니다.');
       await _refresh();
     }
   }
@@ -60,10 +60,10 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('${week.weekNumber}주차 삭제',
+        title: Text('${week.weekNumber}회차 삭제',
             style: TextStyle(fontFamily: "Jalnan")),
         content: Text(
-          '이 주차의 인강·문제 링크·체크리스트가 삭제됩니다.\n학생들의 체크 기록은 남아 있을 수 있습니다.',
+          '이 회차의 인강·문제 링크·체크리스트가 삭제됩니다.\n학생들의 체크 기록은 남아 있을 수 있습니다.',
           style: TextStyle(fontFamily: "NotoSansKR"),
         ),
         actions: [
@@ -119,8 +119,8 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
         ),
         SizedBox(height: 12),
         Text(
-          '각 주차에 인강 URL, 문제풀이 링크, 학생이 스스로 체크할 학습 항목을 넣습니다.\n'
-          '회원은 수강 시작일 기준으로 “이번 주”가 강조되고, 이전 주차도 복습할 수 있습니다.',
+          '각 회차에 인강 URL, 문제풀이 링크, 학생이 스스로 체크할 학습 항목을 넣습니다.\n'
+          '회원은 이전 회차 화상수업을 마치면 다음 회차가 열리고, 이수한 회차는 복습할 수 있습니다.',
           style: TextStyle(
               fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
         ),
@@ -135,16 +135,16 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
             ),
             onPressed: () => _openEditor(),
             icon: Icon(Icons.add),
-            label: Text('주차 추가', style: TextStyle(fontFamily: "Jalnan")),
+            label: Text('회차 추가', style: TextStyle(fontFamily: "Jalnan")),
           ),
         ),
         Divider(height: 36),
-        Text('등록된 주차', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+        Text('등록된 회차', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
         SizedBox(height: 12),
         if (_loading)
           Center(child: CircularProgressIndicator())
         else if (_weeks.isEmpty)
-          Text('등록된 주차가 없습니다. 1주차부터 추가해주세요.',
+          Text('등록된 회차가 없습니다. 1회차부터 추가해주세요.',
               style:
                   TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500))
         else
@@ -160,7 +160,7 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
                             fontSize: 13)),
                   ),
                   title: Text(
-                    week.title.isEmpty ? '${week.weekNumber}주차' : week.title,
+                    week.title.isEmpty ? '${week.weekNumber}회차' : week.title,
                     style: TextStyle(
                         fontFamily: "NotoSansKR", fontWeight: FontWeight.bold),
                   ),
@@ -341,7 +341,7 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
     final isEdit = widget.existing != null;
     return AlertDialog(
       title: Text(
-        isEdit ? '${widget.existing!.weekNumber}주차 수정' : '주차 추가',
+        isEdit ? '${widget.existing!.weekNumber}회차 수정' : '회차 추가',
         style: TextStyle(fontFamily: "Jalnan"),
       ),
       content: SizedBox(
@@ -354,7 +354,7 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
                 controller: weekNumberController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: '주차 번호',
+                  labelText: '회차 번호',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -362,7 +362,7 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
               TextField(
                 controller: titleController,
                 decoration: InputDecoration(
-                  labelText: '주차 제목 (예: 1주차 자기소개)',
+                  labelText: '회차 제목 (예: 1회차 자기소개)',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -371,7 +371,7 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
                 controller: descriptionController,
                 maxLines: 2,
                 decoration: InputDecoration(
-                  labelText: '이번 주 안내 (선택)',
+                  labelText: '이번 회차 안내 (선택)',
                   border: OutlineInputBorder(),
                 ),
               ),

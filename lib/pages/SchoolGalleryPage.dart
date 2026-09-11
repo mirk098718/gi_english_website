@@ -10,6 +10,7 @@ import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/GalleryService.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:gi_english_website/widget/ImageViewer.dart';
 import 'package:gi_english_website/widget/AdminImageUploadDialog.dart';
@@ -32,7 +33,6 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
     ButtonState(
         "FAQ", BehaviorColor.colorOnDefault, SchoolCommunityBoardPage()),
     ButtonState("Gallery", BehaviorColor.colorOnClick, SchoolGalleryPage()),
-    ButtonState("입학상담", BehaviorColor.colorOnDefault, SchoolConsultationPage()),
   ];
 
   bool isAdmin = false;
@@ -670,7 +670,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/communityMainImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.community),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -717,24 +717,15 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
   //mobile
 
   Widget mobileScrollView() {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Container(
-          color: Colors.white,
-          child: Column(
-            children: [
-              // mobileMainImage(),
-              mobileLeftMenu(),
-              mobileContent(),
-              SizedBox(height: 100), // 여백 추가
-            ],
-          ),
+    return SingleChildScrollView(
+      child: Container(
+        color: Colors.white,
+        child: Column(
+          children: [
+            mobileLeftMenu(),
+            mobileContent(),
+          ],
         ),
-      ),
-      bottomNavigationBar: Container(
-        height: 51,
-        child: MyWidget.mobileSchoolFooter(),
       ),
     );
   }
@@ -805,7 +796,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
       child: Stack(
         alignment: Alignment.centerLeft,
         children: [
-          Image.asset("assets/communityMainImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.community),
           Container(
             padding: EdgeInsets.only(left: 20),
             child: Column(

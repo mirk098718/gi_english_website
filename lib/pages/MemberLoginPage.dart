@@ -5,6 +5,7 @@ import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/AccountRecoveryDialog.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
@@ -59,7 +60,6 @@ class _MemberLoginPageState extends State<MemberLoginPage> {
         child: Column(
           children: [
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter()),
           ],
         ),
       ),
@@ -157,6 +157,25 @@ class _MemberLoginPageState extends State<MemberLoginPage> {
                   MyWidget.roundEdgeTextField(
                       "비밀번호를 입력해주세요", passwordController,
                       obscureText: true),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: _isLoading
+                          ? null
+                          : () => AccountRecoveryDialog.show(
+                                context,
+                                prefillEmail: emailController.text,
+                              ),
+                      child: Text(
+                        '아이디 · 비밀번호 찾기',
+                        style: TextStyle(
+                          fontFamily: 'NotoSansKR',
+                          fontSize: 13,
+                          color: Palette.secondaryDark,
+                        ),
+                      ),
+                    ),
+                  ),
                   SizedBox(height: 4),
                   SizedBox(
                     height: 48,

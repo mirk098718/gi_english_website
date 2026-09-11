@@ -7,6 +7,7 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 import '../util/WidgetUtil.dart';
@@ -60,7 +61,6 @@ class _SchoolOnlineProgramPageState extends State<SchoolOnlineProgramPage> {
           children: [
             OnlineProgramSideMenu(selectedIndex: -1, isMobile: true),
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter()),
           ],
         ),
       ),
@@ -88,7 +88,7 @@ class _SchoolOnlineProgramPageState extends State<SchoolOnlineProgramPage> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/ballPoolImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.program),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(

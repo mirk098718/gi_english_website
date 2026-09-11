@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/pages/SchoolAllDayPage.dart';
+import 'package:gi_english_website/pages/SchoolCodingPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
@@ -8,6 +8,7 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 import '../util/WidgetUtil.dart';
@@ -22,8 +23,7 @@ class SchoolCampPage extends StatefulWidget {
 class _SchoolCampPageState extends State<SchoolCampPage> {
   List<ButtonState> buttonStateList = [
     ButtonState("정규프로그램", BehaviorColor.colorOnDefault, SchoolProgramPage()),
-    ButtonState("올데이케어", BehaviorColor.colorOnDefault, SchoolAllDayPage()),
-    ButtonState("방학캠프", BehaviorColor.colorOnClick, SchoolCampPage()),
+    ButtonState("선택프로그램", BehaviorColor.colorOnDefault, SchoolCodingPage()),
     ButtonState("뉴질랜드프로그램", BehaviorColor.colorOnDefault, SchoolNZPage()),
   ];
   @override
@@ -189,7 +189,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/ballPoolImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.program),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -244,7 +244,6 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             content(),
-            MyWidget.mobileSchoolFooter()
           ],
         ),
       ),
@@ -322,7 +321,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
       child: Stack(
         alignment: Alignment.centerLeft,
         children: [
-          Image.asset("assets/ballPoolImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.program),
           Container(
             padding: EdgeInsets.only(left: 20),
             child: Column(

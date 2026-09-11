@@ -91,7 +91,6 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
           children: [
             OnlineProgramSideMenu(selectedIndex: 1, isMobile: true),
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter()),
           ],
         ),
       ),

@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
-import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
-import 'package:gi_english_website/pages/SchoolCommunityBoardPage.dart';
-import 'package:gi_english_website/pages/NoticeDetailPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/ModernWidgets.dart';
-import 'package:gi_english_website/util/NoticeService.dart';
-import 'package:gi_english_website/util/FAQService.dart';
 import 'package:gi_english_website/widget/EasyKeyboardListener.dart';
+import 'package:gi_english_website/widget/HomeAudienceCards.dart';
+import 'package:gi_english_website/widget/HomeTrustBand.dart';
+import 'package:gi_english_website/widget/HomeWeeklyLoopBand.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/SiteNav.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
-import 'package:gi_english_website/class/Notice.dart';
-import 'package:gi_english_website/class/FAQ.dart';
 import '../admin/page/AdminLoginPage.dart';
-import '../util/UrlIUtil.dart';
-import 'package:intl/intl.dart';
 
 class SchoolMainPage extends StatefulWidget {
   const SchoolMainPage({Key? key}) : super(key: key);
@@ -62,539 +56,163 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
     return MobileSchoolLayout(content: mobileScrollView());
   }
 
+  static const String _heroAsset = 'assets/hero-device-mockups-16x9.png';
+
   Widget mainImage() {
     final screen = MediaQuery.sizeOf(context);
-    final heroHeight = (screen.height - 72).clamp(480.0, 780.0);
-    return SizedBox(
+    final heroHeight = (screen.height - 72).clamp(520.0, 720.0);
+    return Container(
       width: double.infinity,
       height: heroHeight,
-      child: Stack(
-        fit: StackFit.expand,
+      color: Palette.navyDark,
+      child: Row(
         children: [
-          Image.asset(
-            "assets/mainGateImageMiddleSchool.png",
-            fit: BoxFit.cover,
-            alignment: Alignment.center,
-          ),
-          Align(
-            alignment: Alignment.centerLeft,
+          Expanded(
+            flex: 5,
             child: Padding(
-              padding: EdgeInsets.only(left: 48),
-              child: Text(
-                "Gleam Island School",
-                style: TextStyle(
-                  fontFamily: "Lovingu",
-                  fontSize: 56,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  shadows: [
-                    Shadow(
-                      offset: Offset(1.0, 1.0),
-                      blurRadius: 8.0,
-                      color: Colors.black45,
-                    ),
-                  ],
+              padding: EdgeInsets.fromLTRB(56, 40, 32, 40),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 520),
+                  child: _heroCopy(compact: false),
                 ),
               ),
             ),
           ),
-          Positioned(
-            bottom: 32,
-            right: 40,
-            child: SizedBox(
-              height: 44,
+          Expanded(
+            flex: 6,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(0, 16, 28, 16),
+              child: Image.asset(
+                _heroAsset,
+                fit: BoxFit.cover,
+                alignment: Alignment(0.72, 0),
+                filterQuality: FilterQuality.high,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget mobileMainImage() {
+    return Container(
+      width: double.infinity,
+      color: Palette.navyDark,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(24, 28, 24, 8),
+            child: _heroCopy(compact: true),
+          ),
+          AspectRatio(
+            aspectRatio: 16 / 10,
+            child: Image.asset(
+              _heroAsset,
+              fit: BoxFit.cover,
+              alignment: Alignment(0.72, 0),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _heroCopy({required bool compact}) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '온라인 영어 · 원어민 1:1',
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: compact ? 12 : 13,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.4,
+            color: Palette.secondaryLight,
+          ),
+        ),
+        SizedBox(height: compact ? 10 : 14),
+        Text(
+          '인강과 화상수업으로\n영어 실력을 만듭니다',
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: compact ? 26 : 40,
+            fontWeight: FontWeight.w800,
+            height: 1.28,
+            color: Palette.white,
+          ),
+        ),
+        SizedBox(height: compact ? 12 : 16),
+        Text(
+          '매주 강의를 보고, 원어민과 1:1로 말하고,\n내 시간에 맞춰 수업을 예약합니다.',
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: compact ? 14 : 16,
+            height: 1.6,
+            color: Palette.white.withValues(alpha: 0.78),
+          ),
+        ),
+        SizedBox(height: compact ? 20 : 28),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            SizedBox(
+              height: compact ? 42 : 46,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.black.withValues(alpha: 0.78),
+                  backgroundColor: Palette.darkTeal,
                   foregroundColor: Palette.white,
                   elevation: 0,
-                  padding: EdgeInsets.symmetric(horizontal: 22),
+                  padding: EdgeInsets.symmetric(horizontal: compact ? 16 : 22),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onPressed: () {
-                  MenuUtil.push(context, SchoolConsultationPage());
-                },
+                onPressed: () => SiteNav.openPlacement(context),
                 child: Text(
-                  "상담 신청",
+                  '무료 체험하기',
                   style: TextStyle(
-                    fontFamily: "NotoSansKR",
+                    fontFamily: 'NotoSansKR',
+                    fontWeight: FontWeight.w700,
+                    fontSize: compact ? 13 : 14,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: compact ? 42 : 46,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Palette.white,
+                  side: BorderSide(color: Palette.white.withValues(alpha: 0.45)),
+                  padding: EdgeInsets.symmetric(horizontal: compact ? 16 : 22),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () => SiteNav.goCourses(context),
+                child: Text(
+                  '과정 보기',
+                  style: TextStyle(
+                    fontFamily: 'NotoSansKR',
                     fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: Palette.white,
+                    fontSize: compact ? 13 : 14,
                   ),
                 ),
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget urlMenu() {
-    return Container(
-      alignment: Alignment.center,
-      color: Palette.white,
-      height: 88,
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          _socialLogoBlock(),
-          SizedBox(width: 16),
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                    child: InkWell(
-                      child: Image.asset("assets/middleOnlineLink.png",
-                          fit: BoxFit.contain),
-                      onTap: () async {
-                        UrlUtil.open('http://gienglish.theclip.net/');
-                      },
-                    ),
-                  ),
-                ),
-                Container(width: 0.5, height: 40, color: Palette.grey500),
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                    child: InkWell(
-                      child: Image.asset("assets/eleOnlineLink.png",
-                          fit: BoxFit.contain),
-                      onTap: () async {
-                        UrlUtil.open(
-                            'https://www.trophy9.com/account/account.do?stdcmd=sign&url=%2Fdefault%2Edo%3F');
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _socialLogoBlock() {
-    return Container(
-      height: 64,
-      padding: EdgeInsets.symmetric(horizontal: 18),
-      decoration: BoxDecoration(
-        color: Palette.grey50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Palette.grey200),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          InkWell(
-            onTap: () async {
-              UrlUtil.open('https://www.instagram.com/gleam_island_school/');
-            },
-            child: SizedBox(
-              width: 40,
-              height: 40,
-              child: Image.asset("assets/instaLogo.png"),
-            ),
-          ),
-          SizedBox(width: 16),
-          InkWell(
-            onTap: () async {
-              UrlUtil.open('https://blog.naver.com/gleam-island-paju');
-            },
-            child: SizedBox(
-              width: 36,
-              height: 36,
-              child: Image.asset("assets/naverBlogLogo.png"),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget bulletinBoard() {
-    double eachBoardHeight = 550;
-
-    return Container(
-      color: Colors.white,
-      padding: EdgeInsets.symmetric(vertical: 56, horizontal: 40),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Spacer(),
-          Expanded(
-            flex: 5,
-            child: _desktopGrayBoard(
-              title: "Notice Board",
-              height: eachBoardHeight,
-              onTitlePressed: () {
-                MenuUtil.push(context, SchoolCommunityNoticePage());
-              },
-              child: _buildNoticeList(),
-            ),
-          ),
-          Spacer(),
-          Expanded(
-            flex: 5,
-            child: _desktopGrayBoard(
-              title: "FAQ",
-              height: eachBoardHeight,
-              onTitlePressed: () {
-                MenuUtil.push(context, SchoolCommunityBoardPage());
-              },
-              child: _buildFAQList(),
-            ),
-          ),
-          Spacer(),
-        ],
-      ),
-    );
-  }
-
-  Widget _desktopGrayBoard({
-    required String title,
-    required double height,
-    required VoidCallback onTitlePressed,
-    required Widget child,
-  }) {
-    return Container(
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Palette.grey100, width: 3),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: [
-          Container(
-            height: 50,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Palette.grey100,
-              border: Border.all(color: Palette.grey100, width: 3),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(18),
-                topRight: Radius.circular(18),
-              ),
-            ),
-            child: TextButton(
-              onPressed: onTitlePressed,
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: Palette.black,
-                  fontFamily: "Jalnan",
-                ),
-              ),
-            ),
-          ),
-          Expanded(child: child),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNoticeList() {
-    return StreamBuilder<List<Notice>>(
-      stream: NoticeService.getNoticesStreamSorted(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Container(
-            color: Colors.white,
-            padding: EdgeInsets.all(20),
-            child: Center(
-              child: Text(
-                '공지사항을 불러오는데 오류가 발생했습니다.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.red,
-                  fontFamily: "NotoSansKR",
-                ),
-              ),
-            ),
-          );
-        }
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container(
-            color: Colors.white,
-            padding: EdgeInsets.all(20),
-            child: Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Palette.primary),
-              ),
-            ),
-          );
-        }
-
-        List<Notice> notices = snapshot.data ?? [];
-        // 최대 5개까지만 표시
-        List<Notice> displayNotices = notices.take(5).toList();
-
-        if (displayNotices.isEmpty) {
-          return Container(
-            color: Colors.white,
-            padding: EdgeInsets.all(20),
-            child: Center(
-              child: Text(
-                '등록된 공지사항이 없습니다.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Palette.grey600,
-                  fontFamily: "NotoSansKR",
-                ),
-              ),
-            ),
-          );
-        }
-
-        return Container(
-          color: Colors.white,
-          child: ListView.separated(
-            padding: EdgeInsets.all(0),
-            itemCount: displayNotices.length,
-            separatorBuilder: (context, index) => Container(
-              height: 1,
-              color: Palette.grey200,
-            ),
-            itemBuilder: (context, index) {
-              Notice notice = displayNotices[index];
-              return _buildNoticeItem(notice);
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildNoticeItem(Notice notice) {
-    // 미리보기 텍스트 생성 (60자 제한)
-    String preview = notice.content.length > 60
-        ? '${notice.content.substring(0, 60)}...'
-        : notice.content;
-
-    return InkWell(
-      onTap: () {
-        if (notice.id != null) {
-          MenuUtil.push(context, NoticeDetailPage(noticeId: notice.id!));
-        }
-      },
-      child: Container(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                if (notice.isImportant) ...[
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                    child: Text(
-                      "중요",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "NotoSansKR",
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                ],
-                Expanded(
-                  child: Text(
-                    notice.title,
-                    style: TextStyle(
-                      color: Palette.black,
-                      fontFamily: "NotoSansKR",
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Text(
-                  DateFormat('MM.dd').format(notice.createdAt),
-                  style: TextStyle(
-                    color: Palette.grey600,
-                    fontFamily: "NotoSansKR",
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8),
-            Text(
-              preview,
-              style: TextStyle(
-                color: Palette.grey700,
-                fontFamily: "NotoSansKR",
-                fontSize: 13,
-                height: 1.4,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
-      ),
+      ],
     );
   }
 
-  Widget _buildFAQList() {
-    return StreamBuilder<List<FAQ>>(
-      stream: FAQService.getFAQsStreamSorted(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Container(
-            color: Colors.white,
-            padding: EdgeInsets.all(20),
-            child: Center(
-              child: Text(
-                'FAQ를 불러오는데 오류가 발생했습니다.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.red,
-                  fontFamily: "NotoSansKR",
-                ),
-              ),
-            ),
-          );
-        }
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container(
-            color: Colors.white,
-            padding: EdgeInsets.all(20),
-            child: Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Palette.primary),
-              ),
-            ),
-          );
-        }
-
-        List<FAQ> faqs = snapshot.data ?? [];
-        // 최대 5개까지만 표시
-        List<FAQ> displayFAQs = faqs.take(5).toList();
-
-        if (displayFAQs.isEmpty) {
-          return Container(
-            color: Colors.white,
-            padding: EdgeInsets.all(20),
-            child: Center(
-              child: Text(
-                '등록된 FAQ가 없습니다.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Palette.grey600,
-                  fontFamily: "NotoSansKR",
-                ),
-              ),
-            ),
-          );
-        }
-
-        return Container(
-          color: Colors.white,
-          child: ListView.separated(
-            padding: EdgeInsets.all(0),
-            itemCount: displayFAQs.length,
-            separatorBuilder: (context, index) => Container(
-              height: 1,
-              color: Palette.grey200,
-            ),
-            itemBuilder: (context, index) {
-              FAQ faq = displayFAQs[index];
-              return _buildFAQItem(faq);
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildFAQItem(FAQ faq) {
-    // 미리보기 텍스트 생성 (50자 제한)
-    String preview = faq.answer.length > 50
-        ? '${faq.answer.substring(0, 50)}...'
-        : faq.answer;
-
-    return InkWell(
-      onTap: () {
-        MenuUtil.push(context, SchoolCommunityBoardPage());
-      },
-      child: Container(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: faq.isImportant ? Palette.primary : Palette.grey300,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                  child: Text(
-                    faq.category,
-                    style: TextStyle(
-                      color: faq.isImportant ? Colors.white : Palette.grey700,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: "NotoSansKR",
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8),
-                if (faq.isImportant) ...[
-                  Icon(Icons.star, color: Palette.primary, size: 14),
-                  SizedBox(width: 4),
-                ],
-              ],
-            ),
-            SizedBox(height: 8),
-            Text(
-              "Q: ${faq.question}",
-              style: TextStyle(
-                color: Palette.black,
-                fontFamily: "NotoSansKR",
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            SizedBox(height: 6),
-            Text(
-              "A: $preview",
-              style: TextStyle(
-                color: Palette.grey700,
-                fontFamily: "NotoSansKR",
-                fontSize: 13,
-                height: 1.4,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget scrollView() {
     return SingleChildScrollView(
@@ -603,8 +221,9 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         child: Column(
           children: [
             mainImage(),
-            urlMenu(),
-            bulletinBoard(),
+            HomeWeeklyLoopBand(),
+            HomeAudienceCards(),
+            HomeTrustBand(),
             ModernWidgets.modernFooter(),
           ],
         ),
@@ -620,519 +239,13 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         child: Column(
           children: [
             mobileMainImage(),
-            mobileUrlMenu(),
-            mobileBulletinBoard(),
-            ModernWidgets.modernMobileFooter()
+            HomeWeeklyLoopBand(compact: true),
+            HomeAudienceCards(compact: true),
+            HomeTrustBand(compact: true),
           ],
         ),
       ),
     );
   }
 
-  Widget mobileMainImage() {
-    final screen = MediaQuery.sizeOf(context);
-    final heroHeight = (screen.height - 108).clamp(320.0, 560.0);
-    return SizedBox(
-      width: double.infinity,
-      height: heroHeight,
-      child: Image.asset(
-        "assets/mainGateImageMiddleSchool.png",
-        fit: BoxFit.cover,
-        alignment: Alignment.center,
-      ),
-    );
-  }
-
-  Widget mobileUrlMenu() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      color: Palette.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              _socialLogoBlock(),
-              Spacer(),
-              SizedBox(
-                width: 80,
-                height: 50,
-                child: ElevatedButton(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "상담",
-                        style: TextStyle(
-                            fontFamily: "Jalnan",
-                            fontSize: 10,
-                            color: Palette.white),
-                      ),
-                      Text(
-                        "신청",
-                        style: TextStyle(
-                            fontFamily: "Jalnan",
-                            fontSize: 10,
-                            color: Palette.white),
-                      ),
-                    ],
-                  ),
-                  onPressed: () {
-                    MenuUtil.push(context, SchoolConsultationPage());
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.secondaryDark,
-                    foregroundColor: Palette.black,
-                  ),
-                ),
-              )
-            ],
-          ),
-          SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                flex: 3,
-                child: InkWell(
-                  child: Container(
-                      height: 55,
-                      child: Image.asset("assets/middleOnlineLink.png")),
-                  onTap: () async {
-                    UrlUtil.open('http://gienglish.theclip.net/');
-                  },
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.all(5),
-                width: 0.5,
-                height: 40,
-                color: Palette.grey500,
-              ),
-              Expanded(
-                flex: 3,
-                child: InkWell(
-                  child: Container(
-                      height: 55,
-                      child: Image.asset("assets/eleOnlineLink.png")),
-                  onTap: () async {
-                    UrlUtil.open(
-                        'https://www.trophy9.com/account/account.do?stdcmd=sign&url=%2Fdefault%2Edo%3F');
-                  },
-                ),
-              ),
-              SizedBox(
-                width: 20,
-              )
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget mobileBulletinBoard() {
-    return Container(
-      color: Colors.white,
-      margin: EdgeInsets.only(left: 20, right: 20),
-      child: Column(
-        children: [
-          // Notice Board Section
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Palette.grey100, width: 3),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              children: [
-                Container(
-                  width: double.infinity,
-                  child: TextButton(
-                    child: Text(
-                      "Notice Board",
-                      style:
-                          TextStyle(color: Palette.black, fontFamily: "Jalnan"),
-                    ),
-                    onPressed: () {
-                      MenuUtil.push(context, SchoolCommunityNoticePage());
-                    },
-                  ),
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Palette.grey100,
-                    border: Border.all(color: Palette.grey100, width: 3),
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(18),
-                        topRight: Radius.circular(18)),
-                  ),
-                ),
-                Container(
-                  height: 350, // 공지 5개 표시 시 스크롤 가능한 높이
-                  child: _buildMobileNoticeList(),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 20),
-          // FAQ Section
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Palette.grey100, width: 3),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              children: [
-                Container(
-                  width: double.infinity,
-                  child: TextButton(
-                    child: Text(
-                      "FAQ",
-                      style:
-                          TextStyle(color: Palette.black, fontFamily: "Jalnan"),
-                    ),
-                    onPressed: () {
-                      MenuUtil.push(context, SchoolCommunityBoardPage());
-                    },
-                  ),
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Palette.grey100,
-                    border: Border.all(color: Palette.grey100, width: 3),
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(18),
-                        topRight: Radius.circular(18)),
-                  ),
-                ),
-                Container(
-                  height: 350, // FAQ 5개 표시 시 스크롤 가능한 높이
-                  child: _buildMobileFAQList(),
-                ),
-              ],
-            ),
-          ),
-          Container(height: 20)
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMobileNoticeList() {
-    return StreamBuilder<List<Notice>>(
-      stream: NoticeService.getNoticesStreamSorted(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Container(
-            color: Colors.white,
-            padding: EdgeInsets.all(20),
-            child: Center(
-              child: Text(
-                '공지사항을 불러오는데 오류가 발생했습니다.',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.red,
-                  fontFamily: "NotoSansKR",
-                ),
-              ),
-            ),
-          );
-        }
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container(
-            color: Colors.white,
-            padding: EdgeInsets.all(20),
-            child: Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Palette.primary),
-                strokeWidth: 2,
-              ),
-            ),
-          );
-        }
-
-        List<Notice> notices = snapshot.data ?? [];
-        // 최대 5개까지만 표시
-        List<Notice> displayNotices = notices.take(5).toList();
-
-        if (displayNotices.isEmpty) {
-          return Container(
-            color: Colors.white,
-            padding: EdgeInsets.all(20),
-            child: Center(
-              child: Text(
-                '등록된 공지사항이 없습니다.',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Palette.grey600,
-                  fontFamily: "NotoSansKR",
-                ),
-              ),
-            ),
-          );
-        }
-
-        return Container(
-          color: Colors.white,
-          child: ListView.separated(
-            padding: EdgeInsets.all(0),
-            itemCount: displayNotices.length,
-            separatorBuilder: (context, index) => Container(
-              height: 1,
-              color: Palette.grey200,
-            ),
-            itemBuilder: (context, index) {
-              Notice notice = displayNotices[index];
-              return _buildMobileNoticeItem(notice);
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildMobileNoticeItem(Notice notice) {
-    // 미리보기 텍스트 생성 (40자 제한 - 모바일에서는 더 짧게)
-    String preview = notice.content.length > 40
-        ? '${notice.content.substring(0, 40)}...'
-        : notice.content;
-
-    return InkWell(
-      onTap: () {
-        if (notice.id != null) {
-          MenuUtil.push(context, NoticeDetailPage(noticeId: notice.id!));
-        }
-      },
-      child: Container(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                if (notice.isImportant) ...[
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                    child: Text(
-                      "중요",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 8,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "NotoSansKR",
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 6),
-                ],
-                Expanded(
-                  child: Text(
-                    notice.title,
-                    style: TextStyle(
-                      color: Palette.black,
-                      fontFamily: "NotoSansKR",
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Text(
-                  DateFormat('MM.dd').format(notice.createdAt),
-                  style: TextStyle(
-                    color: Palette.grey600,
-                    fontFamily: "NotoSansKR",
-                    fontSize: 10,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 6),
-            Text(
-              preview,
-              style: TextStyle(
-                color: Palette.grey700,
-                fontFamily: "NotoSansKR",
-                fontSize: 12,
-                height: 1.3,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMobileFAQList() {
-    return StreamBuilder<List<FAQ>>(
-      stream: FAQService.getFAQsStreamSorted(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Container(
-            color: Colors.white,
-            padding: EdgeInsets.all(20),
-            child: Center(
-              child: Text(
-                'FAQ를 불러오는데 오류가 발생했습니다.',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.red,
-                  fontFamily: "NotoSansKR",
-                ),
-              ),
-            ),
-          );
-        }
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container(
-            color: Colors.white,
-            padding: EdgeInsets.all(20),
-            child: Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Palette.primary),
-                strokeWidth: 2,
-              ),
-            ),
-          );
-        }
-
-        List<FAQ> faqs = snapshot.data ?? [];
-        // 최대 5개까지만 표시
-        List<FAQ> displayFAQs = faqs.take(5).toList();
-
-        if (displayFAQs.isEmpty) {
-          return Container(
-            color: Colors.white,
-            padding: EdgeInsets.all(20),
-            child: Center(
-              child: Text(
-                '등록된 FAQ가 없습니다.',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Palette.grey600,
-                  fontFamily: "NotoSansKR",
-                ),
-              ),
-            ),
-          );
-        }
-
-        return Container(
-          color: Colors.white,
-          child: ListView.separated(
-            padding: EdgeInsets.all(0),
-            itemCount: displayFAQs.length,
-            separatorBuilder: (context, index) => Container(
-              height: 1,
-              color: Palette.grey200,
-            ),
-            itemBuilder: (context, index) {
-              FAQ faq = displayFAQs[index];
-              return _buildMobileFAQItem(faq);
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildMobileFAQItem(FAQ faq) {
-    // 미리보기 텍스트 생성 (30자 제한 - 모바일에서는 더 짧게)
-    String preview = faq.answer.length > 30
-        ? '${faq.answer.substring(0, 30)}...'
-        : faq.answer;
-
-    return InkWell(
-      onTap: () {
-        MenuUtil.push(context, SchoolCommunityBoardPage());
-      },
-      child: Container(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: faq.isImportant ? Palette.primary : Palette.grey300,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                  child: Text(
-                    faq.category,
-                    style: TextStyle(
-                      color: faq.isImportant ? Colors.white : Palette.grey700,
-                      fontSize: 8,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: "NotoSansKR",
-                    ),
-                  ),
-                ),
-                SizedBox(width: 6),
-                if (faq.isImportant) ...[
-                  Icon(Icons.star, color: Palette.primary, size: 12),
-                  SizedBox(width: 4),
-                ],
-              ],
-            ),
-            SizedBox(height: 6),
-            Text(
-              "Q: ${faq.question}",
-              style: TextStyle(
-                color: Palette.black,
-                fontFamily: "NotoSansKR",
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            SizedBox(height: 4),
-            Text(
-              "A: $preview",
-              style: TextStyle(
-                color: Palette.grey700,
-                fontFamily: "NotoSansKR",
-                fontSize: 12,
-                height: 1.3,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-// Widget menuListTile(String menu) {
-//   return ListTile(
-//     leading: Icon(Icons.event_note),
-//     title: Text(menu),
-//     trailing: Icon(
-//       Icons.info_outline,
-//       color: Palette.white,
-//       size: 20,
-//     ),
-//     tileColor: Palette.accent,
-//   );
-// }
-
-// Widget mobileMenuList() {
-//   return Column(
-//     children: [
-//       menuListTile("About Gi어학원"),
-//       menuListTile("Program"),
-//       menuListTile("Curriculum"),
-//       menuListTile("Community"),
-//     ],
-//   );
-// }
 }

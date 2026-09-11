@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
+import 'package:gi_english_website/pages/SchoolCurriculumHighSchoolPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumMiddleSchoolPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
@@ -7,6 +8,7 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/WidgetUtil.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 class SchoolCurriculumElePage extends StatefulWidget {
@@ -22,6 +24,8 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
     ButtonState("정규초등부", BehaviorColor.colorOnClick, SchoolCurriculumElePage()),
     ButtonState("정규중등부", BehaviorColor.colorOnDefault,
         SchoolCurriculumMiddleSchoolPage()),
+    ButtonState("정규고등부", BehaviorColor.colorOnDefault,
+        SchoolCurriculumHighSchoolPage()),
   ];
 
   @override
@@ -184,7 +188,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/curriculumImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.elementary),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -238,7 +242,6 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
           ],
         ),
       ),
@@ -318,7 +321,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
       child: Stack(
         alignment: Alignment.centerLeft,
         children: [
-          Image.asset("assets/curriculumImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.elementary),
           Container(
             padding: EdgeInsets.only(left: 20),
             child: Column(

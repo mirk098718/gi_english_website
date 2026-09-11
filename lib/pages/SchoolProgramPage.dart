@@ -4,8 +4,10 @@ import 'package:gi_english_website/pages/SchoolNZPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/AcademyLmsLinks.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 import '../util/WidgetUtil.dart';
@@ -112,6 +114,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          AcademyLmsLinks(),
           Text(
             "정규 프로그램",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
@@ -343,6 +346,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          AcademyLmsLinks(),
           Text(
             "정규 프로그램",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
@@ -544,7 +548,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/ballPoolImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.program),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -599,7 +603,6 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             mobileContent(),
-            MyWidget.mobileSchoolFooter()
           ],
         ),
       ),
@@ -677,7 +680,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
       child: Stack(
         alignment: Alignment.centerLeft,
         children: [
-          Image.asset("assets/ballPoolImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.program),
           Container(
             padding: EdgeInsets.only(left: 20),
             child: Row(

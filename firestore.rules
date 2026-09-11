@@ -70,11 +70,9 @@ service cloud.firestore {
         || (isLoggedIn() && resource.data.userId == request.auth.uid)
         || isAssignedTeacher(resource.data.userId);
 
-      allow create: if isOwner()
-        || isAssignedTeacher(request.resource.data.userId);
+      allow create: if isOwner();
 
-      allow update, delete: if isOwner()
-        || isAssignedTeacher(resource.data.userId);
+      allow update, delete: if isOwner();
 
       match /session_logs/{logId} {
         allow read: if isOwner()
@@ -83,9 +81,7 @@ service cloud.firestore {
           || isAssignedTeacher(
               get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId);
 
-        allow create, update, delete: if isOwner()
-          || isAssignedTeacher(
-              get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId);
+        allow create, update, delete: if isOwner();
       }
 
       match /week_progress/{weekId} {
@@ -127,20 +123,86 @@ service cloud.firestore {
       allow create, update, delete: if isStaff();
     }
 
-    // 주차별 원어민 수업 예약: 본인 신청, 담당 강사/메인 관리자 확인
+    // 주차별 원어민 수업 예약: 본인 신청, 담당 원어민 강사/메인 관리자 확인
     match /week_bookings/{bookingId} {
       allow read: if isOwner()
         || (isLoggedIn() && resource.data.userId == request.auth.uid)
-        || (isTeacher() && resource.data.teacherId == request.auth.uid);
+        || (isTeacher() && (
+             resource.data.teacherId == request.auth.uid
+             || resource.data.nativeTeacherUid == request.auth.uid));
 
       allow create: if isLoggedIn()
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.status == 'pending';
 
       allow update: if isOwner()
-        || (isTeacher() && resource.data.teacherId == request.auth.uid);
+        || (isTeacher() && (
+             resource.data.teacherId == request.auth.uid
+             || resource.data.nativeTeacherUid == request.auth.uid));
 
       allow delete: if isOwner();
+    }
+
+    // 주차별 화상수업 피드백. 담당 강사/메인 관리자 작성, 해당 수강생 읽기.
+    match /lesson_feedbacks/{feedbackId} {
+      allow read: if isOwner()
+        || (isLoggedIn() && resource.data.userId == request.auth.uid)
+        || (isTeacher() && resource.data.teacherId == request.auth.uid);
+
+      allow create: if isOwner()
+        || (isTeacher()
+          && request.resource.data.teacherId == request.auth.uid);
+
+      allow update: if isOwner()
+        || (isTeacher()
+          && resource.data.teacherId == request.auth.uid
+          && request.resource.data.teacherId == request.auth.uid);
+
+      allow delete: if isOwner();
+    }
+
+    // 원어민 프로필(Emma 등) ↔ 강사 계정 연결. 로그인 회원 읽기.
+    match /native_teacher_accounts/{profileId} {
+      allow read: if true;
+      allow create, update, delete: if isOwner();
+    }
+
+    // 강사가 닫아 둔 시간. 로그인 회원은 예약 가능 여부 확인용으로 읽기.
+    match /teacher_closed_slots/{slotId} {
+      allow read: if isLoggedIn();
+      allow create: if isStaff()
+        && request.resource.data.teacherId == request.auth.uid;
+      allow delete: if isStaff()
+        && resource.data.teacherId == request.auth.uid;
+      allow update: if false;
+    }
+
+    // 매주 같은 요일·시간을 닫아 두는 루틴. 해제는 delete.
+    match /teacher_closed_routines/{routineId} {
+      allow read: if isLoggedIn();
+      allow create: if isStaff()
+        && request.resource.data.teacherId == request.auth.uid;
+      allow delete: if isStaff()
+        && resource.data.teacherId == request.auth.uid;
+      allow update: if false;
+    }
+
+    // 루틴으로 닫혀 있어도 이번 주만 여는 예외.
+    match /teacher_open_exceptions/{slotId} {
+      allow read: if isLoggedIn();
+      allow create: if isStaff()
+        && request.resource.data.teacherId == request.auth.uid;
+      allow delete: if isStaff()
+        && resource.data.teacherId == request.auth.uid;
+      allow update: if false;
+    }
+
+    // 이미 신청된 시간(이름 없이 점유만). 수강생이 열린 시간만 보도록 읽기.
+    match /teacher_occupied_slots/{slotId} {
+      allow read: if isLoggedIn();
+      allow create: if isLoggedIn();
+      allow delete: if isStaff();
+      allow update: if isStaff();
     }
 
     // 결제(payments): 본인 생성/읽기, 메인 관리자 전체 읽기
@@ -188,8 +250,22 @@ service cloud.firestore {
       allow create: if (isLoggedIn() && request.auth.uid == userId)
         || isOwner();
 
-      allow update: if isOwner();
+      allow update: if isOwner()
+        || (isStaff()
+          && request.auth.uid == userId
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.email == resource.data.email);
+
       allow delete: if false;
+    }
+
+    // 예약 확정/신청 알림. 본인만 읽고 읽음 처리.
+    match /notifications/{notificationId} {
+      allow read: if isLoggedIn() && resource.data.userId == request.auth.uid;
+      allow update: if isLoggedIn()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == resource.data.userId;
+      allow create, delete: if false;
     }
   }
 }

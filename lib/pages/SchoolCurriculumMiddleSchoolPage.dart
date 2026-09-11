@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumElePage.dart';
+import 'package:gi_english_website/pages/SchoolCurriculumHighSchoolPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 import '../util/WidgetUtil.dart';
@@ -25,6 +27,8 @@ class _SchoolCurriculumMiddleSchoolPageState
         "정규초등부", BehaviorColor.colorOnDefault, SchoolCurriculumElePage()),
     ButtonState("정규중등부", BehaviorColor.colorOnClick,
         SchoolCurriculumMiddleSchoolPage()),
+    ButtonState("정규고등부", BehaviorColor.colorOnDefault,
+        SchoolCurriculumHighSchoolPage()),
   ];
 
   @override
@@ -211,7 +215,7 @@ class _SchoolCurriculumMiddleSchoolPageState
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/curriculumImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.middle),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -265,7 +269,6 @@ class _SchoolCurriculumMiddleSchoolPageState
             // mobileMainImage(),
             mobileLeftMenu(),
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
           ],
         ),
       ),

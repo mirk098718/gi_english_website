@@ -26,8 +26,34 @@ class OnlineTeacherSelectPage extends StatefulWidget {
 }
 
 class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
-  OnlineNativeTeacher? _selected = OnlineNativeTeacher.all.first;
+  List<OnlineNativeTeacher> _teachers = [];
+  OnlineNativeTeacher? _selected;
   bool _paying = false;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTeachers();
+  }
+
+  Future<void> _loadTeachers() async {
+    final teachers = await AuthService.selectableNativeTeachers();
+    if (!mounted) return;
+    setState(() {
+      _loading = false;
+      _teachers = teachers;
+      if (teachers.isEmpty) {
+        _selected = null;
+        return;
+      }
+      final currentId = _selected?.id;
+      _selected = teachers.firstWhere(
+        (t) => t.id == currentId,
+        orElse: () => teachers.first,
+      );
+    });
+  }
 
   Future<void> _startPayment() async {
     if (AuthService.currentUser == null) {
@@ -96,7 +122,6 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
           children: [
             OnlineProgramSideMenu(selectedIndex: 1, isMobile: true),
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter()),
           ],
         ),
       ),
@@ -136,8 +161,8 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
           Text(
             '선택한 과정을 담당할 메인 원어민 강사입니다.\n'
             '이후 화상수업은 이 선생님을 중심으로 진행되며, '
-            '스케줄이 맞지 않을 때만 다른 선생님으로 변경할 수 있습니다.\n'
-            '(지금은 임시 AI 프로필입니다)',
+            '해당 선생님이 열어 둔 시간에만 예약할 수 있습니다.\n'
+            '스케줄이 맞지 않을 때만 다른 선생님으로 변경할 수 있습니다.',
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: 13,
@@ -181,35 +206,55 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
           SizedBox(height: 24),
           Text('강사 선택', style: TextStyle(fontFamily: 'Jalnan', fontSize: 15)),
           SizedBox(height: 12),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final wide = constraints.maxWidth >= 720;
-              if (wide) {
-                return Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: OnlineNativeTeacher.all
-                      .map((t) => SizedBox(
-                            width: (constraints.maxWidth - 12) / 2,
+          if (_loading)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 40),
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else if (_teachers.isEmpty)
+            Padding(
+              padding: EdgeInsets.only(bottom: 16),
+              child: Text(
+                '현재 선택할 수 있는 원어민 강사가 없습니다. 학원으로 문의해 주세요.',
+                style: TextStyle(
+                  fontFamily: 'NotoSansKR',
+                  fontSize: 13,
+                  color: Palette.grey600,
+                ),
+              ),
+            )
+          else
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final wide = constraints.maxWidth >= 720;
+                if (wide) {
+                  return Wrap(
+                    spacing: 16,
+                    runSpacing: 16,
+                    children: _teachers
+                        .map((t) => SizedBox(
+                              width: (constraints.maxWidth - 16) / 2,
+                              child: _teacherCard(t),
+                            ))
+                        .toList(),
+                  );
+                }
+                return Column(
+                  children: _teachers
+                      .map((t) => Padding(
+                            padding: EdgeInsets.only(bottom: 16),
                             child: _teacherCard(t),
                           ))
                       .toList(),
                 );
-              }
-              return Column(
-                children: OnlineNativeTeacher.all
-                    .map((t) => Padding(
-                          padding: EdgeInsets.only(bottom: 12),
-                          child: _teacherCard(t),
-                        ))
-                    .toList(),
-              );
-            },
-          ),
+              },
+            ),
           SizedBox(height: 24),
           if (_selected != null) ...[
             Text(
-              '메인 강사: ${_selected!.name} (${_selected!.nationality})',
+              _selected!.nationality.trim().isEmpty
+                  ? '메인 강사: ${_selected!.name}'
+                  : '메인 강사: ${_selected!.name} (${_selected!.nationality})',
               style: TextStyle(
                 fontFamily: 'NotoSansKR',
                 fontWeight: FontWeight.w600,
@@ -229,7 +274,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8)),
               ),
-              onPressed: _paying ? null : _startPayment,
+              onPressed: (_paying || _selected == null) ? null : _startPayment,
               icon: Icon(Icons.payment, color: Palette.white),
               label: Text(
                 _paying ? '결제창 여는 중...' : '선택 완료 · 결제하기',
@@ -247,74 +292,90 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
     final selected = _selected?.id == teacher.id;
     return InkWell(
       onTap: () => setState(() => _selected = teacher),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: selected
               ? Palette.secondary.withValues(alpha: 0.06)
               : Palette.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: selected ? Palette.secondary : Palette.grey200,
-            width: selected ? 2 : 1,
+            color: selected ? Palette.darkTeal : Palette.grey200,
+            width: selected ? 2.5 : 1,
           ),
         ),
-        child: Row(
+        clipBehavior: Clip.antiAlias,
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
-                teacher.imageAsset,
-                width: 88,
-                height: 88,
-                fit: BoxFit.cover,
-              ),
+            Stack(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  height: 280,
+                  child: teacher.photoFill(),
+                ),
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: Container(
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Palette.white.withValues(alpha: 0.92),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      selected
+                          ? Icons.check_circle
+                          : Icons.circle_outlined,
+                      color: selected ? Palette.darkTeal : Palette.grey400,
+                      size: 26,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(width: 14),
-            Expanded(
+            Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 18),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          teacher.name,
-                          style: TextStyle(
-                            fontFamily: 'NotoSansKR',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                      Icon(
-                        selected
-                            ? Icons.radio_button_checked
-                            : Icons.radio_button_off,
-                        color:
-                            selected ? Palette.secondary : Palette.grey400,
-                        size: 22,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 4),
                   Text(
-                    teacher.nationality,
+                    teacher.name,
                     style: TextStyle(
-                      fontFamily: 'NotoSansKR',
-                      fontSize: 12,
-                      color: Palette.grey500,
+                      fontFamily: 'Jalnan',
+                      fontSize: 20,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  if (teacher.nationality.trim().isNotEmpty) ...[
+                    SizedBox(height: 8),
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Palette.grey100,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        teacher.nationality,
+                        style: TextStyle(
+                          fontFamily: 'NotoSansKR',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Palette.grey700,
+                        ),
+                      ),
+                    ),
+                  ],
+                  SizedBox(height: 12),
                   Text(
-                    teacher.intro,
+                    teacher.intro.trim().isEmpty
+                        ? '소개가 곧 업데이트됩니다.'
+                        : teacher.intro,
                     style: TextStyle(
                       fontFamily: 'NotoSansKR',
-                      fontSize: 13,
-                      height: 1.45,
+                      fontSize: 14,
+                      height: 1.55,
                       color: Palette.grey700,
                     ),
                   ),

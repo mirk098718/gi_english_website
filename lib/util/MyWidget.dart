@@ -18,12 +18,21 @@ class MyWidget {
               margin: EdgeInsets.only(bottom: 20),
             ),
             Text(
-              "Gi Gleam Island 어학원 파주",
+              "글림교육",
               style: TextStyle(
                   color: Palette.white,
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.w600,
                   fontSize: 16),
+            ),
+            SizedBox(height: 4),
+            Text(
+              "Gleam Education",
+              style: TextStyle(
+                  color: Palette.grey400,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.w500,
+                  fontSize: 13),
             ),
             SizedBox(
               height: 12,
@@ -42,7 +51,7 @@ class MyWidget {
             ),
             SizedBox(height: 24),
             Text(
-              "Copyright ⓒ 글림아일랜드어학원",
+              "Copyright ⓒ 글림교육",
               style: TextStyle(
                 color: Palette.grey500,
                 fontFamily: "NotoSansKR",
@@ -68,12 +77,21 @@ class MyWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Gi Gleam Island 어학원 파주",
+            "글림교육",
             style: TextStyle(
                 color: Palette.white,
                 fontFamily: "NotoSansKR",
                 fontWeight: FontWeight.w700,
                 fontSize: 18),
+          ),
+          SizedBox(height: 4),
+          Text(
+            "Gleam Education",
+            style: TextStyle(
+                color: Palette.white.withValues(alpha: 0.8),
+                fontFamily: "NotoSansKR",
+                fontWeight: FontWeight.w500,
+                fontSize: 13),
           ),
           SizedBox(height: 12),
           Text(
@@ -103,7 +121,7 @@ class MyWidget {
           ),
           SizedBox(height: 8),
           Text(
-            "Copyright ⓒ 글림아일랜드교육",
+            "Copyright ⓒ 글림교육",
             style: TextStyle(
                 color: Palette.white.withValues(alpha:0.7),
                 fontFamily: "NotoSansKR",
@@ -118,9 +136,9 @@ class MyWidget {
     return Container(
       width: double.infinity,
       color: Palette.grey900,
-      padding: EdgeInsets.all(24),
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 18),
       child: Text(
-        "ⓒ 글림아일랜드교육",
+        "ⓒ 글림교육",
         textAlign: TextAlign.center,
         style: TextStyle(
           color: Palette.grey400,
@@ -142,7 +160,7 @@ class MyWidget {
       ),
       padding: EdgeInsets.all(16),
       child: Text(
-        "ⓒ 글림아일랜드교육",
+        "ⓒ 글림교육",
         textAlign: TextAlign.center,
         style: TextStyle(
           color: Palette.white,

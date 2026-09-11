@@ -21,9 +21,11 @@ class Palette {
   static const Color danger = Color(0xFFEF4444); // 모던 레드
   static const Color success = Color(0xFF10B981); // 성공 그린
 
-  // 헤더/푸터용 진한 청록색
-  static const Color darkTeal = Color(0xFF0F766E); // 진한 청록색
-  static const Color darkTealDark = Color(0xFF134E4A); // 더 진한 청록색
+  // 브랜드: 청록 · 진한 남색 · 검정
+  static const Color darkTeal = Color(0xFF0F766E);
+  static const Color darkTealDark = Color(0xFF134E4A);
+  static const Color navy = Color(0xFF0B1F3A);
+  static const Color navyDark = Color(0xFF071526);
 
   // 그레이 계열 - 현대적인 뉴트럴 색상
   static const Color grey50 = Color(0xFFF9FAFB);

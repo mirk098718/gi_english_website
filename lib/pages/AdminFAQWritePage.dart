@@ -3,6 +3,7 @@ import 'package:gi_english_website/class/FAQ.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/FAQService.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
@@ -285,19 +286,19 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
     double width = size.width;
 
     if (width > 768) {
-      return WebSchoolLayout(content: _buildScrollView());
+      return WebSchoolLayout(content: _buildScrollView(includeFooter: true));
     } else {
-      return MobileSchoolLayout(content: _buildScrollView());
+      return MobileSchoolLayout(content: _buildScrollView(includeFooter: false));
     }
   }
 
-  Widget _buildScrollView() {
+  Widget _buildScrollView({required bool includeFooter}) {
     return SingleChildScrollView(
       child: Column(
         children: [
           _buildMainImage(),
           _buildContentGroup(),
-          MyWidget.footer(),
+          if (includeFooter) MyWidget.footer(),
         ],
       ),
     );
@@ -308,7 +309,7 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/communityMainImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.community),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(

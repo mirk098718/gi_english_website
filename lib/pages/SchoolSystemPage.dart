@@ -7,6 +7,7 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 import '../util/WidgetUtil.dart';
@@ -24,7 +25,7 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
     ButtonState("Gi글림아일랜드", BehaviorColor.colorOnDefault, SchoolAboutPage()),
     ButtonState("교원소개", BehaviorColor.colorOnDefault, SchoolTeachersPage()),
     ButtonState("운영시스템", BehaviorColor.colorOnClick, SchoolSystemPage()),
-    ButtonState("오시는 길", BehaviorColor.colorOnDefault, SchoolMapPage()),
+    ButtonState("상담/오시는 길", BehaviorColor.colorOnDefault, SchoolMapPage()),
   ];
 
   @override
@@ -213,7 +214,7 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/aboutMainImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.system),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -268,7 +269,6 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             content(),
-            MyWidget.mobileSchoolFooter()
           ],
         ),
       ),
@@ -337,7 +337,7 @@ class _SchoolSystemPageState extends State<SchoolSystemPage> {
       child: Stack(
         alignment: Alignment.centerLeft,
         children: [
-          Image.asset("assets/aboutMainImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.system),
           Container(
             padding: EdgeInsets.only(left: 20),
             child: Column(

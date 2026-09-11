@@ -5,6 +5,7 @@ import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
@@ -62,7 +63,6 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
         child: Column(
           children: [
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter()),
           ],
         ),
       ),
@@ -78,6 +78,11 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
 
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
       _showMessage('이름, 이메일, 비밀번호는 필수입니다.', isError: true);
+      return;
+    }
+    final phoneError = PhoneUtil.validate(phone);
+    if (phoneError != null) {
+      _showMessage(phoneError, isError: true);
       return;
     }
     if (password.length < 6) {
@@ -161,7 +166,8 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    "가입 후 관리자 수강 배정이 완료되면 내 강의실에서 프로그램을 이용하실 수 있습니다.",
+                    "가입 후 관리자 수강 배정이 완료되면 내 강의실에서 프로그램을 이용하실 수 있습니다. "
+                    "휴대폰 번호는 화상수업 예약이 확정되면 알림 문자를 보내는 데 사용합니다.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: "NotoSansKR",
@@ -173,7 +179,7 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
                   MyWidget.roundEdgeTextField("이름", nameController,
                       autofocus: true),
                   MyWidget.roundEdgeTextField("이메일", emailController),
-                  MyWidget.roundEdgeTextField("연락처 (선택)", phoneController),
+                  MyWidget.roundEdgeTextField("휴대폰 번호 (필수)", phoneController),
                   MyWidget.roundEdgeTextField("비밀번호 (6자 이상)", passwordController,
                       obscureText: true),
                   MyWidget.roundEdgeTextField(

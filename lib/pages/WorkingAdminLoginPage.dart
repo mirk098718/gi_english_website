@@ -4,6 +4,7 @@ import 'package:gi_english_website/pages/AdminNoticeWritePage.dart';
 import 'package:gi_english_website/pages/AdminOnlineHubPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/AccountRecoveryDialog.dart';
 
 class WorkingAdminLoginPage extends StatefulWidget {
   final String category; // 게시판 타입 ('notice' 또는 'faq')
@@ -37,7 +38,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
     return Scaffold(
       appBar: AppBar(
         title:
-            Text("관리자 로그인 (동작 버전)", style: TextStyle(fontFamily: "NotoSansKR")),
+            Text("운영자 로그인", style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: Palette.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -59,7 +60,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
                 ),
                 SizedBox(height: 32),
                 Text(
-                  "관리자 로그인",
+                  "운영자 로그인",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: "Jalnan",
@@ -135,7 +136,26 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
                   ),
                   style: TextStyle(fontFamily: "NotoSansKR", fontSize: 16),
                 ),
-                SizedBox(height: 32),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _isLoading
+                        ? null
+                        : () => AccountRecoveryDialog.show(
+                              context,
+                              prefillEmail: emailController.text,
+                            ),
+                    child: Text(
+                      '아이디 · 비밀번호 찾기',
+                      style: TextStyle(
+                        fontFamily: 'NotoSansKR',
+                        fontSize: 13,
+                        color: Palette.primary,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 8),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(

@@ -1,403 +1,191 @@
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/pages/SchoolMapPage.dart';
-import 'package:gi_english_website/pages/SchoolSystemPage.dart';
-import 'package:gi_english_website/pages/SchoolTeachersPage.dart';
-import 'package:gi_english_website/util/MenuUtil.dart';
-import 'package:gi_english_website/util/MyWidget.dart';
+import 'package:gi_english_website/util/ModernWidgets.dart';
 import 'package:gi_english_website/util/Palette.dart';
-import 'package:gi_english_website/widget/ButtonState.dart';
+import 'package:gi_english_website/widget/AcademyBulletinBoards.dart';
+import 'package:gi_english_website/widget/AcademyHomeCards.dart';
+import 'package:gi_english_website/widget/AcademyLmsLinks.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
-import '../util/WidgetUtil.dart';
-import 'SchoolConsultationPage.dart';
-
-class SchoolAboutPage extends StatefulWidget {
+class SchoolAboutPage extends StatelessWidget {
   const SchoolAboutPage({Key? key}) : super(key: key);
 
-  @override
-  _SchoolAboutPageState createState() => _SchoolAboutPageState();
-}
-
-class _SchoolAboutPageState extends State<SchoolAboutPage> {
-  List<ButtonState> buttonStateList = [
-    ButtonState("Gi글림아일랜드", BehaviorColor.colorOnClick, SchoolAboutPage()),
-    ButtonState("교원소개", BehaviorColor.colorOnDefault, SchoolTeachersPage()),
-    ButtonState("운영시스템", BehaviorColor.colorOnDefault, SchoolSystemPage()),
-    ButtonState("오시는 길", BehaviorColor.colorOnDefault, SchoolMapPage()),
-  ];
+  static const String _heroAsset = 'assets/academy-hero-about.png';
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData mediaQueryData = MediaQuery.of(context);
-    Size size = mediaQueryData.size;
-    double width = size.width;
+    final width = MediaQuery.sizeOf(context).width;
     if (width > 768) {
-      return desktopUi(context);
-    } else {
-      return mobileUi(context);
+      return WebSchoolLayout(content: _desktopScroll(context));
     }
+    return MobileSchoolLayout(content: _mobileScroll(context));
   }
 
-  Widget desktopUi(context) {
-    return WebSchoolLayout(content: scrollView());
-  }
-
-  Widget mobileUi(context) {
-    return MobileSchoolLayout(content: mobileScrollView());
-  }
-
-  Widget contentGroup() {
-    return Container(
-        color: Palette.white,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(width: 232, child: leftAboutMenu()),
-            Expanded(child: content()),
-          ],
-        ));
-  }
-
-  Widget leftAboutMenu() {
-    List<Widget> children = [];
-    for (int i = 0; i < buttonStateList.length; i++) {
-      ButtonState buttonState = buttonStateList[i];
-
-      bool isFirst = (i == 0);
-      bool isLast = (i == buttonStateList.length - 1);
-
-      Widget child;
-      if (isFirst) {
-        child = MyWidget.leftMenuTop(buttonState.color, buttonState.label);
-      } else if (isLast) {
-        //last
-        child = MyWidget.leftMenuBottom(buttonState.color, buttonState.label);
-      } else {
-        child = MyWidget.leftMenuMiddle(buttonState.color, buttonState.label);
-      }
-
-      children.add(InkWell(
-        child: child,
-        onHover: (value) {
-          buttonState.color = value
-              ? BehaviorColor.colorOnHover
-              : (i == 0
-                  ? BehaviorColor.colorOnClick
-                  : BehaviorColor.colorOnDefault);
-          print(
-              "label ${buttonState.label}, selectedColorList: ${buttonState.color}");
-          setState(() {});
-        },
-        onTap: () {
-          MenuUtil.push(context, buttonState.nextPage);
-        },
-      ));
-
-      if (!isLast) {
-        children.add(Divider(height: 1));
-      }
-    }
-
-    return Container(
-      padding: EdgeInsets.all(20),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            width: 1,
-            color: Palette.black,
-          ),
-        ),
-        child: Column(
-          children: children,
-        ),
-      ),
-    );
-  }
-
-  Widget content() {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
-      color: Palette.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "GLEAM ISLAND 의 철학과 목표",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
-          ),
-          WidgetUtil.myDivider(),
-          SizedBox(
-            height: 20,
-          ),
-          Image.asset("assets/gleamIslandMoto.png"),
-          // Text(style: TextStyle(color: Palette.black, fontFamily: "NotoSansKR", fontWeight: FontWeight.normal,
-          //     fontSize: 14),
-          //     "GLEAM ISLAND 란 반짝이는 섬 이라는 뜻으로 오세아니아의 아름다운 섬, \n"
-          //         "뉴질랜드의 교육 철학과 정신을 컨셉트로 한 이름입니다. \n"
-          //     "자유로운 탐구와 적극적인 토론, Creative learning 을 기반으로 하여,\n"
-          //         "뉴질랜드와 호주 등 오세아니아 국가들은 아이들이 \n"
-          //         "무한히 창의적인 발상을 할 수 있도록 가르치며, \n"
-          //         "지루하고 틀에 박힌 주입식 교육 시스템에서 벗어나, \n"
-          //         "반짝이는 아이디어를 마음껏 발산할 수 있는 \n"
-          //         "교육 현장을 제공하는 것이 저희 GLEAM ISLAND 의 모토입니다.\n"
-          //     "GLEAM ISLAND 는 놀이와 학습 현장이 적절히 배분되어 있어, \n"
-          //         "아이들이 지루할 틈이 없는 활기 넘치는 공간일 것입니다."
-          //     ),
-          SizedBox(height: 20),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Image.asset("assets/eleInfo.png"),
-              SizedBox(height: 20),
-              Image.asset("assets/middleschoolNewMainImage.png"),
-              SizedBox(height: 20),
-              Image.asset("assets/highInfo.png"),
-            ],
-          ),
-          SizedBox(height: 20),
-          // Text("GLEAM ISLAND 어학원",
-          //     style: TextStyle(
-          //         fontFamily: "Jalnan",
-          //         fontSize: 15,
-          //         color: Palette.secondaryDark)),
-          // SizedBox(
-          //   height: 20,
-          // ),
-          // Text(style: TextStyle(color: Palette.black, fontFamily: "NotoSansKR", fontWeight: FontWeight.normal,
-          //     fontSize: 14),
-          //     "Gi 글림아일랜드 어학원은,\n"
-          //     "* 영어의 Fundamental을 확립할 Grammar 프로그램,\n"
-          //     "* 적극적 의사표현력을 습득할  NIE Speaking (Debate) 프로그램,\n"
-          //     "* 풍부한 스피킹 표현력을 배울 Gi Expression 프로그램, \n"
-          //     "* Reading 능력을 키워줄  원서읽기 Slow Reading 프로그램,\n"
-          //     "* 초등부를 위한 S.T.E.A.M 프로그램 (Science, Technology, Engineering, Arts, Mathematics)\n"
-          //     "등의 양질의 교육 서비스와 액티비티 프로그램을 제공하는 프리미엄 소수정예 영어학원입니다."),
-          // SizedBox(
-          //   height: 20,
-          // ),
-        ],
-      ),
-    );
-  }
-
-  Widget scrollView() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          mainImage(),
-          contentGroup(),
-          MyWidget.footer(),
-        ],
-      ),
-    );
-  }
-
-  Widget mainImage() {
-    return Container(
-      child: Stack(
-        alignment: Alignment.bottomLeft,
-        children: [
-          Image.asset("assets/aboutMainImage.png"),
-          Container(
-            padding: EdgeInsets.only(left: 40, bottom: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  "About Us",
-                  style: TextStyle(
-                      color: Palette.white,
-                      fontSize: 30,
-                      fontFamily: "LucidaCalligraphy"),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Container(
-                  width: 150,
-                  height: 40,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.black,
-                      foregroundColor: Palette.black,
-                    ),
-                    onPressed: () {
-                      MenuUtil.push(context, SchoolConsultationPage());
-                    },
-                    child: Text("상담신청",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: "Jalnan",
-                          color: Palette.white,
-                        )),
-                  ),
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  //mobile
-
-  Widget mobileScrollView() {
+  Widget _desktopScroll(BuildContext context) {
     return SingleChildScrollView(
       child: Container(
-        color: Colors.white,
+        color: Palette.background,
         child: Column(
           children: [
-            // mobileMainImage(),
-            mobileLeftMenu(),
-            mobileContent(),
-            MyWidget.mobileSchoolFooter()
+            _hero(context, compact: false),
+            AcademyHomeCards(),
+            AcademyBulletinBoards(),
+            _philosophy(compact: false),
+            ModernWidgets.modernFooter(),
           ],
         ),
       ),
     );
   }
 
-  Widget mobileContent() {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
-      color: Palette.white,
+  Widget _mobileScroll(BuildContext context) {
+    return SingleChildScrollView(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "GLEAM ISLAND 의 철학과 목표",
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
-          ),
-          WidgetUtil.myDivider(),
-          SizedBox(
-            height: 20,
-          ),
-          Image.asset("assets/gleamIslandMoto1.png"),
-          Image.asset("assets/gleamIslandMoto2.png"),
-          SizedBox(height: 20),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Image.asset("assets/eleInfo.png"),
-              SizedBox(height: 20),
-              Image.asset("assets/middleschoolNewMainImage.png"),
-              SizedBox(height: 20),
-              Image.asset("assets/highInfo.png"),
-            ],
-          ),
-          SizedBox(height: 20),
+          _hero(context, compact: true),
+          AcademyHomeCards(compact: true),
+          AcademyBulletinBoards(compact: true),
+          _philosophy(compact: true),
         ],
       ),
     );
   }
 
-  Widget mobileLeftMenu() {
-    List<Widget> children = [];
-    for (int i = 0; i < buttonStateList.length; i++) {
-      ButtonState buttonState = buttonStateList[i];
-
-      bool isFirst = (i == 0);
-      bool isLast = (i == buttonStateList.length - 1);
-
-      Widget child;
-      if (isFirst) {
-        child =
-            MyWidget.mobileLeftMenuStart(buttonState.color, buttonState.label);
-      } else if (isLast) {
-        //last
-        child =
-            MyWidget.mobileLeftMenuEnd(buttonState.color, buttonState.label);
-      } else {
-        child =
-            MyWidget.mobileLeftMenuMiddle(buttonState.color, buttonState.label);
-      }
-
-      children.add(InkWell(
-        child: child,
-        onHover: (value) {
-          buttonState.color = value
-              ? BehaviorColor.colorOnHover
-              : (i == 0
-                  ? BehaviorColor.colorOnClick
-                  : BehaviorColor.colorOnDefault);
-          setState(() {});
-        },
-        onTap: () {
-          MenuUtil.push(context, buttonState.nextPage);
-        },
-      ));
-
-      if (!isLast) {
-        children.add(Container(
-          width: 1,
-          height: 40,
-          color: const Color.fromARGB(255, 96, 165, 250),
-        ));
-      }
+  Widget _hero(BuildContext context, {required bool compact}) {
+    final screen = MediaQuery.sizeOf(context);
+    if (compact) {
+      return Container(
+        width: double.infinity,
+        color: Palette.navyDark,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(24, 28, 24, 8),
+              child: _heroCopy(context, compact: true),
+            ),
+            AspectRatio(
+              aspectRatio: 16 / 10,
+              child: Image.asset(
+                _heroAsset,
+                fit: BoxFit.cover,
+                alignment: Alignment.center,
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
+    final heroHeight = (screen.height - 72).clamp(520.0, 720.0);
     return Container(
-      color: Palette.white,
-      padding: EdgeInsets.all(20),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: children,
-        ),
+      width: double.infinity,
+      height: heroHeight,
+      color: Palette.navyDark,
+      child: Row(
+        children: [
+          Expanded(
+            flex: 5,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(56, 40, 32, 40),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 560),
+                  child: _heroCopy(context, compact: false),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 6,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(0, 16, 28, 16),
+              child: Image.asset(
+                _heroAsset,
+                fit: BoxFit.cover,
+                alignment: Alignment.center,
+                filterQuality: FilterQuality.high,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget mobileMainImage() {
+  Widget _heroCopy(BuildContext context, {required bool compact}) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '파주 운정 · 초중등 오프라인',
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: compact ? 12 : 13,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.4,
+            color: Palette.secondaryLight,
+          ),
+        ),
+        SizedBox(height: compact ? 10 : 14),
+        Text(
+          '글림아일랜드 파주 캠퍼스에서\n영어를 말하고 자랍니다',
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: compact ? 26 : 40,
+            fontWeight: FontWeight.w800,
+            height: 1.28,
+            color: Palette.white,
+          ),
+        ),
+        SizedBox(height: compact ? 12 : 16),
+        Text(
+          '초등·중등 정규 수업과 원어민 회화, 소수정예로\n놀이와 학습이 함께하는 현장입니다.',
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: compact ? 14 : 16,
+            height: 1.6,
+            color: Palette.white.withValues(alpha: 0.78),
+          ),
+        ),
+        SizedBox(height: compact ? 20 : 28),
+        AcademyLmsLinks(
+          showHeading: false,
+          onDark: true,
+          compact: compact,
+          centered: true,
+        ),
+      ],
+    );
+  }
+
+  Widget _philosophy({required bool compact}) {
     return Container(
-      child: Stack(
-        alignment: Alignment.centerLeft,
-        children: [
-          Image.asset("assets/aboutMainImage.png"),
-          Container(
-            padding: EdgeInsets.only(left: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "About Us",
-                  style: TextStyle(
-                      color: Palette.white,
-                      fontSize: 20,
-                      fontFamily: "LucidaCalligraphy"),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  width: 150,
-                  height: 40,
-                  child: ElevatedButton(
-                    child: Text(
-                      "상담신청",
-                      style:
-                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
-                    ),
-                    onPressed: () {
-                      MenuUtil.push(context, SchoolConsultationPage());
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 139, 92, 246),
-                      foregroundColor: Palette.black,
-                    ),
-                  ),
-                ),
-              ],
+      width: double.infinity,
+      color: Palette.white,
+      padding: EdgeInsets.fromLTRB(
+        compact ? 24 : 80,
+        compact ? 40 : 72,
+        compact ? 24 : 80,
+        compact ? 48 : 80,
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 860),
+          child: Text(
+            '"GLEAM ISLAND는 반짝이는 섬이라는 뜻으로, 뉴질랜드 교육 철학을 바탕으로 한 이름입니다. 자유로운 탐구와 토론, 놀이와 학습이 함께하는 소수정예 영어 현장을 지향합니다."',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontSize: compact ? 20 : 28,
+              fontWeight: FontWeight.w600,
+              height: 1.7,
+              color: Palette.navy,
             ),
-          )
-        ],
+          ),
+        ),
       ),
     );
   }

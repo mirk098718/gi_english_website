@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/util/AuthService.dart';
+import 'package:gi_english_website/util/EnrollmentService.dart';
 // ignore: avoid_web_libraries_in_flutter, deprecated_member_use
 import 'dart:js' as js;
 
@@ -32,6 +33,10 @@ class PaymentService {
     final sessions = totalSessions ?? course.defaultSessions;
     final orderId = _generateOrderId();
     final amount = course.price;
+    var teacherUid = nativeTeacher?.accountUid ?? '';
+    if (teacherUid.isEmpty && nativeTeacher != null) {
+      teacherUid = await AuthService.uidForNativeProfile(nativeTeacher.id);
+    }
 
     final order = PaymentOrder(
       orderId: orderId,
@@ -45,6 +50,7 @@ class PaymentService {
       status: 'pending',
       nativeTeacherId: nativeTeacher?.id ?? '',
       nativeTeacherName: nativeTeacher?.name ?? '',
+      nativeTeacherUid: teacherUid,
     );
 
     await _firestore.collection('payments').doc(orderId).set({
@@ -59,6 +65,7 @@ class PaymentService {
       'status': 'pending',
       'nativeTeacherId': order.nativeTeacherId,
       'nativeTeacherName': order.nativeTeacherName,
+      'nativeTeacherUid': order.nativeTeacherUid,
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
@@ -220,6 +227,7 @@ class PaymentService {
         'paymentNote': '관리자 수동확정 / 토스 인증',
         'nativeTeacherId': payment['nativeTeacherId']?.toString() ?? '',
         'nativeTeacherName': payment['nativeTeacherName']?.toString() ?? '',
+        'nativeTeacherUid': payment['nativeTeacherUid']?.toString() ?? '',
         'paidAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       };
@@ -229,17 +237,33 @@ class PaymentService {
         final completed = (prev['completedSessions'] is int)
             ? prev['completedSessions'] as int
             : 0;
-        await enrollmentRef.update({
+        final createdRaw = prev['createdAt'];
+        final start = createdRaw is Timestamp
+            ? createdRaw.toDate()
+            : DateTime.now();
+        final payload = <String, dynamic>{
           ...enrollmentPayload,
           'completedSessions': completed,
           'remainingSessions':
               (totalSessions - completed).clamp(0, totalSessions),
-        });
+        };
+        if (prev['expiresAt'] == null) {
+          payload['expiresAt'] = Timestamp.fromDate(
+            EnrollmentService.expiresAtFromStart(start, totalSessions),
+          );
+        }
+        await enrollmentRef.update(payload);
       } else {
         await _firestore.collection('enrollments').add({
           ...enrollmentPayload,
           'completedSessions': 0,
           'remainingSessions': totalSessions,
+          'expiresAt': Timestamp.fromDate(
+            EnrollmentService.expiresAtFromStart(
+              DateTime.now(),
+              totalSessions,
+            ),
+          ),
           'createdAt': FieldValue.serverTimestamp(),
         });
       }
@@ -254,10 +278,13 @@ class PaymentService {
 
       final nativeTeacherId = payment['nativeTeacherId']?.toString() ?? '';
       final nativeTeacherName = payment['nativeTeacherName']?.toString() ?? '';
+      final nativeTeacherUid = payment['nativeTeacherUid']?.toString() ?? '';
       if (nativeTeacherId.isNotEmpty) {
         await _firestore.collection('members').doc(userId).set({
+          'teacherId': nativeTeacherUid,
           'nativeTeacherId': nativeTeacherId,
           'nativeTeacherName': nativeTeacherName,
+          'nativeTeacherUid': nativeTeacherUid,
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
       }
@@ -347,6 +374,7 @@ class PaymentOrder {
   final DateTime? paidAt;
   final String nativeTeacherId;
   final String nativeTeacherName;
+  final String nativeTeacherUid;
 
   PaymentOrder({
     required this.orderId,
@@ -364,6 +392,7 @@ class PaymentOrder {
     this.paidAt,
     this.nativeTeacherId = '',
     this.nativeTeacherName = '',
+    this.nativeTeacherUid = '',
   });
 
   OnlineCourse? get course => OnlineCourse.findById(courseId);
@@ -415,6 +444,7 @@ class PaymentOrder {
       paidAt: toDate(data['paidAt']),
       nativeTeacherId: data['nativeTeacherId']?.toString() ?? '',
       nativeTeacherName: data['nativeTeacherName']?.toString() ?? '',
+      nativeTeacherUid: data['nativeTeacherUid']?.toString() ?? '',
     );
   }
 }

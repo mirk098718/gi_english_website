@@ -17,12 +17,22 @@ service firebase.storage {
       allow read, write: if true;
     }
     
+    // 강사 프로필 사진
+    match /teacher_photos/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // 온라인 강의 영상
+    match /online_lessons/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
     // 기타 모든 파일에 대한 기본 규칙
     match /{allPaths=**} {
-      // 모든 사용자가 읽기 가능
       allow read: if true;
-      // 모든 사용자가 쓰기 가능 (개발/테스트용)
-      allow write: if true;
+      allow write: if request.auth != null;
     }
   }
 }

@@ -97,7 +97,6 @@ class _SchoolOnlineCurriculumPageState
           children: [
             OnlineProgramSideMenu(selectedIndex: 0, isMobile: true),
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter()),
           ],
         ),
       ),

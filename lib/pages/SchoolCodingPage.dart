@@ -7,6 +7,7 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 import '../util/WidgetUtil.dart';
@@ -187,7 +188,7 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/ballPoolImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.coding),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -242,7 +243,6 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
           ],
         ),
       ),
@@ -320,7 +320,7 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
       child: Stack(
         alignment: Alignment.centerLeft,
         children: [
-          Image.asset("assets/ballPoolImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.coding),
           Container(
             padding: EdgeInsets.only(left: 20),
             child: Column(
