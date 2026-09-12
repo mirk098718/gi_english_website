@@ -93,6 +93,7 @@ class _MemberLoginPageState extends State<MemberLoginPage> {
       return;
     }
 
+    await AuthService.getAdminRole();
     _showMessage('로그인되었습니다.');
     MenuUtil.push(context, SchoolOnlineClassroomPage());
   }

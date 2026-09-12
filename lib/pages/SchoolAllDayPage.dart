@@ -312,7 +312,7 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
         children.add(Container(
           width: 1,
           height: 40,
-          color: const Color.fromRGBO(96, 165, 250, 1),
+          color: Palette.grey300,
         ));
       }
     }

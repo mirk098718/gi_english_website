@@ -24,7 +24,7 @@ class WebSchoolLayout extends StatefulWidget {
 class _WebSchoolLayoutState extends State<WebSchoolLayout> {
   static const double _barHeight = 72;
 
-  bool _isAdmin = false;
+  AdminRole _adminRole = AdminRole.none;
   bool _isMemberLoggedIn = AuthService.currentUser != null;
   StreamSubscription<User?>? _authSub;
   _HeaderMenu _menu = _HeaderMenu.none;
@@ -43,6 +43,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             _menu = _HeaderMenu.none;
           }
         });
+        _checkAdminStatus();
       }
     });
   }
@@ -55,11 +56,14 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
     super.dispose();
   }
 
+  bool get _isStaff =>
+      _adminRole == AdminRole.owner || _adminRole == AdminRole.teacher;
+
   Future<void> _checkAdminStatus() async {
-    final isStaff = await AuthService.isStaff();
+    final role = await AuthService.getAdminRole();
     if (mounted) {
       setState(() {
-        _isAdmin = isStaff;
+        _adminRole = role;
       });
     }
   }
@@ -100,7 +104,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
       await AuthService.signOut();
       if (!mounted) return;
       setState(() {
-        _isAdmin = false;
+        _adminRole = AdminRole.none;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -360,7 +364,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
       fontWeight: FontWeight.w600,
     );
 
-    if (_isAdmin) {
+    if (_isStaff) {
       return [
         TextButton(
           onPressed: _logout,
@@ -371,7 +375,10 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             _closeMenu();
             SiteNav.goAdminHub(context);
           },
-          child: Text('관리자', style: operatorStyle),
+          child: Text(
+            _adminRole == AdminRole.teacher ? '수업 관리' : '관리자',
+            style: operatorStyle,
+          ),
         ),
       ];
     }

@@ -10,17 +10,28 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // 메인 관리자 (role 없거나 owner)
-    function isOwner() {
+    // AuthService.ownerEmail 과 동일. 학원 콘텐츠(갤러리/공지/FAQ)와
+    // 온라인 메인 관리자는 이 계정이다. role 이 teacher 로 잘못 저장돼도
+    // 이메일이 맞으면 메인 관리자로 본다.
+    function isOwnerEmail() {
       return isLoggedIn()
-        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
-        && (!('isActive' in adminDoc()) || adminDoc().isActive != false)
-        && (!('role' in adminDoc()) || adminDoc().role == 'owner');
+        && request.auth.token.email is string
+        && request.auth.token.email.lower() == 'gienglish.paju@gmail.com';
     }
 
-    // 서브 강사
+    // 메인 관리자: 지정 이메일이거나, admins.role 이 owner(또는 없음)
+    function isOwner() {
+      return isOwnerEmail()
+        || (isLoggedIn()
+          && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+          && (!('isActive' in adminDoc()) || adminDoc().isActive != false)
+          && (!('role' in adminDoc()) || adminDoc().role == 'owner'));
+    }
+
+    // 서브 강사 (메인 관리자 이메일은 제외)
     function isTeacher() {
       return isLoggedIn()
+        && !isOwnerEmail()
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
         && (!('isActive' in adminDoc()) || adminDoc().isActive != false)
         && adminDoc().role == 'teacher';

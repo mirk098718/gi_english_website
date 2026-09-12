@@ -281,7 +281,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
         children.add(Container(
           width: 1,
           height: 40,
-          color: Palette.primaryLight,
+          color: Palette.grey300,
         ));
       }
     }

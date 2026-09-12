@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:html' as html;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gi_english_website/class/GalleryImage.dart';
+import 'package:gi_english_website/util/AuthService.dart';
 
 class GalleryService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -114,6 +115,13 @@ class GalleryService {
       print(
           '📏 데이터 크기: ${(imageData.length / 1024 / 1024).toStringAsFixed(2)} MB');
 
+      if (AuthService.currentUser == null || !await AuthService.isAdmin()) {
+        throw Exception(
+          '학원 갤러리 업로드는 메인 관리자 계정으로 로그인한 뒤에만 가능합니다. '
+          '강사 계정으로는 사진을 올릴 수 없습니다.',
+        );
+      }
+
       // 이미지 크기 제한 (5MB - Firestore 문서 크기 제한 고려)
       if (imageData.length > 5 * 1024 * 1024) {
         throw Exception('이미지가 너무 큽니다. 5MB 이하의 이미지를 업로드해주세요.');
@@ -179,7 +187,10 @@ class GalleryService {
       if (e is TimeoutException) {
         throw Exception('업로드 시간이 초과되었습니다. 네트워크 연결을 확인해주세요.');
       } else if (e.toString().contains('permission')) {
-        throw Exception('업로드 권한이 없습니다. 관리자에게 문의해주세요.');
+        throw Exception(
+          '업로드 권한이 없습니다. 메인 관리자(학원 운영자)로 다시 로그인해 주세요. '
+          '강사 계정으로는 학원 갤러리에 사진을 올릴 수 없습니다.',
+        );
       } else if (e.toString().contains('quota')) {
         throw Exception('저장 공간이 부족합니다. 관리자에게 문의해주세요.');
       } else {

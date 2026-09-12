@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/FAQ.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
@@ -9,7 +11,6 @@ import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/CommunityPageLayout.dart';
 import 'package:gi_english_website/widget/BoardTable.dart';
-import 'package:gi_english_website/util/WidgetUtil.dart';
 import 'package:intl/intl.dart';
 
 class SchoolCommunityBoardPage extends StatefulWidget {
@@ -22,6 +23,7 @@ class SchoolCommunityBoardPage extends StatefulWidget {
 
 class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
   bool _isAdmin = false;
+  StreamSubscription? _roleSub;
 
   List<ButtonState> get buttonStateList => [
         ButtonState("Notice Board", BehaviorColor.colorOnDefault,
@@ -35,16 +37,18 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
   @override
   void initState() {
     super.initState();
-    _checkAdminStatus();
+    _roleSub = AuthService.listenRole((role) {
+      if (!mounted) return;
+      setState(() {
+        _isAdmin = role == AdminRole.owner;
+      });
+    });
   }
 
-  Future<void> _checkAdminStatus() async {
-    bool isAdmin = await AuthService.isAdmin();
-    if (mounted) {
-      setState(() {
-        _isAdmin = isAdmin;
-      });
-    }
+  @override
+  void dispose() {
+    _roleSub?.cancel();
+    super.dispose();
   }
 
   @override
@@ -85,17 +89,18 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
                 ),
             ],
           ),
-          WidgetUtil.myDivider(),
-          SizedBox(height: 20),
+          SizedBox(height: 8),
+          Container(height: 1, color: Palette.grey200),
+          SizedBox(height: 12),
           Text(
             "자주 묻는 질문과 답변을 확인하실 수 있습니다.",
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               color: Palette.grey600,
               fontFamily: "NotoSansKR",
             ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 12),
           _buildFAQBoard()
         ],
       ),

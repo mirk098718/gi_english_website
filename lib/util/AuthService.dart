@@ -351,18 +351,26 @@ class AuthService {
   static Future<void> signOut() async {
     try {
       await _auth.signOut();
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('isAdminLoggedIn');
-      await prefs.remove('adminEmail');
-      await prefs.remove('adminName');
-      await prefs.remove('adminRole');
-      await prefs.remove('adminUid');
+      await _clearAdminPrefs();
     } catch (e) {
       print('로그아웃 오류: $e');
     }
   }
 
-  /// 메인 관리자(소유자)인지 — 게시판/갤러리/강의 업로드/강사 관리용.
+  static Future<void> _clearAdminPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('isAdminLoggedIn');
+    await prefs.remove('adminEmail');
+    await prefs.remove('adminName');
+    await prefs.remove('adminRole');
+    await prefs.remove('adminUid');
+  }
+
+  static bool isOwnerEmail(String? email) =>
+      (email ?? '').trim().toLowerCase() == ownerEmail;
+
+  /// 메인 관리자(소유자)인지 — 학원 갤러리/공지/FAQ 와 온라인 전체 관리.
+  /// Firebase Auth 세션이 있어야 한다. prefs-only 로그인은 인정하지 않는다.
   static Future<bool> isAdmin() async =>
       (await getAdminRole()) == AdminRole.owner;
 
@@ -375,33 +383,47 @@ class AuthService {
   static Future<bool> isTeacher() async =>
       (await getAdminRole()) == AdminRole.teacher;
 
+  /// Firebase 로그인 상태가 바뀔 때마다 역할을 다시 읽는다.
+  /// 학원 갤러리처럼 로그인 전에 열린 페이지가 버튼을 갱신할 때 사용.
+  static StreamSubscription<User?> listenRole(
+      void Function(AdminRole role) onRole) {
+    Future<void> emit() async => onRole(await getAdminRole());
+    unawaited(emit());
+    return authStateChanges.listen((_) => unawaited(emit()));
+  }
+
   static Future<AdminRole> getAdminRole() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final roleStr = prefs.getString('adminRole');
-      if (roleStr == 'owner') return AdminRole.owner;
-      if (roleStr == 'teacher') return AdminRole.teacher;
-
-      // 레거시: 역할 없이 로그인되어 있으면 메인 관리자로 취급
-      final isLoggedIn = prefs.getBool('isAdminLoggedIn') ?? false;
-      if (isLoggedIn) return AdminRole.owner;
-
       final user = currentUser;
-      if (user == null) return AdminRole.none;
+      if (user == null) {
+        // Firestore 쓰기는 request.auth 가 필요하다.
+        // 예전에 남긴 SharedPreferences 세션만으로는 owner 가 아니다.
+        return AdminRole.none;
+      }
+
+      // 학원/온라인 메인 관리자 이메일은 항상 owner.
+      // 강사 등록 과정에서 role 이 teacher 로 덮여도 갤러리 쓰기가 막히지 않게 한다.
+      if (isOwnerEmail(user.email)) {
+        await _persistResolvedRole(AdminRole.owner, user);
+        return AdminRole.owner;
+      }
 
       final adminDoc =
           await _firestore.collection('admins').doc(user.uid).get();
       if (adminDoc.exists) {
         final data = adminDoc.data() as Map<String, dynamic>;
-        if (data['isActive'] == false) return AdminRole.none;
+        if (data['isActive'] == false) {
+          await _clearAdminPrefs();
+          return AdminRole.none;
+        }
         final role = data['role']?.toString() ?? 'owner';
-        if (role == 'teacher') return AdminRole.teacher;
-        return AdminRole.owner;
+        final resolved =
+            role == 'teacher' ? AdminRole.teacher : AdminRole.owner;
+        await _persistResolvedRole(resolved, user);
+        return resolved;
       }
 
-      if ((user.email ?? '').toLowerCase() == ownerEmail) {
-        return AdminRole.owner;
-      }
+      await _clearAdminPrefs();
       return AdminRole.none;
     } catch (e) {
       print('관리자 역할 확인 오류: $e');
@@ -409,12 +431,22 @@ class AuthService {
     }
   }
 
+  static Future<void> _persistResolvedRole(AdminRole role, User user) async {
+    await saveAdminSession(
+      user.email ?? '',
+      role: role,
+      uid: user.uid,
+    );
+  }
+
   /// 현재 스태프 세션의 uid (강사 필터용).
   static Future<String?> getStaffUid() async {
+    final uid = currentUser?.uid;
+    if (uid != null && uid.isNotEmpty) return uid;
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getString('adminUid');
     if (saved != null && saved.isNotEmpty) return saved;
-    return currentUser?.uid;
+    return null;
   }
 
   // 관리자 등록 (최초 설정용)
@@ -1419,7 +1451,24 @@ class AuthService {
       }
 
       final uid = cred.user!.uid;
+      final signedEmail = cred.user!.email ?? email.trim();
       final adminDoc = await _firestore.collection('admins').doc(uid).get();
+
+      // 메인 관리자 이메일은 admins 문서가 없거나 role 이 teacher 여도 owner.
+      if (isOwnerEmail(signedEmail) || isOwnerEmail(email)) {
+        final name = adminDoc.data()?['name']?.toString() ??
+            cred.user!.displayName ??
+            '관리자';
+        await ensureAdminDoc(signedEmail, name, role: 'owner');
+        await saveAdminSession(
+          signedEmail,
+          name: name,
+          role: AdminRole.owner,
+          uid: uid,
+        );
+        return null;
+      }
+
       if (!adminDoc.exists) {
         await _auth.signOut();
         return '등록된 관리/강사 계정이 아닙니다.';

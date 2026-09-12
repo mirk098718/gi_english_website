@@ -53,59 +53,49 @@ class SchoolAboutPage extends StatelessWidget {
 
   Widget _hero(BuildContext context, {required bool compact}) {
     final screen = MediaQuery.sizeOf(context);
-    if (compact) {
-      return Container(
-        width: double.infinity,
-        color: Palette.navyDark,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(24, 28, 24, 8),
-              child: _heroCopy(context, compact: true),
-            ),
-            AspectRatio(
-              aspectRatio: 16 / 10,
-              child: Image.asset(
-                _heroAsset,
-                fit: BoxFit.cover,
-                alignment: Alignment.center,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+    final height = compact
+        ? 520.0
+        : (screen.height - 72).clamp(560.0, 760.0);
 
-    final heroHeight = (screen.height - 72).clamp(520.0, 720.0);
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      height: heroHeight,
-      color: Palette.navyDark,
-      child: Row(
+      height: height,
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          Expanded(
-            flex: 5,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(56, 40, 32, 40),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 560),
-                  child: _heroCopy(context, compact: false),
-                ),
+          Image.asset(
+            _heroAsset,
+            fit: BoxFit.cover,
+            alignment: const Alignment(0.28, 0),
+            filterQuality: FilterQuality.high,
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                stops: const [0.0, 0.32, 0.58, 1.0],
+                colors: [
+                  Palette.navy.withValues(alpha: compact ? 0.90 : 0.88),
+                  Palette.navy.withValues(alpha: compact ? 0.64 : 0.58),
+                  Palette.navy.withValues(alpha: compact ? 0.30 : 0.22),
+                  Palette.navy.withValues(alpha: compact ? 0.16 : 0.08),
+                ],
               ),
             ),
           ),
-          Expanded(
-            flex: 6,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 16, 28, 16),
-              child: Image.asset(
-                _heroAsset,
-                fit: BoxFit.cover,
-                alignment: Alignment.center,
-                filterQuality: FilterQuality.high,
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              compact ? 24 : 56,
+              compact ? 36 : 48,
+              compact ? 24 : 40,
+              compact ? 28 : 48,
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: compact ? 520 : 560),
+                child: _heroCopy(context, compact: compact),
               ),
             ),
           ),

@@ -215,32 +215,29 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
     });
 
     try {
-      // 1) 메인 관리자 (기존 하드코딩 계정)
+      // 1) 메인 관리자 (기존 하드코딩 계정) — Firebase Auth 세션이 있어야
+      // 학원 갤러리/공지/FAQ 쓰기가 통과한다. prefs-only 로그인은 하지 않는다.
       if (email.toLowerCase() == AuthService.ownerEmail &&
           password == "gleam701") {
         final cred = await AuthService.signInWithEmailAndPassword(
           email,
           password,
         );
-        if (cred != null) {
-          await AuthService.ensureAdminDoc(email, "관리자", role: 'owner');
-          await AuthService.saveAdminSession(
-            email,
-            name: "관리자",
-            role: AdminRole.owner,
-            uid: cred.user?.uid,
-          );
-        } else {
-          await AuthService.saveAdminSession(
-            email,
-            name: "관리자",
-            role: AdminRole.owner,
-          );
+        if (cred == null || cred.user == null) {
           _showSnackBar(
-            'FAQ/공지 저장을 사용하려면 Firebase 콘솔 → Authentication에서 이 이메일로 사용자를 추가해 주세요.',
-            Colors.orange,
+            '메인 관리자 Firebase 로그인에 실패했습니다. '
+            'Authentication에 등록된 비밀번호로 다시 시도해 주세요.',
+            Colors.red,
           );
+          return;
         }
+        await AuthService.ensureAdminDoc(email, "관리자", role: 'owner');
+        await AuthService.saveAdminSession(
+          email,
+          name: "관리자",
+          role: AdminRole.owner,
+          uid: cred.user?.uid,
+        );
 
         _showSnackBar('관리자 로그인에 성공했습니다.', Colors.green);
         Navigator.pop(context);

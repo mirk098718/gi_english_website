@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
@@ -24,19 +25,18 @@ class _ImageViewerState extends State<ImageViewer> {
   late PageController pageController;
   late int currentIndex;
   bool isAdmin = false;
+  StreamSubscription? _roleSub;
 
   @override
   void initState() {
     super.initState();
     currentIndex = widget.initialIndex;
     pageController = PageController(initialPage: widget.initialIndex);
-    _checkAdminStatus();
-  }
-
-  Future<void> _checkAdminStatus() async {
-    bool adminStatus = await AuthService.isAdmin();
-    setState(() {
-      isAdmin = adminStatus;
+    _roleSub = AuthService.listenRole((role) {
+      if (!mounted) return;
+      setState(() {
+        isAdmin = role == AdminRole.owner;
+      });
     });
   }
 
@@ -55,6 +55,7 @@ class _ImageViewerState extends State<ImageViewer> {
 
   @override
   void dispose() {
+    _roleSub?.cancel();
     pageController.dispose();
     super.dispose();
   }

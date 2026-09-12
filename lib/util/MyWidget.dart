@@ -244,6 +244,10 @@ class MyWidget {
   }
 //좌측메뉴 세분화
 
+  static Color _leftMenuTextColor(Color background) {
+    return background == Palette.navy ? Palette.white : Palette.black;
+  }
+
   static Widget leftMenuTop(Color selectedMenuColor, String content) {
     return Container(
       alignment: Alignment.center,
@@ -259,7 +263,9 @@ class MyWidget {
         content,
         textAlign: TextAlign.center,
         style: TextStyle(
-            color: Palette.black, fontWeight: FontWeight.bold, fontSize: 13),
+            color: _leftMenuTextColor(selectedMenuColor),
+            fontWeight: FontWeight.bold,
+            fontSize: 13),
       ),
     );
   }
@@ -275,7 +281,9 @@ class MyWidget {
         menuContent,
         textAlign: TextAlign.center,
         style: TextStyle(
-            color: Palette.black, fontWeight: FontWeight.bold, fontSize: 13),
+            color: _leftMenuTextColor(menuColor),
+            fontWeight: FontWeight.bold,
+            fontSize: 13),
       ),
     );
   }
@@ -295,7 +303,9 @@ class MyWidget {
         content,
         textAlign: TextAlign.center,
         style: TextStyle(
-            color: Palette.black, fontWeight: FontWeight.bold, fontSize: 13),
+            color: _leftMenuTextColor(menuColor),
+            fontWeight: FontWeight.bold,
+            fontSize: 13),
       ),
     );
   }
@@ -409,7 +419,9 @@ class MyWidget {
         content,
         textAlign: TextAlign.center,
         style: TextStyle(
-            color: Palette.black, fontWeight: FontWeight.bold, fontSize: 12),
+            color: _leftMenuTextColor(selectedMenuColor),
+            fontWeight: FontWeight.bold,
+            fontSize: 12),
       ),
     );
   }
@@ -425,7 +437,9 @@ class MyWidget {
         menuContent,
         textAlign: TextAlign.center,
         style: TextStyle(
-            color: Palette.black, fontWeight: FontWeight.bold, fontSize: 12),
+            color: _leftMenuTextColor(menuColor),
+            fontWeight: FontWeight.bold,
+            fontSize: 12),
       ),
     );
   }
@@ -444,7 +458,9 @@ class MyWidget {
         content,
         textAlign: TextAlign.center,
         style: TextStyle(
-            color: Palette.black, fontWeight: FontWeight.bold, fontSize: 12),
+            color: _leftMenuTextColor(menuColor),
+            fontWeight: FontWeight.bold,
+            fontSize: 12),
       ),
     );
   }

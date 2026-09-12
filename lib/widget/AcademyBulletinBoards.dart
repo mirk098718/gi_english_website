@@ -19,70 +19,68 @@ class AcademyBulletinBoards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (compact) {
-      return Container(
-        color: Palette.white,
-        padding: EdgeInsets.fromLTRB(20, 8, 20, 20),
-        child: Column(
-          children: [
-            _boardCard(
-              context,
-              title: 'Notice Board',
-              height: 350,
-              onTitlePressed: () {
-                MenuUtil.push(context, SchoolCommunityNoticePage());
-              },
-              child: _noticeList(context),
-            ),
-            SizedBox(height: 20),
-            _boardCard(
-              context,
-              title: 'FAQ',
-              height: 350,
-              onTitlePressed: () {
-                MenuUtil.push(context, SchoolCommunityBoardPage());
-              },
-              child: _faqList(context),
-            ),
-          ],
-        ),
-      );
-    }
+    final boards = compact
+        ? Column(
+            children: [
+              _boardCard(
+                context,
+                title: '공지사항',
+                onTitlePressed: () {
+                  MenuUtil.push(context, SchoolCommunityNoticePage());
+                },
+                child: _noticeList(context),
+              ),
+              SizedBox(height: 12),
+              _boardCard(
+                context,
+                title: 'FAQ',
+                onTitlePressed: () {
+                  MenuUtil.push(context, SchoolCommunityBoardPage());
+                },
+                child: _faqList(context),
+              ),
+            ],
+          )
+        : Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _boardCard(
+                  context,
+                  title: '공지사항',
+                  onTitlePressed: () {
+                    MenuUtil.push(context, SchoolCommunityNoticePage());
+                  },
+                  child: _noticeList(context),
+                ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _boardCard(
+                  context,
+                  title: 'FAQ',
+                  onTitlePressed: () {
+                    MenuUtil.push(context, SchoolCommunityBoardPage());
+                  },
+                  child: _faqList(context),
+                ),
+              ),
+            ],
+          );
 
     return Container(
       color: Palette.white,
-      padding: EdgeInsets.symmetric(vertical: 56, horizontal: 40),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Spacer(),
-          Expanded(
-            flex: 5,
-            child: _boardCard(
-              context,
-              title: 'Notice Board',
-              height: 550,
-              onTitlePressed: () {
-                MenuUtil.push(context, SchoolCommunityNoticePage());
-              },
-              child: _noticeList(context),
-            ),
-          ),
-          Spacer(),
-          Expanded(
-            flex: 5,
-            child: _boardCard(
-              context,
-              title: 'FAQ',
-              height: 550,
-              onTitlePressed: () {
-                MenuUtil.push(context, SchoolCommunityBoardPage());
-              },
-              child: _faqList(context),
-            ),
-          ),
-          Spacer(),
-        ],
+      padding: EdgeInsets.fromLTRB(
+        compact ? 20 : 48,
+        compact ? 8 : 36,
+        compact ? 20 : 48,
+        compact ? 24 : 40,
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1100),
+          child: boards,
+        ),
       ),
     );
   }
@@ -90,43 +88,60 @@ class AcademyBulletinBoards extends StatelessWidget {
   Widget _boardCard(
     BuildContext context, {
     required String title,
-    required double height,
     required VoidCallback onTitlePressed,
     required Widget child,
   }) {
     return Container(
-      height: height,
       decoration: BoxDecoration(
         color: Palette.white,
-        border: Border.all(color: Palette.grey100, width: 3),
-        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Palette.grey200),
+        borderRadius: BorderRadius.circular(12),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            height: 50,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Palette.grey100,
-              border: Border.all(color: Palette.grey100, width: 3),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(18),
-                topRight: Radius.circular(18),
-              ),
-            ),
-            child: TextButton(
-              onPressed: onTitlePressed,
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: Palette.black,
-                  fontFamily: 'Jalnan',
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
+            child: Row(
+              children: [
+                Container(
+                  width: 3,
+                  height: 14,
+                  color: Palette.navy,
                 ),
-              ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      color: Palette.navy,
+                      fontFamily: 'NotoSansKR',
+                      fontWeight: FontWeight.w800,
+                      fontSize: compact ? 15 : 16,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: onTitlePressed,
+                  style: TextButton.styleFrom(
+                    foregroundColor: Palette.grey600,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    textStyle: const TextStyle(
+                      fontFamily: 'NotoSansKR',
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  child: const Text('더보기'),
+                ),
+              ],
             ),
           ),
-          Expanded(child: child),
+          const Divider(height: 1, color: Palette.grey200),
+          child,
         ],
       ),
     );
@@ -146,16 +161,13 @@ class AcademyBulletinBoards extends StatelessWidget {
         if (status != null) return status;
 
         final notices = (snapshot.data ?? []).take(5).toList();
-        return Container(
-          color: Palette.white,
-          child: ListView.separated(
-            padding: EdgeInsets.zero,
-            itemCount: notices.length,
-            separatorBuilder: (_, __) =>
-                Container(height: 1, color: Palette.grey200),
-            itemBuilder: (context, index) =>
-                _noticeItem(context, notices[index]),
-          ),
+        return Column(
+          children: [
+            for (var i = 0; i < notices.length; i++) ...[
+              if (i > 0) const Divider(height: 1, color: Palette.grey200),
+              _noticeItem(context, notices[i]),
+            ],
+          ],
         );
       },
     );
@@ -175,15 +187,13 @@ class AcademyBulletinBoards extends StatelessWidget {
         if (status != null) return status;
 
         final faqs = (snapshot.data ?? []).take(5).toList();
-        return Container(
-          color: Palette.white,
-          child: ListView.separated(
-            padding: EdgeInsets.zero,
-            itemCount: faqs.length,
-            separatorBuilder: (_, __) =>
-                Container(height: 1, color: Palette.grey200),
-            itemBuilder: (context, index) => _faqItem(context, faqs[index]),
-          ),
+        return Column(
+          children: [
+            for (var i = 0; i < faqs.length; i++) ...[
+              if (i > 0) const Divider(height: 1, color: Palette.grey200),
+              _faqItem(context, faqs[i]),
+            ],
+          ],
         );
       },
     );
@@ -200,12 +210,11 @@ class AcademyBulletinBoards extends StatelessWidget {
       return _message(errorText, Palette.danger);
     }
     if (waiting) {
-      return Container(
-        color: Palette.white,
-        padding: EdgeInsets.all(20),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 28),
         child: Center(
           child: CircularProgressIndicator(
-            strokeWidth: compact ? 2 : 4,
+            strokeWidth: 2,
             valueColor: AlwaysStoppedAnimation<Color>(Palette.darkTeal),
           ),
         ),
@@ -218,14 +227,13 @@ class AcademyBulletinBoards extends StatelessWidget {
   }
 
   Widget _message(String text, Color color) {
-    return Container(
-      color: Palette.white,
-      padding: EdgeInsets.all(20),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Center(
         child: Text(
           text,
           style: TextStyle(
-            fontSize: compact ? 12 : 14,
+            fontSize: compact ? 12 : 13,
             color: color,
             fontFamily: 'NotoSansKR',
           ),
@@ -235,80 +243,60 @@ class AcademyBulletinBoards extends StatelessWidget {
   }
 
   Widget _noticeItem(BuildContext context, Notice notice) {
-    final limit = compact ? 40 : 60;
-    final preview = notice.content.length > limit
-        ? '${notice.content.substring(0, limit)}...'
-        : notice.content;
-
     return InkWell(
       onTap: () {
         if (notice.id != null) {
           MenuUtil.push(context, NoticeDetailPage(noticeId: notice.id!));
         }
       },
-      child: Container(
-        padding: EdgeInsets.all(compact ? 16 : 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 12 : 14,
+          vertical: compact ? 10 : 11,
+        ),
+        child: Row(
           children: [
-            Row(
-              children: [
-                if (notice.isImportant) ...[
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: compact ? 4 : 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Palette.danger,
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                    child: Text(
-                      '중요',
-                      style: TextStyle(
-                        color: Palette.white,
-                        fontSize: compact ? 8 : 10,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'NotoSansKR',
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: compact ? 6 : 8),
-                ],
-                Expanded(
-                  child: Text(
-                    notice.title,
-                    style: TextStyle(
-                      color: Palette.black,
-                      fontFamily: 'NotoSansKR',
-                      fontWeight: FontWeight.bold,
-                      fontSize: compact ? 13 : 14,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+            if (notice.isImportant) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                decoration: BoxDecoration(
+                  color: Palette.danger,
+                  borderRadius: BorderRadius.circular(3),
                 ),
-                Text(
-                  DateFormat('MM.dd').format(notice.createdAt),
+                child: Text(
+                  '중요',
                   style: TextStyle(
-                    color: Palette.grey600,
+                    color: Palette.white,
+                    fontSize: compact ? 9 : 10,
+                    fontWeight: FontWeight.w700,
                     fontFamily: 'NotoSansKR',
-                    fontSize: compact ? 10 : 12,
                   ),
                 ),
-              ],
-            ),
-            SizedBox(height: compact ? 6 : 8),
-            Text(
-              preview,
-              style: TextStyle(
-                color: Palette.grey700,
-                fontFamily: 'NotoSansKR',
-                fontSize: compact ? 12 : 13,
-                height: compact ? 1.3 : 1.4,
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+              const SizedBox(width: 8),
+            ],
+            Expanded(
+              child: Text(
+                notice.title,
+                style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: 'NotoSansKR',
+                  fontWeight:
+                      notice.isImportant ? FontWeight.w700 : FontWeight.w500,
+                  fontSize: compact ? 13 : 14,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              DateFormat('MM.dd').format(notice.createdAt),
+              style: TextStyle(
+                color: Palette.grey500,
+                fontFamily: 'NotoSansKR',
+                fontSize: compact ? 11 : 12,
+              ),
             ),
           ],
         ),
@@ -317,76 +305,49 @@ class AcademyBulletinBoards extends StatelessWidget {
   }
 
   Widget _faqItem(BuildContext context, FAQ faq) {
-    final limit = compact ? 30 : 50;
-    final preview = faq.answer.length > limit
-        ? '${faq.answer.substring(0, limit)}...'
-        : faq.answer;
-
     return InkWell(
       onTap: () {
         MenuUtil.push(context, SchoolCommunityBoardPage());
       },
-      child: Container(
-        padding: EdgeInsets.all(compact ? 16 : 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 12 : 14,
+          vertical: compact ? 10 : 11,
+        ),
+        child: Row(
           children: [
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: compact ? 4 : 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: faq.isImportant ? Palette.darkTeal : Palette.grey300,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                  child: Text(
-                    faq.category,
-                    style: TextStyle(
-                      color:
-                          faq.isImportant ? Palette.white : Palette.grey700,
-                      fontSize: compact ? 8 : 10,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'NotoSansKR',
-                    ),
-                  ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: faq.isImportant
+                    ? Palette.navy.withValues(alpha: 0.08)
+                    : Palette.grey100,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                faq.category,
+                style: TextStyle(
+                  color: faq.isImportant ? Palette.navy : Palette.grey600,
+                  fontSize: compact ? 10 : 11,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'NotoSansKR',
                 ),
-                SizedBox(width: compact ? 6 : 8),
-                if (faq.isImportant) ...[
-                  Icon(
-                    Icons.star,
-                    color: Palette.darkTeal,
-                    size: compact ? 12 : 14,
-                  ),
-                  SizedBox(width: 4),
-                ],
-              ],
-            ),
-            SizedBox(height: compact ? 6 : 8),
-            Text(
-              'Q: ${faq.question}',
-              style: TextStyle(
-                color: Palette.black,
-                fontFamily: 'NotoSansKR',
-                fontWeight: FontWeight.bold,
-                fontSize: compact ? 13 : 14,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-            SizedBox(height: compact ? 4 : 6),
-            Text(
-              'A: $preview',
-              style: TextStyle(
-                color: Palette.grey700,
-                fontFamily: 'NotoSansKR',
-                fontSize: compact ? 12 : 13,
-                height: compact ? 1.3 : 1.4,
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                faq.question,
+                style: TextStyle(
+                  color: Palette.black,
+                  fontFamily: 'NotoSansKR',
+                  fontWeight:
+                      faq.isImportant ? FontWeight.w700 : FontWeight.w500,
+                  fontSize: compact ? 13 : 14,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
@@ -17,8 +18,6 @@ import 'package:gi_english_website/widget/AdminImageUploadDialog.dart';
 import 'package:gi_english_website/widget/AdminImageEditDialog.dart';
 import 'package:gi_english_website/class/GalleryImage.dart';
 
-import '../util/WidgetUtil.dart';
-
 class SchoolGalleryPage extends StatefulWidget {
   const SchoolGalleryPage({Key? key}) : super(key: key);
 
@@ -36,19 +35,23 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
   ];
 
   bool isAdmin = false;
+  StreamSubscription? _roleSub;
 
   @override
   void initState() {
     super.initState();
-    _checkAdminStatus();
+    _roleSub = AuthService.listenRole((role) {
+      if (!mounted) return;
+      setState(() {
+        isAdmin = role == AdminRole.owner;
+      });
+    });
   }
 
-  Future<void> _checkAdminStatus() async {
-    bool adminStatus = await AuthService.isAdmin();
-    print('🔧 갤러리 페이지 - 관리자 권한: $adminStatus');
-    setState(() {
-      isAdmin = adminStatus;
-    });
+  @override
+  void dispose() {
+    _roleSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _showUploadDialog() async {
@@ -174,482 +177,181 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
     );
   }
 
+
   Widget content() {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
       color: Palette.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 제목과 업로드 버튼
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Gallery",
-                style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
-              ),
-              if (isAdmin)
-                ElevatedButton.icon(
-                  onPressed: _showUploadDialog,
-                  icon: Icon(Icons.cloud_upload, size: 18),
-                  label: Text(
-                    "이미지 업로드",
-                    style: TextStyle(
-                      fontFamily: "NotoSansKR",
-                      fontSize: 14,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          WidgetUtil.myDivider(),
-          SizedBox(height: 30),
-
-          // 갤러리 이미지 그리드
-          StreamBuilder<List<GalleryImage>>(
-            stream: GalleryService.getImagesStream(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Palette.primary),
-                  ),
-                );
-              }
-
-              if (snapshot.hasError) {
-                return Center(
-                  child: Text(
-                    '갤러리를 불러오는 중 오류가 발생했습니다.',
-                    style: TextStyle(fontFamily: "NotoSansKR"),
-                  ),
-                );
-              }
-
-              List<GalleryImage> images = snapshot.data ?? [];
-
-              if (images.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.photo_library_outlined,
-                        size: 64,
-                        color: Palette.grey400,
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        '아직 업로드된 이미지가 없습니다.',
-                        style: TextStyle(
-                          fontFamily: "NotoSansKR",
-                          fontSize: 16,
-                          color: Palette.grey600,
-                        ),
-                      ),
-                      if (isAdmin) ...[
-                        SizedBox(height: 8),
-                        Text(
-                          '상단의 "이미지 업로드" 버튼을 클릭하여 이미지를 추가해보세요.',
-                          style: TextStyle(
-                            fontFamily: "NotoSansKR",
-                            fontSize: 14,
-                            color: Palette.grey500,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                );
-              }
-
-              return GridView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount:
-                      MediaQuery.of(context).size.width > 1200 ? 4 : 3,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 1,
-                ),
-                itemCount: images.length,
-                itemBuilder: (context, index) {
-                  GalleryImage image = images[index];
-                  return _buildImageCard(image, images, index);
-                },
-              );
-            },
-          ),
+          _galleryHeader(compact: false),
+          const SizedBox(height: 16),
+          _galleryBody(compact: false),
         ],
-      ),
-    );
-  }
-
-  Widget _buildImageCard(
-      GalleryImage image, List<GalleryImage> allImages, int index) {
-    return InkWell(
-      onTap: () => _openImageViewer(allImages, index),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha:0.1),
-              blurRadius: 8,
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // 이미지
-              Hero(
-                tag: image.id,
-                child: Image.memory(
-                  base64Decode(image.imageData),
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Palette.grey200,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.broken_image,
-                              color: Palette.grey400, size: 32),
-                          SizedBox(height: 8),
-                          Text(
-                            '이미지를 불러올 수 없습니다',
-                            style: TextStyle(
-                              color: Palette.grey600,
-                              fontSize: 12,
-                              fontFamily: "NotoSansKR",
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-
-              // 호버 오버레이
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () => _openImageViewer(allImages, index),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withValues(alpha:0.7),
-                        ],
-                        stops: [0.6, 1.0],
-                      ),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.all(12),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (image.description.isNotEmpty)
-                            Text(
-                              image.description,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontFamily: "NotoSansKR",
-                                fontWeight: FontWeight.w500,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              // 확대 아이콘
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  padding: EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha:0.5),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Icon(
-                    Icons.zoom_in,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                ),
-              ),
-
-              // 관리자용 수정/삭제 버튼
-              if (isAdmin)
-                Positioned(
-                  top: 8,
-                  left: 8,
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha:0.5),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: InkWell(
-                          onTap: () => _showEditDialog(image),
-                          child: Icon(
-                            Icons.edit,
-                            color: Colors.white,
-                            size: 16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        ),
       ),
     );
   }
 
   Widget mobileContent() {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       color: Palette.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 제목과 업로드 버튼
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Gallery",
-                style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
-              ),
-              if (isAdmin)
-                ElevatedButton.icon(
-                  onPressed: _showUploadDialog,
-                  icon: Icon(Icons.cloud_upload, size: 16),
-                  label: Text(
-                    "업로드",
-                    style: TextStyle(
-                      fontFamily: "NotoSansKR",
-                      fontSize: 12,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          WidgetUtil.myDivider(),
-          SizedBox(height: 20),
-
-          // 모바일 갤러리 그리드
-          StreamBuilder<List<GalleryImage>>(
-            stream: GalleryService.getImagesStream(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Palette.primary),
-                  ),
-                );
-              }
-
-              if (snapshot.hasError) {
-                return Center(
-                  child: Text(
-                    '갤러리를 불러오는 중 오류가 발생했습니다.',
-                    style: TextStyle(fontFamily: "NotoSansKR"),
-                  ),
-                );
-              }
-
-              List<GalleryImage> images = snapshot.data ?? [];
-
-              if (images.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.photo_library_outlined,
-                        size: 48,
-                        color: Palette.grey400,
-                      ),
-                      SizedBox(height: 12),
-                      Text(
-                        '아직 업로드된 이미지가 없습니다.',
-                        style: TextStyle(
-                          fontFamily: "NotoSansKR",
-                          fontSize: 14,
-                          color: Palette.grey600,
-                        ),
-                      ),
-                      if (isAdmin) ...[
-                        SizedBox(height: 6),
-                        Text(
-                          '"업로드" 버튼을 눌러 이미지를 추가해보세요.',
-                          style: TextStyle(
-                            fontFamily: "NotoSansKR",
-                            fontSize: 12,
-                            color: Palette.grey500,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                );
-              }
-
-              return GridView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1,
-                ),
-                itemCount: images.length,
-                itemBuilder: (context, index) {
-                  GalleryImage image = images[index];
-                  return _buildMobileImageCard(image, images, index);
-                },
-              );
-            },
-          ),
+          _galleryHeader(compact: true),
+          const SizedBox(height: 14),
+          _galleryBody(compact: true),
         ],
       ),
     );
   }
 
-  Widget _buildMobileImageCard(
-      GalleryImage image, List<GalleryImage> allImages, int index) {
-    return InkWell(
-      onTap: () => _openImageViewer(allImages, index),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha:0.1),
-              blurRadius: 4,
-              offset: Offset(0, 2),
+  Widget _galleryHeader({required bool compact}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(width: 3, height: 16, color: Palette.navy),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '갤러리',
+                style: TextStyle(
+                  fontFamily: 'NotoSansKR',
+                  fontWeight: FontWeight.w800,
+                  fontSize: compact ? 18 : 20,
+                  color: Palette.navy,
+                ),
+              ),
             ),
+            if (isAdmin)
+              TextButton.icon(
+                onPressed: _showUploadDialog,
+                icon: Icon(Icons.add, size: compact ? 16 : 18),
+                label: Text(compact ? '업로드' : '사진 올리기'),
+                style: TextButton.styleFrom(
+                  foregroundColor: Palette.navy,
+                  textStyle: TextStyle(
+                    fontFamily: 'NotoSansKR',
+                    fontWeight: FontWeight.w700,
+                    fontSize: compact ? 13 : 14,
+                  ),
+                ),
+              ),
           ],
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Hero(
-                tag: image.id,
-                child: Image.memory(
-                  base64Decode(image.imageData),
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Palette.grey200,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.broken_image,
-                              color: Palette.grey400, size: 24),
-                          SizedBox(height: 4),
-                          Text(
-                            '이미지 오류',
-                            style: TextStyle(
-                              color: Palette.grey600,
-                              fontSize: 10,
-                              fontFamily: "NotoSansKR",
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
+        const SizedBox(height: 8),
+        Container(height: 1, color: Palette.grey200),
+      ],
+    );
+  }
 
-              // 확대 아이콘
-              Positioned(
-                top: 6,
-                right: 6,
-                child: Container(
-                  padding: EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha:0.5),
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                  child: Icon(
-                    Icons.zoom_in,
-                    color: Colors.white,
-                    size: 14,
-                  ),
-                ),
+  Widget _galleryBody({required bool compact}) {
+    return StreamBuilder<List<GalleryImage>>(
+      stream: GalleryService.getImagesStream(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 40),
+            child: Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Palette.darkTeal),
               ),
+            ),
+          );
+        }
 
-              // 관리자용 수정 버튼
-              if (isAdmin)
-                Positioned(
-                  top: 6,
-                  left: 6,
-                  child: Container(
-                    padding: EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha:0.5),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                    child: InkWell(
-                      onTap: () => _showEditDialog(image),
-                      child: Icon(
-                        Icons.edit,
-                        color: Colors.white,
-                        size: 14,
-                      ),
+        if (snapshot.hasError) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 32),
+            child: Center(
+              child: Text(
+                '갤러리를 불러오는 중 오류가 발생했습니다.',
+                style: TextStyle(fontFamily: 'NotoSansKR'),
+              ),
+            ),
+          );
+        }
+
+        final images = snapshot.data ?? [];
+        if (images.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 48),
+            child: Center(
+              child: Column(
+                children: [
+                  Icon(Icons.photo_library_outlined,
+                      size: 40, color: Palette.grey400),
+                  const SizedBox(height: 10),
+                  Text(
+                    '아직 올라온 사진이 없습니다.',
+                    style: TextStyle(
+                      fontFamily: 'NotoSansKR',
+                      fontSize: 14,
+                      color: Palette.grey600,
                     ),
                   ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return _galleryMasonry(images, compact: compact);
+      },
+    );
+  }
+
+  Widget _galleryMasonry(List<GalleryImage> images, {required bool compact}) {
+    const ratios = [0.82, 1.12, 0.94, 1.05, 0.76, 1.0];
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = compact
+            ? 2
+            : (constraints.maxWidth >= 980
+                ? 4
+                : constraints.maxWidth >= 680
+                    ? 3
+                    : 2);
+        final gap = compact ? 6.0 : 8.0;
+        final buckets = List.generate(columns, (_) => <int>[]);
+        for (var i = 0; i < images.length; i++) {
+          buckets[i % columns].add(i);
+        }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (var c = 0; c < columns; c++) ...[
+              if (c > 0) SizedBox(width: gap),
+              Expanded(
+                child: Column(
+                  children: [
+                    for (var j = 0; j < buckets[c].length; j++) ...[
+                      if (j > 0) SizedBox(height: gap),
+                      AspectRatio(
+                        aspectRatio: ratios[buckets[c][j] % ratios.length],
+                        child: _GalleryTile(
+                          image: images[buckets[c][j]],
+                          compact: compact,
+                          onOpen: () =>
+                              _openImageViewer(images, buckets[c][j]),
+                          onEdit: isAdmin
+                              ? () => _showEditDialog(images[buckets[c][j]])
+                              : null,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
+              ),
             ],
-          ),
-        ),
-      ),
+          ],
+        );
+      },
     );
   }
 
@@ -770,7 +472,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
         children.add(Container(
           width: 1,
           height: 40,
-          color: Palette.primaryLight,
+          color: Palette.grey300,
         ));
       }
     }
@@ -835,6 +537,114 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
             ),
           )
         ],
+      ),
+    );
+  }
+}
+
+
+class _GalleryTile extends StatefulWidget {
+  final GalleryImage image;
+  final bool compact;
+  final VoidCallback onOpen;
+  final VoidCallback? onEdit;
+
+  const _GalleryTile({
+    required this.image,
+    required this.compact,
+    required this.onOpen,
+    this.onEdit,
+  });
+
+  @override
+  State<_GalleryTile> createState() => _GalleryTileState();
+}
+
+class _GalleryTileState extends State<_GalleryTile> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final showCaption = widget.image.description.isNotEmpty &&
+        (_hover || widget.compact);
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: GestureDetector(
+        onTap: widget.onOpen,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Hero(
+                tag: widget.image.id,
+                child: Image.memory(
+                  base64Decode(widget.image.imageData),
+                  fit: BoxFit.cover,
+                  filterQuality: FilterQuality.high,
+                  errorBuilder: (context, error, stackTrace) {
+                    return ColoredBox(
+                      color: Palette.grey200,
+                      child: Icon(Icons.broken_image, color: Palette.grey400),
+                    );
+                  },
+                ),
+              ),
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 160),
+                opacity: showCaption ? 1 : 0,
+                child: const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Color(0x99000000),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              if (showCaption)
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 24, 10, 10),
+                    child: Text(
+                      widget.image.description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'NotoSansKR',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              if (widget.onEdit != null && (_hover || widget.compact))
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Material(
+                    color: Colors.black.withValues(alpha: 0.45),
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: widget.onEdit,
+                      child: const Padding(
+                        padding: EdgeInsets.all(6),
+                        child: Icon(Icons.edit, size: 14, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

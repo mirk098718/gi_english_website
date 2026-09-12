@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/Notice.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -23,12 +25,18 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
   Notice? _notice;
   bool _isLoading = true;
   bool _isAdmin = false;
+  StreamSubscription? _roleSub;
 
   @override
   void initState() {
     super.initState();
     _loadNotice();
-    _checkAdminStatus();
+    _roleSub = AuthService.listenRole((role) {
+      if (!mounted) return;
+      setState(() {
+        _isAdmin = role == AdminRole.owner;
+      });
+    });
   }
 
   Future<void> _loadNotice() async {
@@ -58,11 +66,10 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
     }
   }
 
-  Future<void> _checkAdminStatus() async {
-    bool isAdmin = await AuthService.isAdmin();
-    setState(() {
-      _isAdmin = isAdmin;
-    });
+  @override
+  void dispose() {
+    _roleSub?.cancel();
+    super.dispose();
   }
 
   @override

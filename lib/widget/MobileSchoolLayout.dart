@@ -21,7 +21,7 @@ class MobileSchoolLayout extends StatefulWidget {
 }
 
 class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
-  bool _isAdmin = false;
+  AdminRole _adminRole = AdminRole.none;
   bool _isMemberLoggedIn = AuthService.currentUser != null;
   StreamSubscription<User?>? _authSub;
 
@@ -34,6 +34,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
         setState(() {
           _isMemberLoggedIn = user != null;
         });
+        _checkAdminStatus();
       }
     });
   }
@@ -44,11 +45,14 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
     super.dispose();
   }
 
+  bool get _isStaff =>
+      _adminRole == AdminRole.owner || _adminRole == AdminRole.teacher;
+
   Future<void> _checkAdminStatus() async {
-    final isStaff = await AuthService.isStaff();
+    final role = await AuthService.getAdminRole();
     if (mounted) {
       setState(() {
-        _isAdmin = isStaff;
+        _adminRole = role;
       });
     }
   }
@@ -58,7 +62,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
       await AuthService.signOut();
       if (!mounted) return;
       setState(() {
-        _isAdmin = false;
+        _adminRole = AdminRole.none;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -142,7 +146,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
           NotificationBellButton(),
           HeaderSocialLinks(compact: true),
           SizedBox(width: 4),
-          if (_isAdmin) ...[
+          if (_isStaff) ...[
             TextButton(
               onPressed: _logout,
               child: Text(
@@ -157,7 +161,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
             TextButton(
               onPressed: () => SiteNav.goAdminHub(context),
               child: Text(
-                '관리자',
+                _adminRole == AdminRole.teacher ? '수업 관리' : '관리자',
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
