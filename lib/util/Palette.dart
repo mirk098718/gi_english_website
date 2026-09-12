@@ -104,4 +104,42 @@ class Palette {
     end: Alignment.bottomCenter,
     colors: [white, grey50],
   );
+
+  static const LinearGradient adminGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [navy, darkTealDark],
+  );
+
+  /// 관리자·로그인 화면: 남색 헤더, 청록 액션.
+  static ThemeData adminTheme(ThemeData base) {
+    return base.copyWith(
+      primaryColor: darkTeal,
+      colorScheme: base.colorScheme.copyWith(
+        primary: darkTeal,
+        secondary: navy,
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: navy,
+        foregroundColor: white,
+        elevation: 0,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: darkTeal,
+          foregroundColor: white,
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(foregroundColor: darkTeal),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: navy,
+          side: const BorderSide(color: navy),
+        ),
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(color: darkTeal),
+    );
+  }
 }

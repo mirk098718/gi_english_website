@@ -38,7 +38,9 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
   }
 
   Future<void> _loadTeachers() async {
-    final teachers = await AuthService.selectableNativeTeachers();
+    final teachers = await AuthService.selectableNativeTeachers(
+      kind: TeacherPickKind.checkout,
+    );
     if (!mounted) return;
     setState(() {
       _loading = false;

@@ -119,7 +119,7 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
         ),
         SizedBox(height: 12),
         Text(
-          '각 회차에 인강 URL, 문제풀이 링크, 학생이 스스로 체크할 학습 항목을 넣습니다.\n'
+          '각 회차에 인강 URL과 문제풀이 링크, 학생이 스스로 체크할 학습 항목을 넣습니다.\n'
           '회원은 이전 회차 화상수업을 마치면 다음 회차가 열리고, 이수한 회차는 복습할 수 있습니다.',
           style: TextStyle(
               fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
@@ -129,7 +129,7 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
           alignment: Alignment.centerLeft,
           child: ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Palette.secondaryDark,
+              backgroundColor: Palette.darkTeal,
               foregroundColor: Palette.white,
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             ),
@@ -152,7 +152,7 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
                 margin: EdgeInsets.only(bottom: 10),
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: Palette.secondaryDark,
+                    backgroundColor: Palette.darkTeal,
                     child: Text('${week.weekNumber}',
                         style: TextStyle(
                             fontFamily: "Jalnan",
@@ -495,7 +495,7 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Palette.secondaryDark,
+            backgroundColor: Palette.darkTeal,
             foregroundColor: Palette.white,
           ),
           onPressed: _saving ? null : _save,

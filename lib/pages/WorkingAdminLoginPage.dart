@@ -35,11 +35,13 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Theme(
+      data: Palette.adminTheme(Theme.of(context)),
+      child: Scaffold(
       appBar: AppBar(
         title:
             Text("운영자 로그인", style: TextStyle(fontFamily: "NotoSansKR")),
-        backgroundColor: Palette.primary,
+        backgroundColor: Palette.navy,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -56,7 +58,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
                 Icon(
                   Icons.admin_panel_settings,
                   size: 80,
-                  color: Palette.primary,
+                  color: Palette.darkTeal,
                 ),
                 SizedBox(height: 32),
                 Text(
@@ -65,7 +67,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
                   style: TextStyle(
                     fontFamily: "Jalnan",
                     fontSize: 24,
-                    color: Palette.black,
+                    color: Palette.navy,
                   ),
                 ),
                 SizedBox(height: 40),
@@ -150,7 +152,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
                       style: TextStyle(
                         fontFamily: 'NotoSansKR',
                         fontSize: 13,
-                        color: Palette.primary,
+                        color: Palette.darkTeal,
                       ),
                     ),
                   ),
@@ -159,7 +161,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
                 ElevatedButton(
                   onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
+                    backgroundColor: Palette.darkTeal,
                     padding: EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -190,6 +192,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
           ),
         ),
       ),
+    ),
     );
   }
 

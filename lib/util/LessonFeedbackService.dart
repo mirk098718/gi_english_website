@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
+import 'package:gi_english_website/util/NotificationService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
 int _intValue(dynamic value) {
@@ -113,12 +114,20 @@ class LessonFeedbackService {
   static Future<List<LessonFeedback>> listForStudent({
     String? courseId,
   }) async {
-    final user = AuthService.currentUser;
-    if (user == null) return [];
+    return await listMineForAlerts(courseId: courseId) ?? [];
+  }
+
+  /// 조회 실패 시 null. 종 알림은 빈 목록과 오류를 구분해야 한다.
+  static Future<List<LessonFeedback>?> listMineForAlerts({
+    String? courseId,
+    String? userId,
+  }) async {
+    final uid = userId ?? AuthService.currentUser?.uid ?? '';
+    if (uid.isEmpty) return [];
     try {
       final snapshot = await _firestore
           .collection(_collection)
-          .where('userId', isEqualTo: user.uid)
+          .where('userId', isEqualTo: uid)
           .get();
       final list = snapshot.docs
           .map((doc) => LessonFeedback.fromMap(doc.id, doc.data()))
@@ -131,7 +140,7 @@ class LessonFeedbackService {
       return list;
     } catch (e) {
       print('수강생 피드백 조회 오류: $e');
-      return [];
+      return null;
     }
   }
 
@@ -218,6 +227,20 @@ class LessonFeedbackService {
         if (isNew) 'createdAt': now,
       };
       await ref.set(data, SetOptions(merge: true));
+      final teacher = teacherName.trim().isEmpty ? '강사' : teacherName.trim();
+      final week = booking.weekNumber > 0 ? '${booking.weekNumber}회차' : '화상수업';
+      final sent = await NotificationService.notifyUser(
+        userId: booking.userId,
+        title: '강사 피드백',
+        body: isNew
+            ? '$teacher 선생님이 $week 피드백을 남겼습니다. 내 강의실에서 확인해 주세요.'
+            : '$teacher 선생님이 $week 피드백을 수정했습니다. 내 강의실에서 확인해 주세요.',
+        type: 'lesson_feedback',
+        bookingId: booking.id,
+      );
+      if (sent) {
+        await ref.set({'alertSentAt': now}, SetOptions(merge: true));
+      }
       return null;
     } on FirebaseException catch (e) {
       print('피드백 저장 오류: ${e.code} ${e.message}');

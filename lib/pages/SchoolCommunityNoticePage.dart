@@ -59,7 +59,7 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
 
   Widget _buildContent() {
     return Container(
-      width: MediaQuery.of(context).size.width,
+      width: double.infinity,
       padding: EdgeInsets.all(20),
       color: Palette.white,
       child: Column(

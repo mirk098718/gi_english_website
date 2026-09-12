@@ -441,6 +441,20 @@ function publicTeacherProfileId(teacherUid, data) {
   return "native_" + teacherUid;
 }
 
+function resolveBookingOffer(data, isOwner) {
+  const raw = String((data && data.bookingOffer) || "");
+  if (raw === "both" || raw === "coteach" || raw === "off") return raw;
+  if (data && (Object.prototype.hasOwnProperty.call(data, "selectableAtCheckout") ||
+      Object.prototype.hasOwnProperty.call(data, "acceptsCoTeaching"))) {
+    const checkout = data.selectableAtCheckout !== false;
+    const coteach = data.acceptsCoTeaching !== false;
+    if (!checkout && !coteach) return "off";
+    if (!checkout) return "coteach";
+    return "both";
+  }
+  return isOwner ? "coteach" : "both";
+}
+
 /// 수강생 강사 선택 화면용. admins는 수강생이 직접 읽지 못하므로 서버에서 공개 프로필만 내려준다.
 exports.listSelectableTeachers = functions
   .region("asia-northeast3")
@@ -455,6 +469,8 @@ exports.listSelectableTeachers = functions
       const name = String(data.name || "").trim();
       if (!name) continue;
       const id = publicTeacherProfileId(doc.id, data);
+      const isOwner = data.role !== "teacher";
+      const bookingOffer = resolveBookingOffer(data, isOwner);
       teachers.push({
         id,
         name,
@@ -462,7 +478,10 @@ exports.listSelectableTeachers = functions
         intro: String(data.intro || ""),
         photoUrl: String(data.photoUrl || ""),
         accountUid: doc.id,
-        isOwner: data.role !== "teacher",
+        isOwner,
+        bookingOffer,
+        selectableAtCheckout: bookingOffer === "both",
+        acceptsCoTeaching: bookingOffer === "both" || bookingOffer === "coteach",
       });
 
       db.collection("native_teacher_accounts")
@@ -476,6 +495,10 @@ exports.listSelectableTeachers = functions
             intro: String(data.intro || ""),
             photoUrl: String(data.photoUrl || ""),
             isActive: data.isActive !== false,
+            bookingOffer,
+            selectableAtCheckout: bookingOffer === "both",
+            acceptsCoTeaching:
+              bookingOffer === "both" || bookingOffer === "coteach",
             updatedAt: admin.firestore.FieldValue.serverTimestamp(),
           },
           { merge: true }
@@ -1086,5 +1109,38 @@ exports.sendWeeklyEnrollmentReminders = functions
       backfilled,
       weekKey,
     });
+    return null;
+  });
+
+exports.onLessonFeedbackWritten = functions
+  .region("asia-northeast3")
+  .firestore.document("lesson_feedbacks/{feedbackId}")
+  .onWrite(async (change) => {
+    if (!change.after.exists) return null;
+    const after = change.after.data() || {};
+    if (after.alertSentAt) return null;
+    const userId = String(after.userId || "");
+    if (!userId) return null;
+    const before = change.before.exists ? change.before.data() || {} : null;
+    if (before && String(before.content || "") === String(after.content || "")) {
+      return null;
+    }
+    const teacher = String(after.teacherName || "").trim() || "강사";
+    const weekNumber = Number(after.weekNumber || 0);
+    const week = weekNumber > 0 ? `${weekNumber}회차` : "화상수업";
+    const isNew = !change.before.exists;
+    await writeNotification({
+      userId,
+      title: "강사 피드백",
+      body: isNew
+        ? `${teacher} 선생님이 ${week} 피드백을 남겼습니다. 내 강의실에서 확인해 주세요.`
+        : `${teacher} 선생님이 ${week} 피드백을 수정했습니다. 내 강의실에서 확인해 주세요.`,
+      type: "lesson_feedback",
+      bookingId: String(after.bookingId || change.after.id),
+    });
+    await change.after.ref.set(
+      { alertSentAt: admin.firestore.FieldValue.serverTimestamp() },
+      { merge: true }
+    );
     return null;
   });

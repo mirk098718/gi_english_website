@@ -329,7 +329,7 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.black,
+                      backgroundColor: Palette.navy,
                       foregroundColor: Palette.black,
                     ),
                     onPressed: () {
@@ -370,7 +370,7 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
           Container(
             height: 2,
             width: 100,
-            color: Palette.primary,
+            color: Palette.darkTeal,
           ),
           SizedBox(height: 40),
           _buildForm(),
@@ -433,7 +433,7 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
                     _isImportant = value ?? false;
                   });
                 },
-                activeColor: Palette.primary,
+                activeColor: Palette.darkTeal,
               ),
               Text(
                 "중요한 FAQ",
@@ -505,7 +505,7 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _saveFAQ,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
+                    backgroundColor: Palette.darkTeal,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),

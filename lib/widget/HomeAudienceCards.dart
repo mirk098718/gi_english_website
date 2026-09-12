@@ -44,14 +44,10 @@ class HomeAudienceCards extends StatelessWidget {
             ),
           ),
           SizedBox(height: compact ? 20 : 28),
-          SizedBox(
-            height: compact ? 288 : 332,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: items.length,
-              separatorBuilder: (_, __) => SizedBox(width: compact ? 12 : 16),
-              itemBuilder: (context, index) => _card(context, items[index]),
-            ),
+          Wrap(
+            spacing: compact ? 12 : 16,
+            runSpacing: compact ? 12 : 16,
+            children: items.map((item) => _card(context, item)).toList(),
           ),
           SizedBox(height: compact ? 28 : 36),
           _campusShortcut(context),

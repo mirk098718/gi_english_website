@@ -149,7 +149,7 @@ class _AccountRecoveryDialogState extends State<AccountRecoveryDialog> {
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Palette.secondaryDark,
+            backgroundColor: Palette.darkTeal,
             foregroundColor: Palette.white,
           ),
           onPressed: _sending ? null : _sendReset,

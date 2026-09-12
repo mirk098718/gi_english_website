@@ -118,7 +118,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
 
   Widget content() {
     return Container(
-      width: MediaQuery.of(context).size.width,
+      width: double.infinity,
       padding: EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
       color: Palette.white,
       child: Column(
@@ -141,53 +141,70 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
           SizedBox(
             height: 20,
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                    alignment: Alignment.topLeft,
-                    width: 150,
-                    height: 300,
-                    child: Image.asset("assets/directorPhoto.jpeg")),
-                SizedBox(
-                  width: 20,
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final photo = SizedBox(
+                width: 150,
+                height: 300,
+                child: Image.asset(
+                  "assets/directorPhoto.jpeg",
+                  fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
                 ),
-                Text(
-                    style: TextStyle(
-                        color: Palette.black,
-                        fontFamily: "NotoSansKR",
-                        fontSize: 14),
-                    "Mia Kim \n\n"
-                    "현 Gi 글림아일랜드 어학원 파주 원장\n"
-                    "전 서대문구 소재 청담 에이프릴 어학원 교수부장\n"
-                    "서대문구 소재 위즈빌 어학원 영어 유초등부 강사\n"
-                    "하이잉글리쉬 대기업 출강강사 (현대케피코, 두산중공업 등)\n"
-                    "강남 유명 OPIC (영어 구술 시험) 전문 어학원 강사\n"
-                    "비욘드 어학원 초, 중등 강사\n"
-                    "JTBC 다큐멘터리 “스포츠관광을 디렉팅하라” 영문번역"),
-                SizedBox(
-                  width: 20,
-                ),
-                Text(
-                    style: TextStyle(
-                        color: Palette.black,
-                        fontFamily: "NotoSansKR",
-                        fontSize: 14),
-                    "학력 및 자격\n"
-                    "\n"
-                    "뉴질랜드 오클랜드 공과 대학교\n"
-                    "(Auckland University of Technology) 석사졸\n"
-                    "뉴질랜드 오클랜드 소재 Glenfield College 고등학교 졸\n"
-                    "TESOL 영어 강사 자격 보유\n"
-                    "(Certificate in Teaching English as a Second Language)\n"
-                    "(Queens Academic Group)")
-              ],
-            ),
+              );
+              final bio = Text(
+                "Mia Kim \n\n"
+                "현 Gi 글림아일랜드 어학원 파주 원장\n"
+                "전 서대문구 소재 청담 에이프릴 어학원 교수부장\n"
+                "서대문구 소재 위즈빌 어학원 영어 유초등부 강사\n"
+                "하이잉글리쉬 대기업 출강강사 (현대케피코, 두산중공업 등)\n"
+                "강남 유명 OPIC (영어 구술 시험) 전문 어학원 강사\n"
+                "비욘드 어학원 초, 중등 강사\n"
+                "JTBC 다큐멘터리 “스포츠관광을 디렉팅하라” 영문번역",
+                style: TextStyle(
+                    color: Palette.black,
+                    fontFamily: "NotoSansKR",
+                    fontSize: 14),
+              );
+              final creds = Text(
+                "학력 및 자격\n"
+                "\n"
+                "뉴질랜드 오클랜드 공과 대학교\n"
+                "(Auckland University of Technology) 석사졸\n"
+                "뉴질랜드 오클랜드 소재 Glenfield College 고등학교 졸\n"
+                "TESOL 영어 강사 자격 보유\n"
+                "(Certificate in Teaching English as a Second Language)\n"
+                "(Queens Academic Group)",
+                style: TextStyle(
+                    color: Palette.black,
+                    fontFamily: "NotoSansKR",
+                    fontSize: 14),
+              );
+              if (constraints.maxWidth >= 720) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    photo,
+                    SizedBox(width: 20),
+                    Expanded(child: bio),
+                    SizedBox(width: 20),
+                    Expanded(child: creds),
+                  ],
+                );
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  photo,
+                  SizedBox(height: 16),
+                  bio,
+                  SizedBox(height: 16),
+                  creds,
+                ],
+              );
+            },
           ),
-          Container(child: Image.asset("assets/teachers.png")),
+          WidgetUtil.pageImage("assets/teachers.png", maxWidth: 900),
           SizedBox(height: 40),
           Text(
             "운영시스템",

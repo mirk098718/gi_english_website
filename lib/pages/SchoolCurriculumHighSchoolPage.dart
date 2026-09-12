@@ -112,65 +112,21 @@ class _SchoolCurriculumHighSchoolPageState
   }
 
   Widget content() {
-    return SingleChildScrollView(
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        alignment: Alignment.topLeft,
-        padding: EdgeInsets.all(20),
-        color: Palette.white,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "정규 고등부 Curriculum",
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
-            ),
-            WidgetUtil.myDivider(),
-            SizedBox(height: 20),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _imageSlot('시간표'),
-                SizedBox(height: 20),
-                _imageSlot('커리큘럼'),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _imageSlot(String label) {
     return Container(
-      width: 700,
-      height: 280,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Palette.grey50,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Palette.grey200),
-      ),
+      width: double.infinity,
+      alignment: Alignment.topLeft,
+      padding: EdgeInsets.all(20),
+      color: Palette.white,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            label,
-            style: TextStyle(
-              fontFamily: "Jalnan",
-              fontSize: 16,
-              color: Palette.grey700,
-            ),
+            "정규 고등부 Curriculum",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
-          SizedBox(height: 8),
-          Text(
-            '곧 업데이트합니다.',
-            style: TextStyle(
-              fontFamily: "NotoSansKR",
-              fontSize: 14,
-              color: Palette.grey500,
-            ),
-          ),
+          WidgetUtil.myDivider(),
+          SizedBox(height: 20),
+          WidgetUtil.pageImage("assets/highInfo.png"),
         ],
       ),
     );

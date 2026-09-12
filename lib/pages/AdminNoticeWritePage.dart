@@ -254,7 +254,7 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.black,
+                      backgroundColor: Palette.navy,
                       foregroundColor: Palette.black,
                     ),
                     onPressed: () {
@@ -295,7 +295,7 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
           Container(
             height: 2,
             width: 100,
-            color: Palette.primary,
+            color: Palette.darkTeal,
           ),
           SizedBox(height: 40),
           _buildForm(),
@@ -339,7 +339,7 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
                     _isImportant = value ?? false;
                   });
                 },
-                activeColor: Palette.primary,
+                activeColor: Palette.darkTeal,
               ),
               Text(
                 "중요 공지사항",
@@ -411,7 +411,7 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _saveNotice,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
+                    backgroundColor: Palette.darkTeal,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),

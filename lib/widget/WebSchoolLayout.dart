@@ -7,6 +7,7 @@ import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/GleamMark.dart';
 import 'package:gi_english_website/widget/HeaderSocialLinks.dart';
+import 'package:gi_english_website/widget/NotificationBellButton.dart';
 import 'package:gi_english_website/widget/SiteNav.dart';
 
 enum _HeaderMenu { none, courses, campus }
@@ -241,6 +242,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                NotificationBellButton(),
                 HeaderSocialLinks(),
                 SizedBox(width: 12),
                 ..._accountActions(),

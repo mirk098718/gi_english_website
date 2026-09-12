@@ -7,9 +7,15 @@ import 'package:gi_english_website/util/LessonFeedbackService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
+import 'package:gi_english_website/pages/AdminTeacherScheduleTab.dart';
+import 'package:gi_english_website/pages/StudentDetailPage.dart';
+import 'package:gi_english_website/widget/AdminContentWidth.dart';
 import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
+import 'package:gi_english_website/widget/TeacherMonthLessonSummary.dart';
+import 'package:gi_english_website/widget/NotificationBellButton.dart';
 
 /// 강사 프로필 · 담당 회원 · 화상수업 입장/종료 · 피드백.
+/// 강사 관리에서 열면 스케줄과 한달 이력 탭이 함께 보인다.
 class TeacherRosterPage extends StatelessWidget {
   final Map<String, dynamic>? teacher;
   final bool embedded;
@@ -24,16 +30,65 @@ class TeacherRosterPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final body = TeacherRosterView(teacher: teacher);
     if (embedded) return body;
-    return Scaffold(
-      backgroundColor: Palette.white,
-      appBar: AppBar(
-        title: Text('강사 프로필 · 담당 회원',
-            style: TextStyle(fontFamily: "NotoSansKR")),
-        backgroundColor: Palette.secondaryDark,
-        foregroundColor: Palette.white,
+    final uid = teacher?['uid']?.toString() ?? '';
+    final name = teacher?['name']?.toString() ?? '강사';
+    Widget themed(Widget child) {
+      return Theme(data: Palette.adminTheme(Theme.of(context)), child: child);
+    }
+
+    if (uid.isEmpty) {
+      return themed(Scaffold(
+        backgroundColor: Palette.white,
+        appBar: AppBar(
+          title: Text('강사 프로필 · 담당 회원',
+              style: TextStyle(fontFamily: "NotoSansKR")),
+          backgroundColor: Palette.navy,
+          foregroundColor: Palette.white,
+          actions: const [
+            NotificationBellButton(light: true),
+            SizedBox(width: 8),
+          ],
+        ),
+        body: AdminContentWidth(child: body),
+      ));
+    }
+    return themed(DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        backgroundColor: Palette.white,
+        appBar: AppBar(
+          title: Text(name, style: TextStyle(fontFamily: "NotoSansKR")),
+          backgroundColor: Palette.navy,
+          foregroundColor: Palette.white,
+          actions: const [
+            NotificationBellButton(light: true),
+            SizedBox(width: 8),
+          ],
+          bottom: TabBar(
+            isScrollable: true,
+            indicatorColor: Palette.white,
+            labelColor: Palette.white,
+            unselectedLabelColor: Palette.white.withValues(alpha: 0.7),
+            labelStyle: TextStyle(
+                fontFamily: "NotoSansKR", fontWeight: FontWeight.bold),
+            tabs: const [
+              Tab(text: '프로필·회원'),
+              Tab(text: '스케줄·예약'),
+              Tab(text: '한달 이력'),
+            ],
+          ),
+        ),
+        body: AdminContentWidth(
+          child: TabBarView(
+            children: [
+              body,
+              AdminTeacherScheduleTab(teacherUid: uid),
+              TeacherMonthHistoryPanel(teacherUid: uid, teacherName: name),
+            ],
+          ),
+        ),
       ),
-      body: body,
-    );
+    ));
   }
 }
 
@@ -366,6 +421,16 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                               fontSize: 13,
                               color: Palette.grey600)),
                     ],
+                    if (_canWrite && AuthService.bankLabel(teacher).isNotEmpty) ...[
+                      SizedBox(height: 6),
+                      Text(
+                        AuthService.bankLabel(teacher),
+                        style: TextStyle(
+                            fontFamily: "NotoSansKR",
+                            fontSize: 13,
+                            color: Palette.grey600),
+                      ),
+                    ],
                     if (nationality.isNotEmpty) ...[
                       SizedBox(height: 8),
                       Container(
@@ -406,9 +471,116 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                 fontSize: 12,
                 color: Palette.grey500),
           ),
+          if (isOwnerTeacher && _canWrite) ...[
+            SizedBox(height: 16),
+            Text('수업 받기',
+                style: TextStyle(fontFamily: "Jalnan", fontSize: 14)),
+            SizedBox(height: 6),
+            Text(
+              '결제 때 고르는 강사와, 다른 강사 수강생의 코티칭을 따로 켤 수 있습니다.',
+              style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 12,
+                  color: Palette.grey600),
+            ),
+            SizedBox(height: 10),
+            _offerTile(TeacherBookingOffer.both),
+            _offerTile(TeacherBookingOffer.coteach),
+            _offerTile(TeacherBookingOffer.off),
+          ],
         ],
       ),
     );
+  }
+
+  String get _bookingOffer =>
+      TeacherBookingOffer.resolve(_teacher, isOwner: true);
+
+  Widget _offerTile(String offer) {
+    final selected = _bookingOffer == offer;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: selected
+            ? Palette.secondaryDark.withValues(alpha: 0.08)
+            : Palette.white,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          onTap: _busy ? null : () => _setBookingOffer(offer),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: double.maxFinite,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: selected ? Palette.secondaryDark : Palette.grey200,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  selected
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_off,
+                  size: 20,
+                  color: selected ? Palette.secondaryDark : Palette.grey400,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        TeacherBookingOffer.label(offer),
+                        style: TextStyle(
+                          fontFamily: "NotoSansKR",
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        TeacherBookingOffer.description(offer),
+                        style: TextStyle(
+                          fontFamily: "NotoSansKR",
+                          fontSize: 12,
+                          color: Palette.grey600,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _setBookingOffer(String offer) async {
+    if (_bookingOffer == offer || _teacherUid.isEmpty) return;
+    setState(() => _busy = true);
+    final error = await AuthService.updateBookingOffer(
+      teacherUid: _teacherUid,
+      offer: offer,
+    );
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      if (error == null) {
+        final next = Map<String, dynamic>.from(_teacher ?? {});
+        next['bookingOffer'] = offer;
+        _teacher = next;
+      }
+    });
+    if (error != null) {
+      _toast(error, error: true);
+      return;
+    }
+    _toast('수업 받기 설정을 저장했습니다.');
   }
 
   Widget _photo(String url, double size) {
@@ -478,6 +650,30 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                 fontFamily: "NotoSansKR", fontSize: 12, color: Palette.grey600),
           ),
           children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => StudentDetailPage(
+                        member: member,
+                        teacherName: guest
+                            ? assignedTeacherName
+                            : AuthService.memberTeacherName(member),
+                      ),
+                    ),
+                  );
+                  if (!mounted) return;
+                  await _load();
+                },
+                icon: Icon(Icons.person_outline, size: 18),
+                label: Text('회원 상세 · 결제',
+                    style: TextStyle(fontFamily: "NotoSansKR")),
+              ),
+            ),
+            SizedBox(height: 8),
             Align(
               alignment: Alignment.centerLeft,
               child: StudentLearningProgressPanel(
@@ -574,7 +770,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
               if (canHost)
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
+                    backgroundColor: Palette.darkTeal,
                     foregroundColor: Palette.white,
                     visualDensity: VisualDensity.compact,
                   ),

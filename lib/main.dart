@@ -5,6 +5,7 @@ import 'package:gi_english_website/firebase_options.dart';
 import 'package:gi_english_website/pages/PaymentResultPage.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:gi_english_website/util/NoticeService.dart';
+import 'package:gi_english_website/util/SiteAlertCenter.dart';
 
 import 'pages/AdminTeacherScheduleTab.dart';
 import 'pages/SchoolAboutPage.dart';
@@ -20,6 +21,7 @@ Future<void> main() async {
 
   // 달력 등 한글 로케일(요일/월 이름) 사용을 위한 초기화
   await initializeDateFormatting('ko_KR', null);
+  SiteAlertCenter.instance.start();
 
   runApp(MyApp());
 }
@@ -27,13 +29,16 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return Listener(
+      onPointerDown: (_) => SiteAlertCenter.instance.unlockAudio(),
+      child: MaterialApp(
         scrollBehavior: MyCustomScrollBehavior(),
         title: 'Gleam Island Homepage',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: _resolveHome());
+        home: _resolveHome()),
+    );
   }
 
   /// 토스 결제 리다이렉트 URL(/payment/success|fail)을 앱 시작 시 처리한다.

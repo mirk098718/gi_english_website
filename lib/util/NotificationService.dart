@@ -36,10 +36,43 @@ class AppNotification {
           : DateTime.now(),
     );
   }
+
+  AppNotification copyWith({bool? read}) {
+    return AppNotification(
+      id: id,
+      userId: userId,
+      title: title,
+      body: body,
+      type: type,
+      bookingId: bookingId,
+      read: read ?? this.read,
+      createdAt: createdAt,
+    );
+  }
 }
 
 class NotificationService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  static Stream<List<AppNotification>> watchMine({
+    String? userId,
+    int limit = 40,
+  }) {
+    final uid = userId ?? AuthService.currentUser?.uid ?? '';
+    if (uid.isEmpty) return Stream.value(const []);
+    return _firestore
+        .collection('notifications')
+        .where('userId', isEqualTo: uid)
+        .limit(limit)
+        .snapshots()
+        .map((snapshot) {
+      final list = snapshot.docs
+          .map((doc) => AppNotification.fromMap(doc.id, doc.data()))
+          .toList();
+      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return list;
+    });
+  }
 
   static Future<List<AppNotification>> listMine({int limit = 20}) async {
     final user = AuthService.currentUser;
@@ -58,6 +91,31 @@ class NotificationService {
     } catch (e) {
       print('알림 조회 오류: $e');
       return [];
+    }
+  }
+
+  static Future<bool> notifyUser({
+    required String userId,
+    required String title,
+    required String body,
+    required String type,
+    String bookingId = '',
+  }) async {
+    if (userId.isEmpty) return false;
+    try {
+      await _firestore.collection('notifications').add({
+        'userId': userId,
+        'title': title,
+        'body': body,
+        'type': type,
+        'bookingId': bookingId,
+        'read': false,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      return true;
+    } catch (e) {
+      print('알림 생성 오류: $e');
+      return false;
     }
   }
 

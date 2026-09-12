@@ -52,14 +52,11 @@ class AcademyHomeCards extends StatelessWidget {
             ),
           ),
           SizedBox(height: compact ? 20 : 28),
-          SizedBox(
-            height: compact ? 288 : 332,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: programs.length,
-              separatorBuilder: (_, __) => SizedBox(width: compact ? 12 : 16),
-              itemBuilder: (context, index) => _card(context, programs[index]),
-            ),
+          Wrap(
+            spacing: compact ? 12 : 16,
+            runSpacing: compact ? 12 : 16,
+            children:
+                programs.map((item) => _card(context, item)).toList(),
           ),
           SizedBox(height: compact ? 28 : 36),
           Text(
@@ -73,14 +70,10 @@ class AcademyHomeCards extends StatelessWidget {
             ),
           ),
           SizedBox(height: 12),
-          SizedBox(
-            height: compact ? 288 : 332,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: guides.length,
-              separatorBuilder: (_, __) => SizedBox(width: compact ? 12 : 16),
-              itemBuilder: (context, index) => _card(context, guides[index]),
-            ),
+          Wrap(
+            spacing: compact ? 12 : 16,
+            runSpacing: compact ? 12 : 16,
+            children: guides.map((item) => _card(context, item)).toList(),
           ),
         ],
       ),

@@ -111,35 +111,28 @@ class _SchoolCurriculumMiddleSchoolPageState
   }
 
   Widget content() {
-    return SingleChildScrollView(
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        alignment: Alignment.topLeft,
-        padding: EdgeInsets.all(20),
-        color: Palette.white,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "정규 중등부 Curriculum",
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
-            ),
-            WidgetUtil.myDivider(),
-            SizedBox(height: 20),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 700,
-                  child: Image.asset("assets/middleschoolNewTimetable.png"),
-                ),
-                SizedBox(height: 20),
-                Container(
-                  width: 700,
-                  child: Image.asset("assets/middleschoolNewMainImage.png"),
-                ),
-              ],
-            ),
+    return Container(
+      width: double.infinity,
+      alignment: Alignment.topLeft,
+      padding: EdgeInsets.all(20),
+      color: Palette.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "정규 중등부 Curriculum",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
+          ),
+          WidgetUtil.myDivider(),
+          SizedBox(height: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              WidgetUtil.pageImage("assets/middleschoolNewTimetable.png"),
+              SizedBox(height: 20),
+              WidgetUtil.pageImage("assets/middleschoolNewMainImage.png"),
+            ],
+          ),
 
             // SizedBox(height: 40),
             // Text(
@@ -191,11 +184,10 @@ class _SchoolCurriculumMiddleSchoolPageState
             // //     "Lexile 수준은 책의 난이도와 가독성에 따라 과학적, 수학적으로 지정됩니다.\n"
             // //     "자녀의 Lexile 수준을 알면 이 수준에 맞는 책을 검색하여 가정 도서관을 확장하고 가정에서 매일 읽기 연습을 장려할 수 있습니다.\n"
             // //     "Lexile 데이터베이스를 사용하여 Lexile 수준, 제목 또는 주제별로 검색하여 자녀가 좋아하고 읽기 성취도에 낙담하지 않고 읽을 수 있는 책을 찾으십시오.\n"
-            // //     "아래 차트를 사용하여 Lexile 수준을 다른 수준별 읽기 시스템과 비교하십시오:"),
+            //             //     "아래 차트를 사용하여 Lexile 수준을 다른 수준별 읽기 시스템과 비교하십시오:"),
           ],
         ),
-      ),
-    );
+      );
   }
 
   Widget scrollView() {

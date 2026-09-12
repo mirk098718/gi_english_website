@@ -319,10 +319,16 @@ class PaymentService {
   static Future<List<PaymentOrder>> myPayments() async {
     final user = AuthService.currentUser;
     if (user == null) return [];
+    return paymentsForUser(user.uid);
+  }
+
+  /// 특정 회원의 결제 목록 (관리자 상세용).
+  static Future<List<PaymentOrder>> paymentsForUser(String userId) async {
+    if (userId.isEmpty) return [];
     try {
       final snapshot = await _firestore
           .collection('payments')
-          .where('userId', isEqualTo: user.uid)
+          .where('userId', isEqualTo: userId)
           .get();
       final list = snapshot.docs
           .map((d) => PaymentOrder.fromMap(d.id, d.data()))
@@ -334,7 +340,7 @@ class PaymentService {
       });
       return list;
     } catch (e) {
-      print('내 결제 조회 오류: $e');
+      print('회원 결제 조회 오류: $e');
       return [];
     }
   }

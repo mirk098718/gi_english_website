@@ -7,6 +7,7 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/GleamMark.dart';
 import 'package:gi_english_website/widget/HeaderSocialLinks.dart';
+import 'package:gi_english_website/widget/NotificationBellButton.dart';
 import 'package:gi_english_website/widget/SiteNav.dart';
 
 class MobileSchoolLayout extends StatefulWidget {
@@ -138,6 +139,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
               ),
             ),
           ),
+          NotificationBellButton(),
           HeaderSocialLinks(compact: true),
           SizedBox(width: 4),
           if (_isAdmin) ...[

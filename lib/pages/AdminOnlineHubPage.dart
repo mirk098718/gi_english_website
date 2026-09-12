@@ -12,17 +12,21 @@ import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
-import 'package:gi_english_website/util/PaymentService.dart';
 import 'package:gi_english_website/pages/AdminTeacherScheduleTab.dart';
 import 'package:gi_english_website/pages/AdminWeekCurriculumTab.dart';
+import 'package:gi_english_website/pages/AdminMembersHubPage.dart';
+import 'package:gi_english_website/pages/AdminPaymentTab.dart';
+import 'package:gi_english_website/pages/StudentDetailPage.dart';
 import 'package:gi_english_website/pages/TeacherRosterPage.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
 import 'package:gi_english_website/widget/TeacherPhotoCropDialog.dart';
 import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
+import 'package:gi_english_website/widget/AdminContentWidth.dart';
+import 'package:gi_english_website/widget/NotificationBellButton.dart';
 
 /// 관리자/강사용 온라인 프로그램 관리 허브.
-/// - 메인 관리자: 수강·결제, 스케줄, 강사 관리, 강의 업로드, 주간 학습
-/// - 원어민 강사: 스케줄·예약 컨펌, 회원관리(화상 입장·종료·피드백)
+/// - 메인 관리자: 회원관리(내 스케줄·내 수강생·전체 스케줄·모든 수강생), 결제·정산, 강사 관리, 주간 학습
+/// - 원어민 강사: 회원관리(내 스케줄·내 수강생)
 class AdminOnlineHubPage extends StatefulWidget {
   const AdminOnlineHubPage({Key? key}) : super(key: key);
 
@@ -70,9 +74,10 @@ class _AdminOnlineHubPageState extends State<AdminOnlineHubPage>
       return;
     }
 
-    final tabCount = role == AdminRole.owner ? 7 : 2;
     _tabController?.dispose();
-    _tabController = TabController(length: tabCount, vsync: this);
+    _tabController = role == AdminRole.owner
+        ? TabController(length: 4, vsync: this)
+        : null;
 
     setState(() {
       _role = role;
@@ -84,69 +89,77 @@ class _AdminOnlineHubPageState extends State<AdminOnlineHubPage>
     }
   }
 
+  Widget _shell(Widget child) {
+    return Theme(data: Palette.adminTheme(Theme.of(context)), child: child);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_checking) {
-      return Scaffold(
+      return _shell(const Scaffold(
         body: Center(child: CircularProgressIndicator()),
-      );
+      ));
     }
-    if (!_authorized || _tabController == null) {
-      return Scaffold(body: SizedBox.shrink());
+    if (!_authorized) {
+      return _shell(const Scaffold(body: SizedBox.shrink()));
     }
 
     final isOwner = _role == AdminRole.owner;
+    final members = AdminMembersHubPage(
+      role: isOwner ? AdminRole.owner : AdminRole.teacher,
+      mySchedule: const AdminTeacherScheduleTab(),
+      myStudents: isOwner
+          ? AdminEnrollmentTab(
+              role: AdminRole.owner,
+              mineAndCoteachOnly: true,
+            )
+          : const TeacherRosterPage(embedded: true),
+    );
 
-    return Scaffold(
+    return _shell(Scaffold(
       appBar: AppBar(
         title: Text(
           isOwner ? '온라인 프로그램 관리' : '수업 관리',
           style: TextStyle(fontFamily: "NotoSansKR"),
         ),
-        backgroundColor: Palette.secondaryDark,
+        backgroundColor: Palette.navy,
         foregroundColor: Palette.white,
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          indicatorColor: Palette.white,
-          labelColor: Palette.white,
-          unselectedLabelColor: Palette.white.withValues(alpha: 0.7),
-          labelStyle:
-              TextStyle(fontFamily: "NotoSansKR", fontWeight: FontWeight.bold),
-          tabs: isOwner
-              ? [
-                  Tab(text: '수강·결제'),
-                  Tab(text: '결제내역'),
-                  Tab(text: '스케줄 · 예약'),
-                  Tab(text: '화상수업'),
-                  Tab(text: '강사 관리'),
-                  Tab(text: '강의 업로드'),
-                  Tab(text: '주간 학습'),
-                ]
-              : [
-                  Tab(text: '스케줄 · 예약'),
+        actions: const [
+          NotificationBellButton(light: true),
+          SizedBox(width: 8),
+        ],
+        bottom: isOwner
+            ? TabBar(
+                controller: _tabController,
+                isScrollable: true,
+                indicatorColor: Palette.white,
+                labelColor: Palette.white,
+                unselectedLabelColor: Palette.white.withValues(alpha: 0.7),
+                labelStyle: TextStyle(
+                    fontFamily: "NotoSansKR", fontWeight: FontWeight.bold),
+                tabs: const [
                   Tab(text: '회원관리'),
+                  Tab(text: '결제내역'),
+                  Tab(text: '강사 관리'),
+                  Tab(text: '주간 학습'),
                 ],
-        ),
+              )
+            : null,
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: isOwner
-            ? [
-                AdminEnrollmentTab(role: AdminRole.owner),
-                AdminPaymentTab(),
-                AdminTeacherScheduleTab(showAllBookings: true),
-                AdminSessionTab(),
-                AdminTeacherTab(),
-                AdminLessonTab(),
-                AdminWeekCurriculumTab(),
-              ]
-            : [
-                AdminTeacherScheduleTab(),
-                TeacherRosterPage(embedded: true),
-              ],
+      body: AdminContentWidth(
+        child: isOwner
+            ? TabBarView(
+                controller: _tabController,
+                children: [
+                  members,
+                  AdminPaymentTab(),
+                  AdminTeacherTab(),
+                  AdminWeekCurriculumTab(),
+                ],
+              )
+            : members,
       ),
-    );
+    ));
   }
 }
 
@@ -156,8 +169,12 @@ class _AdminOnlineHubPageState extends State<AdminOnlineHubPage>
 
 class AdminEnrollmentTab extends StatefulWidget {
   final AdminRole role;
+  final bool mineAndCoteachOnly;
 
-  AdminEnrollmentTab({this.role = AdminRole.owner});
+  AdminEnrollmentTab({
+    this.role = AdminRole.owner,
+    this.mineAndCoteachOnly = false,
+  });
 
   @override
   _AdminEnrollmentTabState createState() => _AdminEnrollmentTabState();
@@ -248,12 +265,12 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
     List<Map<String, dynamic>> members;
     List<EnrollmentRecord> enrollments;
 
-    if (_isOwner) {
+    if (_isOwner && !widget.mineAndCoteachOnly) {
       members = await AuthService.listMembers();
       enrollments = await EnrollmentService.listEnrollments();
     } else {
       final uid = _staffUid ?? await AuthService.getStaffUid() ?? '';
-      members = await AuthService.listMembers(teacherId: uid);
+      members = await _membersForTeacher(uid);
       final memberIds = members.map((m) => m['uid']?.toString() ?? '').toList();
       enrollments =
           await EnrollmentService.listEnrollments(memberIds: memberIds);
@@ -268,6 +285,39 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
       _loading = false;
     });
     _bannerKey.currentState?.reload();
+  }
+
+  Future<List<Map<String, dynamic>>> _membersForTeacher(String teacherUid) async {
+    if (teacherUid.isEmpty) return [];
+    final assigned =
+        await AuthService.listMembers(teacherId: teacherUid, limit: 500);
+    final byId = <String, Map<String, dynamic>>{};
+    for (final member in assigned) {
+      final id = member['uid']?.toString() ?? '';
+      if (id.isEmpty) continue;
+      byId[id] = member;
+    }
+    final bookings =
+        await EnrollmentService.weekBookingsForTeacher(teacherUid);
+    for (final booking in bookings) {
+      if (booking.userId.isEmpty || byId.containsKey(booking.userId)) continue;
+      byId[booking.userId] = {
+        'uid': booking.userId,
+        'name': booking.memberName,
+        'email': booking.email,
+        'assignedTeacherName': booking.assignedTeacherName,
+        'isCoteachGuest': true,
+      };
+    }
+    final list = byId.values.toList()
+      ..sort((a, b) {
+        final guestA = a['isCoteachGuest'] == true;
+        final guestB = b['isCoteachGuest'] == true;
+        if (guestA != guestB) return guestA ? 1 : -1;
+        return (a['name']?.toString() ?? '')
+            .compareTo(b['name']?.toString() ?? '');
+      });
+    return list;
   }
 
   void _toast(String message, {bool error = false}) {
@@ -287,119 +337,133 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
         padding: EdgeInsets.all(20),
         children: [
           LiveSessionBanner(key: _bannerKey, hostName: _adminName),
-          Text(_isOwner ? '회원에게 과정 배정' : '담당 회원에게 과정 배정',
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 18)),
+          Text('내 수강생 관리', style: TextStyle(fontFamily: "Jalnan", fontSize: 18)),
           SizedBox(height: 8),
           Text(
-            _isOwner
-                ? '회원가입이 완료된 회원의 이메일로 과정을 배정합니다. 배정된 과정은 해당 회원의 내 강의실에 표시됩니다.'
-                : '메인 관리자가 나에게 배정한 회원에게만 과정을 등록하고 회차를 차감할 수 있습니다.',
+            '나에게 배정된 수강생과, 코티칭으로 들어온 수강생만 보여 줍니다. '
+            '회차 차감과 결제 기록을 여기서 관리하세요.',
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
-          SizedBox(height: 16),
-          TextField(
-            controller: emailController,
-            decoration: InputDecoration(
-              labelText: '회원 이메일',
-              border: OutlineInputBorder(),
-              filled: true,
-              fillColor: Palette.white,
-            ),
-          ),
           SizedBox(height: 12),
-          DropdownButtonFormField<OnlineCourse>(
-            initialValue: _selectedCourse,
-            decoration: InputDecoration(
-              labelText: '과정 선택',
-              border: OutlineInputBorder(),
-              filled: true,
-              fillColor: Palette.white,
-            ),
-            items: OnlineCourse.all
-                .map((c) => DropdownMenuItem(
-                      value: c,
-                      child: Text('${c.order}. ${c.title} (${c.subtitle})',
-                          style: TextStyle(
-                              fontFamily: "NotoSansKR", fontSize: 13)),
-                    ))
-                .toList(),
-            onChanged: (value) {
-              setState(() {
-                _selectedCourse = value;
-              });
-            },
-          ),
-          SizedBox(height: 12),
-          TextField(
-            controller: sessionsController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              labelText: '전체 화상수업 횟수',
-              suffixText: '회',
-              border: OutlineInputBorder(),
-              filled: true,
-              fillColor: Palette.white,
-            ),
-          ),
-          SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Palette.secondaryDark,
-                foregroundColor: Palette.white,
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              initiallyExpanded: false,
+              tilePadding: EdgeInsets.zero,
+              childrenPadding: EdgeInsets.only(bottom: 8),
+              leading: Icon(Icons.playlist_add, color: Palette.navy),
+              title: Text('수동 과정 배정',
+                  style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+              subtitle: Text(
+                '오프라인 이전, 체험, 결제 복구가 필요할 때만 펼치세요.',
+                style: TextStyle(
+                    fontFamily: "NotoSansKR",
+                    fontSize: 12,
+                    color: Palette.grey600),
               ),
-              onPressed: _saving ? null : _assign,
-              child: _saving
-                  ? SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Palette.white),
-                    )
-                  : Text('배정하기', style: TextStyle(fontFamily: "Jalnan")),
+              children: [
+                TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    labelText: '회원 이메일',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Palette.white,
+                  ),
+                ),
+                SizedBox(height: 12),
+                DropdownButtonFormField<OnlineCourse>(
+                  initialValue: _selectedCourse,
+                  decoration: InputDecoration(
+                    labelText: '과정 선택',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Palette.white,
+                  ),
+                  items: OnlineCourse.all
+                      .map((c) => DropdownMenuItem(
+                            value: c,
+                            child: Text('${c.order}. ${c.title} (${c.subtitle})',
+                                style: TextStyle(
+                                    fontFamily: "NotoSansKR", fontSize: 13)),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedCourse = value;
+                    });
+                  },
+                ),
+                SizedBox(height: 12),
+                TextField(
+                  controller: sessionsController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: '전체 화상수업 횟수',
+                    suffixText: '회',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Palette.white,
+                  ),
+                ),
+                SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Palette.darkTeal,
+                      foregroundColor: Palette.white,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                    ),
+                    onPressed: _saving ? null : _assign,
+                    child: _saving
+                        ? SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Palette.white),
+                          )
+                        : Text('배정하기', style: TextStyle(fontFamily: "Jalnan")),
+                  ),
+                ),
+                if (_members.isNotEmpty) ...[
+                  SizedBox(height: 16),
+                  Text('담당·코티칭 회원에서 이메일 채우기',
+                      style: TextStyle(fontFamily: "Jalnan", fontSize: 14)),
+                  ..._members.take(12).map((m) {
+                    final email = m['email']?.toString() ?? '';
+                    final name = m['name']?.toString() ?? '';
+                    if (email.isEmpty) return SizedBox.shrink();
+                    return ListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      title: Text('$name ($email)',
+                          style:
+                              TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
+                      trailing: TextButton(
+                        onPressed: () {
+                          emailController.text = email;
+                        },
+                        child: Text('선택',
+                            style: TextStyle(
+                                fontFamily: "NotoSansKR",
+                                color: Palette.secondaryDark)),
+                      ),
+                    );
+                  }),
+                ],
+              ],
             ),
           ),
-          SizedBox(height: 28),
-          Text(_isOwner ? '최근 가입 회원' : '내 담당 회원',
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
-          SizedBox(height: 8),
-          if (_members.isEmpty)
-            Text(
-                _isOwner
-                    ? '가입된 회원이 없습니다.'
-                    : '배정된 회원이 없습니다. 메인 관리자에게 회원 배정을 요청하세요.',
-                style:
-                    TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500))
-          else
-            ...(_isOwner ? _members.take(8) : _members).map((m) {
-              final email = m['email']?.toString() ?? '';
-              final name = m['name']?.toString() ?? '';
-              return ListTile(
-                dense: true,
-                contentPadding: EdgeInsets.zero,
-                title: Text('$name ($email)',
-                    style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
-                trailing: TextButton(
-                  onPressed: () {
-                    emailController.text = email;
-                  },
-                  child: Text('선택',
-                      style: TextStyle(
-                          fontFamily: "NotoSansKR",
-                          color: Palette.secondaryDark)),
-                ),
-              );
-            }),
           if (_isOwner) ...[
             Divider(height: 32),
             Text('결제·수강 내역 요약',
                 style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
             SizedBox(height: 8),
             Text(
-              '전체 배정 ${_enrollments.length}건 · 결제완료 ${_enrollments.where((e) => e.isPaid).length}건 · 미결제 ${_enrollments.where((e) => !e.isPaid).length}건',
+              '내 수강생 배정 ${_enrollments.length}건 · 결제완료 ${_enrollments.where((e) => e.isPaid).length}건 · 미결제 ${_enrollments.where((e) => !e.isPaid).length}건',
               style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 13,
@@ -416,11 +480,11 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
             ),
           ],
           Divider(height: 32),
-          Text('회원별 수강 배정 목록',
+          Text('담당·코티칭 수강생',
               style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           SizedBox(height: 8),
           Text(
-            '회원 이름 아래에 배정된 수업이 표시됩니다. 각 수업에서 진행 회차 차감, 배정 변경·취소를 할 수 있습니다.',
+            '배정된 수업에서 회차를 보정하고, 이름을 눌러 회원 상세·결제를 볼 수 있습니다.',
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
@@ -428,7 +492,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
           if (_loading)
             Center(child: CircularProgressIndicator())
           else if (_members.isEmpty)
-            Text('배정 내역이 없습니다.',
+            Text('아직 담당하거나 코티칭으로 들어온 수강생이 없습니다.',
                 style:
                     TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500))
           else
@@ -442,6 +506,9 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
     final uid = member['uid']?.toString() ?? '';
     final name = member['name']?.toString().trim() ?? '';
     final email = member['email']?.toString().trim() ?? '';
+    final guest = member['isCoteachGuest'] == true;
+    final assignedTeacherName =
+        member['assignedTeacherName']?.toString().trim() ?? '';
     final records =
         _enrollments.where((record) => record.userId == uid).toList();
 
@@ -450,36 +517,81 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
       clipBehavior: Clip.antiAlias,
       child: ExpansionTile(
         initiallyExpanded: records.isNotEmpty,
-        leading: CircleAvatar(
-          backgroundColor: Palette.secondaryDark,
-          foregroundColor: Palette.white,
-          child: Text(name.isEmpty ? '?' : name.substring(0, 1),
-              style: TextStyle(fontFamily: "NotoSansKR")),
-        ),
+        leading: guest
+            ? Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Palette.accent.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '코티칭',
+                  style: TextStyle(
+                    fontFamily: "NotoSansKR",
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Palette.accent,
+                  ),
+                ),
+              )
+            : CircleAvatar(
+                backgroundColor: Palette.darkTeal,
+                foregroundColor: Palette.white,
+                child: Text(name.isEmpty ? '?' : name.substring(0, 1),
+                    style: TextStyle(fontFamily: "NotoSansKR")),
+              ),
         title: Text(name.isEmpty ? '이름 미등록 회원' : name,
             style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontWeight: FontWeight.bold,
                 fontSize: 16)),
         subtitle: Text(
-          '$email · 배정 ${records.length}개',
+          [
+            if (email.isNotEmpty) email,
+            if (guest && assignedTeacherName.isNotEmpty)
+              '담당 $assignedTeacherName',
+            '배정 ${records.length}개',
+          ].join(' · '),
           style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12),
         ),
         children: [
           Padding(
             padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: ElevatedButton.icon(
-                onPressed: () => _showAssignDialog(email),
-                icon: Icon(Icons.add, size: 18),
-                label:
-                    Text('수업 배정', style: TextStyle(fontFamily: "NotoSansKR")),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.secondaryDark,
-                  foregroundColor: Palette.white,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: email.isEmpty ? null : () => _showAssignDialog(email),
+                  icon: Icon(Icons.add, size: 18),
+                  label:
+                      Text('수업 배정', style: TextStyle(fontFamily: "NotoSansKR")),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.darkTeal,
+                    foregroundColor: Palette.white,
+                  ),
                 ),
-              ),
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => StudentDetailPage(
+                          member: member,
+                          teacherName: guest
+                              ? assignedTeacherName
+                              : AuthService.memberTeacherName(member),
+                        ),
+                      ),
+                    );
+                    if (!mounted) return;
+                    await _refresh();
+                  },
+                  icon: Icon(Icons.person_outline, size: 18),
+                  label: Text('회원 상세',
+                      style: TextStyle(fontFamily: "NotoSansKR")),
+                ),
+              ],
             ),
           ),
           if (records.isEmpty)
@@ -587,7 +699,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                 label: Text('회차 차감',
                     style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.primary,
+                  backgroundColor: Palette.darkTeal,
                   foregroundColor: Palette.white,
                 ),
               ),
@@ -1057,160 +1169,6 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// 결제 내역 탭 (메인 관리자 전용)
-// ---------------------------------------------------------------------------
-
-class AdminPaymentTab extends StatefulWidget {
-  @override
-  _AdminPaymentTabState createState() => _AdminPaymentTabState();
-}
-
-class _AdminPaymentTabState extends State<AdminPaymentTab> {
-  List<PaymentOrder> _payments = [];
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _refresh();
-  }
-
-  Future<void> _refresh() async {
-    setState(() => _loading = true);
-    final list = await PaymentService.listPayments();
-    if (!mounted) return;
-    setState(() {
-      _payments = list;
-      _loading = false;
-    });
-  }
-
-  String _formatDateTime(DateTime? dt) {
-    if (dt == null) return '-';
-    String two(int n) => n.toString().padLeft(2, '0');
-    return '${dt.year}.${two(dt.month)}.${two(dt.day)} '
-        '${two(dt.hour)}:${two(dt.minute)}';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final paidCount = _payments.where((p) => p.status == 'paid').length;
-    final pendingCount = _payments.where((p) => p.status == 'pending').length;
-    final paidSum = _payments
-        .where((p) => p.status == 'paid')
-        .fold<int>(0, (sum, p) => sum + p.amount);
-
-    return RefreshIndicator(
-      onRefresh: _refresh,
-      child: ListView(
-        padding: EdgeInsets.all(20),
-        children: [
-          Text('토스페이먼츠 결제 내역',
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 18)),
-          SizedBox(height: 8),
-          Text(
-            '회원이 결제한 내역입니다. 결제 완료 시 수강이 자동 배정됩니다.',
-            style: TextStyle(
-                fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
-          ),
-          SizedBox(height: 16),
-          Text(
-            '결제완료 $paidCount건 · 대기 $pendingCount건 · 매출 합계 ${_formatWon(paidSum)}',
-            style: TextStyle(
-                fontFamily: "NotoSansKR",
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: Palette.secondaryDark),
-          ),
-          SizedBox(height: 20),
-          if (_loading)
-            Center(child: CircularProgressIndicator())
-          else if (_payments.isEmpty)
-            Text('결제 내역이 없습니다.',
-                style:
-                    TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500))
-          else
-            ..._payments.map((p) {
-              final color = p.status == 'paid'
-                  ? Palette.success
-                  : (p.status == 'failed' ? Palette.danger : Palette.grey600);
-              return Card(
-                margin: EdgeInsets.only(bottom: 10),
-                child: ListTile(
-                  title: Text(
-                      '${p.memberName.isEmpty ? p.email : p.memberName} · ${p.courseTitle}',
-                      style: TextStyle(
-                          fontFamily: "NotoSansKR",
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13)),
-                  subtitle: Text(
-                    '${p.email}\n'
-                    '${p.amountLabel} · 화상 ${p.totalSessions}회 · ${p.statusLabel}\n'
-                    '주문 ${p.orderId}\n'
-                    '생성 ${_formatDateTime(p.createdAt)}'
-                    '${p.paidAt != null ? ' · 결제 ${_formatDateTime(p.paidAt)}' : ''}',
-                    style: TextStyle(
-                        fontFamily: "NotoSansKR",
-                        fontSize: 12,
-                        height: 1.45,
-                        color: Palette.grey600),
-                  ),
-                  isThreeLine: true,
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(p.statusLabel,
-                          style: TextStyle(
-                              fontFamily: "NotoSansKR",
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: color)),
-                      if (p.status == 'authorized' || p.status == 'pending')
-                        TextButton(
-                          onPressed: () async {
-                            final error =
-                                await PaymentService.adminFulfillPayment(
-                                    p.orderId);
-                            if (!mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(error ?? '수강 배정이 완료되었습니다.',
-                                    style: TextStyle(fontFamily: "NotoSansKR")),
-                                backgroundColor: error != null
-                                    ? Palette.danger
-                                    : Palette.success,
-                              ),
-                            );
-                            await _refresh();
-                          },
-                          child: Text('수강 배정',
-                              style: TextStyle(
-                                  fontFamily: "NotoSansKR",
-                                  fontSize: 11,
-                                  color: Palette.secondaryDark)),
-                        ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-        ],
-      ),
-    );
-  }
-
-  String _formatWon(int amount) {
-    final s = amount.toString();
-    final buf = StringBuffer();
-    for (int i = 0; i < s.length; i++) {
-      if (i > 0 && (s.length - i) % 3 == 0) buf.write(',');
-      buf.write(s[i]);
-    }
-    return '${buf.toString()}원';
-  }
-}
 
 // ---------------------------------------------------------------------------
 // 진행 중인 수업 배너 (종료 깜빡함 방지)
@@ -1478,7 +1436,7 @@ class _ClassControlDialogState extends State<_ClassControlDialog> {
                     width: double.maxFinite,
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.primary,
+                        backgroundColor: Palette.darkTeal,
                         foregroundColor: Palette.white,
                         padding: EdgeInsets.symmetric(vertical: 14),
                       ),
@@ -1958,7 +1916,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
               alignment: Alignment.centerLeft,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.secondaryDark,
+                  backgroundColor: Palette.darkTeal,
                   foregroundColor: Palette.white,
                   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                 ),
@@ -2070,7 +2028,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
               children: [
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
+                    backgroundColor: Palette.darkTeal,
                     foregroundColor: Palette.white,
                   ),
                   onPressed: () => _enterAsHost(session),
@@ -2152,6 +2110,9 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
   late final TextEditingController _nationalityCtrl;
   late final TextEditingController _introCtrl;
   late final TextEditingController _phoneCtrl;
+  late final TextEditingController _bankNameCtrl;
+  late final TextEditingController _bankAccountCtrl;
+  late final TextEditingController _accountHolderCtrl;
   late final TextEditingController _passwordCtrl;
   Uint8List? _newPhoto;
   bool _saving = false;
@@ -2173,6 +2134,12 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
         TextEditingController(text: widget.teacher['intro']?.toString() ?? '');
     _phoneCtrl =
         TextEditingController(text: widget.teacher['phone']?.toString() ?? '');
+    _bankNameCtrl = TextEditingController(
+        text: widget.teacher['bankName']?.toString() ?? '');
+    _bankAccountCtrl = TextEditingController(
+        text: widget.teacher['bankAccount']?.toString() ?? '');
+    _accountHolderCtrl = TextEditingController(
+        text: widget.teacher['accountHolder']?.toString() ?? '');
     _passwordCtrl = TextEditingController();
   }
 
@@ -2182,6 +2149,9 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
     _nationalityCtrl.dispose();
     _introCtrl.dispose();
     _phoneCtrl.dispose();
+    _bankNameCtrl.dispose();
+    _bankAccountCtrl.dispose();
+    _accountHolderCtrl.dispose();
     _passwordCtrl.dispose();
     super.dispose();
   }
@@ -2217,6 +2187,9 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
         phone: _phoneCtrl.text,
         nationality: _nationalityCtrl.text,
         intro: _introCtrl.text,
+        bankName: _bankNameCtrl.text,
+        bankAccount: _bankAccountCtrl.text,
+        accountHolder: _accountHolderCtrl.text,
         photoBytes: _newPhoto,
         photoFileName: _newPhoto == null ? null : 'teacher.jpg',
         password: _passwordCtrl.text.trim(),
@@ -2296,6 +2269,31 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
               ),
               SizedBox(height: 12),
               TextField(
+                controller: _bankNameCtrl,
+                decoration: InputDecoration(
+                  labelText: '월급 은행',
+                  hintText: '예: 국민은행',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 12),
+              TextField(
+                controller: _bankAccountCtrl,
+                decoration: InputDecoration(
+                  labelText: '계좌번호',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 12),
+              TextField(
+                controller: _accountHolderCtrl,
+                decoration: InputDecoration(
+                  labelText: '예금주',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 12),
+              TextField(
                 controller: _nationalityCtrl,
                 decoration: InputDecoration(
                   labelText: '국적 (예: USA, UK, Korea)',
@@ -2360,24 +2358,251 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
   }
 }
 
+class _TeacherRegisterDialog extends StatefulWidget {
+  final Future<Uint8List?> Function() pickPhoto;
+
+  const _TeacherRegisterDialog({required this.pickPhoto});
+
+  @override
+  State<_TeacherRegisterDialog> createState() => _TeacherRegisterDialogState();
+}
+
+class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
+  final _nameCtrl = TextEditingController();
+  final _emailCtrl = TextEditingController();
+  final _passwordCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
+  final _bankNameCtrl = TextEditingController();
+  final _bankAccountCtrl = TextEditingController();
+  final _accountHolderCtrl = TextEditingController();
+  final _nationalityCtrl = TextEditingController();
+  final _introCtrl = TextEditingController();
+  Uint8List? _photo;
+  bool _saving = false;
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _emailCtrl.dispose();
+    _passwordCtrl.dispose();
+    _phoneCtrl.dispose();
+    _bankNameCtrl.dispose();
+    _bankAccountCtrl.dispose();
+    _accountHolderCtrl.dispose();
+    _nationalityCtrl.dispose();
+    _introCtrl.dispose();
+    super.dispose();
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
+        backgroundColor: Palette.danger,
+      ),
+    );
+  }
+
+  Future<void> _save() async {
+    if (_saving) return;
+    final name = _nameCtrl.text.trim();
+    final email = _emailCtrl.text.trim();
+    final password = _passwordCtrl.text.trim();
+    final phone = _phoneCtrl.text.trim();
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+      _showError('이름, 이메일, 비밀번호를 모두 입력해주세요.');
+      return;
+    }
+    final phoneError = PhoneUtil.validate(phone);
+    if (phoneError != null) {
+      _showError(phoneError);
+      return;
+    }
+    setState(() => _saving = true);
+    String? error;
+    try {
+      error = await AuthService.registerTeacher(
+        email: email,
+        password: password,
+        name: name,
+        phone: phone,
+        nationality: _nationalityCtrl.text.trim(),
+        intro: _introCtrl.text.trim(),
+        photoBytes: _photo,
+        photoFileName: _photo == null ? null : 'teacher.jpg',
+        bankName: _bankNameCtrl.text.trim(),
+        bankAccount: _bankAccountCtrl.text.trim(),
+        accountHolder: _accountHolderCtrl.text.trim(),
+      );
+    } catch (e) {
+      error = '강사 등록 중 오류가 발생했습니다.';
+    }
+    if (!mounted) return;
+    setState(() => _saving = false);
+    if (error != null) {
+      _showError(error);
+      return;
+    }
+    Navigator.of(context).pop(true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Palette.white,
+      surfaceTintColor: Palette.white,
+      title: Text('강사등록', style: TextStyle(fontFamily: "Jalnan")),
+      content: SizedBox(
+        width: 460,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '등록한 강사는 관리자 로그인 화면에서 이메일/비밀번호로 로그인할 수 있습니다. '
+                '사진과 소개는 수강생의 강사 선택 화면에 그대로 보입니다.',
+                style: TextStyle(
+                    fontFamily: "NotoSansKR",
+                    fontSize: 13,
+                    color: Palette.grey600),
+              ),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  _adminTeacherCirclePhoto(bytes: _photo, size: 72),
+                  SizedBox(width: 16),
+                  OutlinedButton.icon(
+                    onPressed: _saving
+                        ? null
+                        : () async {
+                            final cropped = await widget.pickPhoto();
+                            if (!mounted || cropped == null || cropped.isEmpty) {
+                              return;
+                            }
+                            setState(() => _photo = cropped);
+                          },
+                    icon: Icon(Icons.photo_camera_outlined, size: 18),
+                    label: Text(
+                        _photo == null ? '강사 사진 등록' : '사진 다시 선택',
+                        style: TextStyle(fontFamily: "NotoSansKR")),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: _nameCtrl,
+                decoration: InputDecoration(
+                  labelText: '강사 이름',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 12),
+              TextField(
+                controller: _emailCtrl,
+                decoration: InputDecoration(
+                  labelText: '강사 이메일',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 12),
+              TextField(
+                controller: _passwordCtrl,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: '초기 비밀번호 (6자 이상)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 12),
+              TextField(
+                controller: _phoneCtrl,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(
+                  labelText: '휴대폰 번호',
+                  helperText: '수업 예약이 들어오면 이 번호로 알림 문자를 보냅니다.',
+                  helperMaxLines: 2,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 12),
+              TextField(
+                controller: _bankNameCtrl,
+                decoration: InputDecoration(
+                  labelText: '월급 은행',
+                  hintText: '예: 국민은행',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 12),
+              TextField(
+                controller: _bankAccountCtrl,
+                decoration: InputDecoration(
+                  labelText: '계좌번호',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 12),
+              TextField(
+                controller: _accountHolderCtrl,
+                decoration: InputDecoration(
+                  labelText: '예금주',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 12),
+              TextField(
+                controller: _nationalityCtrl,
+                decoration: InputDecoration(
+                  labelText: '국적 (예: USA, UK, Korea)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 12),
+              TextField(
+                controller: _introCtrl,
+                maxLines: 5,
+                decoration: InputDecoration(
+                  labelText: '강사 프로필 / 소개',
+                  hintText: '경력, 수업 스타일, 학생에게 전하고 싶은 말을 적어 주세요.',
+                  alignLabelWithHint: true,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _saving ? null : () => Navigator.pop(context, false),
+          child: Text('닫기'),
+        ),
+        ElevatedButton(
+          onPressed: _saving ? null : _save,
+          child: _saving
+              ? SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text('등록'),
+        ),
+      ],
+    );
+  }
+}
+
 class AdminTeacherTab extends StatefulWidget {
   @override
   _AdminTeacherTabState createState() => _AdminTeacherTabState();
 }
 
 class _AdminTeacherTabState extends State<AdminTeacherTab> {
-  final nameController = TextEditingController();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final phoneController = TextEditingController();
-  final nationalityController = TextEditingController();
-  final introController = TextEditingController();
   List<Map<String, dynamic>> _teachers = [];
   List<Map<String, dynamic>> _members = [];
+  List<WeekBooking> _bookings = [];
   bool _loading = true;
-  bool _saving = false;
-  Uint8List? _photoBytes;
-  String? _photoFileName;
 
   @override
   void initState() {
@@ -2385,28 +2610,56 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
     _refresh();
   }
 
-  @override
-  void dispose() {
-    nameController.dispose();
-    emailController.dispose();
-    passwordController.dispose();
-    phoneController.dispose();
-    nationalityController.dispose();
-    introController.dispose();
-    super.dispose();
-  }
-
   Future<void> _refresh() async {
     setState(() => _loading = true);
     await AuthService.publishTeacherProfiles();
     final teachers = await AuthService.listTeachers();
     final members = await AuthService.listMembers();
+    final bookings = await EnrollmentService.staffWeekBookings(mineOnly: false);
     if (!mounted) return;
     setState(() {
       _teachers = teachers;
       _members = members;
+      _bookings = bookings;
       _loading = false;
     });
+  }
+
+  bool _bookingDone(WeekBooking booking) {
+    final at = EnrollmentService.bookingDateTime(booking.date, booking.time);
+    if (at == null) return booking.isConfirmed;
+    return booking.isConfirmed &&
+        DateTime.now().isAfter(
+            at.add(Duration(minutes: EnrollmentService.lessonMinutes)));
+  }
+
+  TeacherMonthStats _statsFor(String uid) {
+    return TeacherMonthStats.fromBookings(
+      bookings: _bookings,
+      teacherUid: uid,
+      isCompleted: _bookingDone,
+    );
+  }
+
+  int _pendingFor(String uid) {
+    final now = DateTime.now();
+    var count = 0;
+    for (final booking in _bookings) {
+      if (!TeacherMonthStats.taughtBy(booking, uid)) continue;
+      if (booking.date.year != now.year || booking.date.month != now.month) {
+        continue;
+      }
+      if (booking.status == 'pending') count += 1;
+    }
+    return count;
+  }
+
+  Future<void> _openTeacherDetail(Map<String, dynamic> teacher) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => TeacherRosterPage(teacher: teacher)),
+    );
+    if (mounted) await _refresh();
   }
 
   void _toast(String message, {bool error = false}) {
@@ -2419,56 +2672,14 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
     );
   }
 
-  Future<void> _registerTeacher() async {
-    final name = nameController.text.trim();
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
-    final phone = phoneController.text.trim();
-    if (name.isEmpty || email.isEmpty || password.isEmpty) {
-      _toast('이름, 이메일, 비밀번호를 모두 입력해주세요.', error: true);
-      return;
-    }
-    final phoneError = PhoneUtil.validate(phone);
-    if (phoneError != null) {
-      _toast(phoneError, error: true);
-      return;
-    }
-
-    setState(() => _saving = true);
-    String? error;
-    try {
-      error = await AuthService.registerTeacher(
-        email: email,
-        password: password,
-        name: name,
-        phone: phone,
-        nationality: nationalityController.text.trim(),
-        intro: introController.text.trim(),
-        photoBytes: _photoBytes,
-        photoFileName: _photoFileName,
-      );
-    } catch (e) {
-      error = '강사 등록 중 오류가 발생했습니다.';
-    }
-    if (!mounted) return;
-    setState(() => _saving = false);
-
-    if (error != null) {
-      _toast(error, error: true);
-      return;
-    }
-
+  Future<void> _openRegister() async {
+    final saved = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => _TeacherRegisterDialog(pickPhoto: _pickPhoto),
+    );
+    if (!mounted || saved != true) return;
     _toast('강사가 등록되었습니다. 해당 계정으로 로그인할 수 있습니다.');
-    nameController.clear();
-    emailController.clear();
-    passwordController.clear();
-    phoneController.clear();
-    nationalityController.clear();
-    introController.clear();
-    setState(() {
-      _photoBytes = null;
-      _photoFileName = null;
-    });
     await _refresh();
   }
 
@@ -2521,6 +2732,69 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
     if (!mounted || saved != true) return;
     await _refresh();
     if (mounted) _toast('강사 정보를 수정했습니다.');
+  }
+
+  Future<void> _editOwnerBookingOffer(Map<String, dynamic> teacher) async {
+    final uid = teacher['uid']?.toString() ?? '';
+    if (uid.isEmpty) return;
+    final current = TeacherBookingOffer.resolve(teacher, isOwner: true);
+    final next = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text('수업 받기',
+              style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+          content: SizedBox(
+            width: 420,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TeacherBookingOffer.both,
+                TeacherBookingOffer.coteach,
+                TeacherBookingOffer.off,
+              ].map((offer) {
+                final selected = current == offer;
+                return ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(
+                    selected
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_off,
+                    color: selected
+                        ? Palette.secondaryDark
+                        : Palette.grey400,
+                  ),
+                  title: Text(TeacherBookingOffer.label(offer),
+                      style: TextStyle(
+                          fontFamily: "NotoSansKR",
+                          fontWeight: FontWeight.w700)),
+                  subtitle: Text(TeacherBookingOffer.description(offer),
+                      style: TextStyle(
+                          fontFamily: "NotoSansKR", fontSize: 12)),
+                  onTap: () => Navigator.pop(dialogContext, offer),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text('닫기', style: TextStyle(fontFamily: "NotoSansKR")),
+            ),
+          ],
+        );
+      },
+    );
+    if (next == null || next == current) return;
+    final error =
+        await AuthService.updateBookingOffer(teacherUid: uid, offer: next);
+    if (!mounted) return;
+    if (error != null) {
+      _toast(error, error: true);
+      return;
+    }
+    _toast('수업 받기 설정을 저장했습니다.');
+    await _refresh();
   }
 
   Future<void> _assignMember(Map<String, dynamic> member) async {
@@ -2666,149 +2940,27 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
       child: ListView(
         padding: EdgeInsets.all(20),
         children: [
-          Text('서브 강사 등록',
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 18)),
-          SizedBox(height: 8),
-          Text(
-            '등록한 강사는 관리자 로그인 화면에서 이메일/비밀번호로 로그인할 수 있습니다. '
-            '사진과 소개는 수강생의 강사 선택 화면에 그대로 보입니다. '
-            '이미 등록한 강사는 목록의 수정에서 바꿀 수 있습니다.',
-            style: TextStyle(
-                fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
-          ),
-          SizedBox(height: 16),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _circlePhoto(bytes: _photoBytes, size: 72),
-              SizedBox(width: 16),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    OutlinedButton.icon(
-                      onPressed: _saving
-                          ? null
-                          : () async {
-                              final cropped = await _pickPhoto();
-                              if (cropped == null || cropped.isEmpty) return;
-                              setState(() {
-                                _photoBytes = cropped;
-                                _photoFileName = 'teacher.jpg';
-                              });
-                            },
-                      icon: Icon(Icons.photo_camera_outlined, size: 18),
-                      label: Text(
-                          _photoFileName == null ? '강사 사진 등록' : '사진 다시 선택',
-                          style: TextStyle(fontFamily: "NotoSansKR")),
-                    ),
-                    if (_photoFileName != null) ...[
-                      SizedBox(height: 6),
-                      Text(
-                        _photoFileName!,
-                        style: TextStyle(
-                            fontFamily: "NotoSansKR",
-                            fontSize: 12,
-                            color: Palette.grey500),
-                      ),
-                    ],
-                  ],
+                child: Text('등록된 강사',
+                    style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+              ),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.darkTeal,
+                  foregroundColor: Palette.white,
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
+                onPressed: _openRegister,
+                icon: Icon(Icons.person_add_alt_1, size: 18),
+                label: Text('강사등록', style: TextStyle(fontFamily: "Jalnan")),
               ),
             ],
           ),
-          SizedBox(height: 16),
-          TextField(
-            controller: nameController,
-            decoration: InputDecoration(
-              labelText: '강사 이름',
-              border: OutlineInputBorder(),
-              filled: true,
-              fillColor: Palette.white,
-            ),
-          ),
-          SizedBox(height: 12),
-          TextField(
-            controller: emailController,
-            decoration: InputDecoration(
-              labelText: '강사 이메일',
-              border: OutlineInputBorder(),
-              filled: true,
-              fillColor: Palette.white,
-            ),
-          ),
-          SizedBox(height: 12),
-          TextField(
-            controller: passwordController,
-            obscureText: true,
-            decoration: InputDecoration(
-              labelText: '초기 비밀번호 (6자 이상)',
-              border: OutlineInputBorder(),
-              filled: true,
-              fillColor: Palette.white,
-            ),
-          ),
-          SizedBox(height: 12),
-          TextField(
-            controller: phoneController,
-            keyboardType: TextInputType.phone,
-            decoration: InputDecoration(
-              labelText: '휴대폰 번호',
-              helperText: '수업 예약이 들어오면 이 번호로 알림 문자를 보냅니다.',
-              helperMaxLines: 2,
-              border: OutlineInputBorder(),
-              filled: true,
-              fillColor: Palette.white,
-            ),
-          ),
-          SizedBox(height: 12),
-          TextField(
-            controller: nationalityController,
-            decoration: InputDecoration(
-              labelText: '국적 (예: USA, UK, Korea)',
-              border: OutlineInputBorder(),
-              filled: true,
-              fillColor: Palette.white,
-            ),
-          ),
-          SizedBox(height: 12),
-          TextField(
-            controller: introController,
-            maxLines: 5,
-            decoration: InputDecoration(
-              labelText: '강사 프로필 / 소개',
-              hintText: '경력, 수업 스타일, 학생에게 전하고 싶은 말을 적어 주세요.',
-              alignLabelWithHint: true,
-              border: OutlineInputBorder(),
-              filled: true,
-              fillColor: Palette.white,
-            ),
-          ),
-          SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Palette.secondaryDark,
-                foregroundColor: Palette.white,
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-              ),
-              onPressed: _saving ? null : _registerTeacher,
-              child: _saving
-                  ? SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Palette.white),
-                    )
-                  : Text('강사 등록', style: TextStyle(fontFamily: "Jalnan")),
-            ),
-          ),
-          SizedBox(height: 28),
-          Text('등록된 강사', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           SizedBox(height: 8),
           Text(
-            '강사를 클릭하면 프로필, 담당 회원, 화상수업 입장·종료와 회차별 피드백을 확인하고 작성할 수 있습니다.',
+            '강사를 누르면 프로필·회원, 그 강사의 스케줄·예약, 한달 수업 이력을 볼 수 있습니다. 카드에는 이번 달 진행·취소·수입이 함께 보입니다.',
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
@@ -2830,6 +2982,13 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
               final intro = t['intro']?.toString() ?? '';
               final nationality = t['nationality']?.toString() ?? '';
               final photoUrl = t['photoUrl']?.toString() ?? '';
+              final bookingOffer = TeacherBookingOffer.resolve(
+                t,
+                isOwner: isOwnerTeacher,
+              );
+              final stats = _statsFor(uid);
+              final pending = _pendingFor(uid);
+              final bank = AuthService.bankLabel(t);
               final titleName = isOwnerTeacher
                   ? '${t['name'] ?? '관리자'} (메인 관리자 · 강사)'
                   : '${t['name'] ?? ''} (${t['email'] ?? ''})';
@@ -2842,14 +3001,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                     children: [
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => TeacherRosterPage(teacher: t),
-                            ),
-                          );
-                        },
+                        onTap: () => _openTeacherDetail(t),
                         leading: _circlePhoto(url: photoUrl, size: 52),
                         title: Text(titleName,
                             style: TextStyle(fontFamily: "NotoSansKR")),
@@ -2859,10 +3011,13 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                             if (!isOwnerTeacher && t['hasLoginPassword'] != true)
                               '비밀번호 없음',
                             isOwnerTeacher
-                                ? '활성 · 담당 회원 $assignedCount명'
+                                ? '${TeacherBookingOffer.label(bookingOffer)} · 담당 $assignedCount명'
                                 : (active
-                                    ? '활성 · 담당 회원 $assignedCount명'
-                                    : '비활성 · 담당 회원 $assignedCount명'),
+                                    ? '활성 · 담당 $assignedCount명'
+                                    : '비활성 · 담당 $assignedCount명'),
+                            '이번달 진행 ${stats.completedCount}회 · 취소 ${stats.cancelledCount}회 · 대기 ${pending}건',
+                            stats.incomeLabel,
+                            if (bank.isNotEmpty) bank,
                             PhoneUtil.isValid(t['phone']?.toString() ?? '')
                                 ? PhoneUtil.display(t['phone']?.toString() ?? '')
                                 : '연락처 없음',
@@ -2876,16 +3031,8 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                           spacing: 4,
                           children: [
                             TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        TeacherRosterPage(teacher: t),
-                                  ),
-                                );
-                              },
-                              child: Text('프로필',
+                              onPressed: () => _openTeacherDetail(t),
+                              child: Text('상세',
                                   style: TextStyle(
                                       fontFamily: "NotoSansKR",
                                       color: Palette.secondaryDark)),
@@ -2897,6 +3044,14 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                                       fontFamily: "NotoSansKR",
                                       color: Palette.secondaryDark)),
                             ),
+                            if (isOwnerTeacher)
+                              TextButton(
+                                onPressed: () => _editOwnerBookingOffer(t),
+                                child: Text('수업 받기',
+                                    style: TextStyle(
+                                        fontFamily: "NotoSansKR",
+                                        color: Palette.secondaryDark)),
+                              ),
                             if (!isOwnerTeacher)
                               TextButton(
                                 onPressed: () async {
@@ -3246,7 +3401,7 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
           alignment: Alignment.centerLeft,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Palette.primary,
+              backgroundColor: Palette.darkTeal,
               foregroundColor: Palette.white,
             ),
             onPressed: _saving ? null : _saveMeetingUrl,
@@ -3332,7 +3487,7 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
           alignment: Alignment.centerLeft,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Palette.secondaryDark,
+              backgroundColor: Palette.darkTeal,
               foregroundColor: Palette.white,
               padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
             ),

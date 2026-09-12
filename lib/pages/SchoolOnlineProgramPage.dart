@@ -145,13 +145,8 @@ class _SchoolOnlineProgramPageState extends State<SchoolOnlineProgramPage> {
   }
 
   Widget classGuideImage() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        width: 800,
-        child: Image.asset("assets/onlineProgramClasses.png"),
-      ),
-    );
+    return WidgetUtil.pageImage("assets/onlineProgramClasses.png",
+        maxWidth: 800);
   }
 
   Widget content() {

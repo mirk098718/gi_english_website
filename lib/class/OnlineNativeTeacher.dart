@@ -17,6 +17,12 @@ class OnlineNativeTeacher {
   /// 메인 관리자가 연결한 실제 강사 계정(admins uid). 없으면 빈 문자열.
   final String accountUid;
 
+  /// 결제 화면에서 메인 강사로 고를 수 있는지.
+  final bool selectableAtCheckout;
+
+  /// 다른 강사 담당 수강생의 코티칭(대체) 예약을 받는지.
+  final bool acceptsCoTeaching;
+
   const OnlineNativeTeacher({
     required this.id,
     required this.name,
@@ -25,6 +31,8 @@ class OnlineNativeTeacher {
     required this.imageAsset,
     this.photoUrl = '',
     this.accountUid = '',
+    this.selectableAtCheckout = true,
+    this.acceptsCoTeaching = true,
   });
 
   static const String ownerProfileId = 'native_owner_gi';
@@ -91,6 +99,8 @@ class OnlineNativeTeacher {
     String? imageAsset,
     String? photoUrl,
     String? accountUid,
+    bool? selectableAtCheckout,
+    bool? acceptsCoTeaching,
   }) {
     return OnlineNativeTeacher(
       id: id,
@@ -100,6 +110,8 @@ class OnlineNativeTeacher {
       imageAsset: imageAsset ?? this.imageAsset,
       photoUrl: photoUrl ?? this.photoUrl,
       accountUid: accountUid ?? this.accountUid,
+      selectableAtCheckout: selectableAtCheckout ?? this.selectableAtCheckout,
+      acceptsCoTeaching: acceptsCoTeaching ?? this.acceptsCoTeaching,
     );
   }
 
@@ -228,6 +240,8 @@ class OnlineNativeTeacher {
     if (accountUid.isEmpty && id.startsWith('native_') && id != ownerProfileId) {
       accountUid = id.substring('native_'.length);
     }
+    final isOwner = id == ownerProfileId;
+    final offer = TeacherBookingOffer.resolve(data, isOwner: isOwner);
     return OnlineNativeTeacher(
       id: id,
       name: name.isEmpty ? (dummy?.name ?? '') : name,
@@ -236,6 +250,52 @@ class OnlineNativeTeacher {
       imageAsset: dummy?.imageAsset ?? fallbackAsset,
       photoUrl: photoUrl,
       accountUid: accountUid,
+      selectableAtCheckout: TeacherBookingOffer.shownAtCheckout(offer),
+      acceptsCoTeaching: TeacherBookingOffer.shownAsCoteach(offer),
     );
+  }
+}
+
+/// 결제 선택 / 코티칭 수신 설정.
+/// 메인 관리자는 결제 강사가 아닌 경우가 많아 기본값은 코티칭만.
+class TeacherBookingOffer {
+  static const String both = 'both';
+  static const String coteach = 'coteach';
+  static const String off = 'off';
+
+  static String resolve(Map<String, dynamic>? data, {required bool isOwner}) {
+    final map = data ?? <String, dynamic>{};
+    final raw = map['bookingOffer']?.toString() ?? '';
+    if (raw == both || raw == coteach || raw == off) return raw;
+    if (map.containsKey('selectableAtCheckout') ||
+        map.containsKey('acceptsCoTeaching')) {
+      final checkout = map['selectableAtCheckout'] != false;
+      final coteachOn = map['acceptsCoTeaching'] != false;
+      if (!checkout && !coteachOn) return off;
+      if (!checkout) return coteach;
+      return both;
+    }
+    return isOwner ? coteach : both;
+  }
+
+  static bool shownAtCheckout(String offer) => offer == both;
+
+  static bool shownAsCoteach(String offer) =>
+      offer == both || offer == coteach;
+
+  static String label(String offer) {
+    if (offer == coteach) return '코티칭만';
+    if (offer == off) return '둘 다 끄기';
+    return '결제 선택 · 코티칭';
+  }
+
+  static String description(String offer) {
+    if (offer == coteach) {
+      return '결제 화면에는 나오지 않고, 다른 강사 담당 수강생이 내 스케줄로 예약할 수 있습니다.';
+    }
+    if (offer == off) {
+      return '결제 선택과 코티칭을 모두 받지 않습니다. 이미 배정된 수강생 예약은 그대로입니다.';
+    }
+    return '수강생이 결제할 때 이 강사를 고를 수 있고, 코티칭 예약도 받습니다.';
   }
 }

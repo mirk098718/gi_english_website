@@ -30,7 +30,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         body: SizedBox.expand(
           child: Container(
             padding: EdgeInsets.all(50),
-            color: Palette.primary,
+            decoration: const BoxDecoration(gradient: Palette.adminGradient),
             alignment: Alignment.center,
             child: Container(
               width: 500,
@@ -39,7 +39,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 children: [
                   Text(
                     "Admin Login",
-                    style: TextStyle(fontSize: 25),
+                    style: TextStyle(fontSize: 25, color: Palette.white),
                   ),
                   SizedBox(height: 20),
                   MyWidget.roundEdgeTextField("ID", adminIdController),
@@ -49,7 +49,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   SizedBox(height: 20),
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Palette.primaryLight,
+                          backgroundColor: Palette.darkTeal,
+                          foregroundColor: Palette.white,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0)),
                           minimumSize: Size(100, 40)),

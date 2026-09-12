@@ -118,7 +118,7 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
 
   Widget content() {
     return Container(
-      width: MediaQuery.of(context).size.width,
+      width: double.infinity,
       padding: EdgeInsets.all(20),
       color: Palette.white,
       child: Column(

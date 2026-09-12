@@ -207,10 +207,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           SizedBox(
             height: 40,
           ),
-          SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Container(
-                  width: 800, child: Image.asset("assets/whyNZInfo.png"))),
+          WidgetUtil.pageImage("assets/whyNZInfo.png", maxWidth: 800),
           SizedBox(
             height: 40,
           ),
@@ -220,9 +217,8 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
                   Uri.parse('https://m.youtube.com/watch?v=Ytc6ClRRhw0'),
                 );
               },
-              child: Container(
-                  width: 800,
-                  child: Image.asset("assets/whyChooseNzClip.png"))),
+              child: WidgetUtil.pageImage("assets/whyChooseNzClip.png",
+                  maxWidth: 800)),
           SizedBox(
             height: 40,
           ),
@@ -234,18 +230,13 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           SizedBox(
             height: 40,
           ),
-          SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Container(
-                  width: 800,
-                  child: Image.asset("assets/whyTaurangaInfo.png"))),
+          WidgetUtil.pageImage("assets/whyTaurangaInfo.png", maxWidth: 800),
           SizedBox(
             height: 40,
           ),
           InkWell(
-            child: Container(
-                width: 800,
-                child: Image.asset("assets/whyTaurangaClipWeb.png")),
+            child: WidgetUtil.pageImage("assets/whyTaurangaClipWeb.png",
+                maxWidth: 800),
             onTap: () async {
               UrlUtil.open('https://www.youtube.com/watch?v=uT2IIPu5uuY');
             },
@@ -264,7 +255,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           SizedBox(
             height: 40,
           ),
-          Image.asset("assets/schoolSelection.png"),
+          WidgetUtil.pageImage("assets/schoolSelection.png", maxWidth: 800),
           SizedBox(
             height: 40,
           ),
@@ -276,8 +267,8 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           SizedBox(
             height: 40,
           ),
-          Image.asset("assets/schoolList.png"),
-          Image.asset("assets/nzMiddleSchoolList.png"),
+          WidgetUtil.pageImage("assets/schoolList.png", maxWidth: 800),
+          WidgetUtil.pageImage("assets/nzMiddleSchoolList.png", maxWidth: 800),
           SizedBox(
             height: 40,
           ),

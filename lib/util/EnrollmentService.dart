@@ -1566,10 +1566,12 @@ class EnrollmentService {
     }
   }
 
-  /// 원어민 화상수업은 30분 단위. 오전 6시부터 밤 11:00까지. 마지막 11:30은 두지 않는다.
+  /// 예약 칸은 30분 간격. 오전 6시부터 밤 11:00까지. 마지막 11:30은 두지 않는다.
+  /// 실제 수업은 [lessonMinutes]분, 강사 정산은 [lessonPayWon]원/건.
   static final List<String> bookingTimeSlots = _buildBookingTimeSlots();
 
-  static const int lessonMinutes = 30;
+  static const int lessonMinutes = 20;
+  static const int lessonPayWon = 10000;
 
   static List<String> _buildBookingTimeSlots() {
     final slots = <String>[];
@@ -1673,6 +1675,41 @@ class EnrollmentService {
     final hm =
         '${current.hour.toString().padLeft(2, '0')}:${current.minute.toString().padLeft(2, '0')}';
     return bookingTimeSlots.where((slot) => slot.compareTo(hm) > 0).toList();
+  }
+
+  /// 지금 수업 알림을 띄울 확정 예약. 시작 5분 전 ~ 수업 종료까지.
+  static List<WeekBooking> dueLessonAlerts(
+    List<WeekBooking> bookings, {
+    DateTime? now,
+  }) {
+    final current = now ?? DateTime.now();
+    return bookings.where((booking) {
+      if (!booking.isConfirmed) return false;
+      final at = bookingDateTime(booking.date, booking.time);
+      if (at == null) return false;
+      final from = at.subtract(const Duration(minutes: 5));
+      final to = at.add(Duration(minutes: lessonMinutes));
+      return !current.isBefore(from) && current.isBefore(to);
+    }).toList();
+  }
+
+  static Future<List<WeekBooking>> myAllWeekBookings() async {
+    final user = AuthService.currentUser;
+    if (user == null) return [];
+    try {
+      final snapshot = await _firestore
+          .collection('week_bookings')
+          .where('userId', isEqualTo: user.uid)
+          .get();
+      final list = snapshot.docs
+          .map((doc) => WeekBooking.fromMap(doc.id, doc.data()))
+          .toList();
+      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return list;
+    } catch (e) {
+      print('내 예약 전체 조회 오류: $e');
+      return [];
+    }
   }
 
   static Future<List<WeekBooking>> myWeekBookings({
@@ -1856,6 +1893,10 @@ class EnrollmentService {
                   ''));
       final isSubstitute =
           teacherUid.isNotEmpty && assignedUid.isNotEmpty && teacherUid != assignedUid;
+      if (isSubstitute &&
+          !await AuthService.teacherAcceptsCoTeaching(teacherUid)) {
+        return '이 선생님은 지금은 코티칭 예약을 받지 않습니다.';
+      }
 
       await _firestore.runTransaction((transaction) async {
         if (teacherUid.isNotEmpty) {
@@ -2416,6 +2457,70 @@ class WeekBooking {
       createdAt: toDateTime(data['createdAt']) ?? DateTime.now(),
       confirmedAt: toDateTime(data['confirmedAt']),
       confirmedBy: data['confirmedBy']?.toString() ?? '',
+    );
+  }
+}
+
+/// 강사 스케줄의 이번 달 진행·취소·수입.
+class TeacherMonthStats {
+  final int year;
+  final int month;
+  final int completedCount;
+  final int cancelledCount;
+
+  TeacherMonthStats({
+    required this.year,
+    required this.month,
+    required this.completedCount,
+    required this.cancelledCount,
+  });
+
+  int get incomeWon => completedCount * EnrollmentService.lessonPayWon;
+
+  String get monthLabel => '$year년 $month월';
+
+  String get incomeLabel {
+    final digits = incomeWon.toString();
+    final buffer = StringBuffer();
+    for (var i = 0; i < digits.length; i++) {
+      if (i > 0 && (digits.length - i) % 3 == 0) buffer.write(',');
+      buffer.write(digits[i]);
+    }
+    return '${buffer}원';
+  }
+
+  static bool taughtBy(WeekBooking booking, String teacherUid) {
+    if (teacherUid.isEmpty) return false;
+    return booking.teacherId == teacherUid ||
+        booking.nativeTeacherUid == teacherUid;
+  }
+
+  static TeacherMonthStats fromBookings({
+    required List<WeekBooking> bookings,
+    required String teacherUid,
+    required bool Function(WeekBooking booking) isCompleted,
+    DateTime? now,
+  }) {
+    final current = now ?? DateTime.now();
+    var completed = 0;
+    var cancelled = 0;
+    for (final booking in bookings) {
+      if (!taughtBy(booking, teacherUid)) continue;
+      if (booking.date.year != current.year ||
+          booking.date.month != current.month) {
+        continue;
+      }
+      if (booking.status == 'rejected') {
+        cancelled += 1;
+      } else if (booking.isConfirmed && isCompleted(booking)) {
+        completed += 1;
+      }
+    }
+    return TeacherMonthStats(
+      year: current.year,
+      month: current.month,
+      completedCount: completed,
+      cancelledCount: cancelled,
     );
   }
 }

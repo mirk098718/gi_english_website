@@ -495,7 +495,9 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
   }
 
   Future<void> _pickOtherTeacher(OnlineWeek week) async {
-    final teachers = await AuthService.selectableNativeTeachers();
+    final teachers = await AuthService.selectableNativeTeachers(
+      kind: TeacherPickKind.coteach,
+    );
     final assignedUid = _assignedNativeTeacher?.accountUid ?? '';
     final assignedId = _assignedNativeTeacher?.id ?? '';
     final others = teachers.where((teacher) {
@@ -1299,8 +1301,8 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
           ] else ...[
             Text(
               otherTeacher
-                  ? '수업은 30분입니다. 선택한 원어민 선생님이 열어 둔 시간만 예약할 수 있습니다. 담당 선생님이 아니어도 강사가 확인하면 확정됩니다.'
-                  : '수업은 30분입니다. 담당 원어민 선생님이 열어 둔 시간만 6:00 AM부터 11:00 PM까지 30분 단위로 선택할 수 있습니다. 강사가 확인하면 예약이 확정됩니다.',
+                  ? '수업은 20분입니다. 선택한 원어민 선생님이 열어 둔 시간만 예약할 수 있습니다. 담당 선생님이 아니어도 강사가 확인하면 확정됩니다.'
+                  : '수업은 20분입니다. 담당 원어민 선생님이 열어 둔 시간만 6:00 AM부터 11:00 PM까지 30분 단위로 선택할 수 있습니다. 강사가 확인하면 예약이 확정됩니다.',
               style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 13,

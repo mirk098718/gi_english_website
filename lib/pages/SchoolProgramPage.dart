@@ -126,9 +126,9 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
               bottom: 20,
             ),
             padding: EdgeInsets.only(left: 20),
-            width: 500,
+            width: double.infinity,
             color: Palette.grey100,
-            child: Row(
+            child: Wrap(
               children: [
                 Container(
                   padding: EdgeInsets.only(right: 20, top: 20, bottom: 20),
@@ -272,16 +272,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           SizedBox(
             height: 20,
           ),
-          SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Column(
-                children: [
-                  Container(
-                      width: 700, child: Image.asset("assets/elePrep.png")),
-                  Container(
-                      width: 720, child: Image.asset("assets/eleProgram.png"))
-                ],
-              )),
+          WidgetUtil.pageImage("assets/elePrep.png"),
+          WidgetUtil.pageImage("assets/eleProgram.png", maxWidth: 720),
           SizedBox(height: 60),
           // Text(style: TextStyle(
           //     color: Palette.black,
@@ -310,13 +302,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
             height: 20,
           ),
 
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Container(
-              width: 720,
-              child: Image.asset("assets/middleSchoolProgramInfo.png"),
-            ),
-          ),
+          WidgetUtil.pageImage("assets/middleSchoolProgramInfo.png",
+              maxWidth: 720),
           SizedBox(
             height: 20,
           ),
@@ -356,7 +343,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
             margin: EdgeInsets.only(top: 20, bottom: 20),
             // padding: EdgeInsets.all(10),
             padding: EdgeInsets.all(20),
-            width: 440,
+            width: double.infinity,
             color: Palette.grey100,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -462,16 +449,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           SizedBox(
             height: 20,
           ),
-          SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Column(
-                children: [
-                  Container(
-                      width: 700, child: Image.asset("assets/elePrep.png")),
-                  Container(
-                      width: 720, child: Image.asset("assets/eleProgram.png"))
-                ],
-              )),
+          WidgetUtil.pageImage("assets/elePrep.png"),
+          WidgetUtil.pageImage("assets/eleProgram.png", maxWidth: 720),
           SizedBox(
             height: 60,
           ),
@@ -502,13 +481,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
             height: 20,
           ),
 
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Container(
-              width: 720,
-              child: Image.asset("assets/middleSchoolProgramInfo.png"),
-            ),
-          ),
+          WidgetUtil.pageImage("assets/middleSchoolProgramInfo.png",
+              maxWidth: 720),
           SizedBox(
             height: 20,
           ),

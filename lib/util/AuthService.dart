@@ -17,6 +17,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// - [teacher]: 서브 강사 (배정된 회원의 스케줄·피드백·화상수업)
 enum AdminRole { owner, teacher, none }
 
+/// 수강생이 강사를 고르는 화면.
+enum TeacherPickKind { checkout, coteach }
+
 class AuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -163,9 +166,11 @@ class AuthService {
 
   /// 회원 목록 (관리자용).
   /// [teacherId]가 있으면 해당 강사에게 배정된 회원만 반환한다.
+  /// [oldestFirst]가 true면 가입 시각이 오래된 회원부터 반환한다.
   static Future<List<Map<String, dynamic>>> listMembers({
     int limit = 100,
     String? teacherId,
+    bool oldestFirst = false,
   }) async {
     try {
       Query query = _firestore.collection('members');
@@ -181,21 +186,49 @@ class AuthService {
       }).toList();
 
       list.sort((a, b) {
-        final aRaw = a['createdAt'];
-        final bRaw = b['createdAt'];
-        final aTime = aRaw is Timestamp
-            ? aRaw.toDate()
-            : DateTime.fromMillisecondsSinceEpoch(0);
-        final bTime = bRaw is Timestamp
-            ? bRaw.toDate()
-            : DateTime.fromMillisecondsSinceEpoch(0);
-        return bTime.compareTo(aTime);
+        final aTime = memberCreatedAt(a) ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final bTime = memberCreatedAt(b) ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return oldestFirst ? aTime.compareTo(bTime) : bTime.compareTo(aTime);
       });
       return list;
     } catch (e) {
       print('회원 목록 조회 오류: $e');
       return [];
     }
+  }
+
+  static Future<Map<String, dynamic>?> getMember(String uid) async {
+    if (uid.isEmpty) return null;
+    try {
+      final doc = await _firestore.collection('members').doc(uid).get();
+      if (!doc.exists) return null;
+      final data = Map<String, dynamic>.from(doc.data() ?? {});
+      data['uid'] = doc.id;
+      return data;
+    } catch (e) {
+      print('회원 단건 조회 오류: $e');
+      return null;
+    }
+  }
+
+  static DateTime? memberCreatedAt(Map<String, dynamic> member) {
+    final raw = member['createdAt'];
+    if (raw is Timestamp) return raw.toDate();
+    if (raw is DateTime) return raw;
+    return null;
+  }
+
+  static String memberTeacherName(
+    Map<String, dynamic> member, {
+    Map<String, String> teacherNames = const {},
+  }) {
+    final named = member['nativeTeacherName']?.toString().trim() ?? '';
+    if (named.isNotEmpty) return named;
+    final id = member['teacherId']?.toString().trim() ??
+        member['nativeTeacherUid']?.toString().trim() ??
+        '';
+    if (id.isEmpty) return '';
+    return teacherNames[id]?.trim() ?? '';
   }
 
   /// 회원이 본인 휴대폰 번호를 저장한다.
@@ -413,6 +446,18 @@ class AuthService {
 
   /// 서브 강사 계정 생성.
   /// 메인 관리자 세션을 유지하기 위해 보조 Firebase 앱으로 Auth 계정을 만든다.
+  static String bankLabel(Map<String, dynamic>? data) {
+    final bank = data?['bankName']?.toString().trim() ?? '';
+    final account = data?['bankAccount']?.toString().trim() ?? '';
+    final holder = data?['accountHolder']?.toString().trim() ?? '';
+    if (bank.isEmpty && account.isEmpty) return '';
+    return [
+      if (bank.isNotEmpty) bank,
+      if (account.isNotEmpty) account,
+      if (holder.isNotEmpty) '예금주 $holder',
+    ].join(' · ');
+  }
+
   static Future<String?> registerTeacher({
     required String email,
     required String password,
@@ -420,6 +465,9 @@ class AuthService {
     String phone = '',
     String nationality = '',
     String intro = '',
+    String bankName = '',
+    String bankAccount = '',
+    String accountHolder = '',
     Uint8List? photoBytes,
     String? photoFileName,
   }) async {
@@ -475,6 +523,9 @@ class AuthService {
         'phone': PhoneUtil.normalize(phone),
         'nationality': nationality.trim(),
         'intro': intro.trim(),
+        'bankName': bankName.trim(),
+        'bankAccount': bankAccount.trim(),
+        'accountHolder': accountHolder.trim(),
         'photoUrl': photoUrl,
         'nativeProfileId': profileId,
         'role': 'teacher',
@@ -528,16 +579,28 @@ class AuthService {
   }
 
   /// 강사 목록 (메인 관리자용). 메인 관리자 본인도 강사로 포함한다.
+  /// 예전 로그인으로 남은 owner 문서가 있어도 하나만 보여 준다.
   static Future<List<Map<String, dynamic>>> listTeachers() async {
     try {
       final snapshot = await _firestore.collection('admins').get();
 
-      final list = snapshot.docs.map((doc) {
-        final data = doc.data();
+      final owners = <Map<String, dynamic>>[];
+      final teachers = <Map<String, dynamic>>[];
+      for (final doc in snapshot.docs) {
+        final data = Map<String, dynamic>.from(doc.data());
         data['uid'] = doc.id;
-        return data;
-      }).toList();
+        if (data['role']?.toString() == 'teacher') {
+          teachers.add(data);
+        } else {
+          owners.add(data);
+        }
+      }
 
+      final owner = _pickOwnerRecord(owners);
+      final list = <Map<String, dynamic>>[
+        if (owner != null) owner,
+        ...teachers,
+      ];
       list.sort((a, b) {
         final aOwner = a['role']?.toString() != 'teacher';
         final bOwner = b['role']?.toString() != 'teacher';
@@ -552,6 +615,27 @@ class AuthService {
       print('강사 목록 조회 오류: $e');
       return [];
     }
+  }
+
+  static Map<String, dynamic>? _pickOwnerRecord(
+      List<Map<String, dynamic>> owners) {
+    if (owners.isEmpty) return null;
+    Map<String, dynamic>? picked;
+    var best = -1;
+    for (final owner in owners) {
+      var score = 0;
+      final email = (owner['email']?.toString() ?? '').toLowerCase();
+      if (email == ownerEmail) score += 100;
+      if (owner['role']?.toString() == 'owner') score += 20;
+      if (currentUser != null && owner['uid'] == currentUser!.uid) score += 10;
+      if ((owner['phone']?.toString() ?? '').trim().isNotEmpty) score += 5;
+      if ((owner['name']?.toString() ?? '').trim().isNotEmpty) score += 2;
+      if (score > best) {
+        best = score;
+        picked = owner;
+      }
+    }
+    return picked ?? owners.first;
   }
 
   static Future<String> currentStaffUid() async {
@@ -585,6 +669,20 @@ class AuthService {
         'name': await getAdminName(),
         'email': currentUser?.email ?? '',
       };
+    }
+  }
+
+  static Future<Map<String, dynamic>?> staffProfile(String uid) async {
+    if (uid.isEmpty) return currentStaffProfile();
+    try {
+      final doc = await _firestore.collection('admins').doc(uid).get();
+      if (!doc.exists) return null;
+      final data = Map<String, dynamic>.from(doc.data() ?? {});
+      data['uid'] = doc.id;
+      return data;
+    } catch (e) {
+      print('강사 프로필 조회 오류: $e');
+      return null;
     }
   }
 
@@ -691,8 +789,9 @@ class AuthService {
     String intro = '',
     String photoUrl = '',
     required bool isActive,
+    String? bookingOffer,
   }) async {
-    await _firestore.collection('native_teacher_accounts').doc(profileId).set({
+    final data = <String, dynamic>{
       'teacherUid': teacherUid,
       'name': name,
       'email': email,
@@ -701,7 +800,66 @@ class AuthService {
       'photoUrl': photoUrl,
       'isActive': isActive,
       'updatedAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
+    };
+    if (bookingOffer != null && bookingOffer.isNotEmpty) {
+      data['bookingOffer'] = bookingOffer;
+      data['selectableAtCheckout'] =
+          TeacherBookingOffer.shownAtCheckout(bookingOffer);
+      data['acceptsCoTeaching'] =
+          TeacherBookingOffer.shownAsCoteach(bookingOffer);
+    }
+    await _firestore
+        .collection('native_teacher_accounts')
+        .doc(profileId)
+        .set(data, SetOptions(merge: true));
+  }
+
+  /// 메인 관리자(또는 강사)의 결제 선택·코티칭 수신 설정.
+  static Future<String?> updateBookingOffer({
+    required String teacherUid,
+    required String offer,
+  }) async {
+    if (offer != TeacherBookingOffer.both &&
+        offer != TeacherBookingOffer.coteach &&
+        offer != TeacherBookingOffer.off) {
+      return '올바르지 않은 수업 받기 설정입니다.';
+    }
+    try {
+      final adminRef = _firestore.collection('admins').doc(teacherUid);
+      final adminSnap = await adminRef.get();
+      if (!adminSnap.exists) return '강사 계정을 찾을 수 없습니다.';
+      final data = adminSnap.data() ?? {};
+      final isOwnerTeacher = data['role']?.toString() != 'teacher';
+      var existing = data['nativeProfileId']?.toString() ?? '';
+      if (existing.startsWith('native_temp_')) existing = '';
+      final profileId = OnlineNativeTeacher.profileIdFor(
+        uid: teacherUid,
+        isOwner: isOwnerTeacher,
+        existing: existing,
+      );
+      await adminRef.set({
+        'bookingOffer': offer,
+        'selectableAtCheckout': TeacherBookingOffer.shownAtCheckout(offer),
+        'acceptsCoTeaching': TeacherBookingOffer.shownAsCoteach(offer),
+        'nativeProfileId': profileId,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      await _upsertNativeProfile(
+        teacherUid: teacherUid,
+        profileId: profileId,
+        name: data['name']?.toString() ?? '',
+        email: data['email']?.toString() ?? '',
+        nationality: data['nationality']?.toString() ?? '',
+        intro: data['intro']?.toString() ?? '',
+        photoUrl: data['photoUrl']?.toString() ?? '',
+        isActive: data['isActive'] != false,
+        bookingOffer: offer,
+      );
+      return null;
+    } catch (e) {
+      print('수업 받기 설정 오류: $e');
+      return '수업 받기 설정을 저장하지 못했습니다.';
+    }
   }
 
   /// 이미 등록된 강사에게 로그인 비밀번호를 만들거나 바꾼다.
@@ -740,6 +898,9 @@ class AuthService {
     String phone = '',
     String nationality = '',
     String intro = '',
+    String bankName = '',
+    String bankAccount = '',
+    String accountHolder = '',
     Uint8List? photoBytes,
     String? photoFileName,
     String? password,
@@ -782,6 +943,9 @@ class AuthService {
         'phone': PhoneUtil.normalize(phone),
         'nationality': nationality.trim(),
         'intro': intro.trim(),
+        'bankName': bankName.trim(),
+        'bankAccount': bankAccount.trim(),
+        'accountHolder': accountHolder.trim(),
         'photoUrl': photoUrl,
         'nativeProfileId': profileId,
         'updatedAt': FieldValue.serverTimestamp(),
@@ -797,6 +961,10 @@ class AuthService {
           intro: intro.trim(),
           photoUrl: photoUrl,
           isActive: isActive,
+          bookingOffer: TeacherBookingOffer.resolve(
+            data,
+            isOwner: isOwnerTeacher,
+          ),
         );
       } catch (e) {
         print('원어민 프로필 동기화 오류: $e');
@@ -906,9 +1074,17 @@ class AuthService {
           intro: data['intro']?.toString() ?? '',
           photoUrl: data['photoUrl']?.toString() ?? '',
           isActive: data['isActive'] != false,
+          bookingOffer: TeacherBookingOffer.resolve(
+            data,
+            isOwner: isOwnerTeacher,
+          ),
         );
         await _firestore.collection('admins').doc(doc.id).set({
           'nativeProfileId': profileId,
+          'bookingOffer': TeacherBookingOffer.resolve(
+            data,
+            isOwner: isOwnerTeacher,
+          ),
         }, SetOptions(merge: true));
       }
     } catch (e) {
@@ -916,17 +1092,36 @@ class AuthService {
     }
   }
 
-  static Future<List<OnlineNativeTeacher>> selectableNativeTeachers() async {
+  static Future<List<OnlineNativeTeacher>> selectableNativeTeachers({
+    TeacherPickKind? kind,
+  }) async {
+    final teachers = await _loadPublicTeachers();
+    if (kind == TeacherPickKind.checkout) {
+      return teachers.where((t) => t.selectableAtCheckout).toList();
+    }
+    if (kind == TeacherPickKind.coteach) {
+      return teachers.where((t) => t.acceptsCoTeaching).toList();
+    }
+    return teachers;
+  }
+
+  static Future<List<OnlineNativeTeacher>> _loadPublicTeachers() async {
+    var teachers = <OnlineNativeTeacher>[];
     try {
-      final fromServer = await _selectableTeachersFromServer();
-      if (fromServer.isNotEmpty) {
-        OnlineNativeTeacher.cacheAll(fromServer);
-        return fromServer;
-      }
+      teachers = await _selectableTeachersFromServer();
     } catch (e) {
       print('선택 가능 강사 Functions 조회 오류: $e');
     }
+    if (teachers.isEmpty) {
+      teachers = await _teachersFromStore();
+    } else {
+      teachers = await _applyStoredBookingOffers(teachers);
+    }
+    OnlineNativeTeacher.cacheAll(teachers);
+    return teachers;
+  }
 
+  static Future<List<OnlineNativeTeacher>> _teachersFromStore() async {
     try {
       final snapshot =
           await _firestore.collection('native_teacher_accounts').get();
@@ -944,11 +1139,77 @@ class AuthService {
         if (aOwner != bOwner) return aOwner.compareTo(bOwner);
         return a.name.compareTo(b.name);
       });
-      OnlineNativeTeacher.cacheAll(fromStore);
       return fromStore;
     } catch (e) {
       print('선택 가능 원어민 강사 조회 오류: $e');
       return [];
+    }
+  }
+
+  static Future<List<OnlineNativeTeacher>> _applyStoredBookingOffers(
+    List<OnlineNativeTeacher> teachers,
+  ) async {
+    try {
+      final snapshot =
+          await _firestore.collection('native_teacher_accounts').get();
+      final byKey = <String, String>{};
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final isOwner = doc.id == OnlineNativeTeacher.ownerProfileId;
+        final offer = TeacherBookingOffer.resolve(data, isOwner: isOwner);
+        byKey[doc.id] = offer;
+        final uid = data['teacherUid']?.toString() ?? '';
+        if (uid.isNotEmpty) byKey[uid] = offer;
+      }
+      return teachers.map((teacher) {
+        final offer = byKey[teacher.id] ??
+            byKey[teacher.accountUid] ??
+            TeacherBookingOffer.resolve(
+              null,
+              isOwner: teacher.id == OnlineNativeTeacher.ownerProfileId,
+            );
+        return teacher.copyWith(
+          selectableAtCheckout: TeacherBookingOffer.shownAtCheckout(offer),
+          acceptsCoTeaching: TeacherBookingOffer.shownAsCoteach(offer),
+        );
+      }).toList();
+    } catch (e) {
+      print('강사 수업 받기 설정 조회 오류: $e');
+      return teachers
+          .map((teacher) {
+            final isOwner = teacher.id == OnlineNativeTeacher.ownerProfileId;
+            final offer =
+                TeacherBookingOffer.resolve(null, isOwner: isOwner);
+            return teacher.copyWith(
+              selectableAtCheckout:
+                  TeacherBookingOffer.shownAtCheckout(offer),
+              acceptsCoTeaching: TeacherBookingOffer.shownAsCoteach(offer),
+            );
+          })
+          .toList();
+    }
+  }
+
+  static Future<bool> teacherAcceptsCoTeaching(String teacherUid) async {
+    if (teacherUid.isEmpty) return false;
+    try {
+      final byUid = await _firestore
+          .collection('native_teacher_accounts')
+          .where('teacherUid', isEqualTo: teacherUid)
+          .limit(1)
+          .get();
+      if (byUid.docs.isEmpty) {
+        return teacherUid.isNotEmpty;
+      }
+      final doc = byUid.docs.first;
+      final offer = TeacherBookingOffer.resolve(
+        doc.data(),
+        isOwner: doc.id == OnlineNativeTeacher.ownerProfileId,
+      );
+      return TeacherBookingOffer.shownAsCoteach(offer);
+    } catch (e) {
+      print('코티칭 가능 여부 조회 오류: $e');
+      return true;
     }
   }
 
@@ -968,16 +1229,20 @@ class AuthService {
       final map = Map<String, dynamic>.from(item);
       final name = map['name']?.toString().trim() ?? '';
       if (name.isEmpty) continue;
+      final isOwner = map['isOwner'] == true;
+      final offer = TeacherBookingOffer.resolve(map, isOwner: isOwner);
       teachers.add(OnlineNativeTeacher(
         id: map['id']?.toString() ?? '',
         name: name,
         nationality: map['nationality']?.toString() ?? '',
         intro: map['intro']?.toString() ?? '',
-        imageAsset: map['isOwner'] == true
+        imageAsset: isOwner
             ? 'assets/directorPhoto.jpeg'
             : OnlineNativeTeacher.fallbackAsset,
         photoUrl: map['photoUrl']?.toString() ?? '',
         accountUid: map['accountUid']?.toString() ?? '',
+        selectableAtCheckout: TeacherBookingOffer.shownAtCheckout(offer),
+        acceptsCoTeaching: TeacherBookingOffer.shownAsCoteach(offer),
       ));
     }
     return teachers;

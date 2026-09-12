@@ -149,20 +149,11 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
           SizedBox(
             height: 20,
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Container(
-                width: 700, child: Image.asset("assets/optionalPrograms.png")),
-          ),
+          WidgetUtil.pageImage("assets/optionalPrograms.png"),
           SizedBox(
             height: 60,
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Container(
-                width: 700,
-                child: Image.asset("assets/middleSchoolOptionalProgram.png")),
-          ),
+          WidgetUtil.pageImage("assets/middleSchoolOptionalProgram.png"),
           SizedBox(
             height: 50,
           ),

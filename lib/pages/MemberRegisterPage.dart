@@ -161,7 +161,7 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
                     style: TextStyle(
                       fontFamily: "Jalnan",
                       fontSize: 15,
-                      color: Palette.secondaryDark,
+                      color: Palette.navy,
                     ),
                   ),
                   SizedBox(height: 8),
@@ -190,7 +190,7 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
                     height: 48,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.secondaryDark,
+                        backgroundColor: Palette.darkTeal,
                         foregroundColor: Palette.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -226,7 +226,7 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
                       style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 13,
-                        color: Palette.secondaryDark,
+                        color: Palette.darkTeal,
                       ),
                     ),
                   ),

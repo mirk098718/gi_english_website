@@ -119,7 +119,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
 
   Widget content() {
     return Container(
-      width: MediaQuery.of(context).size.width,
+      width: double.infinity,
       padding: EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
       color: Palette.white,
       child: Column(

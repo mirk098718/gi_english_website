@@ -370,7 +370,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
             height: 44,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Palette.secondaryDark,
+                backgroundColor: Palette.darkTeal,
                 foregroundColor: Palette.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
