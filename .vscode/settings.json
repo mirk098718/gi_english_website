@@ -1,0 +1,9 @@
+{
+  "dart.flutterHotReloadOnSave": "all",
+  "dart.flutterSelectDeviceWhenConnected": false,
+  "dart.flutterRunAdditionalArgs": [
+    "--web-port=7357",
+    "--web-hostname=127.0.0.1",
+    "--pid-file=.dart_tool/flutter_chrome.pid"
+  ]
+}

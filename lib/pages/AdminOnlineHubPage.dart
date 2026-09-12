@@ -18,6 +18,7 @@ import 'package:gi_english_website/pages/AdminWeekCurriculumTab.dart';
 import 'package:gi_english_website/pages/TeacherRosterPage.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
 import 'package:gi_english_website/widget/TeacherPhotoCropDialog.dart';
+import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
 
 /// 관리자/강사용 온라인 프로그램 관리 허브.
 /// - 메인 관리자: 수강·결제, 스케줄, 강사 관리, 강의 업로드, 주간 학습
@@ -167,6 +168,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
   final sessionsController = TextEditingController(text: '8');
   OnlineCourse? _selectedCourse = OnlineCourse.all.first;
   List<EnrollmentRecord> _enrollments = [];
+  Map<String, List<StudentWeekProgress>> _learning = {};
   List<Map<String, dynamic>> _members = [];
   bool _loading = true;
   bool _saving = false;
@@ -257,9 +259,11 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
           await EnrollmentService.listEnrollments(memberIds: memberIds);
     }
 
+    final learning = await EnrollmentService.learningByEnrollment(enrollments);
     if (!mounted) return;
     setState(() {
       _enrollments = enrollments;
+      _learning = learning;
       _members = members;
       _loading = false;
     });
@@ -562,6 +566,12 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   color: record.isPaid ? Palette.success : Palette.danger),
             ),
           ],
+          SizedBox(height: 12),
+          StudentLearningProgressPanel(
+            enrollments: [record],
+            progressByEnrollment: _learning,
+            dense: true,
+          ),
           SizedBox(height: 12),
           Wrap(
             spacing: 8,

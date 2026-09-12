@@ -139,6 +139,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
       enrollmentId: enrollment.id,
       weekId: week.id,
       checkedItemIds: next,
+      week: week,
     );
     if (!mounted) return;
     setState(() {
@@ -155,14 +156,8 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
     }
   }
 
-  bool _problemsChecked(OnlineWeek week, List<String> checked) {
-    for (final item in week.checklistItems) {
-      if (item.id == 'solve_problems' || item.label.contains('문제풀이')) {
-        return checked.contains(item.id);
-      }
-    }
-    return week.checklistItems.isNotEmpty &&
-        week.checkedCount(checked) == week.checklistItems.length;
+  bool _readyToBook(OnlineWeek week, List<String> checked) {
+    return EnrollmentService.isWeekReadyToBook(week, checked);
   }
 
   WeekBooking? _bookingFor(String weekId) {
@@ -833,7 +828,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
         ? "권장은 주 1회입니다."
         : "권장은 주 1회이며, 수강 기한은 ${enrollment.remainingDeadlineWeeks}주 남았습니다.";
     return "지금 열린 수업은 $current회차입니다. 이 회차 화상수업을 마치면 다음 회차가 열립니다. "
-        "$deadline 인강을 보고 문제풀이를 한 뒤 아래 항목을 체크하세요."
+        "$deadline 인강과 문제풀이를 모두 체크하면 예약이 열립니다."
         "${done > 0 ? ' 이수 $done/${enrollment.totalSessions}회.' : ''}";
   }
 
@@ -1030,6 +1025,18 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
               child: Text('3. 학습 체크리스트',
                   style: TextStyle(fontFamily: "Jalnan", fontSize: 13)),
             ),
+            SizedBox(height: 4),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                '인강 시청과 문제풀이를 모두 체크해야 아래 예약이 열립니다.',
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 12,
+                  color: Palette.grey500,
+                ),
+              ),
+            ),
             SizedBox(height: 8),
             if (_enrollment == null)
               Text(
@@ -1074,10 +1081,20 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
               ),
             SizedBox(height: 16),
             weekFeedbackSection(week),
-            if (_enrollment != null &&
-                _problemsChecked(week, checked)) ...[
+            if (_enrollment != null) ...[
               SizedBox(height: 16),
-              weekBookingSection(week),
+              if (_readyToBook(week, checked))
+                weekBookingSection(week)
+              else
+                Text(
+                  '인강 시청과 문제풀이를 모두 체크하면 화상수업 예약이 열립니다.',
+                  style: TextStyle(
+                    fontFamily: "NotoSansKR",
+                    fontSize: 13,
+                    color: Palette.grey600,
+                    height: 1.5,
+                  ),
+                ),
             ],
             ],
           ],
@@ -1283,7 +1300,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
             Text(
               otherTeacher
                   ? '수업은 30분입니다. 선택한 원어민 선생님이 열어 둔 시간만 예약할 수 있습니다. 담당 선생님이 아니어도 강사가 확인하면 확정됩니다.'
-                  : '수업은 30분입니다. 담당 원어민 선생님이 열어 둔 시간만 6:00 AM부터 11:30 PM까지 30분 단위로 선택할 수 있습니다. 강사가 확인하면 예약이 확정됩니다.',
+                  : '수업은 30분입니다. 담당 원어민 선생님이 열어 둔 시간만 6:00 AM부터 11:00 PM까지 30분 단위로 선택할 수 있습니다. 강사가 확인하면 예약이 확정됩니다.',
               style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 13,

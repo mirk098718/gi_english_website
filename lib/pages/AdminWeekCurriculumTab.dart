@@ -258,7 +258,8 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
     }
     if (_links.isEmpty) _links.add(_LinkDraft());
     if (_checks.isEmpty) {
-      _checks.add(_CheckDraft(id: _newCheckId()));
+      _checks.add(_CheckDraft(id: 'watch_video', label: '인강 시청하기'));
+      _checks.add(_CheckDraft(id: 'solve_problems', label: '문제풀이 하기'));
     }
   }
 

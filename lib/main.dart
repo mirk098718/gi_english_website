@@ -6,6 +6,7 @@ import 'package:gi_english_website/pages/PaymentResultPage.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:gi_english_website/util/NoticeService.dart';
 
+import 'pages/AdminTeacherScheduleTab.dart';
 import 'pages/SchoolAboutPage.dart';
 
 Future<void> main() async {
@@ -44,6 +45,9 @@ class MyApp extends StatelessWidget {
     }
     if (path.contains('/payment/fail')) {
       return PaymentResultPage.fromUri(uri, success: false);
+    }
+    if (AdminTeacherSchedulePage.matchesUri(uri)) {
+      return const AdminTeacherSchedulePage();
     }
     return const SchoolAboutPage();
   }

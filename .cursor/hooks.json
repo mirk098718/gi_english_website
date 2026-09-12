@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "hooks": {
+    "afterFileEdit": [
+      {
+        "command": ".cursor/hooks/mark_flutter_hot_restart.py"
+      }
+    ],
+    "stop": [
+      {
+        "command": ".cursor/hooks/run_flutter_hot_restart.py",
+        "timeout": 30
+      }
+    ]
+  }
+}

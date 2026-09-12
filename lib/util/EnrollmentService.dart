@@ -28,7 +28,10 @@ import 'package:gi_english_website/util/UrlIUtil.dart';
 ///     createdAt, updatedAt
 ///   }
 /// - enrollments/{id}/session_logs/{logId} : { delta, completedAfter, totalSessions, adminName, createdAt }
-/// - enrollments/{id}/week_progress/{weekId} : { checkedItemIds, updatedAt }
+/// - enrollments/{id}/week_progress/{weekId} : {
+///     checkedItemIds, weekNumber, weekTitle, videoUrl,
+///     problemLinks: [{ title, url }], updatedAt
+///   }
 /// - week_bookings/{docId} : {
 ///     userId, memberName, courseId, weekId, weekNumber,
 ///     date, time, status, teacherId, createdAt, confirmedAt, confirmedBy
@@ -94,6 +97,28 @@ class EnrollmentService {
 
   static OnlineWeek defaultWeek1(String courseId) {
     return defaultWeek(courseId, 1);
+  }
+
+  static bool isVideoChecklistItem(WeekChecklistItem item) {
+    return item.id == 'watch_video' || item.label.contains('인강');
+  }
+
+  static bool isProblemChecklistItem(WeekChecklistItem item) {
+    return item.id == 'solve_problems' || item.label.contains('문제풀이');
+  }
+
+  /// 인강·문제풀이 항목이 모두 체크됐는지. 둘 다 있어야 화상수업 예약이 열린다.
+  static bool isWeekReadyToBook(OnlineWeek week, List<String> checked) {
+    final items = week.checklistItems;
+    if (items.isEmpty) return false;
+    final videos = items.where(isVideoChecklistItem).toList();
+    final problems = items.where(isProblemChecklistItem).toList();
+    if (videos.isEmpty && problems.isEmpty) {
+      return items.every((item) => checked.contains(item.id));
+    }
+    if (videos.isEmpty || problems.isEmpty) return false;
+    return videos.every((item) => checked.contains(item.id)) &&
+        problems.every((item) => checked.contains(item.id));
   }
 
   /// 아직 관리자가 등록하지 않은 회차도 예약·학습 UI가 보이도록 하는 자리표시.
@@ -764,16 +789,31 @@ class EnrollmentService {
   static Future<List<EnrollmentRecord>> listEnrollments(
       {List<String>? memberIds}) async {
     try {
-      final snapshot = await _firestore.collection('enrollments').get();
+      final allowed = memberIds
+          ?.map((id) => id.trim())
+          .where((id) => id.isNotEmpty)
+          .toSet()
+          .toList();
+      if (allowed != null && allowed.isEmpty) return [];
 
-      var list = snapshot.docs
+      final docs = <QueryDocumentSnapshot<Map<String, dynamic>>>[];
+      if (allowed == null) {
+        docs.addAll((await _firestore.collection('enrollments').get()).docs);
+      } else {
+        for (var i = 0; i < allowed.length; i += 10) {
+          final end = i + 10 > allowed.length ? allowed.length : i + 10;
+          final chunk = allowed.sublist(i, end);
+          final snapshot = await _firestore
+              .collection('enrollments')
+              .where('userId', whereIn: chunk)
+              .get();
+          docs.addAll(snapshot.docs);
+        }
+      }
+
+      var list = docs
           .map((doc) => EnrollmentRecord.fromMap(doc.id, doc.data()))
           .toList();
-
-      if (memberIds != null) {
-        final allowed = memberIds.toSet();
-        list = list.where((e) => allowed.contains(e.userId)).toList();
-      }
 
       list.sort((a, b) {
         final aTime = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
@@ -1246,6 +1286,12 @@ class EnrollmentService {
 
   static Future<Map<String, List<String>>> weekProgress(
       String enrollmentId) async {
+    final records = await weekProgressRecords(enrollmentId);
+    return records.map((id, record) => MapEntry(id, record.checkedItemIds));
+  }
+
+  static Future<Map<String, WeekProgressRecord>> weekProgressRecords(
+      String enrollmentId) async {
     try {
       final snapshot = await _firestore
           .collection('enrollments')
@@ -1253,15 +1299,9 @@ class EnrollmentService {
           .collection('week_progress')
           .get();
 
-      final Map<String, List<String>> result = {};
+      final Map<String, WeekProgressRecord> result = {};
       for (final doc in snapshot.docs) {
-        final raw = doc.data()['checkedItemIds'];
-        if (raw is List) {
-          result[doc.id] =
-              raw.map((e) => e.toString()).where((e) => e.isNotEmpty).toList();
-        } else {
-          result[doc.id] = [];
-        }
+        result[doc.id] = WeekProgressRecord.fromMap(doc.id, doc.data());
       }
       return result;
     } catch (e) {
@@ -1270,21 +1310,125 @@ class EnrollmentService {
     }
   }
 
+  /// 강사 화면에 보여줄 회차별 인강·문제 체크. 열린 회차와 체크 기록이 있는 회차만.
+  static Future<Map<String, List<StudentWeekProgress>>> learningByEnrollment(
+    Iterable<EnrollmentRecord> enrollments,
+  ) async {
+    final unique = <String, EnrollmentRecord>{};
+    for (final enrollment in enrollments) {
+      unique[enrollment.id] = enrollment;
+    }
+    if (unique.isEmpty) return {};
+
+    final list = unique.values.toList();
+    final throughByCourse = <String, int>{};
+    for (final enrollment in list) {
+      final current = throughByCourse[enrollment.courseId] ?? 1;
+      final next = enrollment.unlockedSessionNumber;
+      throughByCourse[enrollment.courseId] = next > current ? next : current;
+    }
+
+    final weeksByCourse = <String, List<OnlineWeek>>{};
+    await Future.wait(throughByCourse.entries.map((entry) async {
+      weeksByCourse[entry.key] = await weeks(
+        entry.key,
+        ensureThrough: entry.value,
+      );
+    }));
+
+    final result = <String, List<StudentWeekProgress>>{};
+    await Future.wait(list.map((enrollment) async {
+      final records = await weekProgressRecords(enrollment.id);
+      result[enrollment.id] = mergeLearningWeeks(
+        weeks: weeksByCourse[enrollment.courseId] ?? const [],
+        records: records,
+        through: enrollment.unlockedSessionNumber,
+      );
+    }));
+    return result;
+  }
+
+  static List<StudentWeekProgress> mergeLearningWeeks({
+    required List<OnlineWeek> weeks,
+    required Map<String, WeekProgressRecord> records,
+    required int through,
+  }) {
+    final byNumber = <int, OnlineWeek>{};
+    for (final week in weeks) {
+      byNumber[week.weekNumber] = week;
+    }
+    final seen = <String>{};
+    final result = <StudentWeekProgress>[];
+
+    for (var n = 1; n <= through; n++) {
+      final week = byNumber[n];
+      if (week == null) continue;
+      seen.add(week.id);
+      result.add(StudentWeekProgress.from(week, records[week.id]));
+    }
+
+    final extras = records.entries
+        .where((entry) => !seen.contains(entry.key))
+        .toList()
+      ..sort((a, b) => a.value.weekNumber.compareTo(b.value.weekNumber));
+    for (final entry in extras) {
+      OnlineWeek? week;
+      for (final item in weeks) {
+        if (item.id == entry.key) {
+          week = item;
+          break;
+        }
+      }
+      result.add(StudentWeekProgress.from(
+        week ?? _weekFromProgress(entry.key, entry.value),
+        entry.value,
+      ));
+    }
+    result.sort((a, b) => a.weekNumber.compareTo(b.weekNumber));
+    return result;
+  }
+
+  static OnlineWeek _weekFromProgress(String weekId, WeekProgressRecord record) {
+    return OnlineWeek(
+      id: weekId,
+      courseId: '',
+      weekNumber: record.weekNumber < 1 ? 1 : record.weekNumber,
+      title: record.weekTitle,
+      description: '',
+      videoUrl: record.videoUrl,
+      problemLinks: record.problemLinks,
+      checklistItems: const [
+        WeekChecklistItem(id: 'watch_video', label: '인강 시청하기'),
+        WeekChecklistItem(id: 'solve_problems', label: '문제풀이 하기'),
+      ],
+    );
+  }
+
   static Future<String?> setWeekChecklist({
     required String enrollmentId,
     required String weekId,
     required List<String> checkedItemIds,
+    OnlineWeek? week,
   }) async {
     try {
+      final payload = <String, dynamic>{
+        'checkedItemIds': checkedItemIds,
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+      if (week != null) {
+        payload['weekNumber'] = week.weekNumber;
+        payload['weekTitle'] = week.title;
+        payload['videoUrl'] = week.videoUrl;
+        payload['problemLinks'] = week.problemLinks
+            .map((link) => {'title': link.title, 'url': link.url})
+            .toList();
+      }
       await _firestore
           .collection('enrollments')
           .doc(enrollmentId)
           .collection('week_progress')
           .doc(weekId)
-          .set({
-        'checkedItemIds': checkedItemIds,
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+          .set(payload, SetOptions(merge: true));
       return null;
     } catch (e) {
       print('체크리스트 저장 오류: $e');
@@ -1422,7 +1566,7 @@ class EnrollmentService {
     }
   }
 
-  /// 원어민 화상수업은 30분 단위. 오전 6시부터 밤 11:30(수업 종료 자정)까지.
+  /// 원어민 화상수업은 30분 단위. 오전 6시부터 밤 11:00까지. 마지막 11:30은 두지 않는다.
   static final List<String> bookingTimeSlots = _buildBookingTimeSlots();
 
   static const int lessonMinutes = 30;
@@ -1430,10 +1574,9 @@ class EnrollmentService {
   static List<String> _buildBookingTimeSlots() {
     final slots = <String>[];
     for (var hour = 6; hour <= 23; hour++) {
-      for (final minute in [0, 30]) {
-        slots.add(
-          '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}',
-        );
+      slots.add('${hour.toString().padLeft(2, '0')}:00');
+      if (hour < 23) {
+        slots.add('${hour.toString().padLeft(2, '0')}:30');
       }
     }
     return slots;
@@ -1644,6 +1787,10 @@ class EnrollmentService {
     }
     if (!isSessionUnlocked(enrollment, week.weekNumber)) {
       return '이전 회차 화상수업을 마치면 이 회차를 예약할 수 있습니다.';
+    }
+    final checked = (await weekProgress(enrollment.id))[week.id] ?? const [];
+    if (!isWeekReadyToBook(week, checked)) {
+      return '인강 시청과 문제풀이를 모두 체크한 뒤에 예약할 수 있습니다.';
     }
     if (!allowed.any((d) => d == day)) {
       return '선택할 수 없는 날짜입니다.';
@@ -2028,6 +2175,118 @@ class OnlineSession {
       teacherId: data['teacherId']?.toString() ?? '',
       memberName: data['memberName']?.toString() ?? '',
       weekNumber: EnrollmentService._intValue(data['weekNumber']),
+    );
+  }
+}
+
+class WeekProgressRecord {
+  final String weekId;
+  final List<String> checkedItemIds;
+  final int weekNumber;
+  final String weekTitle;
+  final String videoUrl;
+  final List<WeekProblemLink> problemLinks;
+
+  WeekProgressRecord({
+    required this.weekId,
+    required this.checkedItemIds,
+    this.weekNumber = 0,
+    this.weekTitle = '',
+    this.videoUrl = '',
+    this.problemLinks = const [],
+  });
+
+  factory WeekProgressRecord.fromMap(String id, Map<String, dynamic> data) {
+    final raw = data['checkedItemIds'];
+    final checked = raw is List
+        ? raw.map((e) => e.toString()).where((e) => e.isNotEmpty).toList()
+        : <String>[];
+    final links = <WeekProblemLink>[];
+    final rawLinks = data['problemLinks'];
+    if (rawLinks is List) {
+      for (final item in rawLinks) {
+        if (item is Map) {
+          links.add(WeekProblemLink(
+            title: item['title']?.toString() ?? '문제풀이',
+            url: item['url']?.toString() ?? '',
+          ));
+        }
+      }
+    }
+    return WeekProgressRecord(
+      weekId: id,
+      checkedItemIds: checked,
+      weekNumber: EnrollmentService._intValue(data['weekNumber']),
+      weekTitle: data['weekTitle']?.toString() ?? '',
+      videoUrl: data['videoUrl']?.toString() ?? '',
+      problemLinks: links,
+    );
+  }
+}
+
+/// 강사가 수강생 카드에서 보는 회차별 인강·문제 진도.
+class StudentWeekProgress {
+  final String weekId;
+  final int weekNumber;
+  final String weekTitle;
+  final String videoUrl;
+  final List<WeekProblemLink> problemLinks;
+  final bool videoChecked;
+  final bool problemsChecked;
+  final bool readyToBook;
+
+  StudentWeekProgress({
+    required this.weekId,
+    required this.weekNumber,
+    required this.weekTitle,
+    required this.videoUrl,
+    required this.problemLinks,
+    required this.videoChecked,
+    required this.problemsChecked,
+    required this.readyToBook,
+  });
+
+  String get videoLabel {
+    if (weekTitle.trim().isNotEmpty) return weekTitle.trim();
+    if (videoUrl.trim().isNotEmpty) return videoUrl.trim();
+    return '인강';
+  }
+
+  factory StudentWeekProgress.from(
+    OnlineWeek week,
+    WeekProgressRecord? record,
+  ) {
+    final checked = record?.checkedItemIds ?? const <String>[];
+    final videoUrl = (record != null && record.videoUrl.trim().isNotEmpty)
+        ? record.videoUrl
+        : week.videoUrl;
+    final title = week.title.trim().isNotEmpty
+        ? week.title
+        : (record?.weekTitle ?? '');
+    final problems = (record != null && record.problemLinks.isNotEmpty)
+        ? record.problemLinks
+        : week.problemLinks;
+    final videoItems = week.checklistItems
+        .where(EnrollmentService.isVideoChecklistItem)
+        .toList();
+    final problemItems = week.checklistItems
+        .where(EnrollmentService.isProblemChecklistItem)
+        .toList();
+    return StudentWeekProgress(
+      weekId: week.id,
+      weekNumber: week.weekNumber > 0
+          ? week.weekNumber
+          : (record?.weekNumber ?? 0),
+      weekTitle: title,
+      videoUrl: videoUrl,
+      problemLinks: problems,
+      videoChecked: videoItems.isEmpty
+          ? checked.contains('watch_video')
+          : videoItems.every((item) => checked.contains(item.id)),
+      problemsChecked: problemItems.isEmpty
+          ? checked.contains('solve_problems')
+          : problemItems.every((item) => checked.contains(item.id)),
+      readyToBook: EnrollmentService.isWeekReadyToBook(week, checked),
     );
   }
 }

@@ -1,3 +1,7 @@
+// ignore: deprecated_member_use
+import 'dart:html' as html;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -8,13 +12,114 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/util/TeacherScheduleService.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
+import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
+
+/// 스케줄만 따로 보는 전체 화면. `/schedule` 또는 허브의 ‘새 화면으로 열기’.
+class AdminTeacherSchedulePage extends StatefulWidget {
+  final bool? showAllBookings;
+
+  const AdminTeacherSchedulePage({Key? key, this.showAllBookings})
+      : super(key: key);
+
+  static bool matchesUri(Uri uri) {
+    if (uri.queryParameters['view'] == 'schedule') return true;
+    return uri.path.toLowerCase().contains('/schedule');
+  }
+
+  static void openNewScreen(
+    BuildContext context, {
+    required bool showAllBookings,
+  }) {
+    if (kIsWeb) {
+      final params = <String, String>{'view': 'schedule'};
+      if (showAllBookings) params['all'] = '1';
+      final url = Uri.parse(html.window.location.origin)
+          .replace(queryParameters: params)
+          .toString();
+      html.window.open(url, 'giSchedule');
+      return;
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) =>
+            AdminTeacherSchedulePage(showAllBookings: showAllBookings),
+      ),
+    );
+  }
+
+  @override
+  State<AdminTeacherSchedulePage> createState() =>
+      _AdminTeacherSchedulePageState();
+}
+
+class _AdminTeacherSchedulePageState extends State<AdminTeacherSchedulePage> {
+  bool _checking = true;
+  bool _authorized = false;
+  bool _showAll = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _boot();
+  }
+
+  Future<void> _boot() async {
+    final isStaff = await AuthService.isStaff();
+    final role = await AuthService.getAdminRole();
+    if (!mounted) return;
+    final fromQuery = Uri.base.queryParameters['all'] == '1';
+    setState(() {
+      _authorized = isStaff;
+      _showAll = widget.showAllBookings ??
+          (fromQuery || role == AdminRole.owner);
+      _checking = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_checking) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (!_authorized) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('스케줄 · 예약', style: TextStyle(fontFamily: "NotoSansKR")),
+          backgroundColor: Palette.secondaryDark,
+          foregroundColor: Palette.white,
+        ),
+        body: Center(
+          child: Text(
+            '강사 또는 관리자로 로그인한 뒤 다시 열어 주세요.',
+            style: TextStyle(fontFamily: "NotoSansKR"),
+          ),
+        ),
+      );
+    }
+    return Scaffold(
+      backgroundColor: Palette.white,
+      body: SafeArea(
+        child: AdminTeacherScheduleTab(
+          showAllBookings: _showAll,
+          standalone: true,
+        ),
+      ),
+    );
+  }
+}
 
 /// 강사 스케줄(불가 시간)과 수업 예약을 한 화면에서 보고 컨펌한다.
 class AdminTeacherScheduleTab extends StatefulWidget {
   final bool showAllBookings;
+  final bool standalone;
 
-  const AdminTeacherScheduleTab({Key? key, this.showAllBookings = false})
-      : super(key: key);
+  const AdminTeacherScheduleTab({
+    Key? key,
+    this.showAllBookings = false,
+    this.standalone = false,
+  }) : super(key: key);
 
   @override
   _AdminTeacherScheduleTabState createState() =>
@@ -24,17 +129,30 @@ class AdminTeacherScheduleTab extends StatefulWidget {
 class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   TeacherAvailability _availability = TeacherAvailability(teacherUid: '');
   List<WeekBooking> _bookings = [];
+  List<EnrollmentRecord> _enrollments = [];
+  Map<String, List<StudentWeekProgress>> _learning = {};
   List<AppNotification> _notifications = [];
   DateTime _weekStart = EnrollmentService.weekStart(DateTime.now());
   bool _loading = true;
   bool _saving = false;
   String _teacherUid = '';
   String _staffPhone = '';
+  DateTime? _selectAnchorDate;
+  String? _selectAnchorTime;
+  bool _selecting = false;
+  final Set<String> _selectedKeys = {};
+  final ScrollController _gridScroll = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _refresh();
+  }
+
+  @override
+  void dispose() {
+    _gridScroll.dispose();
+    super.dispose();
   }
 
   Future<void> _refresh() async {
@@ -44,13 +162,37 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     final bookings = await EnrollmentService.staffWeekBookings(
       mineOnly: !widget.showAllBookings,
     );
+    if (widget.standalone) {
+      if (!mounted) return;
+      setState(() {
+        _teacherUid = uid;
+        _availability = availability;
+        _bookings = bookings;
+        _enrollments = [];
+        _learning = {};
+        _staffPhone = '';
+        _notifications = [];
+        _loading = false;
+      });
+      return;
+    }
     final profile = await AuthService.currentStaffProfile();
     final notifications = await NotificationService.listMine();
+    final userIds = bookings
+        .map((item) => item.userId)
+        .where((id) => id.isNotEmpty)
+        .toSet()
+        .toList();
+    final enrollments =
+        await EnrollmentService.listEnrollments(memberIds: userIds);
+    final learning = await EnrollmentService.learningByEnrollment(enrollments);
     if (!mounted) return;
     setState(() {
       _teacherUid = uid;
       _availability = availability;
       _bookings = bookings;
+      _enrollments = enrollments;
+      _learning = learning;
       _staffPhone = profile?['phone']?.toString() ?? '';
       _notifications = notifications.where((item) => !item.read).toList();
       _loading = false;
@@ -201,17 +343,20 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     final routine = _availability.isRoutine(date, time);
     final exception = _availability.isException(date, time);
     final oneOff = _availability.isOneOffClosed(date, time);
+    final existingNote = _availability.noteFor(date, time);
     final timeLabel = EnrollmentService.formatBookingTime(time);
     final dateLabel = EnrollmentService.formatBookingDate(date);
     final weekday = _availability.weekdayLabel(date);
+    final noteController = TextEditingController(text: existingNote);
 
     final action = await showDialog<_SlotAction>(
       context: context,
       builder: (dialogContext) {
         Widget option(_SlotAction value, IconData icon, String title,
-            String subtitle) {
+            String subtitle,
+            {Color? iconColor}) {
           return ListTile(
-            leading: Icon(icon, color: Palette.darkTeal),
+            leading: Icon(icon, color: iconColor ?? Palette.darkTeal),
             title: Text(title, style: TextStyle(fontFamily: "NotoSansKR")),
             subtitle: Text(subtitle,
                 style: TextStyle(
@@ -284,6 +429,13 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
             ),
           ]);
         }
+        options.add(option(
+          _SlotAction.savePersonal,
+          Icons.circle,
+          existingNote.isEmpty ? '개인 일정으로 닫기' : '개인 일정 저장',
+          '아래 사유를 빨간 점으로 표시하고 이 시간을 닫습니다.',
+          iconColor: Palette.danger,
+        ));
 
         return AlertDialog(
           backgroundColor: Palette.white,
@@ -297,11 +449,23 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '수업은 30분입니다. 원치 않는 시간을 닫거나, 매주 같은 시간을 루틴으로 고정할 수 있습니다.',
+                  '수업은 30분입니다. 닫거나, 매주 같은 시간을 고정하거나, 사유를 적어 개인 일정을 표시할 수 있습니다.',
                   style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 13,
                       color: Palette.grey600),
+                ),
+                SizedBox(height: 12),
+                TextField(
+                  controller: noteController,
+                  maxLines: 2,
+                  decoration: InputDecoration(
+                    labelText: '개인 일정 사유',
+                    hintText: '예: 병원, 출장',
+                    helperText: '사유를 적으면 빨간 점으로 표시됩니다.',
+                    helperMaxLines: 2,
+                    border: OutlineInputBorder(),
+                  ),
                 ),
                 SizedBox(height: 8),
                 ...options,
@@ -319,21 +483,39 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         );
       },
     );
+    final note = noteController.text.trim();
+    noteController.dispose();
     if (action == null || !mounted) return;
-    await _applySlotAction(action, date, time);
+    await _applySlotAction(action, date, time, note: note);
   }
 
   Future<void> _applySlotAction(
-      _SlotAction action, DateTime date, String time) async {
+      _SlotAction action, DateTime date, String time,
+      {String note = ''}) async {
     setState(() => _saving = true);
     String? error;
     switch (action) {
+      case _SlotAction.savePersonal:
+        if (note.isEmpty) {
+          setState(() => _saving = false);
+          _toast('개인 일정 사유를 입력해 주세요.', error: true);
+          return;
+        }
+        error = await TeacherScheduleService.setClosed(
+          teacherUid: _teacherUid,
+          date: date,
+          time: time,
+          closed: true,
+          note: note,
+        );
+        break;
       case _SlotAction.closeOnce:
         error = await TeacherScheduleService.setClosed(
           teacherUid: _teacherUid,
           date: date,
           time: time,
           closed: true,
+          note: note,
         );
         break;
       case _SlotAction.openOnce:
@@ -555,124 +737,97 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     ];
   }
 
+  static const double _timeColWidth = 62;
+  static const double _dayHeaderHeight = 32;
+  static const double _cellWidth = 70;
+  static const double _cellHeight = 26;
+  static const double _rowPitch = 28;
+
   List<DateTime> get _days =>
       List.generate(7, (i) => _weekStart.add(Duration(days: i)));
 
+  double _gridHeight(BuildContext context) {
+    final view = MediaQuery.of(context).size.height;
+    final rows = EnrollmentService.bookingTimeSlots.length * _rowPitch +
+        _dayHeaderHeight +
+        8;
+    return (view * 0.68).clamp(520.0, rows).toDouble();
+  }
+
+  String _historyLabel(WeekBooking booking) {
+    final raw = booking.memberName.trim().isNotEmpty
+        ? booking.memberName.trim()
+        : booking.email.trim();
+    final name = raw.isEmpty
+        ? '완료'
+        : (raw.length > 5 ? raw.substring(0, 5) : raw);
+    if (booking.weekNumber <= 0) return name;
+    return '$name\n${booking.weekNumber}회';
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (widget.standalone) {
+      return Padding(
+        padding: EdgeInsets.fromLTRB(8, 2, 8, 8),
+        child: Column(
+          children: [
+            _weekBar(compact: true),
+            Expanded(child: _grid()),
+          ],
+        ),
+      );
+    }
+
     return ListView(
       padding: EdgeInsets.all(20),
       children: [
-        Text('스케줄 · 예약', style: TextStyle(fontFamily: "Jalnan", fontSize: 18)),
-        SizedBox(height: 8),
-        Text(
-          widget.showAllBookings
-              ? '화상수업은 30분입니다. 6:00 AM–11:30 PM 칸을 눌러 이번만 닫거나 매주 같은 시간을 루틴으로 고정하세요.\n'
-                  '학원 전체 예약이 칸과 아래 목록에 함께 보입니다. 담당이 비어 있으면 컨펌 시 내 스케줄로 연결됩니다.'
-              : '화상수업은 30분입니다. 원치 않는 칸을 눌러 이번만 닫거나, 매주 같은 요일·시간을 루틴으로 고정할 수 있습니다.\n'
-                  '고정한 루틴은 언제든 해제할 수 있고, 수강생은 열린 시간만 예약합니다.',
-          style: TextStyle(
-              fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('스케줄 · 예약',
+                      style: TextStyle(fontFamily: "Jalnan", fontSize: 18)),
+                  SizedBox(height: 8),
+                  Text(
+                    widget.showAllBookings
+                        ? '화상수업은 30분입니다. 6:00 AM–11:00 PM 칸을 눌러 이번만 닫거나 매주 같은 시간을 루틴으로 고정하세요.\n'
+                            '학원 전체 예약이 칸과 아래 목록에 함께 보입니다. 담당이 비어 있으면 컨펌 시 내 스케줄로 연결됩니다.'
+                        : '화상수업은 30분입니다. 칸을 누르거나 드래그해서 여러 시간을 한꺼번에 닫을 수 있습니다.\n'
+                            '고정한 루틴은 언제든 해제할 수 있고, 수강생은 열린 시간만 예약합니다.',
+                    style: TextStyle(
+                        fontFamily: "NotoSansKR",
+                        fontSize: 13,
+                        color: Palette.grey600),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 12),
+            OutlinedButton.icon(
+              onPressed: () => AdminTeacherSchedulePage.openNewScreen(
+                context,
+                showAllBookings: widget.showAllBookings,
+              ),
+              icon: Icon(Icons.open_in_new, size: 18),
+              label: Text('새 화면으로 열기',
+                  style: TextStyle(fontFamily: "NotoSansKR")),
+            ),
+          ],
         ),
         SizedBox(height: 16),
         ..._staffAlerts(),
-        Row(
-          children: [
-            IconButton(
-              tooltip: '이전 주',
-              onPressed: () {
-                setState(() {
-                  _weekStart = _weekStart.subtract(Duration(days: 7));
-                });
-              },
-              icon: Icon(Icons.chevron_left),
-            ),
-            Expanded(
-              child: Text(
-                '${EnrollmentService.formatBookingDate(_weekStart)} ~ '
-                '${EnrollmentService.formatBookingDate(_days.last)}',
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13),
-              ),
-            ),
-            IconButton(
-              tooltip: '다음 주',
-              onPressed: () {
-                setState(() {
-                  _weekStart = _weekStart.add(Duration(days: 7));
-                });
-              },
-              icon: Icon(Icons.chevron_right),
-            ),
-            OutlinedButton.icon(
-              onPressed: _loading ? null : _refresh,
-              icon: Icon(Icons.refresh, size: 18),
-              label:
-                  Text('새로고침', style: TextStyle(fontFamily: "NotoSansKR")),
-            ),
-          ],
-        ),
+        _weekBar(),
         SizedBox(height: 8),
-        Wrap(
-          spacing: 12,
-          runSpacing: 6,
-          children: [
-            _legend(Palette.white, Palette.grey300, '열림'),
-            _legend(Palette.grey200, Palette.grey400, '이번만 닫힘'),
-            _legend(Palette.grey200, Palette.navy, '매주 닫힘'),
-            _legend(Palette.white, Palette.darkTeal, '이번만 열림'),
-            _legend(Palette.warning.withValues(alpha: 0.16), Palette.warning,
-                '예약 대기'),
-            _legend(Palette.primary.withValues(alpha: 0.12), Palette.primary,
-                '내 수강생 확정'),
-            _legend(Palette.accent.withValues(alpha: 0.16), Palette.accent,
-                '타 수강생'),
-            _legend(Palette.grey200, Palette.grey400, '완료 · 취소'),
-            _legend(Palette.grey100, Palette.grey300, '지난 시간'),
-          ],
-        ),
+        _legendRow(),
         SizedBox(height: 16),
-        if (_loading)
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 40),
-            child: Center(child: CircularProgressIndicator()),
-          )
-        else
-          SizedBox(
-            height: 560,
-            child: Scrollbar(
-              thumbVisibility: true,
-              child: SingleChildScrollView(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      children: [
-                        SizedBox(width: 88, height: 44),
-                        ...EnrollmentService.bookingTimeSlots
-                            .map(_timeLabel),
-                      ],
-                    ),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(children: _days.map(_dayHeader).toList()),
-                            ...EnrollmentService.bookingTimeSlots
-                                .map(_timeCells),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+        SizedBox(
+          height: _gridHeight(context),
+          child: _grid(),
+        ),
         SizedBox(height: 28),
         Text('수업 예약',
             style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
@@ -685,13 +840,442 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
               fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
         ),
         SizedBox(height: 12),
-        if (!_loading && _bookings.isEmpty)
-          Text('아직 들어온 예약이 없습니다.',
-              style:
-                  TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500))
-        else
-          ..._bookings.map(_bookingCard),
+        _bookingList(),
       ],
+    );
+  }
+
+  Widget _weekBar({bool compact = false}) {
+    return Row(
+      children: [
+        IconButton(
+          tooltip: '이전 주',
+          visualDensity: compact ? VisualDensity.compact : null,
+          onPressed: () {
+            setState(() {
+              _weekStart = _weekStart.subtract(Duration(days: 7));
+            });
+          },
+          icon: Icon(Icons.chevron_left),
+        ),
+        Expanded(
+          child: Text(
+            '${EnrollmentService.formatBookingDate(_weekStart)} ~ '
+            '${EnrollmentService.formatBookingDate(_days.last)}',
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+                fontFamily: "NotoSansKR", fontSize: compact ? 12 : 13),
+          ),
+        ),
+        IconButton(
+          tooltip: '다음 주',
+          visualDensity: compact ? VisualDensity.compact : null,
+          onPressed: () {
+            setState(() {
+              _weekStart = _weekStart.add(Duration(days: 7));
+            });
+          },
+          icon: Icon(Icons.chevron_right),
+        ),
+        if (compact) ...[
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: Palette.danger,
+              shape: BoxShape.circle,
+            ),
+          ),
+          SizedBox(width: 4),
+          Text('개인',
+              style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 11,
+                  color: Palette.grey600)),
+          IconButton(
+            tooltip: '새로고침',
+            visualDensity: VisualDensity.compact,
+            onPressed: _loading ? null : _refresh,
+            icon: Icon(Icons.refresh, size: 18),
+          ),
+        ] else
+          OutlinedButton.icon(
+            onPressed: _loading ? null : _refresh,
+            icon: Icon(Icons.refresh, size: 18),
+            label: Text('새로고침', style: TextStyle(fontFamily: "NotoSansKR")),
+          ),
+      ],
+    );
+  }
+
+  Widget _legendRow() {
+    return Wrap(
+      spacing: 12,
+      runSpacing: 6,
+      children: [
+        _legend(Palette.white, Palette.grey300, '열림'),
+        _legend(Palette.grey200, Palette.grey400, '이번만 닫힘'),
+        _legend(Palette.grey200, Palette.navy, '매주 닫힘'),
+        _legend(Palette.white, Palette.darkTeal, '이번만 열림'),
+        _legend(Palette.warning.withValues(alpha: 0.16), Palette.warning,
+            '예약 대기'),
+        _legend(Palette.primary.withValues(alpha: 0.12), Palette.primary,
+            '내 수강생 확정'),
+        _legend(Palette.accent.withValues(alpha: 0.16), Palette.accent,
+            '타 수강생'),
+        _legend(Palette.grey200, Palette.grey400, '완료 · 취소'),
+        _legend(Palette.grey100, Palette.grey300, '지난 시간'),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: Palette.danger,
+                shape: BoxShape.circle,
+              ),
+            ),
+            SizedBox(width: 6),
+            Text('개인 일정',
+                style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _grid() {
+    if (_loading) {
+      return Center(child: CircularProgressIndicator());
+    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final slotCount = EnrollmentService.bookingTimeSlots.length;
+        final hasBoundedH =
+            constraints.maxHeight.isFinite && constraints.maxHeight > 80;
+        final hasBoundedW =
+            constraints.maxWidth.isFinite && constraints.maxWidth > 120;
+        final rowH = widget.standalone && hasBoundedH
+            ? ((constraints.maxHeight - _dayHeaderHeight) / slotCount)
+                .clamp(20.0, 42.0)
+                .toDouble()
+            : _rowPitch;
+        final cellH = widget.standalone
+            ? (rowH - 2).clamp(18.0, 40.0).toDouble()
+            : _cellHeight;
+        final cellW = widget.standalone && hasBoundedW
+            ? ((constraints.maxWidth - _timeColWidth - 8) / 7)
+                .clamp(70.0, 280.0)
+                .toDouble()
+            : _cellWidth;
+        final physics = _selecting
+            ? const NeverScrollableScrollPhysics()
+            : const ClampingScrollPhysics();
+        return Listener(
+          onPointerUp: (_) => _finishSelect(),
+          onPointerCancel: (_) => _finishSelect(),
+          child: Scrollbar(
+            controller: _gridScroll,
+            thumbVisibility: widget.standalone ? false : true,
+            child: SingleChildScrollView(
+              controller: _gridScroll,
+              physics: physics,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    children: [
+                      SizedBox(
+                          width: _timeColWidth, height: _dayHeaderHeight),
+                      ...EnrollmentService.bookingTimeSlots
+                          .map((t) => _timeLabel(t, height: rowH)),
+                    ],
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: physics,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: _days
+                                .map((d) => _dayHeader(d, width: cellW))
+                                .toList(),
+                          ),
+                          ...EnrollmentService.bookingTimeSlots.map(
+                            (t) =>
+                                _timeCells(t, width: cellW, height: cellH),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  bool _canToggleSlot(DateTime date, String time) {
+    if (_isSlotPast(date, time)) return false;
+    if (_bookingAt(date, time) != null) return false;
+    if (_availability.isOccupied(date, time)) return false;
+    return true;
+  }
+
+  void _beginSelect(DateTime date, String time) {
+    if (_saving || !_canToggleSlot(date, time)) return;
+    _selecting = true;
+    _selectAnchorDate = EnrollmentService.dateOnly(date);
+    _selectAnchorTime = time;
+    _applySelectRect(date, time);
+  }
+
+  void _hoverSelect(DateTime date, String time) {
+    if (!_selecting) return;
+    _applySelectRect(date, time);
+  }
+
+  void _applySelectRect(DateTime date, String time) {
+    final anchorDate = _selectAnchorDate;
+    final anchorTime = _selectAnchorTime;
+    if (anchorDate == null || anchorTime == null) return;
+    final slots = EnrollmentService.bookingTimeSlots;
+    final aTime = slots.indexOf(anchorTime);
+    final bTime = slots.indexOf(time);
+    if (aTime < 0 || bTime < 0) return;
+    final startTime = aTime < bTime ? aTime : bTime;
+    final endTime = aTime < bTime ? bTime : aTime;
+    var startDay = EnrollmentService.dateOnly(anchorDate);
+    var endDay = EnrollmentService.dateOnly(date);
+    if (endDay.isBefore(startDay)) {
+      final swap = startDay;
+      startDay = endDay;
+      endDay = swap;
+    }
+    final keys = <String>{};
+    for (var day = startDay;
+        !day.isAfter(endDay);
+        day = day.add(const Duration(days: 1))) {
+      for (var i = startTime; i <= endTime; i++) {
+        final slotTime = slots[i];
+        if (!_canToggleSlot(day, slotTime)) continue;
+        keys.add(TeacherScheduleService.slotKey(day, slotTime));
+      }
+    }
+    setState(() {
+      _selectedKeys
+        ..clear()
+        ..addAll(keys);
+    });
+  }
+
+  Future<void> _finishSelect() async {
+    if (!_selecting) return;
+    final keys = Set<String>.from(_selectedKeys);
+    _selecting = false;
+    _selectAnchorDate = null;
+    _selectAnchorTime = null;
+    if (keys.isEmpty) return;
+    if (keys.length == 1) {
+      final parsed = _parseSlotKey(keys.first);
+      setState(() => _selectedKeys.clear());
+      if (parsed != null) await _onCellTap(parsed.date, parsed.time);
+      return;
+    }
+    await _onMultiSelect(keys);
+    if (mounted) setState(() => _selectedKeys.clear());
+  }
+
+  _PickedSlot? _parseSlotKey(String key) {
+    final at = key.lastIndexOf('_');
+    if (at <= 0) return null;
+    final date = DateTime.tryParse(key.substring(0, at));
+    final time = key.substring(at + 1);
+    if (date == null || time.isEmpty) return null;
+    return _PickedSlot(EnrollmentService.dateOnly(date), time);
+  }
+
+  Future<void> _onMultiSelect(Set<String> keys) async {
+    final slots = <_PickedSlot>[];
+    for (final key in keys) {
+      final parsed = _parseSlotKey(key);
+      if (parsed != null) slots.add(parsed);
+    }
+    if (slots.isEmpty) return;
+    slots.sort((a, b) {
+      final byDate = a.date.compareTo(b.date);
+      if (byDate != 0) return byDate;
+      return a.time.compareTo(b.time);
+    });
+
+    final noteController = TextEditingController();
+    final action = await showDialog<_SlotAction>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: Palette.white,
+        surfaceTintColor: Palette.white,
+        title: Text('선택한 ${slots.length}칸',
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+        content: SizedBox(
+          width: 420,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '드래그한 시간을 한꺼번에 닫거나 다시 열 수 있습니다. 사유를 적으면 빨간 점으로 개인 일정이 표시됩니다.',
+                style: TextStyle(
+                    fontFamily: "NotoSansKR",
+                    fontSize: 13,
+                    color: Palette.grey600),
+              ),
+              SizedBox(height: 12),
+              TextField(
+                controller: noteController,
+                maxLines: 2,
+                decoration: InputDecoration(
+                  labelText: '개인 일정 사유 (선택)',
+                  hintText: '예: 병원, 출장',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 8),
+              ListTile(
+                leading: Icon(Icons.event_busy, color: Palette.darkTeal),
+                title: Text('이번만 닫기',
+                    style: TextStyle(fontFamily: "NotoSansKR")),
+                subtitle: Text('선택한 칸만 이번 주에 닫습니다.',
+                    style: TextStyle(
+                        fontFamily: "NotoSansKR",
+                        fontSize: 12,
+                        color: Palette.grey600)),
+                onTap: () =>
+                    Navigator.pop(dialogContext, _SlotAction.closeOnce),
+              ),
+              ListTile(
+                leading: Icon(Icons.circle, color: Palette.danger, size: 16),
+                title: Text('개인 일정으로 닫기',
+                    style: TextStyle(fontFamily: "NotoSansKR")),
+                subtitle: Text('사유를 빨간 점으로 표시하고 선택한 칸을 닫습니다.',
+                    style: TextStyle(
+                        fontFamily: "NotoSansKR",
+                        fontSize: 12,
+                        color: Palette.grey600)),
+                onTap: () =>
+                    Navigator.pop(dialogContext, _SlotAction.savePersonal),
+              ),
+              ListTile(
+                leading: Icon(Icons.push_pin, color: Palette.darkTeal),
+                title: Text('매주 이 시간 닫기',
+                    style: TextStyle(fontFamily: "NotoSansKR")),
+                subtitle: Text('각 칸의 요일·시간을 매주 반복해서 닫습니다.',
+                    style: TextStyle(
+                        fontFamily: "NotoSansKR",
+                        fontSize: 12,
+                        color: Palette.grey600)),
+                onTap: () =>
+                    Navigator.pop(dialogContext, _SlotAction.pinRoutine),
+              ),
+              ListTile(
+                leading: Icon(Icons.lock_open, color: Palette.darkTeal),
+                title: Text('다시 열기',
+                    style: TextStyle(fontFamily: "NotoSansKR")),
+                subtitle: Text('선택한 칸의 닫기·루틴을 해제합니다.',
+                    style: TextStyle(
+                        fontFamily: "NotoSansKR",
+                        fontSize: 12,
+                        color: Palette.grey600)),
+                onTap: () =>
+                    Navigator.pop(dialogContext, _SlotAction.openOnce),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text('취소',
+                style: TextStyle(
+                    fontFamily: "NotoSansKR", color: Palette.grey600)),
+          ),
+        ],
+      ),
+    );
+    final note = noteController.text.trim();
+    noteController.dispose();
+    if (action == null || !mounted) return;
+    if (action == _SlotAction.savePersonal && note.isEmpty) {
+      _toast('개인 일정 사유를 입력해 주세요.', error: true);
+      return;
+    }
+
+    setState(() => _saving = true);
+    String? error;
+    final dates = slots.map((s) => s.date).toList();
+    final times = slots.map((s) => s.time).toList();
+    if (action == _SlotAction.pinRoutine) {
+      error = await TeacherScheduleService.setRoutineClosedMany(
+        teacherUid: _teacherUid,
+        dates: dates,
+        times: times,
+        closed: true,
+      );
+    } else if (action == _SlotAction.closeOnce ||
+        action == _SlotAction.savePersonal) {
+      error = await TeacherScheduleService.setClosedMany(
+        teacherUid: _teacherUid,
+        dates: dates,
+        times: times,
+        closed: true,
+        note: note,
+      );
+    } else {
+      error = await TeacherScheduleService.setRoutineClosedMany(
+        teacherUid: _teacherUid,
+        dates: dates,
+        times: times,
+        closed: false,
+      );
+      if (error == null) {
+        error = await TeacherScheduleService.setClosedMany(
+          teacherUid: _teacherUid,
+          dates: dates,
+          times: times,
+          closed: false,
+        );
+      }
+    }
+    if (!mounted) return;
+    setState(() => _saving = false);
+    if (error != null) {
+      _toast(error, error: true);
+      return;
+    }
+    _toast('${slots.length}칸을 반영했습니다.');
+    await _refresh();
+  }
+
+  Widget _bookingList() {
+    if (_loading) return SizedBox.shrink();
+    if (_bookings.isEmpty) {
+      return Text('아직 들어온 예약이 없습니다.',
+          style: TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500));
+    }
+    if (widget.standalone) {
+      return ListView(
+        children: _bookings.map(_bookingCard).toList(),
+      );
+    }
+    return Column(
+      children: _bookings.map(_bookingCard).toList(),
     );
   }
 
@@ -715,25 +1299,27 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     );
   }
 
-  Widget _dayHeader(DateTime day) {
+  Widget _dayHeader(DateTime day, {double? width}) {
     return SizedBox(
-      width: 88,
-      height: 44,
+      width: (width ?? _cellWidth) + 2,
+      height: _dayHeaderHeight,
       child: Center(
         child: Text(
           EnrollmentService.formatBookingDate(day).replaceFirst(
               RegExp(r'^\d{4}\.'), ''),
           textAlign: TextAlign.center,
-          style: TextStyle(fontFamily: "NotoSansKR", fontSize: 11),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontFamily: "NotoSansKR", fontSize: 10),
         ),
       ),
     );
   }
 
-  Widget _timeLabel(String time) {
+  Widget _timeLabel(String time, {double? height}) {
     return SizedBox(
-      width: 88,
-      height: 40,
+      width: _timeColWidth,
+      height: height ?? _rowPitch,
       child: Align(
         alignment: Alignment.centerLeft,
         child: Text(
@@ -742,7 +1328,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontFamily: "Jalnan",
-            fontSize: 11,
+            fontSize: 10,
             color: Palette.grey700,
           ),
         ),
@@ -750,14 +1336,18 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     );
   }
 
-  Widget _timeCells(String time) {
+  Widget _timeCells(String time, {double? width, double? height}) {
     return Row(
-      children: _days.map((day) => _cell(day, time)).toList(),
+      children: _days
+          .map((day) => _cell(day, time, width: width, height: height))
+          .toList(),
     );
   }
 
-  Widget _cell(DateTime date, String time) {
+  Widget _cell(DateTime date, String time, {double? width, double? height}) {
     final booking = _bookingAt(date, time);
+    final personalNote = _availability.noteFor(date, time);
+    final hasPersonal = personalNote.isNotEmpty && booking == null;
     final occupied = booking != null || _availability.isOccupied(date, time);
     final closed = _availability.isClosed(date, time);
     final routine = _availability.isRoutine(date, time);
@@ -785,7 +1375,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       fill = Palette.grey200;
       border = Palette.grey400;
       textColor = Palette.grey500;
-      label = '완료';
+      label = _historyLabel(booking);
     } else if (pastEmpty) {
       fill = Palette.grey100;
       border = Palette.grey300;
@@ -824,14 +1414,21 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     final settled = booking != null && _isBookingSettled(booking);
     final canOpenBooking =
         booking != null && booking.isConfirmed && !settled;
-    final canToggleSlot = !slotPast && !occupied;
+    final canToggleSlot = _canToggleSlot(date, time);
+    final selected =
+        _selectedKeys.contains(TeacherScheduleService.slotKey(date, time));
     final tappable = canOpenBooking ||
         canToggleSlot ||
         booking != null ||
         (booking != null && settled);
+    if (selected) {
+      fill = Palette.secondary.withValues(alpha: 0.18);
+      border = Palette.secondaryDark;
+      textColor = Palette.secondaryDark;
+    }
 
     return Padding(
-      padding: EdgeInsets.all(2),
+      padding: EdgeInsets.all(1),
       child: Material(
         color: Colors.transparent,
         child: Semantics(
@@ -839,38 +1436,104 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
           excludeSemantics: true,
           enabled: tappable,
           label:
-              '${EnrollmentService.formatBookingDate(date)} ${EnrollmentService.formatBookingTime(time)} ${label.isEmpty ? '지난 시간' : label}${canOpenBooking ? ' · 화상수업 입장' : ''}',
-          child: InkWell(
-            onTap: !tappable ? null : () => _onCellTap(date, time),
-            borderRadius: BorderRadius.circular(6),
-            child: Container(
-              width: 86,
-              height: 36,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: fill,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: border),
-              ),
-              child: Text(
-                label,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontFamily: "NotoSansKR",
-                  fontSize: 10,
-                  fontWeight:
-                      canOpenBooking || settled ? FontWeight.w700 : FontWeight.w400,
-                  color: textColor,
-                  decoration:
-                      canOpenBooking ? TextDecoration.underline : null,
+              '${EnrollmentService.formatBookingDate(date)} ${EnrollmentService.formatBookingTime(time)} ${label.isEmpty ? '지난 시간' : label.replaceAll('\n', ' ')}${hasPersonal ? ' · $personalNote' : ''}${canOpenBooking ? ' · 화상수업 입장' : ''}',
+          child: MouseRegion(
+            onEnter: (_) => _hoverSelect(date, time),
+            child: Listener(
+              onPointerDown: canToggleSlot
+                  ? (event) {
+                      if (event.buttons == 1) _beginSelect(date, time);
+                    }
+                  : null,
+              child: InkWell(
+                onTap: (!tappable || canToggleSlot)
+                    ? null
+                    : () => _onCellTap(date, time),
+                borderRadius: BorderRadius.circular(4),
+                child: _slotFace(
+                  width: width ?? _cellWidth,
+                  height: height ?? _cellHeight,
+                  fill: fill,
+                  border: border,
+                  selected: selected,
+                  label: label,
+                  textColor: textColor,
+                  emphasize: canOpenBooking || settled,
+                  underline: canOpenBooking,
+                  personalNote: hasPersonal ? personalNote : '',
                 ),
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _slotFace({
+    required double width,
+    required double height,
+    required Color fill,
+    required Color border,
+    required bool selected,
+    required String label,
+    required Color textColor,
+    required bool emphasize,
+    required bool underline,
+    required String personalNote,
+  }) {
+    final face = Container(
+      width: width,
+      height: height,
+      alignment: Alignment.center,
+      padding: EdgeInsets.symmetric(horizontal: 2),
+      decoration: BoxDecoration(
+        color: fill,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: border,
+          width: selected ? 1.5 : 1,
+        ),
+      ),
+      child: Stack(
+        children: [
+          Center(
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: "NotoSansKR",
+                fontSize: 8,
+                height: 1.15,
+                fontWeight: emphasize ? FontWeight.w700 : FontWeight.w400,
+                color: textColor,
+                decoration: underline ? TextDecoration.underline : null,
+              ),
+            ),
+          ),
+          if (personalNote.isNotEmpty)
+            Positioned(
+              top: 3,
+              left: 3,
+              child: Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: Palette.danger,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+    if (personalNote.isEmpty) return face;
+    return Tooltip(
+      message: personalNote,
+      waitDuration: const Duration(milliseconds: 250),
+      child: face,
     );
   }
 
@@ -970,6 +1633,17 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                     color: Palette.grey600),
               ),
             ],
+            SizedBox(height: 10),
+            StudentLearningProgressPanel(
+              enrollments: _enrollments
+                  .where((item) =>
+                      item.userId == booking.userId &&
+                      item.courseId == booking.courseId)
+                  .toList(),
+              progressByEnrollment: _learning,
+              onlyWeekNumber: booking.weekNumber,
+              dense: true,
+            ),
             if (booking.isPending) ...[
               SizedBox(height: 12),
               Row(
@@ -1010,8 +1684,16 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   }
 }
 
+class _PickedSlot {
+  final DateTime date;
+  final String time;
+
+  _PickedSlot(this.date, this.time);
+}
+
 enum _SlotAction {
   closeOnce,
+  savePersonal,
   openOnce,
   pinRoutine,
   unpinRoutine,

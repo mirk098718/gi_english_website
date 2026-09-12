@@ -48,6 +48,7 @@ class TeacherScheduleService {
     final occupiedKeys = <String>{};
     final routineKeys = <String>{};
     final exceptionKeys = <String>{};
+    final notes = <String, String>{};
 
     try {
       final closed = await _firestore
@@ -55,8 +56,11 @@ class TeacherScheduleService {
           .where('teacherId', isEqualTo: teacherUid)
           .get();
       for (final doc in closed.docs) {
-        final key = doc.data()['slotKey']?.toString() ?? '';
+        final data = doc.data();
+        final key = data['slotKey']?.toString() ?? '';
         if (key.isNotEmpty) closedKeys.add(key);
+        final note = data['note']?.toString().trim() ?? '';
+        if (key.isNotEmpty && note.isNotEmpty) notes[key] = note;
       }
     } catch (e) {
       print('닫힌 스케줄 조회 오류: $e');
@@ -107,6 +111,7 @@ class TeacherScheduleService {
       occupiedKeys: occupiedKeys,
       routineKeys: routineKeys,
       exceptionKeys: exceptionKeys,
+      notes: notes,
     );
   }
 
@@ -115,6 +120,7 @@ class TeacherScheduleService {
     required DateTime date,
     required String time,
     required bool closed,
+    String note = '',
   }) async {
     if (teacherUid.isEmpty) return '강사 계정이 없습니다.';
     final day = dateOnly(date);
@@ -123,15 +129,17 @@ class TeacherScheduleService {
         .doc(docId(teacherUid, day, time));
     try {
       if (closed) {
+        final trimmed = note.trim();
         await ref.set({
           'teacherId': teacherUid,
           'dateKey': dateKey(day),
           'time': time,
           'slotKey': slotKey(day, time),
+          'note': trimmed.isEmpty ? FieldValue.delete() : trimmed,
           'createdAt': FieldValue.serverTimestamp(),
-        });
+        }, SetOptions(merge: true));
       } else {
-        await ref.delete();
+        await _deleteIfExists(ref);
       }
       return null;
     } catch (e) {
@@ -160,16 +168,17 @@ class TeacherScheduleService {
           'routineKey': routineKey(weekday, time),
           'createdAt': FieldValue.serverTimestamp(),
         });
-        await _firestore
+        // 없는 문서를 delete하면 rules가 resource.data를 읽지 못해
+        // permission-denied가 난다. 루틴은 이미 저장된 뒤라 새로고침하면
+        // '매주'로 보이지만, 첫 저장은 실패로 표시됐다.
+        await _deleteIfExists(_firestore
             .collection('teacher_open_exceptions')
-            .doc(docId(teacherUid, dateOnly(date), time))
-            .delete();
-        await _firestore
+            .doc(docId(teacherUid, dateOnly(date), time)));
+        await _deleteIfExists(_firestore
             .collection('teacher_closed_slots')
-            .doc(docId(teacherUid, dateOnly(date), time))
-            .delete();
+            .doc(docId(teacherUid, dateOnly(date), time)));
       } else {
-        await ref.delete();
+        await _deleteIfExists(ref);
       }
       return null;
     } catch (e) {
@@ -198,18 +207,62 @@ class TeacherScheduleService {
           'slotKey': slotKey(day, time),
           'createdAt': FieldValue.serverTimestamp(),
         });
-        await _firestore
+        await _deleteIfExists(_firestore
             .collection('teacher_closed_slots')
-            .doc(docId(teacherUid, day, time))
-            .delete();
+            .doc(docId(teacherUid, day, time)));
       } else {
-        await ref.delete();
+        await _deleteIfExists(ref);
       }
       return null;
     } catch (e) {
       print('예외 스케줄 변경 오류: $e');
       return '스케줄 저장에 실패했습니다.';
     }
+  }
+
+  static Future<void> _deleteIfExists(DocumentReference ref) async {
+    final snap = await ref.get();
+    if (snap.exists) await ref.delete();
+  }
+
+  static Future<String?> setClosedMany({
+    required String teacherUid,
+    required List<DateTime> dates,
+    required List<String> times,
+    required bool closed,
+    String note = '',
+  }) async {
+    if (dates.length != times.length) return '선택한 시간이 올바르지 않습니다.';
+    for (var i = 0; i < dates.length; i++) {
+      final error = await setClosed(
+        teacherUid: teacherUid,
+        date: dates[i],
+        time: times[i],
+        closed: closed,
+        note: note,
+      );
+      if (error != null) return error;
+    }
+    return null;
+  }
+
+  static Future<String?> setRoutineClosedMany({
+    required String teacherUid,
+    required List<DateTime> dates,
+    required List<String> times,
+    required bool closed,
+  }) async {
+    if (dates.length != times.length) return '선택한 시간이 올바르지 않습니다.';
+    for (var i = 0; i < dates.length; i++) {
+      final error = await setRoutineClosed(
+        teacherUid: teacherUid,
+        date: dates[i],
+        time: times[i],
+        closed: closed,
+      );
+      if (error != null) return error;
+    }
+    return null;
   }
 
   static DocumentReference occupiedRef(
@@ -244,6 +297,7 @@ class TeacherAvailability {
   final Set<String> occupiedKeys;
   final Set<String> routineKeys;
   final Set<String> exceptionKeys;
+  final Map<String, String> notes;
 
   TeacherAvailability({
     required this.teacherUid,
@@ -251,10 +305,15 @@ class TeacherAvailability {
     Set<String>? occupiedKeys,
     Set<String>? routineKeys,
     Set<String>? exceptionKeys,
+    Map<String, String>? notes,
   })  : closedKeys = closedKeys ?? {},
         occupiedKeys = occupiedKeys ?? {},
         routineKeys = routineKeys ?? {},
-        exceptionKeys = exceptionKeys ?? {};
+        exceptionKeys = exceptionKeys ?? {},
+        notes = notes ?? {};
+
+  String noteFor(DateTime date, String time) =>
+      notes[TeacherScheduleService.slotKey(date, time)] ?? '';
 
   bool isOneOffClosed(DateTime date, String time) =>
       closedKeys.contains(TeacherScheduleService.slotKey(date, time));

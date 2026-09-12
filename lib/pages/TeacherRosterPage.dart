@@ -7,6 +7,7 @@ import 'package:gi_english_website/util/LessonFeedbackService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
+import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
 
 /// 강사 프로필 · 담당 회원 · 화상수업 입장/종료 · 피드백.
 class TeacherRosterPage extends StatelessWidget {
@@ -52,6 +53,8 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
   List<WeekBooking> _bookings = [];
   List<LessonFeedback> _feedbacks = [];
   List<OnlineSession> _sessions = [];
+  List<EnrollmentRecord> _enrollments = [];
+  Map<String, List<StudentWeekProgress>> _learning = {};
   bool _loading = true;
   String _staffUid = '';
   bool _isOwner = false;
@@ -108,6 +111,10 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       });
     }
     final feedbacks = await LessonFeedbackService.listForTeacher(teacherUid);
+    final userIds = {...byId.keys, ...guestById.keys}.toList();
+    final enrollments =
+        await EnrollmentService.listEnrollments(memberIds: userIds);
+    final learning = await EnrollmentService.learningByEnrollment(enrollments);
     if (!mounted) return;
     setState(() {
       _teacher = teacher;
@@ -120,6 +127,8 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       _bookings = bookings;
       _feedbacks = feedbacks;
       _sessions = sessions;
+      _enrollments = enrollments;
+      _learning = learning;
       _staffUid = staffUid;
       _isOwner = isOwner;
       _writerName = writerName;
@@ -426,6 +435,8 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     final email = member['email']?.toString() ?? '';
     final assignedTeacherName = member['assignedTeacherName']?.toString() ?? '';
     final lessons = _bookingsFor(memberId);
+    final records =
+        _enrollments.where((item) => item.userId == memberId).toList();
     return Card(
       margin: EdgeInsets.only(bottom: 12),
       child: Theme(
@@ -467,6 +478,14 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                 fontFamily: "NotoSansKR", fontSize: 12, color: Palette.grey600),
           ),
           children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: StudentLearningProgressPanel(
+                enrollments: records,
+                progressByEnrollment: _learning,
+              ),
+            ),
+            SizedBox(height: 16),
             if (lessons.isEmpty)
               Align(
                 alignment: Alignment.centerLeft,

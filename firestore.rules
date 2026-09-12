@@ -65,11 +65,11 @@ service cloud.firestore {
       allow read, update, delete: if isOwner();
     }
 
-    // 수강 정보: 본인 / 메인관리자 / 담당 강사
+    // 수강 정보: 본인 / 스태프(담당·대체 강사가 진도를 볼 수 있게)
     match /enrollments/{enrollmentId} {
       allow read: if isOwner()
         || (isLoggedIn() && resource.data.userId == request.auth.uid)
-        || isAssignedTeacher(resource.data.userId);
+        || isStaff();
 
       allow create: if isOwner();
 
@@ -100,8 +100,7 @@ service cloud.firestore {
         allow read: if isOwner()
           || (isLoggedIn()
             && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId == request.auth.uid)
-          || isAssignedTeacher(
-              get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId);
+          || isStaff();
 
         allow create, update: if isOwner()
           || (isLoggedIn()
@@ -180,8 +179,12 @@ service cloud.firestore {
       allow create: if isStaff()
         && request.resource.data.teacherId == request.auth.uid;
       allow delete: if isStaff()
-        && resource.data.teacherId == request.auth.uid;
-      allow update: if false;
+        && (!exists(/databases/$(database)/documents/teacher_closed_slots/$(slotId))
+            || resource.data.teacherId == request.auth.uid
+            || isOwner());
+      allow update: if isStaff()
+        && resource.data.teacherId == request.auth.uid
+        && request.resource.data.teacherId == request.auth.uid;
     }
 
     // 매주 같은 요일·시간을 닫아 두는 루틴. 해제는 delete.
@@ -190,8 +193,12 @@ service cloud.firestore {
       allow create: if isStaff()
         && request.resource.data.teacherId == request.auth.uid;
       allow delete: if isStaff()
-        && resource.data.teacherId == request.auth.uid;
-      allow update: if false;
+        && (!exists(/databases/$(database)/documents/teacher_closed_routines/$(routineId))
+            || resource.data.teacherId == request.auth.uid
+            || isOwner());
+      allow update: if isStaff()
+        && resource.data.teacherId == request.auth.uid
+        && request.resource.data.teacherId == request.auth.uid;
     }
 
     // 루틴으로 닫혀 있어도 이번 주만 여는 예외.
@@ -200,8 +207,12 @@ service cloud.firestore {
       allow create: if isStaff()
         && request.resource.data.teacherId == request.auth.uid;
       allow delete: if isStaff()
-        && resource.data.teacherId == request.auth.uid;
-      allow update: if false;
+        && (!exists(/databases/$(database)/documents/teacher_open_exceptions/$(slotId))
+            || resource.data.teacherId == request.auth.uid
+            || isOwner());
+      allow update: if isStaff()
+        && resource.data.teacherId == request.auth.uid
+        && request.resource.data.teacherId == request.auth.uid;
     }
 
     // 이미 신청된 시간(이름 없이 점유만). 수강생이 열린 시간만 보도록 읽기.
