@@ -57,7 +57,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
     return MobileSchoolLayout(content: mobileScrollView());
   }
 
-  static const String _heroAsset = 'assets/hero-device-mockups-16x9.png';
+  static const String _heroAsset = 'assets/hero-device-mockups-16x9-v5.png';
 
   Widget mainImage() {
     final screen = MediaQuery.sizeOf(context);
@@ -69,7 +69,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         fit: StackFit.expand,
         children: [
           ColoredBox(color: Palette.navyDark),
-          _heroDeviceShot(scale: 1.18, alignment: Alignment(0.78, 0)),
+          _heroDeviceShot(scale: 1.04, alignment: Alignment(0.92, 0.04)),
           IgnorePointer(
             child: DecoratedBox(
               decoration: BoxDecoration(
@@ -116,8 +116,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
           AspectRatio(
             aspectRatio: 1.4,
             child: _heroDeviceShot(
-              scale: 1.52,
-              alignment: Alignment(0.86, 0),
+              scale: 1.18,
+              alignment: Alignment(0.9, 0.06),
             ),
           ),
         ],
@@ -160,10 +160,10 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         ),
         SizedBox(height: compact ? 10 : 14),
         Text(
-          '인강과 화상수업으로\n영어 실력을 만듭니다',
+          '인강으로 배운 영어,\n원어민 화상 수업에서\n완벽히 내 것으로 만듭니다',
           style: TextStyle(
             fontFamily: 'NotoSansKR',
-            fontSize: compact ? 26 : 40,
+            fontSize: compact ? 24 : 36,
             fontWeight: FontWeight.w800,
             height: 1.28,
             color: Palette.white,
@@ -171,7 +171,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         ),
         SizedBox(height: compact ? 12 : 16),
         Text(
-          '매주 강의를 보고, 원어민과 1:1로 말하고,\n내 시간에 맞춰 수업을 예약합니다.',
+          '매주 강의를 보고, 연습문제를 푼 후,\n내 시간에 맞춰 원어민과 1:1 수업을 예약합니다.',
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: compact ? 14 : 16,

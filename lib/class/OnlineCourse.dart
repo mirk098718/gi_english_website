@@ -47,7 +47,7 @@ class OnlineCourse {
         '영어에 자신감을 갖고 싶은 분들께 추천',
       ],
       accentColor: Palette.warning,
-      price: 200000,
+      price: 180000,
       defaultSessions: 8,
     ),
     OnlineCourse(
@@ -64,7 +64,7 @@ class OnlineCourse {
         '말문이 트이는 기초 실력 완성',
       ],
       accentColor: Palette.secondary,
-      price: 250000,
+      price: 200000,
       defaultSessions: 8,
     ),
     OnlineCourse(
@@ -81,7 +81,7 @@ class OnlineCourse {
         '한 단계 더 업그레이드된 영어 실력',
       ],
       accentColor: Palette.primary,
-      price: 280000,
+      price: 200000,
       defaultSessions: 8,
     ),
     OnlineCourse(
@@ -98,7 +98,7 @@ class OnlineCourse {
         '글로벌 비즈니스 자신감 향상',
       ],
       accentColor: Palette.accent,
-      price: 300000,
+      price: 200000,
       defaultSessions: 8,
     ),
     OnlineCourse(
@@ -115,7 +115,7 @@ class OnlineCourse {
         '유창하고 세련된 영어 구사 능력 완성',
       ],
       accentColor: Palette.danger,
-      price: 350000,
+      price: 250000,
       defaultSessions: 8,
     ),
   ];

@@ -9,6 +9,7 @@ import 'package:gi_english_website/util/SiteAlertCenter.dart';
 
 import 'pages/AdminTeacherScheduleTab.dart';
 import 'pages/SchoolAboutPage.dart';
+import 'pages/SchoolMainPage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +54,10 @@ class MyApp extends StatelessWidget {
     }
     if (AdminTeacherSchedulePage.matchesUri(uri)) {
       return const AdminTeacherSchedulePage();
+    }
+    if (uri.queryParameters['view'] == 'online' ||
+        path.toLowerCase().contains('/online')) {
+      return const SchoolMainPage();
     }
     return const SchoolAboutPage();
   }
