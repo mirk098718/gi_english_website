@@ -57,7 +57,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
     return MobileSchoolLayout(content: mobileScrollView());
   }
 
-  static const String _heroAsset = 'assets/hero-device-mockups-16x9-v5.png';
+  static const String _heroAsset = 'assets/hero-online-gleam.jpg';
+  static const Color _heroBg = Color(0xFFF6F6F1);
 
   Widget mainImage() {
     final screen = MediaQuery.sizeOf(context);
@@ -68,8 +69,13 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          ColoredBox(color: Palette.navyDark),
-          _heroDeviceShot(scale: 1.04, alignment: Alignment(0.92, 0.04)),
+          ColoredBox(color: _heroBg),
+          Image.asset(
+            _heroAsset,
+            fit: BoxFit.cover,
+            alignment: Alignment(0.28, 0),
+            filterQuality: FilterQuality.high,
+          ),
           IgnorePointer(
             child: DecoratedBox(
               decoration: BoxDecoration(
@@ -77,12 +83,12 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                   colors: [
-                    Palette.navyDark,
-                    Palette.navyDark.withValues(alpha: 0.82),
-                    Palette.navyDark.withValues(alpha: 0.18),
-                    Palette.navyDark.withValues(alpha: 0),
+                    _heroBg,
+                    _heroBg.withValues(alpha: 0.92),
+                    _heroBg.withValues(alpha: 0.35),
+                    _heroBg.withValues(alpha: 0),
                   ],
-                  stops: const [0.0, 0.22, 0.42, 0.58],
+                  stops: const [0.0, 0.22, 0.4, 0.56],
                 ),
               ),
             ),
@@ -105,7 +111,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
   Widget mobileMainImage() {
     return Container(
       width: double.infinity,
-      color: Palette.navyDark,
+      color: _heroBg,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -114,31 +120,15 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             child: _heroCopy(compact: true),
           ),
           AspectRatio(
-            aspectRatio: 1.4,
-            child: _heroDeviceShot(
-              scale: 1.18,
-              alignment: Alignment(0.9, 0.06),
+            aspectRatio: 16 / 9,
+            child: Image.asset(
+              _heroAsset,
+              fit: BoxFit.cover,
+              alignment: Alignment(0.55, 0),
+              filterQuality: FilterQuality.high,
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _heroDeviceShot({
-    required double scale,
-    required Alignment alignment,
-  }) {
-    return ClipRect(
-      child: Transform.scale(
-        scale: scale,
-        alignment: alignment,
-        child: Image.asset(
-          _heroAsset,
-          fit: BoxFit.cover,
-          alignment: alignment,
-          filterQuality: FilterQuality.high,
-        ),
       ),
     );
   }
@@ -155,7 +145,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             fontSize: compact ? 12 : 13,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.4,
-            color: Palette.secondaryLight,
+            color: Palette.darkTeal,
           ),
         ),
         SizedBox(height: compact ? 10 : 14),
@@ -166,7 +156,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             fontSize: compact ? 24 : 36,
             fontWeight: FontWeight.w800,
             height: 1.28,
-            color: Palette.white,
+            color: Palette.navy,
           ),
         ),
         SizedBox(height: compact ? 12 : 16),
@@ -176,7 +166,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             fontFamily: 'NotoSansKR',
             fontSize: compact ? 14 : 16,
             height: 1.6,
-            color: Palette.white.withValues(alpha: 0.78),
+            color: Palette.grey700,
           ),
         ),
         SizedBox(height: compact ? 20 : 28),
@@ -211,8 +201,8 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
               height: compact ? 42 : 46,
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Palette.white,
-                  side: BorderSide(color: Palette.white.withValues(alpha: 0.45)),
+                  foregroundColor: Palette.navy,
+                  side: BorderSide(color: Palette.navy.withValues(alpha: 0.28)),
                   padding: EdgeInsets.symmetric(horizontal: compact ? 16 : 22),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
