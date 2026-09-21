@@ -6,6 +6,7 @@ import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonFeedbackService.dart';
+import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/TeacherScheduleService.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -35,6 +36,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
   Map<String, List<String>> _weekProgress = {};
   List<WeekBooking> _bookings = [];
   List<LessonFeedback> _feedbacks = [];
+  List<LessonRating> _ratings = [];
   TeacherAvailability _teacherAvailability =
       TeacherAvailability(teacherUid: '');
   final Map<String, DateTime> _selectedDates = {};
@@ -77,6 +79,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
     Map<String, List<String>> progress = {};
     List<WeekBooking> bookings = [];
     List<LessonFeedback> feedbacks = [];
+    List<LessonRating> ratings = [];
     TeacherAvailability availability = TeacherAvailability(teacherUid: '');
     if (enrollment != null) {
       progress = await EnrollmentService.weekProgress(enrollment.id);
@@ -84,6 +87,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
           await EnrollmentService.myWeekBookings(courseId: widget.course.id);
       feedbacks = await LessonFeedbackService.listForStudent(
           courseId: widget.course.id);
+      ratings = await LessonRatingService.listMine();
       final teacherUid =
           await TeacherScheduleService.resolveTeacherUid(
         nativeTeacherUid: enrollment.nativeTeacherUid,
@@ -103,6 +107,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
       _weekProgress = progress;
       _bookings = bookings;
       _feedbacks = feedbacks;
+      _ratings = ratings;
       _teacherAvailability = availability;
       _isLoading = false;
     });
@@ -847,6 +852,44 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
         "${done > 0 ? ' 이수 $done/${enrollment.totalSessions}회.' : ''}";
   }
 
+  LessonRating? _ratingForWeek(OnlineWeek week) {
+    LessonRating? best;
+    for (final rating in _ratings) {
+      if (week.id.isNotEmpty && rating.weekId == week.id) {
+        if (best == null || rating.date.isAfter(best.date)) best = rating;
+        continue;
+      }
+      if (week.weekNumber > 0 && rating.weekNumber == week.weekNumber) {
+        if (best == null || rating.date.isAfter(best.date)) best = rating;
+      }
+    }
+    if (best != null) return best;
+    final booking = _bookingFor(week.id);
+    if (booking != null) {
+      return LessonRatingService.forBooking(_ratings, booking.id);
+    }
+    return null;
+  }
+
+  String _lockMessage(OnlineWeek week) {
+    final previous = week.weekNumber - 1;
+    if (previous > 0) {
+      LessonRating? pending;
+      for (final rating in _ratings) {
+        if (rating.weekNumber == previous && rating.isPendingStudent) {
+          pending = rating;
+          break;
+        }
+      }
+      if (pending != null) {
+        return '${previous}회차 강사 평가(별점)를 마치면 이 회차가 열립니다. '
+            '평가를 하지 않으면 다음 단계와 강사 정산이 진행되지 않습니다.';
+      }
+    }
+    return '이전 회차 화상수업과 강사 평가를 마치면 이 회차가 열립니다. '
+        '인강과 예약은 열린 회차에서만 진행할 수 있습니다.';
+  }
+
   Widget weekTile(OnlineWeek week) {
     final enrollment = _enrollment;
     final unlocked = enrollment == null ||
@@ -944,8 +987,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
           children: [
             if (!unlocked) ...[
               Text(
-                '이전 회차 화상수업을 마치면 이 회차가 열립니다. '
-                '인강과 예약은 열린 회차에서만 진행할 수 있습니다.',
+                _lockMessage(week),
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 13,
@@ -1121,6 +1163,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
   Widget weekFeedbackSection(OnlineWeek week) {
     final feedback =
         LessonFeedbackService.forWeek(_feedbacks, week.id, week.weekNumber);
+    final rating = _ratingForWeek(week);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1173,6 +1216,51 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                         color: Palette.black,
                       ),
                     ),
+                    SizedBox(height: 12),
+                    Text('수업 평가',
+                        style: TextStyle(
+                            fontFamily: "NotoSansKR",
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12)),
+                    SizedBox(height: 6),
+                    if (rating != null && rating.isRated) ...[
+                      LessonStarView(stars: rating.stars),
+                      if (rating.review.trim().isNotEmpty) ...[
+                        SizedBox(height: 6),
+                        Text(
+                          rating.review.trim(),
+                          style: TextStyle(
+                            fontFamily: "NotoSansKR",
+                            fontSize: 13,
+                            height: 1.45,
+                            color: Palette.grey700,
+                          ),
+                        ),
+                      ],
+                    ] else if (rating != null && rating.isPendingStudent)
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            final saved = await LessonRatingService.showPrompt(
+                              context: context,
+                              rating: rating,
+                            );
+                            if (saved) await _loadData();
+                          },
+                          child: Text('별점 평가하기',
+                              style: TextStyle(fontFamily: "NotoSansKR")),
+                        ),
+                      )
+                    else
+                      Text(
+                        '강사 피드백을 확인한 뒤 별점 평가를 마치면 다음 회차가 열립니다.',
+                        style: TextStyle(
+                          fontFamily: "NotoSansKR",
+                          fontSize: 13,
+                          color: Palette.grey600,
+                        ),
+                      ),
                   ],
                 ),
         ),

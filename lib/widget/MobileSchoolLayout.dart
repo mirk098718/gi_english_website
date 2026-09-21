@@ -8,6 +8,7 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/GleamMark.dart';
 import 'package:gi_english_website/widget/HeaderSocialLinks.dart';
 import 'package:gi_english_website/widget/LetsTalkNavChip.dart';
+import 'package:gi_english_website/widget/LessonRatingPromptHost.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
 import 'package:gi_english_website/widget/SiteNav.dart';
 
@@ -89,7 +90,9 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
     final viewportHeight = MediaQuery.sizeOf(context).height;
     const topBarHeight = 108.0;
 
-    return Scaffold(
+    return LessonRatingPromptHost(
+      enabled: _isMemberLoggedIn && !_isStaff,
+      child: Scaffold(
       body: SizedBox(
         height: viewportHeight,
         child: Stack(
@@ -115,6 +118,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
             Positioned(top: 0, left: 0, right: 0, child: _topBar()),
           ],
         ),
+      ),
       ),
     );
   }

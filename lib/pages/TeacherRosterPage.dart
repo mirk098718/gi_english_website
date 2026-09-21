@@ -6,6 +6,7 @@ import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonFeedbackService.dart';
+import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/util/JitsiJoin.dart';
@@ -14,6 +15,7 @@ import 'package:gi_english_website/pages/StudentDetailPage.dart';
 import 'package:gi_english_website/widget/AdminContentWidth.dart';
 import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
 import 'package:gi_english_website/widget/TeacherMonthLessonSummary.dart';
+import 'package:gi_english_website/widget/LessonRatingPromptHost.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/widget/ProfileEditDialog.dart';
@@ -111,6 +113,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
   List<Map<String, dynamic>> _guestMembers = [];
   List<WeekBooking> _bookings = [];
   List<LessonFeedback> _feedbacks = [];
+  List<LessonRating> _ratings = [];
   List<OnlineSession> _sessions = [];
   List<EnrollmentRecord> _enrollments = [];
   Map<String, List<StudentWeekProgress>> _learning = {};
@@ -170,6 +173,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       });
     }
     final feedbacks = await LessonFeedbackService.listForTeacher(teacherUid);
+    final ratings = await LessonRatingService.listForTeacher(teacherUid);
     final userIds = {...byId.keys, ...guestById.keys}.toList();
     final enrollments =
         await EnrollmentService.listEnrollments(memberIds: userIds);
@@ -185,6 +189,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
             .compareTo(AuthService.profileDisplayName(b)));
       _bookings = bookings;
       _feedbacks = feedbacks;
+      _ratings = ratings;
       _sessions = sessions;
       _enrollments = enrollments;
       _learning = learning;
@@ -193,6 +198,16 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       _writerName = writerName;
       _loading = false;
     });
+  }
+
+  String _monthAverageLabel() {
+    final stats = LessonRatingService.monthStats(
+      bookings: _bookings,
+      teacherUid: _teacherUid,
+      ratings: _ratings,
+    );
+    if (stats.ratedCount <= 0) return '';
+    return ' · 이번달 평균 ${stats.averageStarsLabel} (${stats.ratedCount}건)';
   }
 
   void _toast(String message, {bool error = false}) {
@@ -242,9 +257,12 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
           : _writerName,
     );
     if (saved) {
-      _toast(afterClass ? '피드백을 저장했습니다. 수업이 마무리되었습니다.' : '피드백을 저장했습니다.');
+      _toast(afterClass
+          ? '피드백을 저장했습니다. 수강생에게 수업 평가 요청이 전달되었습니다.'
+          : '피드백을 저장했습니다. 수강생 평가가 끝나야 이 수업이 정산에 포함됩니다.');
       await _load();
     } else if (afterClass && mounted) {
+      _toast('피드백을 작성해야 수강생 평가와 정산이 진행됩니다.', error: true);
       await _load();
     }
   }
@@ -292,7 +310,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       builder: (dialogContext) => AlertDialog(
         title: Text('수업 종료', style: TextStyle(fontFamily: "Jalnan")),
         content: Text(
-          '이 회차 화상수업을 종료할까요?\n종료 후 바로 피드백을 작성할 수 있습니다.',
+          '이 회차 화상수업을 종료할까요?\n종료 후 피드백을 작성해야 수강생 평가가 시작되고, 평가가 끝나야 정산에 포함됩니다.',
           style: TextStyle(fontFamily: "NotoSansKR", height: 1.5),
         ),
         actions: [
@@ -345,7 +363,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
           SizedBox(height: 8),
           Text(
             '담당 회원의 화상수업 입장·종료와 회차별 피드백을 여기서 진행합니다. '
-            '수업 종료 직후 피드백 창이 열립니다.',
+            '수업 종료 직후 피드백 창이 열리고, 저장하면 수강생에게 별점 평가가 요청됩니다.',
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
@@ -485,7 +503,8 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
           ),
           SizedBox(height: 10),
           Text(
-            '내 수강생 ${_members.length}명 · 타 수강생 ${_guestMembers.length}명 · 화상수업 ${_bookings.length}건',
+            '내 수강생 ${_members.length}명 · 타 수강생 ${_guestMembers.length}명 · 화상수업 ${_bookings.length}건'
+            '${_monthAverageLabel()}',
             style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 12,
@@ -765,6 +784,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
 
   Widget _lessonRow(WeekBooking booking) {
     final feedback = LessonFeedbackService.forBooking(_feedbacks, booking.id);
+    final rating = LessonRatingService.forBooking(_ratings, booking.id);
     final written = feedback != null && feedback.hasContent;
     final course = OnlineCourse.findById(booking.courseId);
     final session = _sessionFor(booking);
@@ -829,6 +849,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                   ),
                 ),
               ),
+              LessonRatingStatusChip(rating: rating),
               if (canHost)
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -860,6 +881,18 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
               ),
             ],
           ),
+          if (rating != null && rating.review.trim().isNotEmpty) ...[
+            SizedBox(height: 8),
+            Text(
+              rating.review.trim(),
+              style: TextStyle(
+                fontFamily: "NotoSansKR",
+                fontSize: 13,
+                height: 1.45,
+                color: Palette.grey800,
+              ),
+            ),
+          ],
         ],
       ),
     );

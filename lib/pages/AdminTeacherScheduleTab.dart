@@ -7,6 +7,7 @@ import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonFeedbackService.dart';
+import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/NotificationService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
@@ -153,6 +154,7 @@ class AdminTeacherScheduleTab extends StatefulWidget {
 class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   TeacherAvailability _availability = TeacherAvailability(teacherUid: '');
   List<WeekBooking> _bookings = [];
+  List<LessonRating> _ratings = [];
   List<EnrollmentRecord> _enrollments = [];
   Map<String, List<StudentWeekProgress>> _learning = {};
   List<AppNotification> _notifications = [];
@@ -187,12 +189,16 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
             : await EnrollmentService.staffWeekBookings(
                 mineOnly: !widget.showAllBookings,
               );
+    final ratings = uid.isEmpty
+        ? <LessonRating>[]
+        : await LessonRatingService.listForTeacher(uid);
     if (widget.standalone || widget.schoolOverview) {
       if (!mounted) return;
       setState(() {
         _teacherUid = uid;
         _availability = availability;
         _bookings = bookings;
+        _ratings = ratings;
         _enrollments = [];
         _learning = {};
         _staffPhone = '';
@@ -220,6 +226,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       _teacherUid = uid;
       _availability = availability;
       _bookings = bookings;
+      _ratings = ratings;
       _enrollments = enrollments;
       _learning = learning;
       _staffPhone = profile?['phone']?.toString() ?? '';
@@ -883,11 +890,10 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     );
   }
 
-  TeacherMonthStats get _monthStats => TeacherMonthStats.fromBookings(
+  TeacherMonthStats get _monthStats => LessonRatingService.monthStats(
         bookings: _bookings,
         teacherUid: _teacherUid,
-        isCompleted: (booking) =>
-            booking.isConfirmed && _isSlotPast(booking.date, booking.time),
+        ratings: _ratings,
       );
 
   Widget _monthSummary({bool compact = false}) {

@@ -8,6 +8,7 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/GleamMark.dart';
 import 'package:gi_english_website/widget/HeaderSocialLinks.dart';
 import 'package:gi_english_website/widget/LetsTalkNavChip.dart';
+import 'package:gi_english_website/widget/LessonRatingPromptHost.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
 import 'package:gi_english_website/widget/SiteNav.dart';
 
@@ -128,7 +129,9 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return LessonRatingPromptHost(
+      enabled: _isMemberLoggedIn && !_isStaff,
+      child: Scaffold(
       body: Stack(
         children: [
           Positioned(
@@ -153,6 +156,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             child: _header(),
           ),
         ],
+      ),
       ),
     );
   }

@@ -644,10 +644,10 @@ class EnrollmentService {
         await ref.set(payload, SetOptions(merge: true));
       }
 
-      // 종료 시 진도 반영(클라우드 함수 백업). 이미 반영됐으면 건너뛴다.
+      // 종료 시 정산·다음 회차는 강사 피드백+학생 별점이 끝난 뒤에 반영한다.
       if (!isLive) {
         final data = (await ref.get()).data() ?? existing.data() ?? {};
-        await _creditEnrollmentAfterSessionEnd(
+        await _openPayGateAfterSessionEnd(
           sessionId: sessionId,
           data: data,
         );
@@ -668,80 +668,63 @@ class EnrollmentService {
     }
   }
 
-  /// 화상수업 종료 후 이수 횟수를 +1 한다. sessionCredited로 중복 방지.
-  /// Cloud Function(onOnlineSessionUpdated)과 같은 로직의 클라이언트 백업.
-  static Future<void> _creditEnrollmentAfterSessionEnd({
+  /// 화상수업 종료 후 정산 게이트를 연다. 별점 제출 전에는 다음 회차를 열지 않는다.
+  static Future<void> _openPayGateAfterSessionEnd({
     required String sessionId,
     required Map<String, dynamic> data,
   }) async {
-    final userId = data['userId']?.toString() ?? '';
-    final courseId = data['courseId']?.toString() ?? '';
-    if (userId.isEmpty || courseId.isEmpty) return;
+    var bookingId = data['bookingId']?.toString() ?? '';
+    if (bookingId.isEmpty && sessionId.startsWith('booking_')) {
+      bookingId = sessionId.substring('booking_'.length);
+    }
+    if (bookingId.isEmpty) return;
 
     try {
-      final sessionRef =
-          _firestore.collection('online_sessions').doc(sessionId);
-      final enrollSnap = await _firestore
-          .collection('enrollments')
-          .where('userId', isEqualTo: userId)
-          .get();
-      DocumentReference<Map<String, dynamic>>? enrollmentRef;
-      for (final doc in enrollSnap.docs) {
-        if (doc.data()['courseId']?.toString() == courseId) {
-          enrollmentRef = doc.reference;
-          break;
-        }
-      }
-      if (enrollmentRef == null) return;
+      final ref = _firestore.collection('lesson_ratings').doc(bookingId);
+      final existing = await ref.get();
+      final current = existing.data() ?? {};
+      final status = current['status']?.toString() ?? '';
+      if (status == 'rated' || status == 'pending') return;
 
-      await _firestore.runTransaction((transaction) async {
-        final sessionSnap = await transaction.get(sessionRef);
-        final session = sessionSnap.data() ?? {};
-        if (session['sessionCredited'] == true) return;
+      Map<String, dynamic> booking = {};
+      try {
+        final snap =
+            await _firestore.collection('week_bookings').doc(bookingId).get();
+        booking = snap.data() ?? {};
+      } catch (_) {}
 
-        final enrollSnapTx = await transaction.get(enrollmentRef!);
-        if (!enrollSnapTx.exists) return;
-        final enroll = enrollSnapTx.data() ?? {};
-        final total = _intValue(enroll['totalSessions']);
-        final current = _intValue(enroll['completedSessions']);
-        if (total <= 0 || current >= total) {
-          transaction.set(
-            sessionRef,
-            {
-              'sessionCredited': true,
-              'creditedAt': FieldValue.serverTimestamp(),
-            },
-            SetOptions(merge: true),
-          );
-          return;
-        }
-
-        final next = current + 1;
-        transaction.update(enrollmentRef, {
-          'completedSessions': next,
-          'remainingSessions': total - next,
-          'lastSessionAt': FieldValue.serverTimestamp(),
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
-        transaction.set(enrollmentRef.collection('session_logs').doc(), {
-          'delta': 1,
-          'completedAfter': next,
-          'totalSessions': total,
-          'adminName': '화상수업 종료',
-          'sessionId': sessionId,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-        transaction.set(
-          sessionRef,
-          {
-            'sessionCredited': true,
-            'creditedAt': FieldValue.serverTimestamp(),
-          },
-          SetOptions(merge: true),
-        );
-      });
+      await ref.set({
+        'bookingId': bookingId,
+        'teacherId': (data['teacherId'] ??
+                booking['teacherId'] ??
+                booking['nativeTeacherUid'] ??
+                '')
+            .toString(),
+        'teacherName': (data['hostName'] ??
+                booking['nativeTeacherName'] ??
+                booking['assignedTeacherName'] ??
+                '')
+            .toString(),
+        'userId': (data['userId'] ?? booking['userId'] ?? '').toString(),
+        'memberName':
+            (data['memberName'] ?? booking['memberName'] ?? '').toString(),
+        'email': booking['email']?.toString() ?? '',
+        'courseId': (data['courseId'] ?? booking['courseId'] ?? '').toString(),
+        'weekId': booking['weekId']?.toString() ?? '',
+        'weekNumber': _intValue(data['weekNumber'] ?? booking['weekNumber']),
+        'weekTitle': normalizeSessionLabel(
+            (data['title'] ?? booking['weekTitle'] ?? '').toString()),
+        'date': booking['date'] ?? FieldValue.serverTimestamp(),
+        'time': (data['time'] ?? booking['time'] ?? '').toString(),
+        'sessionId': sessionId,
+        'status': 'awaiting_feedback',
+        'stars': 0,
+        'review': '',
+        'updatedAt': FieldValue.serverTimestamp(),
+        if (!existing.exists) 'createdAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
-      print('수업 종료 진도 반영 오류: $e');
+      print('수업 평가 게이트 생성 오류: $e');
     }
   }
 
@@ -2468,17 +2451,32 @@ class TeacherMonthStats {
   final int month;
   final int completedCount;
   final int cancelledCount;
+  final int awaitingCount;
+  final int ratedCount;
+  final int starSum;
 
   TeacherMonthStats({
     required this.year,
     required this.month,
     required this.completedCount,
     required this.cancelledCount,
+    this.awaitingCount = 0,
+    this.ratedCount = 0,
+    this.starSum = 0,
   });
 
   int get incomeWon => completedCount * EnrollmentService.lessonPayWon;
 
   String get monthLabel => '$year년 $month월';
+
+  double? get averageStars =>
+      ratedCount <= 0 ? null : starSum / ratedCount;
+
+  String get averageStarsLabel {
+    final avg = averageStars;
+    if (avg == null) return '-';
+    return '${avg.toStringAsFixed(1)}점';
+  }
 
   String get incomeLabel {
     final digits = incomeWon.toString();
@@ -2500,11 +2498,15 @@ class TeacherMonthStats {
     required List<WeekBooking> bookings,
     required String teacherUid,
     required bool Function(WeekBooking booking) isCompleted,
+    bool Function(WeekBooking booking)? isAwaitingPay,
+    int ratedCount = 0,
+    int starSum = 0,
     DateTime? now,
   }) {
     final current = now ?? DateTime.now();
     var completed = 0;
     var cancelled = 0;
+    var awaiting = 0;
     for (final booking in bookings) {
       if (!taughtBy(booking, teacherUid)) continue;
       if (booking.date.year != current.year ||
@@ -2515,6 +2517,9 @@ class TeacherMonthStats {
         cancelled += 1;
       } else if (booking.isConfirmed && isCompleted(booking)) {
         completed += 1;
+      } else if (booking.isConfirmed &&
+          (isAwaitingPay?.call(booking) ?? false)) {
+        awaiting += 1;
       }
     }
     return TeacherMonthStats(
@@ -2522,6 +2527,9 @@ class TeacherMonthStats {
       month: current.month,
       completedCount: completed,
       cancelledCount: cancelled,
+      awaitingCount: awaiting,
+      ratedCount: ratedCount,
+      starSum: starSum,
     );
   }
 }

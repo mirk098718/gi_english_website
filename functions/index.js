@@ -899,103 +899,268 @@ exports.sendLessonReminders = functions
     return null;
   });
 
+function bookingIdFromSession(sessionId, session) {
+  const fromField = String((session && session.bookingId) || "").trim();
+  if (fromField) return fromField;
+  const id = String(sessionId || "");
+  if (id.startsWith("booking_")) return id.slice("booking_".length);
+  return "";
+}
+
+async function loadBookingData(bookingId) {
+  if (!bookingId) return {};
+  try {
+    const snap = await admin.firestore().collection("week_bookings").doc(bookingId).get();
+    return snap.exists ? snap.data() || {} : {};
+  } catch (_) {
+    return {};
+  }
+}
+
+async function ensureLessonRating({ bookingId, sessionId, session, status, extra }) {
+  if (!bookingId) return null;
+  const ref = admin.firestore().collection("lesson_ratings").doc(bookingId);
+  const existing = await ref.get();
+  const current = existing.exists ? existing.data() || {} : {};
+  if (current.status === "rated") return ref;
+  if (status === "awaiting_feedback" && current.status === "pending") return ref;
+
+  const booking = await loadBookingData(bookingId);
+  const sessionData = session || {};
+  const payload = {
+    bookingId,
+    teacherId: String(
+      sessionData.teacherId ||
+        booking.teacherId ||
+        booking.nativeTeacherUid ||
+        current.teacherId ||
+        ""
+    ),
+    teacherName: String(
+      (extra && extra.teacherName) ||
+        sessionData.hostName ||
+        booking.nativeTeacherName ||
+        booking.assignedTeacherName ||
+        current.teacherName ||
+        ""
+    ),
+    userId: String(sessionData.userId || booking.userId || current.userId || ""),
+    memberName: String(
+      sessionData.memberName || booking.memberName || current.memberName || ""
+    ),
+    email: String(booking.email || current.email || ""),
+    courseId: String(sessionData.courseId || booking.courseId || current.courseId || ""),
+    courseTitle: String((extra && extra.courseTitle) || current.courseTitle || ""),
+    weekId: String(booking.weekId || current.weekId || ""),
+    weekNumber: Number(
+      sessionData.weekNumber || booking.weekNumber || current.weekNumber || 0
+    ),
+    weekTitle: String(sessionData.title || booking.weekTitle || current.weekTitle || "")
+      .trim()
+      .replace(/(\d+)\s*주차/g, "$1회차"),
+    date: booking.date || current.date || admin.firestore.FieldValue.serverTimestamp(),
+    time: String(sessionData.time || booking.time || current.time || ""),
+    sessionId: String(sessionId || current.sessionId || sessionIdForBooking(bookingId)),
+    status,
+    stars: Number(current.stars || 0),
+    review: String(current.review || ""),
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  };
+  if (!existing.exists) {
+    payload.createdAt = admin.firestore.FieldValue.serverTimestamp();
+  }
+  if (status === "pending") {
+    payload.feedbackSubmittedAt = admin.firestore.FieldValue.serverTimestamp();
+  }
+  await ref.set(payload, { merge: true });
+  return ref;
+}
+
+async function creditEnrollmentFromRating(rating, ratingId) {
+  const userId = String((rating && rating.userId) || "");
+  const courseId = String((rating && rating.courseId) || "");
+  const bookingId = String((rating && rating.bookingId) || ratingId || "");
+  const sessionId = String(
+    (rating && rating.sessionId) || (bookingId ? sessionIdForBooking(bookingId) : "")
+  );
+  if (!userId || !courseId || !sessionId) {
+    console.log("평가 이수 건너뜀: userId/courseId/sessionId 없음", ratingId);
+    return { credited: false };
+  }
+
+  const db = admin.firestore();
+  const sessionRef = db.collection("online_sessions").doc(sessionId);
+  const ratingRef = db.collection("lesson_ratings").doc(ratingId);
+  const enrollSnap = await db
+    .collection("enrollments")
+    .where("userId", "==", userId)
+    .get();
+  let enrollmentRef = null;
+  for (const doc of enrollSnap.docs) {
+    if (String((doc.data() || {}).courseId || "") === courseId) {
+      enrollmentRef = doc.ref;
+      break;
+    }
+  }
+  if (!enrollmentRef) {
+    console.log("평가 이수 건너뜀: 수강 배정 없음", userId, courseId);
+    return { credited: false };
+  }
+
+  const weekNumber = Number((rating && rating.weekNumber) || 0);
+  let credited = false;
+  let nextCompleted = 0;
+  let totalSessions = 0;
+
+  await db.runTransaction(async (tx) => {
+    const ratingSnap = await tx.get(ratingRef);
+    const ratingData = ratingSnap.exists ? ratingSnap.data() || {} : {};
+    if (ratingData.sessionCredited === true) return;
+
+    const sessionSnap = await tx.get(sessionRef);
+    const session = sessionSnap.exists ? sessionSnap.data() || {} : {};
+    if (session.sessionCredited === true) {
+      tx.set(
+        ratingRef,
+        {
+          sessionCredited: true,
+          creditedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+      return;
+    }
+
+    const enrollSnapTx = await tx.get(enrollmentRef);
+    if (!enrollSnapTx.exists) return;
+    const enroll = enrollSnapTx.data() || {};
+    const total = Number(enroll.totalSessions || 0);
+    const current = Number(enroll.completedSessions || 0);
+    totalSessions = total;
+    if (total <= 0 || current >= total) {
+      if (sessionSnap.exists) {
+        tx.update(sessionRef, {
+          sessionCredited: true,
+          creditedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+      tx.set(
+        ratingRef,
+        {
+          sessionCredited: true,
+          creditedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+      return;
+    }
+
+    const next = current + 1;
+    nextCompleted = next;
+    credited = true;
+    tx.update(enrollmentRef, {
+      completedSessions: next,
+      remainingSessions: Math.max(0, total - next),
+      lastSessionAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    tx.set(enrollmentRef.collection("session_logs").doc(), {
+      delta: 1,
+      completedAfter: next,
+      totalSessions: total,
+      adminName: "수업 평가 완료",
+      sessionId,
+      bookingId,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    if (sessionSnap.exists) {
+      tx.update(sessionRef, {
+        sessionCredited: true,
+        creditedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    }
+    tx.set(
+      ratingRef,
+      {
+        sessionCredited: true,
+        creditedAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+  });
+
+  return { credited, nextCompleted, totalSessions, weekNumber, userId, bookingId };
+}
+
+function ratingReminderText(rating) {
+  const weekNumber = Number((rating && rating.weekNumber) || 0);
+  const week = weekNumber > 0 ? `${weekNumber}회차` : "화상수업";
+  return `${week} 강사 평가를 아직 하지 않았습니다. 사이트에서 별점 평가를 마치면 다음 회차가 열립니다.`;
+}
+
+async function sendRatingReminder(rating, ratingId, { reason }) {
+  const userId = String((rating && rating.userId) || "");
+  if (!userId) return false;
+  const body = ratingReminderText(rating);
+  await writeNotification({
+    userId,
+    title: "수업 평가 요청",
+    body,
+    type: "lesson_rating",
+    bookingId: String((rating && rating.bookingId) || ratingId || ""),
+  });
+  const phone = await memberPhone(userId, rating && rating.phone);
+  if (phone) {
+    await sendSms({
+      to: phone,
+      text: `[글림교육] ${body}`,
+    });
+  } else {
+    console.log("학생 연락처가 없어 평가 알림 SMS를 건너뜁니다.", userId, reason);
+  }
+  await admin
+    .firestore()
+    .collection("lesson_ratings")
+    .doc(ratingId)
+    .set(
+      {
+        lastReminderAt: admin.firestore.FieldValue.serverTimestamp(),
+        reminderCount: Number((rating && rating.reminderCount) || 0) + 1,
+        reminderReason: reason || "",
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+  return true;
+}
+
+function isRatingReminderDue(rating, now) {
+  if (!rating || rating.status !== "pending") return false;
+  const last = toJsDate(rating.lastReminderAt);
+  const created = toJsDate(rating.createdAt) || toJsDate(rating.feedbackSubmittedAt) || now;
+  const anchor = last || created;
+  return now.getTime() - anchor.getTime() >= 3 * 60 * 60 * 1000;
+}
+
 exports.onOnlineSessionUpdated = functions
   .region("asia-northeast3")
   .firestore.document("online_sessions/{sessionId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data() || {};
     const after = change.after.data() || {};
-    if (after.sessionCredited === true) return null;
     if (before.isLive !== true || after.isLive !== false) return null;
-
-    const db = admin.firestore();
-    const sessionRef = change.after.ref;
-    const userId = String(after.userId || "");
-    const courseId = String(after.courseId || "");
-    if (!userId || !courseId) {
-      console.log(
-        "수업 종료 차감 건너뜀: userId/courseId 없음",
-        context.params.sessionId
-      );
+    const sessionId = context.params.sessionId;
+    const bookingId = bookingIdFromSession(sessionId, after);
+    if (!bookingId) {
+      console.log("수업 종료 평가 게이트 건너뜀: bookingId 없음", sessionId);
       return null;
     }
-
-    const enrollSnap = await db
-      .collection("enrollments")
-      .where("userId", "==", userId)
-      .get();
-    let enrollmentRef = null;
-    for (const doc of enrollSnap.docs) {
-      if (String((doc.data() || {}).courseId || "") === courseId) {
-        enrollmentRef = doc.ref;
-        break;
-      }
-    }
-    if (!enrollmentRef) {
-      console.log("수업 종료 차감 건너뜀: 수강 배정 없음", userId, courseId);
-      return null;
-    }
-
-    const weekNumber = Number(after.weekNumber || after.order || 0);
-    let credited = false;
-    let nextCompleted = 0;
-    let totalSessions = 0;
-
-    await db.runTransaction(async (tx) => {
-      const sessionSnap = await tx.get(sessionRef);
-      const session = sessionSnap.data() || {};
-      if (session.sessionCredited === true) return;
-
-      const enrollSnapTx = await tx.get(enrollmentRef);
-      if (!enrollSnapTx.exists) return;
-      const enroll = enrollSnapTx.data() || {};
-      const total = Number(enroll.totalSessions || 0);
-      const current = Number(enroll.completedSessions || 0);
-      totalSessions = total;
-      if (total <= 0 || current >= total) {
-        tx.update(sessionRef, {
-          sessionCredited: true,
-          creditedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-        return;
-      }
-
-      const next = current + 1;
-      nextCompleted = next;
-      credited = true;
-      tx.update(enrollmentRef, {
-        completedSessions: next,
-        remainingSessions: Math.max(0, total - next),
-        lastSessionAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-      tx.set(enrollmentRef.collection("session_logs").doc(), {
-        delta: 1,
-        completedAfter: next,
-        totalSessions: total,
-        adminName: "화상수업 종료",
-        sessionId: context.params.sessionId,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-      tx.update(sessionRef, {
-        sessionCredited: true,
-        creditedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
+    await ensureLessonRating({
+      bookingId,
+      sessionId,
+      session: after,
+      status: "awaiting_feedback",
     });
-
-    if (credited) {
-      const opened = nextCompleted < totalSessions ? nextCompleted + 1 : 0;
-      const label = weekNumber || nextCompleted;
-      await writeNotification({
-        userId,
-        title: "화상수업 이수",
-        body: opened
-          ? `${label}회차 화상수업을 마쳤습니다. ${opened}회차가 열렸습니다.`
-          : `${label}회차 화상수업을 마쳤습니다. 전 회차를 모두 이수했습니다.`,
-        type: "session_completed",
-        bookingId: String(after.bookingId || ""),
-      });
-    }
     return null;
   });
 
@@ -1129,18 +1294,90 @@ exports.onLessonFeedbackWritten = functions
     const weekNumber = Number(after.weekNumber || 0);
     const week = weekNumber > 0 ? `${weekNumber}회차` : "화상수업";
     const isNew = !change.before.exists;
+    const bookingId = String(after.bookingId || change.after.id);
     await writeNotification({
       userId,
       title: "강사 피드백",
       body: isNew
-        ? `${teacher} 선생님이 ${week} 피드백을 남겼습니다. 내 강의실에서 확인해 주세요.`
+        ? `${teacher} 선생님이 ${week} 피드백을 남겼습니다. 바로 수업 평가(별점)를 완료해 주세요.`
         : `${teacher} 선생님이 ${week} 피드백을 수정했습니다. 내 강의실에서 확인해 주세요.`,
       type: "lesson_feedback",
-      bookingId: String(after.bookingId || change.after.id),
+      bookingId,
     });
     await change.after.ref.set(
       { alertSentAt: admin.firestore.FieldValue.serverTimestamp() },
       { merge: true }
     );
+    await ensureLessonRating({
+      bookingId,
+      sessionId: String(after.sessionId || sessionIdForBooking(bookingId)),
+      session: after,
+      status: "pending",
+      extra: { teacherName: teacher, courseTitle: String(after.courseTitle || "") },
+    });
+    return null;
+  });
+
+exports.onLessonRatingWritten = functions
+  .region("asia-northeast3")
+  .firestore.document("lesson_ratings/{ratingId}")
+  .onWrite(async (change, context) => {
+    if (!change.after.exists) return null;
+    const after = change.after.data() || {};
+    const before = change.before.exists ? change.before.data() || {} : {};
+    const ratingId = context.params.ratingId;
+
+    const becameRated =
+      after.status === "rated" && before.status !== "rated";
+    if (becameRated) {
+      const result = await creditEnrollmentFromRating(after, ratingId);
+      if (result.credited) {
+        const opened =
+          result.nextCompleted < result.totalSessions
+            ? result.nextCompleted + 1
+            : 0;
+        const label = result.weekNumber || result.nextCompleted;
+        await writeNotification({
+          userId: result.userId,
+          title: "화상수업 이수",
+          body: opened
+            ? `${label}회차 평가를 마쳤습니다. ${opened}회차가 열렸습니다.`
+            : `${label}회차 평가를 마쳤습니다. 전 회차를 모두 이수했습니다.`,
+          type: "session_completed",
+          bookingId: result.bookingId,
+        });
+      }
+      return null;
+    }
+
+    const justDismissed =
+      after.status === "pending" &&
+      after.dismissedAt &&
+      !before.dismissedAt;
+    if (justDismissed) {
+      await sendRatingReminder(after, ratingId, { reason: "dismissed" });
+    }
+    return null;
+  });
+
+exports.sendRatingReminders = functions
+  .region("asia-northeast3")
+  .pubsub.schedule("every 15 minutes")
+  .timeZone("Asia/Seoul")
+  .onRun(async () => {
+    const now = new Date();
+    const snap = await admin
+      .firestore()
+      .collection("lesson_ratings")
+      .where("status", "==", "pending")
+      .get();
+    let sent = 0;
+    for (const doc of snap.docs) {
+      const data = doc.data() || {};
+      if (!isRatingReminderDue(data, now)) continue;
+      const ok = await sendRatingReminder(data, doc.id, { reason: "scheduled" });
+      if (ok) sent += 1;
+    }
+    console.log("수업 평가 재알림", { pending: snap.size, sent });
     return null;
   });

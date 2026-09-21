@@ -441,6 +441,56 @@ service cloud.firestore {
       allow delete: if isOwner();
     }
 
+    // 회차별 화상수업 평가. 스태프가 게이트를 열고, 해당 수강생이 별점을 남긴다.
+    match /lesson_ratings/{ratingId} {
+      allow read: if isOwner()
+        || (isLoggedIn() && resource.data.userId == request.auth.uid)
+        || (isTeacher() && resource.data.teacherId == request.auth.uid);
+
+      allow create: if isStaff()
+        && request.resource.data.userId is string
+        && request.resource.data.userId.size() > 0
+        && request.resource.data.status in ['awaiting_feedback', 'pending']
+        && (!('stars' in request.resource.data)
+          || request.resource.data.stars == 0);
+
+      allow update: if isOwner()
+        || (
+          isStaff()
+          && request.resource.data.userId == resource.data.userId
+          && request.resource.data.teacherId == resource.data.teacherId
+          && request.resource.data.bookingId == resource.data.bookingId
+          && resource.data.status != 'rated'
+          && request.resource.data.status in ['awaiting_feedback', 'pending']
+          && request.resource.data.stars == resource.data.stars
+        )
+        || (
+          isLoggedIn()
+          && resource.data.userId == request.auth.uid
+          && request.resource.data.userId == resource.data.userId
+          && request.resource.data.teacherId == resource.data.teacherId
+          && request.resource.data.bookingId == resource.data.bookingId
+          && resource.data.status == 'pending'
+          && (
+            (
+              request.resource.data.status == 'pending'
+              && request.resource.data.diff(resource.data).affectedKeys()
+                  .hasOnly(['dismissedAt', 'updatedAt'])
+            )
+            || (
+              request.resource.data.status == 'rated'
+              && request.resource.data.stars is int
+              && request.resource.data.stars >= 1
+              && request.resource.data.stars <= 5
+              && request.resource.data.diff(resource.data).affectedKeys()
+                  .hasOnly(['stars', 'review', 'status', 'ratedAt', 'updatedAt', 'dismissedAt'])
+            )
+          )
+        );
+
+      allow delete: if isOwner();
+    }
+
     // 예약·수업·피드백 알림. 본인만 읽고 읽음 처리. 강사는 수강생에게 생성.
     // Let's Talk 메시지는 로그인 회원이 상대에게만 생성할 수 있다.
     match /notifications/{notificationId} {

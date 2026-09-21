@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/StudentDetailPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
+import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PaymentService.dart';
 
@@ -16,6 +17,7 @@ class _AdminPaymentTabState extends State<AdminPaymentTab> {
   List<EnrollmentRecord> _enrollments = [];
   List<Map<String, dynamic>> _teachers = [];
   List<WeekBooking> _bookings = [];
+  List<LessonRating> _ratings = [];
   bool _loading = true;
 
   @override
@@ -30,12 +32,14 @@ class _AdminPaymentTabState extends State<AdminPaymentTab> {
     final enrollments = await EnrollmentService.listEnrollments();
     final teachers = await AuthService.listTeachers();
     final bookings = await EnrollmentService.staffWeekBookings(mineOnly: false);
+    final ratings = await LessonRatingService.listAll();
     if (!mounted) return;
     setState(() {
       _payments = payments;
       _enrollments = enrollments;
       _teachers = teachers;
       _bookings = bookings;
+      _ratings = ratings;
       _loading = false;
     });
   }
@@ -74,6 +78,7 @@ class _AdminPaymentTabState extends State<AdminPaymentTab> {
                 _TeacherPayrollPane(
                   teachers: _teachers,
                   bookings: _bookings,
+                  ratings: _ratings,
                   loading: _loading,
                   onRefresh: _refresh,
                 ),
@@ -509,12 +514,14 @@ class _StudentSettlementPaneState extends State<_StudentSettlementPane> {
 class _TeacherPayrollPane extends StatefulWidget {
   final List<Map<String, dynamic>> teachers;
   final List<WeekBooking> bookings;
+  final List<LessonRating> ratings;
   final bool loading;
   final Future<void> Function() onRefresh;
 
   const _TeacherPayrollPane({
     required this.teachers,
     required this.bookings,
+    required this.ratings,
     required this.loading,
     required this.onRefresh,
   });
@@ -538,19 +545,11 @@ class _TeacherPayRow {
 class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
   DateTime _month = DateTime(DateTime.now().year, DateTime.now().month);
 
-  bool _isCompleted(WeekBooking booking) {
-    final at = EnrollmentService.bookingDateTime(booking.date, booking.time);
-    if (at == null) return booking.isConfirmed;
-    return booking.isConfirmed &&
-        DateTime.now().isAfter(
-            at.add(Duration(minutes: EnrollmentService.lessonMinutes)));
-  }
-
   TeacherMonthStats _statsFor(String uid) {
-    return TeacherMonthStats.fromBookings(
+    return LessonRatingService.monthStats(
       bookings: widget.bookings,
       teacherUid: uid,
-      isCompleted: _isCompleted,
+      ratings: widget.ratings,
       now: _month,
     );
   }
@@ -581,7 +580,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
 
     final completed = rows.fold<int>(0, (sum, row) => sum + row.stats.completedCount);
     final cancelled = rows.fold<int>(0, (sum, row) => sum + row.stats.cancelledCount);
-    final pending = rows.fold<int>(0, (sum, row) => sum + row.pending);
+    final awaiting = rows.fold<int>(0, (sum, row) => sum + row.stats.awaitingCount);
     final payroll = rows.fold<int>(0, (sum, row) => sum + row.stats.incomeWon);
 
     return RefreshIndicator(
@@ -598,7 +597,8 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
           ),
           const SizedBox(height: 8),
           Text(
-            '확정 후 수업 시간이 지난 건을 진행으로 셉니다. '
+            '강사 피드백과 수강생 별점 평가가 모두 끝난 수업만 진행으로 셉니다. '
+            '예전 수업(평가 기록 없음)은 수업 시간이 지나면 포함됩니다. '
             '수업 ${EnrollmentService.lessonMinutes}분 · 건당 ${_formatWon(EnrollmentService.lessonPayWon)}.',
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
@@ -609,12 +609,12 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
           const SizedBox(height: 10),
           _summaryRow([
             _summaryCell('진행', '$completed회', Palette.secondaryDark),
-            _summaryCell('취소', '$cancelled회', Palette.danger),
+            _summaryCell('월급', _formatWon(payroll), Palette.navy),
           ]),
           const SizedBox(height: 8),
           _summaryRow([
-            _summaryCell('대기', '$pending건', Palette.grey600),
-            _summaryCell('월급', _formatWon(payroll), Palette.navy),
+            _summaryCell('평가대기', '$awaiting건', Palette.warning),
+            _summaryCell('취소', '$cancelled회', Palette.danger),
           ]),
           const SizedBox(height: 24),
           Text('강사별 월급', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
@@ -664,12 +664,17 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
             const SizedBox(height: 10),
             _summaryRow([
               _summaryCell('진행', '${stats.completedCount}회', Palette.secondaryDark),
-              _summaryCell('취소', '${stats.cancelledCount}회', Palette.danger),
+              _summaryCell('월급', stats.incomeLabel, Palette.navy),
             ]),
             const SizedBox(height: 8),
             _summaryRow([
-              _summaryCell('대기', '${row.pending}건', Palette.grey600),
-              _summaryCell('월급', stats.incomeLabel, Palette.navy),
+              _summaryCell('평가대기', '${stats.awaitingCount}건', Palette.warning),
+              _summaryCell('평균별점', stats.averageStarsLabel, Palette.warning),
+            ]),
+            const SizedBox(height: 8),
+            _summaryRow([
+              _summaryCell('취소', '${stats.cancelledCount}회', Palette.danger),
+              _summaryCell('예약대기', '${row.pending}건', Palette.grey600),
             ]),
             const SizedBox(height: 10),
             Text(

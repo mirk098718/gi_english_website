@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
+import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/LessonRatingPromptHost.dart';
 
 /// 스케줄 옆에서 보는 이번 달 진행·취소 수업 수와 수입.
 class TeacherMonthLessonSummary extends StatelessWidget {
@@ -23,6 +25,8 @@ class TeacherMonthLessonSummary extends StatelessWidget {
       _cell('진행', loading ? '-' : '${stats.completedCount}회', Palette.secondaryDark),
       _cell('취소', loading ? '-' : '${stats.cancelledCount}회', Palette.danger),
       _cell('수입', loading ? '-' : stats.incomeLabel, Palette.navy),
+      if (!compact)
+        _cell('평균별점', loading ? '-' : stats.averageStarsLabel, Palette.warning),
     ];
 
     return Container(
@@ -51,7 +55,9 @@ class TeacherMonthLessonSummary extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${EnrollmentService.lessonMinutes}분 · ${_payLabel()}',
+                      '${EnrollmentService.lessonMinutes}분 · ${_payLabel()}'
+                      ' · 평균 ${stats.averageStarsLabel}'
+                      '${stats.awaitingCount > 0 ? ' · 평가대기 ${stats.awaitingCount}건' : ''}',
                       style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 10,
@@ -82,7 +88,8 @@ class TeacherMonthLessonSummary extends StatelessWidget {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  '${stats.monthLabel} · 수업 ${EnrollmentService.lessonMinutes}분 · 건당 ${_payLabel()}',
+                  '${stats.monthLabel} · 수업 ${EnrollmentService.lessonMinutes}분 · 건당 ${_payLabel()}'
+                  '${stats.awaitingCount > 0 ? ' · 평가 대기 ${stats.awaitingCount}건' : ''}',
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 12,
@@ -171,6 +178,7 @@ class TeacherMonthHistoryPanel extends StatefulWidget {
 class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
   DateTime _month = DateTime(DateTime.now().year, DateTime.now().month);
   List<WeekBooking> _bookings = [];
+  List<LessonRating> _ratings = [];
   bool _loading = true;
 
   @override
@@ -183,19 +191,14 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
     setState(() => _loading = true);
     final bookings =
         await EnrollmentService.weekBookingsForTeacher(widget.teacherUid);
+    final ratings =
+        await LessonRatingService.listForTeacher(widget.teacherUid);
     if (!mounted) return;
     setState(() {
       _bookings = bookings;
+      _ratings = ratings;
       _loading = false;
     });
-  }
-
-  bool _isCompleted(WeekBooking booking) {
-    final at = EnrollmentService.bookingDateTime(booking.date, booking.time);
-    if (at == null) return booking.isConfirmed;
-    return booking.isConfirmed &&
-        DateTime.now().isAfter(
-            at.add(Duration(minutes: EnrollmentService.lessonMinutes)));
   }
 
   List<WeekBooking> get _monthBookings {
@@ -212,10 +215,10 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
     return items;
   }
 
-  TeacherMonthStats get _stats => TeacherMonthStats.fromBookings(
+  TeacherMonthStats get _stats => LessonRatingService.monthStats(
         bookings: _bookings,
         teacherUid: widget.teacherUid,
-        isCompleted: _isCompleted,
+        ratings: _ratings,
         now: _month,
       );
 
@@ -261,8 +264,8 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
         const SizedBox(height: 16),
         Text(
           widget.teacherName.isEmpty
-              ? '이 달의 예약 · 진행 · 취소가 시간순으로 보입니다.'
-              : '${widget.teacherName} 선생님의 이 달 예약 · 진행 · 취소입니다.',
+              ? '이 달의 예약 · 진행 · 평가가 시간순으로 보입니다. 별점은 인사 평가에 쓰입니다.'
+              : '${widget.teacherName} 선생님의 이 달 예약 · 진행 · 학생 평가입니다.',
           style: TextStyle(
               fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
         ),
@@ -286,7 +289,8 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
     final when =
         '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)}';
     final guest = booking.isSubstitute;
-    final done = _isCompleted(booking);
+    final rating = LessonRatingService.forBooking(_ratings, booking.id);
+    final done = LessonRatingService.isPayable(booking, rating, now: _month);
     return Container(
       width: double.maxFinite,
       margin: const EdgeInsets.only(bottom: 8),
@@ -300,7 +304,7 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '$when · ${booking.statusLabel}${done ? ' · 진행' : ''}',
+            '$when · ${booking.statusLabel}${done ? ' · 정산' : ''}',
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontWeight: FontWeight.w700,
@@ -320,6 +324,20 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
               color: Palette.grey600,
             ),
           ),
+          const SizedBox(height: 8),
+          LessonRatingStatusChip(rating: rating),
+          if (rating != null && rating.review.trim().isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              rating.review.trim(),
+              style: TextStyle(
+                fontFamily: "NotoSansKR",
+                fontSize: 13,
+                height: 1.45,
+                color: Palette.grey800,
+              ),
+            ),
+          ],
         ],
       ),
     );

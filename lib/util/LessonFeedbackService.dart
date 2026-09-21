@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
+import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/NotificationService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
@@ -241,6 +242,11 @@ class LessonFeedbackService {
       if (sent) {
         await ref.set({'alertSentAt': now}, SetOptions(merge: true));
       }
+      await LessonRatingService.openAfterFeedback(
+        booking: booking,
+        teacherId: teacherId.isNotEmpty ? teacherId : writerUid,
+        teacherName: teacherName,
+      );
       return null;
     } on FirebaseException catch (e) {
       print('피드백 저장 오류: ${e.code} ${e.message}');
@@ -373,7 +379,8 @@ class _LessonFeedbackDialogState extends State<LessonFeedbackDialog> {
                   decoration: InputDecoration(
                     labelText: '수업 피드백',
                     alignLabelWithHint: true,
-                    hintText: '오늘 수업에서 잘한 점, 고칠 점, 다음 회차 과제를 적어 주세요.',
+                    hintText:
+                        '오늘 수업에서 잘한 점, 고칠 점, 다음 회차 과제를 적어 주세요. 저장하면 수강생에게 수업 평가가 요청됩니다.',
                     border: OutlineInputBorder(),
                   ),
                 )
