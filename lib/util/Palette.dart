@@ -27,6 +27,18 @@ class Palette {
   static const Color navy = Color(0xFF0B1F3A);
   static const Color navyDark = Color(0xFF071526);
 
+  // Let's Talk Cafe — 학습 메뉴와 구분되는 코랄 톤
+  static const Color talkCoral = Color(0xFFFF5B6B);
+  static const Color talkCoralDark = Color(0xFFE23B55);
+  static const Color talkMango = Color(0xFFFFB020);
+  static const Color talkCream = Color(0xFFFFF4EB);
+  static const Color talkInk = Color(0xFF2A1420);
+  static const LinearGradient talkGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [talkCoral, Color(0xFFFF7A45)],
+  );
+
   // 그레이 계열 - 현대적인 뉴트럴 색상
   static const Color grey50 = Color(0xFFF9FAFB);
   static const Color grey100 = Color(0xFFF3F4F6);

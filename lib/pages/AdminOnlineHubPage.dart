@@ -17,9 +17,10 @@ import 'package:gi_english_website/pages/AdminMembersHubPage.dart';
 import 'package:gi_english_website/pages/AdminPaymentTab.dart';
 import 'package:gi_english_website/pages/StudentDetailPage.dart';
 import 'package:gi_english_website/pages/TeacherRosterPage.dart';
-import 'package:gi_english_website/util/UrlIUtil.dart';
+import 'package:gi_english_website/util/JitsiJoin.dart';
 import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
 import 'package:gi_english_website/widget/AdminContentWidth.dart';
+import 'package:gi_english_website/widget/AdminTalkReportsTab.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/util/ProfilePhotoPicker.dart';
@@ -76,7 +77,7 @@ class _AdminOnlineHubPageState extends State<AdminOnlineHubPage>
 
     _tabController?.dispose();
     _tabController = role == AdminRole.owner
-        ? TabController(length: 4, vsync: this)
+        ? TabController(length: 5, vsync: this)
         : null;
 
     setState(() {
@@ -142,6 +143,7 @@ class _AdminOnlineHubPageState extends State<AdminOnlineHubPage>
                   Tab(text: '결제내역'),
                   Tab(text: '강사 관리'),
                   Tab(text: '주간 학습'),
+                  Tab(text: "Let's Talk 신고"),
                 ],
               )
             : null,
@@ -155,6 +157,7 @@ class _AdminOnlineHubPageState extends State<AdminOnlineHubPage>
                   AdminPaymentTab(),
                   AdminTeacherTab(),
                   AdminWeekCurriculumTab(),
+                  const AdminTalkReportsTab(),
                 ],
               )
             : members,
@@ -1381,7 +1384,11 @@ class _ClassControlDialogState extends State<_ClassControlDialog> {
       (s) => s.id == sessionId,
       orElse: () => _sessions.last,
     );
-    await UrlUtil.open(started.meetingUrl);
+    await JitsiJoin.open(
+      started.meetingUrl,
+      asHost: true,
+      displayName: widget.hostName,
+    );
   }
 
   Future<void> _toggleLive(OnlineSession session) async {
@@ -1489,7 +1496,11 @@ class _ClassControlDialogState extends State<_ClassControlDialog> {
                                 IconButton(
                                   tooltip: '호스트로 입장',
                                   onPressed: () async {
-                                    UrlUtil.open(session.meetingUrl);
+                                    JitsiJoin.open(
+                                      session.meetingUrl,
+                                      asHost: true,
+                                      displayName: widget.hostName,
+                                    );
                                     if (!session.isLive && !session.isFinished) {
                                       await _toggleLive(session);
                                     }
@@ -1672,7 +1683,11 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
   }
 
   Future<void> _enterAsHost(OnlineSession session) async {
-    UrlUtil.open(session.meetingUrl);
+    JitsiJoin.open(
+      session.meetingUrl,
+      asHost: true,
+      displayName: _hostName,
+    );
     if (!session.isLive && !session.isFinished) {
       final error = await EnrollmentService.setSessionLive(
         sessionId: session.id,
@@ -1802,9 +1817,8 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  '※ meet.jit.si는 첫 입장자에게 호스트 로그인을 요구할 수 있습니다. '
-                  '이 경우 강사가 회의실에서 ‘내가 호스트’를 눌러 Google 계정으로 한 번 로그인하면 됩니다. '
-                  'Google Meet·Zoom 링크를 쓰려면 아래 회의 주소 칸에 직접 붙여넣으세요.',
+                  '※ 방을 여는 사람은 호스트로 바로 들어갑니다. Google 로그인은 처음 한 번만 하면 다음부터 기억됩니다. '
+                  '수강생은 로그인 없이 입장합니다. Google Meet·Zoom을 쓰려면 아래 회의 주소 칸에 붙여넣으세요.',
                   style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 12,

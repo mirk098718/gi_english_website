@@ -12,6 +12,7 @@ import 'package:gi_english_website/pages/SchoolCurriculumMiddleSchoolPage.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
 import 'package:gi_english_website/pages/SchoolMapPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
+import 'package:gi_english_website/pages/SchoolLetsTalkPage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineClassroomPage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineCurriculumPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
@@ -81,6 +82,10 @@ class SiteNav {
   static void goClassroom(BuildContext context) {
     if (!isMemberLoggedIn) return;
     MenuUtil.push(context, const SchoolOnlineClassroomPage());
+  }
+
+  static void goLetsTalk(BuildContext context) {
+    MenuUtil.push(context, const SchoolLetsTalkPage());
   }
 
   static void goAcademy(BuildContext context) {

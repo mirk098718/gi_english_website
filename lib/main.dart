@@ -9,6 +9,7 @@ import 'package:gi_english_website/util/SiteAlertCenter.dart';
 
 import 'pages/AdminTeacherScheduleTab.dart';
 import 'pages/SchoolAboutPage.dart';
+import 'pages/SchoolLetsTalkPage.dart';
 import 'pages/SchoolMainPage.dart';
 
 Future<void> main() async {
@@ -58,6 +59,10 @@ class MyApp extends StatelessWidget {
     if (uri.queryParameters['view'] == 'online' ||
         path.toLowerCase().contains('/online')) {
       return const SchoolMainPage();
+    }
+    if (uri.queryParameters['view'] == 'talk' ||
+        path.toLowerCase().contains('/lets-talk')) {
+      return const SchoolLetsTalkPage();
     }
     return const SchoolAboutPage();
   }

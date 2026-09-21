@@ -9,6 +9,7 @@ import 'package:gi_english_website/util/LessonFeedbackService.dart';
 import 'package:gi_english_website/util/TeacherScheduleService.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/util/JitsiJoin.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
@@ -394,6 +395,18 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
     return true;
   }
 
+  String get _meetingDisplayName {
+    return (AuthService.currentUser?.displayName ?? '').trim();
+  }
+
+  void _openStudentMeeting(String url) {
+    JitsiJoin.open(
+      url,
+      asHost: false,
+      displayName: _meetingDisplayName,
+    );
+  }
+
   Widget _joinButton(String url) {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
@@ -401,7 +414,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
         foregroundColor: Palette.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
-      onPressed: () => UrlUtil.open(url),
+      onPressed: () => _openStudentMeeting(url),
       icon: Icon(Icons.login, size: 16, color: Palette.white),
       label: Text(
         '화상수업 입장',
@@ -731,7 +744,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: () => UrlUtil.open(session.meetingUrl),
+              onPressed: () => _openStudentMeeting(session.meetingUrl),
               icon: Icon(Icons.login, size: 16, color: Palette.white),
               label: Text(
                 "입장하기",

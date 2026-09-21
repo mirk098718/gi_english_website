@@ -300,16 +300,172 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Let's Talk: 로그인한 수강생끼리 Jitsi 방을 열고 참여한다.
+    match /talk_rooms/{roomId} {
+      allow read: if isLoggedIn();
+
+      allow create: if isLoggedIn()
+        && request.resource.data.hostId == request.auth.uid
+        && request.resource.data.type in ['group', 'oneToOne']
+        && request.resource.data.level in ['beginner', 'elementary', 'intermediate', 'advanced']
+        && request.resource.data.topic is string
+        && request.resource.data.topic.size() > 0
+        && request.resource.data.topic.size() <= 40
+        && request.resource.data.maxPeople is int
+        && request.resource.data.maxPeople >= 2
+        && request.resource.data.maxPeople <= 6
+        && (request.resource.data.type == 'group' || request.resource.data.maxPeople == 2)
+        && request.resource.data.memberIds is list
+        && request.resource.data.memberIds.size() == 1
+        && request.resource.data.memberIds[0] == request.auth.uid
+        && request.resource.data.meetingUrl == 'https://meet.jit.si/GleamTalk-' + roomId
+        && request.resource.data.status == 'open';
+
+      allow update: if isLoggedIn() && (
+        isOwner()
+        || (
+          resource.data.hostId == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['status', 'updatedAt'])
+          && request.resource.data.status == 'closed'
+        )
+        || (
+          resource.data.status == 'open'
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['memberIds', 'memberNames', 'memberPhotos', 'status', 'updatedAt'])
+          && request.resource.data.hostId == resource.data.hostId
+          && request.resource.data.type == resource.data.type
+          && request.resource.data.topic == resource.data.topic
+          && request.resource.data.level == resource.data.level
+          && request.resource.data.maxPeople == resource.data.maxPeople
+          && request.resource.data.meetingUrl == resource.data.meetingUrl
+          && request.resource.data.memberIds.hasAll(resource.data.memberIds)
+          && request.resource.data.memberIds.size() == resource.data.memberIds.size() + 1
+          && request.auth.uid in request.resource.data.memberIds
+          && !(request.auth.uid in resource.data.memberIds)
+          && request.resource.data.memberIds.size() <= resource.data.maxPeople
+          && request.auth.uid in request.resource.data.memberNames
+          && (request.resource.data.memberIds.size() == resource.data.maxPeople
+              ? request.resource.data.status == 'full'
+              : request.resource.data.status == 'open')
+        )
+        || (
+          resource.data.status in ['open', 'full']
+          && request.auth.uid in resource.data.memberIds
+          && !(request.auth.uid in request.resource.data.memberIds)
+          && resource.data.memberIds.hasAll(request.resource.data.memberIds)
+          && request.resource.data.memberIds.size() == resource.data.memberIds.size() - 1
+          && request.resource.data.type == resource.data.type
+          && request.resource.data.topic == resource.data.topic
+          && request.resource.data.level == resource.data.level
+          && request.resource.data.maxPeople == resource.data.maxPeople
+          && request.resource.data.meetingUrl == resource.data.meetingUrl
+          && request.resource.data.memberIds.size() == 0
+          && request.resource.data.status == 'closed'
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['memberIds', 'status', 'updatedAt'])
+        )
+        || (
+          resource.data.status in ['open', 'full']
+          && request.auth.uid in resource.data.memberIds
+          && !(request.auth.uid in request.resource.data.memberIds)
+          && resource.data.memberIds.hasAll(request.resource.data.memberIds)
+          && request.resource.data.memberIds.size() == resource.data.memberIds.size() - 1
+          && request.resource.data.memberIds.size() > 0
+          && resource.data.hostId != request.auth.uid
+          && request.resource.data.hostId == resource.data.hostId
+          && request.resource.data.status == 'open'
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['memberIds', 'status', 'updatedAt'])
+        )
+        || (
+          resource.data.status in ['open', 'full']
+          && request.auth.uid in resource.data.memberIds
+          && !(request.auth.uid in request.resource.data.memberIds)
+          && resource.data.memberIds.hasAll(request.resource.data.memberIds)
+          && request.resource.data.memberIds.size() == resource.data.memberIds.size() - 1
+          && request.resource.data.memberIds.size() > 0
+          && resource.data.hostId == request.auth.uid
+          && request.resource.data.hostId in request.resource.data.memberIds
+          && request.resource.data.hostId != request.auth.uid
+          && request.resource.data.status == 'open'
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['memberIds', 'status', 'updatedAt', 'hostId', 'hostName', 'hostPhotoUrl'])
+        )
+      );
+
+      allow delete: if isOwner();
+    }
+
+    match /talk_contacts/{contactId} {
+      allow read: if isLoggedIn() && request.auth.uid in resource.data.userIds;
+      allow create: if isLoggedIn()
+        && request.auth.uid in request.resource.data.userIds
+        && request.resource.data.userIds.size() == 2;
+      allow update: if isLoggedIn()
+        && request.auth.uid in resource.data.userIds
+        && request.auth.uid in request.resource.data.userIds
+        && request.resource.data.userIds.size() == 2;
+      allow delete: if false;
+    }
+
+    match /talk_blocks/{blockId} {
+      allow read: if isLoggedIn()
+        && (resource.data.blockerId == request.auth.uid
+          || resource.data.blockedId == request.auth.uid);
+      allow create: if isLoggedIn()
+        && request.resource.data.blockerId == request.auth.uid
+        && request.resource.data.blockedId is string
+        && request.resource.data.blockedId.size() > 0
+        && request.resource.data.blockedId != request.auth.uid;
+      allow update: if false;
+      allow delete: if isLoggedIn()
+        && resource.data.blockerId == request.auth.uid;
+    }
+
+    match /talk_reports/{reportId} {
+      allow read: if isStaff()
+        || (isLoggedIn() && resource.data.reporterId == request.auth.uid);
+      allow create: if isLoggedIn()
+        && request.resource.data.reporterId == request.auth.uid
+        && request.resource.data.targetId is string
+        && request.resource.data.targetId.size() > 0
+        && request.resource.data.targetId != request.auth.uid
+        && request.resource.data.reason is string
+        && request.resource.data.reason.size() > 0
+        && request.resource.data.status == 'pending';
+      allow update: if isOwner()
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['status', 'reviewedAt', 'reviewerId'])
+        && request.resource.data.status == 'reviewed';
+      allow delete: if isOwner();
+    }
+
     // 예약·수업·피드백 알림. 본인만 읽고 읽음 처리. 강사는 수강생에게 생성.
+    // Let's Talk 메시지는 로그인 회원이 상대에게만 생성할 수 있다.
     match /notifications/{notificationId} {
       allow read: if isLoggedIn() && resource.data.userId == request.auth.uid;
       allow update: if isLoggedIn()
         && resource.data.userId == request.auth.uid
         && request.resource.data.userId == resource.data.userId;
-      allow create: if isStaff()
+      allow create: if (
+        isStaff()
         && request.resource.data.userId is string
         && request.resource.data.userId.size() > 0
-        && request.resource.data.read == false;
+        && request.resource.data.read == false
+      ) || (
+        isLoggedIn()
+        && request.resource.data.type == 'talk_message'
+        && request.resource.data.senderId == request.auth.uid
+        && request.resource.data.userId is string
+        && request.resource.data.userId.size() > 0
+        && request.resource.data.userId != request.auth.uid
+        && request.resource.data.read == false
+        && request.resource.data.title is string
+        && request.resource.data.body is string
+        && request.resource.data.body.size() > 0
+        && request.resource.data.body.size() <= 400
+      );
       allow delete: if false;
     }
   }

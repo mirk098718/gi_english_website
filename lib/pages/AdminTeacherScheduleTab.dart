@@ -11,7 +11,7 @@ import 'package:gi_english_website/util/NotificationService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/util/TeacherScheduleService.dart';
-import 'package:gi_english_website/util/UrlIUtil.dart';
+import 'package:gi_english_website/util/JitsiJoin.dart';
 import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
 import 'package:gi_english_website/widget/TeacherMonthLessonSummary.dart';
 import 'package:gi_english_website/pages/StudentDetailPage.dart';
@@ -296,7 +296,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     );
     _toast('${booking.memberName.isEmpty ? '수강생' : booking.memberName} 화상수업을 엽니다.');
     // 팝업 차단을 피하려고 클릭 직후 바로 URL을 연다.
-    await UrlUtil.open(url);
+    await JitsiJoin.open(url, asHost: true);
 
     final sessionId = booking.sessionId.trim().isNotEmpty
         ? booking.sessionId.trim()

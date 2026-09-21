@@ -8,7 +8,7 @@ import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonFeedbackService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
-import 'package:gi_english_website/util/UrlIUtil.dart';
+import 'package:gi_english_website/util/JitsiJoin.dart';
 import 'package:gi_english_website/pages/AdminTeacherScheduleTab.dart';
 import 'package:gi_english_website/pages/StudentDetailPage.dart';
 import 'package:gi_english_website/widget/AdminContentWidth.dart';
@@ -265,7 +265,11 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
         (session != null && session.meetingUrl.trim().isNotEmpty)
             ? session.meetingUrl
             : url;
-    await UrlUtil.open(openUrl);
+    await JitsiJoin.open(
+      openUrl,
+      asHost: true,
+      displayName: _writerName,
+    );
     final error = await EnrollmentService.setSessionLive(
       sessionId: _sessionIdFor(booking),
       isLive: true,

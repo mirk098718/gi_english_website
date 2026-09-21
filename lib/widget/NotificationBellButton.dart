@@ -165,7 +165,9 @@ class _NotificationBellButtonState extends State<NotificationBellButton>
             height: 8,
             margin: const EdgeInsets.only(top: 6, right: 8),
             decoration: BoxDecoration(
-              color: Palette.danger,
+              color: item.type == 'talk_message'
+                  ? Palette.talkCoral
+                  : Palette.danger,
               shape: BoxShape.circle,
             ),
           ),

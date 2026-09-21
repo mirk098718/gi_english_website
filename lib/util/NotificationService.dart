@@ -100,6 +100,7 @@ class NotificationService {
     required String body,
     required String type,
     String bookingId = '',
+    String senderId = '',
   }) async {
     if (userId.isEmpty) return false;
     try {
@@ -109,6 +110,7 @@ class NotificationService {
         'body': body,
         'type': type,
         'bookingId': bookingId,
+        if (senderId.isNotEmpty) 'senderId': senderId,
         'read': false,
         'createdAt': FieldValue.serverTimestamp(),
       });

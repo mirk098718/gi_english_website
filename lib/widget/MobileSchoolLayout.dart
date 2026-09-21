@@ -7,6 +7,7 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/GleamMark.dart';
 import 'package:gi_english_website/widget/HeaderSocialLinks.dart';
+import 'package:gi_english_website/widget/LetsTalkNavChip.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
 import 'package:gi_english_website/widget/SiteNav.dart';
 
@@ -249,6 +250,10 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
               '내 강의실',
               () => SiteNav.goClassroom(context),
               enabled: _isMemberLoggedIn,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: LetsTalkNavChip(compact: true),
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 6),

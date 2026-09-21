@@ -7,6 +7,7 @@ import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/GleamMark.dart';
 import 'package:gi_english_website/widget/HeaderSocialLinks.dart';
+import 'package:gi_english_website/widget/LetsTalkNavChip.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
 import 'package:gi_english_website/widget/SiteNav.dart';
 
@@ -224,6 +225,19 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                       _closeMenu();
                       SiteNav.goClassroom(context);
                     },
+                  ),
+                  SizedBox(width: 10),
+                  MouseRegion(
+                    onEnter: (_) => _scheduleClose(),
+                    child: LetsTalkNavChip(
+                      onTap: () {
+                        _closeMenu();
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (!mounted) return;
+                          SiteNav.goLetsTalk(context);
+                        });
+                      },
+                    ),
                   ),
                   _navDivider(),
                   _navItem(
