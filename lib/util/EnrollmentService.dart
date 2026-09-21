@@ -881,7 +881,7 @@ class EnrollmentService {
       final payload = <String, dynamic>{
         'userId': userId,
         'email': email.trim(),
-        'memberName': member['name']?.toString() ?? '',
+        'memberName': AuthService.profileDisplayName(member),
         'courseId': courseId,
         'isActive': true,
         'totalSessions': totalSessions,
@@ -1926,9 +1926,10 @@ class EnrollmentService {
 
         transaction.set(bookingRef, {
           'userId': user.uid,
-          'memberName': enrollment.memberName.isNotEmpty
-              ? enrollment.memberName
-              : (member?['name']?.toString() ?? ''),
+          'memberName': AuthService.profileDisplayName(
+            member,
+            fallback: enrollment.memberName,
+          ),
           'email': enrollment.email,
           'phone': PhoneUtil.normalize(member?['phone']?.toString() ?? ''),
           'courseId': enrollment.courseId,

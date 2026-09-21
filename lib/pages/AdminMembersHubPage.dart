@@ -4,6 +4,7 @@ import 'package:gi_english_website/pages/StudentDetailPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
+import 'package:gi_english_website/widget/ProfileAvatar.dart';
 
 /// 회원관리.
 /// 메인 관리자: 내 스케줄 / 내 수강생 / 전체 스케줄 / 모든 수강생.
@@ -181,7 +182,7 @@ class _AllStudentsPanelState extends State<AllStudentsPanel> {
   }
 
   Widget _studentTile(Map<String, dynamic> member, int order) {
-    final name = member['name']?.toString().trim() ?? '';
+    final name = AuthService.profileDisplayName(member, fallback: '이름 미등록 회원');
     final email = member['email']?.toString().trim() ?? '';
     final phone = member['phone']?.toString() ?? '';
     final joined = AuthService.memberCreatedAt(member);
@@ -190,14 +191,13 @@ class _AllStudentsPanelState extends State<AllStudentsPanel> {
       margin: const EdgeInsets.only(bottom: 10),
       child: ListTile(
         onTap: () => _openDetail(member),
-        leading: CircleAvatar(
-          backgroundColor: Palette.navy,
-          foregroundColor: Palette.white,
-          child: Text('$order',
-              style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
+        leading: ProfileAvatar.fromData(
+          member,
+          size: 40,
+          fallback: name,
         ),
         title: Text(
-          name.isEmpty ? '이름 미등록 회원' : name,
+          '$order. $name',
           style: TextStyle(
               fontFamily: "NotoSansKR", fontWeight: FontWeight.bold, fontSize: 14),
         ),

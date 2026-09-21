@@ -38,11 +38,15 @@ class PaymentService {
       teacherUid = await AuthService.uidForNativeProfile(nativeTeacher.id);
     }
 
+    final member = await AuthService.currentMemberDoc();
     final order = PaymentOrder(
       orderId: orderId,
       userId: user.uid,
       email: user.email ?? '',
-      memberName: user.displayName ?? '',
+      memberName: AuthService.profileDisplayName(
+        member,
+        fallback: user.displayName ?? '',
+      ),
       courseId: course.id,
       courseTitle: course.title,
       amount: amount,

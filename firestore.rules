@@ -181,7 +181,13 @@ service cloud.firestore {
     // 원어민 프로필(Emma 등) ↔ 강사 계정 연결. 로그인 회원 읽기.
     match /native_teacher_accounts/{profileId} {
       allow read: if true;
-      allow create, update, delete: if isOwner();
+      allow create: if isOwner()
+        || (isStaff() && request.resource.data.teacherUid == request.auth.uid);
+      allow update: if isOwner()
+        || (isStaff()
+          && resource.data.teacherUid == request.auth.uid
+          && request.resource.data.teacherUid == resource.data.teacherUid);
+      allow delete: if isOwner();
     }
 
     // 강사가 닫아 둔 시간. 로그인 회원은 예약 가능 여부 확인용으로 읽기.
@@ -269,7 +275,10 @@ service cloud.firestore {
       allow create: if isLoggedIn() && request.auth.uid == memberId;
 
       allow update: if isOwner()
-        || (isLoggedIn() && request.auth.uid == memberId);
+        || (isLoggedIn()
+          && request.auth.uid == memberId
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['nickname', 'photoUrl', 'phone', 'updatedAt']));
 
       allow delete: if isOwner();
     }

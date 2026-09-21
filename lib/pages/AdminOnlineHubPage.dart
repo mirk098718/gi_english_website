@@ -4,7 +4,6 @@ import 'dart:typed_data';
 // ignore: deprecated_member_use
 import 'dart:html' as html;
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
@@ -19,10 +18,11 @@ import 'package:gi_english_website/pages/AdminPaymentTab.dart';
 import 'package:gi_english_website/pages/StudentDetailPage.dart';
 import 'package:gi_english_website/pages/TeacherRosterPage.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
-import 'package:gi_english_website/widget/TeacherPhotoCropDialog.dart';
 import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
 import 'package:gi_english_website/widget/AdminContentWidth.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
+import 'package:gi_english_website/widget/ProfileAvatar.dart';
+import 'package:gi_english_website/util/ProfilePhotoPicker.dart';
 
 /// 관리자/강사용 온라인 프로그램 관리 허브.
 /// - 메인 관리자: 회원관리(내 스케줄·내 수강생·전체 스케줄·모든 수강생), 결제·정산, 강사 관리, 주간 학습
@@ -504,7 +504,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
 
   Widget _memberCard(Map<String, dynamic> member) {
     final uid = member['uid']?.toString() ?? '';
-    final name = member['name']?.toString().trim() ?? '';
+    final name = AuthService.profileDisplayName(member, fallback: '이름 미등록 회원');
     final email = member['email']?.toString().trim() ?? '';
     final guest = member['isCoteachGuest'] == true;
     final assignedTeacherName =
@@ -534,13 +534,8 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   ),
                 ),
               )
-            : CircleAvatar(
-                backgroundColor: Palette.darkTeal,
-                foregroundColor: Palette.white,
-                child: Text(name.isEmpty ? '?' : name.substring(0, 1),
-                    style: TextStyle(fontFamily: "NotoSansKR")),
-              ),
-        title: Text(name.isEmpty ? '이름 미등록 회원' : name,
+            : ProfileAvatar.fromData(member, size: 40, fallback: name),
+        title: Text(name,
             style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontWeight: FontWeight.bold,
@@ -2107,6 +2102,7 @@ class _TeacherEditDialog extends StatefulWidget {
 
 class _TeacherEditDialogState extends State<_TeacherEditDialog> {
   late final TextEditingController _nameCtrl;
+  late final TextEditingController _nicknameCtrl;
   late final TextEditingController _nationalityCtrl;
   late final TextEditingController _introCtrl;
   late final TextEditingController _phoneCtrl;
@@ -2128,6 +2124,8 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
     super.initState();
     _nameCtrl =
         TextEditingController(text: widget.teacher['name']?.toString() ?? '');
+    _nicknameCtrl = TextEditingController(
+        text: widget.teacher['nickname']?.toString() ?? '');
     _nationalityCtrl = TextEditingController(
         text: widget.teacher['nationality']?.toString() ?? '');
     _introCtrl =
@@ -2146,6 +2144,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
   @override
   void dispose() {
     _nameCtrl.dispose();
+    _nicknameCtrl.dispose();
     _nationalityCtrl.dispose();
     _introCtrl.dispose();
     _phoneCtrl.dispose();
@@ -2184,6 +2183,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
       error = await AuthService.updateTeacherProfile(
         teacherUid: _uid,
         name: _nameCtrl.text,
+        nickname: _nicknameCtrl.text,
         phone: _phoneCtrl.text,
         nationality: _nationalityCtrl.text,
         intro: _introCtrl.text,
@@ -2253,6 +2253,17 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
                 controller: _nameCtrl,
                 decoration: InputDecoration(
                   labelText: '강사 이름',
+                  helperText: '수강생이 강사를 고를 때 보이는 이름입니다.',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 12),
+              TextField(
+                controller: _nicknameCtrl,
+                decoration: InputDecoration(
+                  labelText: '닉네임 (선택)',
+                  helperText: '로그인은 이메일, 수업 목록에는 닉네임이 보입니다.',
+                  helperMaxLines: 2,
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2369,6 +2380,7 @@ class _TeacherRegisterDialog extends StatefulWidget {
 
 class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
   final _nameCtrl = TextEditingController();
+  final _nicknameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
@@ -2383,6 +2395,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
   @override
   void dispose() {
     _nameCtrl.dispose();
+    _nicknameCtrl.dispose();
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
     _phoneCtrl.dispose();
@@ -2425,6 +2438,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
         email: email,
         password: password,
         name: name,
+        nickname: _nicknameCtrl.text.trim(),
         phone: phone,
         nationality: _nationalityCtrl.text.trim(),
         intro: _introCtrl.text.trim(),
@@ -2494,6 +2508,17 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
                 controller: _nameCtrl,
                 decoration: InputDecoration(
                   labelText: '강사 이름',
+                  helperText: '수강생이 강사를 고를 때 보이는 이름입니다.',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 12),
+              TextField(
+                controller: _nicknameCtrl,
+                decoration: InputDecoration(
+                  labelText: '닉네임 (선택)',
+                  helperText: '로그인은 이메일, 수업 목록에는 닉네임이 보입니다.',
+                  helperMaxLines: 2,
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2683,33 +2708,11 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
     await _refresh();
   }
 
-  Future<Uint8List?> _pickPhoto() async {
-    Uint8List? raw;
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
-        allowMultiple: false,
-        withData: true,
-      );
-      if (result == null || result.files.isEmpty) return null;
-      final bytes = result.files.single.bytes;
-      if (bytes == null || bytes.isEmpty) {
-        _toast('사진을 읽지 못했습니다. JPG 또는 PNG로 다시 시도해주세요.', error: true);
-        return null;
-      }
-      raw = Uint8List.fromList(bytes);
-    } catch (e) {
-      _toast('사진 선택 중 오류가 났습니다.', error: true);
-      return null;
-    }
-    if (!mounted) return null;
-    try {
-      return await TeacherPhotoCropDialog.show(context, raw);
-    } catch (e) {
-      print('사진 자르기 닫기 오류: $e');
-      return null;
-    }
+  Future<Uint8List?> _pickPhoto() {
+    return ProfilePhotoPicker.pickAndCrop(
+      context,
+      onError: (message) => _toast(message, error: true),
+    );
   }
 
   Widget _circlePhoto({
@@ -2812,7 +2815,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${member['name'] ?? ''} (${member['email'] ?? ''})',
+                  '${AuthService.profileDisplayName(member)} (${member['email'] ?? ''})',
                   style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13),
                 ),
                 SizedBox(height: 16),
@@ -2989,9 +2992,14 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
               final stats = _statsFor(uid);
               final pending = _pendingFor(uid);
               final bank = AuthService.bankLabel(t);
+              final nickname = t['nickname']?.toString().trim() ?? '';
+              final officialName = t['name']?.toString() ?? '';
+              final shown = AuthService.profileDisplayName(t, fallback: officialName);
               final titleName = isOwnerTeacher
-                  ? '${t['name'] ?? '관리자'} (메인 관리자 · 강사)'
-                  : '${t['name'] ?? ''} (${t['email'] ?? ''})';
+                  ? '$shown (메인 관리자 · 강사)'
+                  : (nickname.isNotEmpty && nickname != officialName
+                      ? '$shown · ${t['email'] ?? ''}'
+                      : '$shown (${t['email'] ?? ''})');
               return Card(
                 margin: EdgeInsets.only(bottom: 10),
                 child: Padding(

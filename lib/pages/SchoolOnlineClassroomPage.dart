@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,8 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
+import 'package:gi_english_website/widget/ProfileAvatar.dart';
+import 'package:gi_english_website/widget/ProfileEditDialog.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 import '../util/WidgetUtil.dart';
@@ -30,6 +33,7 @@ class SchoolOnlineClassroomPage extends StatefulWidget {
 class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
   List<EnrollmentRecord> _myEnrollments = [];
   List<AppNotification> _notifications = [];
+  Map<String, dynamic>? _member;
   String _memberPhone = '';
   bool _isLoading = true;
   bool _savingPhone = false;
@@ -45,6 +49,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
         setState(() {
           _myEnrollments = [];
           _notifications = [];
+          _member = null;
           _memberPhone = '';
           _isLoading = false;
         });
@@ -64,6 +69,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
     setState(() {
       _myEnrollments = [];
       _notifications = [];
+      _member = null;
       _memberPhone = '';
       _isLoading = false;
     });
@@ -84,9 +90,43 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
     setState(() {
       _myEnrollments = enrollments;
       _notifications = notifications;
+      _member = member;
       _memberPhone = member?['phone']?.toString() ?? '';
       _isLoading = false;
     });
+  }
+
+  Future<void> _editProfile() async {
+    final member = _member ?? {};
+    final uid = AuthService.currentUser?.uid ?? '';
+    if (uid.isEmpty) return;
+    final saved = await ProfileEditDialog.show(
+      context,
+      email: AuthService.currentUser?.email ?? '',
+      nickname: member['nickname']?.toString() ?? '',
+      photoUrl: AuthService.profilePhotoUrl(member),
+      onSave: ({
+        required String nickname,
+        Uint8List? photoBytes,
+      }) {
+        return AuthService.updateMemberDisplayProfile(
+          memberId: uid,
+          nickname: nickname,
+          photoBytes: photoBytes,
+          photoFileName: photoBytes == null ? null : 'photo.jpg',
+        );
+      },
+    );
+    if (!mounted || !saved) return;
+    await _loadMyCourses();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('프로필을 저장했습니다.',
+            style: TextStyle(fontFamily: "NotoSansKR")),
+        backgroundColor: Palette.success,
+      ),
+    );
   }
 
   Future<void> _editPhone({String initial = ''}) async {
@@ -214,6 +254,84 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
           )),
       SizedBox(height: 8),
     ];
+  }
+
+  Widget _profileCard({required String displayName, required String email}) {
+    return Container(
+      width: double.maxFinite,
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Palette.grey50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Palette.grey200),
+      ),
+      child: Row(
+        children: [
+          ProfileAvatar.fromData(_member, size: 64, fallback: displayName),
+          SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  displayName.isEmpty ? '수강생' : displayName,
+                  style: TextStyle(fontFamily: "Jalnan", fontSize: 16),
+                ),
+                if (email.isNotEmpty) ...[
+                  SizedBox(height: 4),
+                  Text(
+                    email,
+                    style: TextStyle(
+                      fontFamily: "NotoSansKR",
+                      fontSize: 13,
+                      color: Palette.grey600,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          OutlinedButton(
+            onPressed: _editProfile,
+            child: Text('프로필 수정',
+                style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _profileHint() {
+    return Container(
+      width: double.maxFinite,
+      padding: EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF7ED),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFFDBA74)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.person_outline, color: Palette.warning, size: 20),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              '수업에서 불릴 닉네임과 프로필 사진을 등록해 주세요. 로그인은 이메일 그대로입니다.',
+              style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 13,
+                  color: Palette.grey700),
+            ),
+          ),
+          TextButton(
+            onPressed: _editProfile,
+            child: Text('등록',
+                style: TextStyle(
+                    fontFamily: "NotoSansKR", color: Palette.secondaryDark)),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _phoneBanner() {
@@ -395,17 +513,32 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
   }
 
   Widget loggedInView() {
-    String email = AuthService.currentUser?.email ?? '';
+    final email = AuthService.currentUser?.email ?? '';
+    final displayName = AuthService.profileDisplayName(
+      _member,
+      fallback: email,
+    );
+    final nickname = _member?['nickname']?.toString().trim() ?? '';
+    final photoUrl = AuthService.profilePhotoUrl(_member);
+    final profileIncomplete = nickname.isEmpty && photoUrl.isEmpty;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _profileCard(displayName: displayName, email: email),
+        if (profileIncomplete) ...[
+          SizedBox(height: 12),
+          _profileHint(),
+        ],
+        SizedBox(height: 16),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: Text(
-                email.isEmpty ? "수강 중인 프로그램" : "$email 님의 수강 중인 프로그램",
+                displayName.isEmpty
+                    ? "수강 중인 프로그램"
+                    : "$displayName 님의 수강 중인 프로그램",
                 style: TextStyle(
                   fontFamily: "Jalnan",
                   fontSize: 15,

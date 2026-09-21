@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
@@ -13,6 +15,8 @@ import 'package:gi_english_website/widget/AdminContentWidth.dart';
 import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
 import 'package:gi_english_website/widget/TeacherMonthLessonSummary.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
+import 'package:gi_english_website/widget/ProfileAvatar.dart';
+import 'package:gi_english_website/widget/ProfileEditDialog.dart';
 
 /// 강사 프로필 · 담당 회원 · 화상수업 입장/종료 · 피드백.
 /// 강사 관리에서 열면 스케줄과 한달 이력 탭이 함께 보인다.
@@ -31,7 +35,7 @@ class TeacherRosterPage extends StatelessWidget {
     final body = TeacherRosterView(teacher: teacher);
     if (embedded) return body;
     final uid = teacher?['uid']?.toString() ?? '';
-    final name = teacher?['name']?.toString() ?? '강사';
+    final name = AuthService.profileDisplayName(teacher, fallback: '강사');
     Widget themed(Widget child) {
       return Theme(data: Palette.adminTheme(Theme.of(context)), child: child);
     }
@@ -174,11 +178,11 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     setState(() {
       _teacher = teacher;
       _members = byId.values.toList()
-        ..sort((a, b) => (a['name']?.toString() ?? '')
-            .compareTo(b['name']?.toString() ?? ''));
+        ..sort((a, b) => AuthService.profileDisplayName(a)
+            .compareTo(AuthService.profileDisplayName(b)));
       _guestMembers = guestById.values.toList()
-        ..sort((a, b) => (a['name']?.toString() ?? '')
-            .compareTo(b['name']?.toString() ?? ''));
+        ..sort((a, b) => AuthService.profileDisplayName(a)
+            .compareTo(AuthService.profileDisplayName(b)));
       _bookings = bookings;
       _feedbacks = feedbacks;
       _sessions = sessions;
@@ -371,7 +375,9 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
 
   Widget _profileCard() {
     final teacher = _teacher ?? {};
-    final name = teacher['name']?.toString() ?? '';
+    final legalName = teacher['name']?.toString() ?? '';
+    final nickname = teacher['nickname']?.toString().trim() ?? '';
+    final name = AuthService.profileDisplayName(teacher, fallback: legalName);
     final email = teacher['email']?.toString() ?? '';
     final nationality = teacher['nationality']?.toString() ?? '';
     final intro = teacher['intro']?.toString() ?? '';
@@ -405,6 +411,16 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                       isOwnerTeacher ? '$name (메인 관리자 · 강사)' : name,
                       style: TextStyle(fontFamily: "Jalnan", fontSize: 18),
                     ),
+                    if (nickname.isNotEmpty &&
+                        legalName.isNotEmpty &&
+                        nickname != legalName) ...[
+                      SizedBox(height: 4),
+                      Text('이름 $legalName',
+                          style: TextStyle(
+                              fontFamily: "NotoSansKR",
+                              fontSize: 13,
+                              color: Palette.grey600)),
+                    ],
                     if (email.isNotEmpty) ...[
                       SizedBox(height: 6),
                       Text(email,
@@ -471,6 +487,18 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                 fontSize: 12,
                 color: Palette.grey500),
           ),
+          if (_canWrite) ...[
+            SizedBox(height: 14),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: OutlinedButton.icon(
+                onPressed: _busy ? null : _editDisplayProfile,
+                icon: Icon(Icons.edit_outlined, size: 18),
+                label: Text('닉네임·사진 수정',
+                    style: TextStyle(fontFamily: "NotoSansKR")),
+              ),
+            ),
+          ],
           if (isOwnerTeacher && _canWrite) ...[
             SizedBox(height: 16),
             Text('수업 받기',
@@ -560,6 +588,36 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     );
   }
 
+  Future<void> _editDisplayProfile() async {
+    final teacher = _teacher ?? {};
+    final uid = _teacherUid;
+    if (uid.isEmpty) return;
+    final saved = await ProfileEditDialog.show(
+      context,
+      title: '닉네임·사진 수정',
+      email: teacher['email']?.toString() ?? '',
+      nickname: teacher['nickname']?.toString() ?? '',
+      photoUrl: AuthService.profilePhotoUrl(teacher),
+      helperText:
+          '로그인은 이메일 그대로 두고, 수업 목록에는 닉네임과 사진이 보입니다. 수강생이 고르는 강사 이름(영문 이름 등)은 관리자 수정에서 바꿉니다.',
+      onSave: ({
+        required String nickname,
+        Uint8List? photoBytes,
+      }) {
+        return AuthService.updateStaffDisplayProfile(
+          teacherUid: uid,
+          nickname: nickname,
+          photoBytes: photoBytes,
+          photoFileName: photoBytes == null ? null : 'photo.jpg',
+        );
+      },
+    );
+    if (!mounted || !saved) return;
+    await _load();
+    if (!mounted) return;
+    _toast('프로필을 저장했습니다.');
+  }
+
   Future<void> _setBookingOffer(String offer) async {
     if (_bookingOffer == offer || _teacherUid.isEmpty) return;
     setState(() => _busy = true);
@@ -603,7 +661,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
 
   Widget _memberCard(Map<String, dynamic> member, {bool guest = false}) {
     final memberId = member['uid']?.toString() ?? '';
-    final name = member['name']?.toString() ?? '';
+    final name = AuthService.profileDisplayName(member, fallback: '');
     final email = member['email']?.toString() ?? '';
     final assignedTeacherName = member['assignedTeacherName']?.toString() ?? '';
     final lessons = _bookingsFor(memberId);
@@ -633,7 +691,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                     ),
                   ),
                 )
-              : null,
+              : ProfileAvatar.fromData(member, size: 40, fallback: name),
           title: Text(
             name.isEmpty ? email : name,
             style:

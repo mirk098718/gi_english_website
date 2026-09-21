@@ -7,6 +7,7 @@ import 'package:gi_english_website/util/PaymentService.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/widget/AdminContentWidth.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
+import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
 
 /// 수강생 한 명의 가입·담당·수강·결제 정보를 모두 보여 준다.
@@ -83,7 +84,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final name = _member['name']?.toString().trim() ?? '';
+    final name = AuthService.profileDisplayName(_member, fallback: '수강생 정보');
     return Theme(
       data: Palette.adminTheme(Theme.of(context)),
       child: Scaffold(
@@ -171,7 +172,10 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
   }
 
   Widget _profileCard() {
-    final name = _member['name']?.toString().trim() ?? '';
+    final legalName = _member['name']?.toString().trim() ?? '';
+    final nickname = _member['nickname']?.toString().trim() ?? '';
+    final displayName =
+        AuthService.profileDisplayName(_member, fallback: '이름 미등록 회원');
     final email = _member['email']?.toString().trim() ?? '';
     final phone = _member['phone']?.toString() ?? '';
     final joined = AuthService.memberCreatedAt(_member);
@@ -187,9 +191,19 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(name.isEmpty ? '이름 미등록 회원' : name,
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 18)),
-          const SizedBox(height: 10),
+          Row(
+            children: [
+              ProfileAvatar.fromData(_member, size: 64, fallback: displayName),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(displayName,
+                    style: TextStyle(fontFamily: "Jalnan", fontSize: 18)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _infoRow('닉네임', nickname.isEmpty ? '-' : nickname),
+          _infoRow('이름', legalName.isEmpty ? '-' : legalName),
           _infoRow('이메일', email.isEmpty ? '-' : email),
           _infoRow(
               '연락처',

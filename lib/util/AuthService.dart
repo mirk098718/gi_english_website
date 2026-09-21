@@ -79,6 +79,48 @@ class AuthService {
     }
   }
 
+  /// 수업·목록에 보이는 이름. 닉네임이 있으면 닉네임을 쓰고, 없으면 실명·이메일을 쓴다.
+  static String profileDisplayName(
+    Map<String, dynamic>? data, {
+    String fallback = '',
+  }) {
+    final nickname = data?['nickname']?.toString().trim() ?? '';
+    if (nickname.isNotEmpty) return nickname;
+    final name = data?['name']?.toString().trim() ?? '';
+    if (name.isNotEmpty) return name;
+    final email = data?['email']?.toString().trim() ?? '';
+    if (email.isNotEmpty) return email;
+    return fallback;
+  }
+
+  static String profilePhotoUrl(Map<String, dynamic>? data) {
+    return data?['photoUrl']?.toString().trim() ?? '';
+  }
+
+  static String profileInitial(String label) {
+    final value = label.trim();
+    if (value.isEmpty) return '?';
+    return value.substring(0, 1);
+  }
+
+  /// 닉네임은 선택. 넣으면 2–16자, 이메일 형식은 안 된다.
+  static String? validateNickname(String raw, {bool required = false}) {
+    final value = raw.trim();
+    if (value.isEmpty) {
+      return required ? '닉네임을 입력해주세요.' : null;
+    }
+    if (value.contains('@')) {
+      return '닉네임에는 이메일을 넣을 수 없습니다.';
+    }
+    if (value.length < 2) {
+      return '닉네임은 2자 이상으로 입력해주세요.';
+    }
+    if (value.length > 16) {
+      return '닉네임은 16자 이하로 입력해주세요.';
+    }
+    return null;
+  }
+
   /// 온라인 프로그램 회원 가입.
   /// 성공 시 null, 실패 시 사용자에게 보여줄 오류 메시지를 반환한다.
   static Future<String?> registerMember({
@@ -86,9 +128,14 @@ class AuthService {
     required String password,
     required String name,
     String phone = '',
+    String nickname = '',
+    Uint8List? photoBytes,
+    String? photoFileName,
   }) async {
     final phoneError = PhoneUtil.validate(phone);
     if (phoneError != null) return phoneError;
+    final nicknameError = validateNickname(nickname);
+    if (nicknameError != null) return nicknameError;
     try {
       final result = await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -98,10 +145,31 @@ class AuthService {
       final user = result.user;
       if (user == null) return '회원가입에 실패했습니다. 다시 시도해주세요.';
 
-      await user.updateDisplayName(name);
+      final trimmedName = name.trim();
+      final trimmedNickname = nickname.trim();
+      await user.updateDisplayName(
+        trimmedNickname.isNotEmpty ? trimmedNickname : trimmedName,
+      );
+
+      String photoUrl = '';
+      if (photoBytes != null && photoBytes.isNotEmpty) {
+        try {
+          photoUrl = await uploadProfilePhoto(
+            folder: 'member_photos',
+            ownerUid: user.uid,
+            bytes: photoBytes,
+            fileName: photoFileName ?? 'photo.jpg',
+          );
+        } catch (e) {
+          print('회원 사진 업로드 오류: $e');
+        }
+      }
+
       await _firestore.collection('members').doc(user.uid).set({
         'email': email,
-        'name': name,
+        'name': trimmedName,
+        'nickname': trimmedNickname,
+        'photoUrl': photoUrl,
         'phone': PhoneUtil.normalize(phone),
         'role': 'member',
         'isActive': true,
@@ -231,6 +299,121 @@ class AuthService {
     return teacherNames[id]?.trim() ?? '';
   }
 
+  /// 수강생이 닉네임·프로필 사진을 저장한다. 로그인 이메일은 바꾸지 않는다.
+  static Future<String?> updateMemberDisplayProfile({
+    required String memberId,
+    required String nickname,
+    Uint8List? photoBytes,
+    String? photoFileName,
+  }) async {
+    if (memberId.isEmpty) return '로그인 정보가 없습니다.';
+    final nicknameError = validateNickname(nickname);
+    if (nicknameError != null) return nicknameError;
+    try {
+      final doc = await _firestore.collection('members').doc(memberId).get();
+      if (!doc.exists) return '회원 정보를 찾을 수 없습니다.';
+      final data = doc.data() ?? {};
+      var photoUrl = data['photoUrl']?.toString() ?? '';
+      if (photoBytes != null && photoBytes.isNotEmpty) {
+        try {
+          photoUrl = await uploadProfilePhoto(
+            folder: 'member_photos',
+            ownerUid: memberId,
+            bytes: photoBytes,
+            fileName: photoFileName ?? 'photo.jpg',
+          );
+        } catch (e) {
+          return '사진 업로드에 실패했습니다. ${_uploadErrorMessage(e)}';
+        }
+      }
+      final trimmedNickname = nickname.trim();
+      await _firestore.collection('members').doc(memberId).set({
+        'nickname': trimmedNickname,
+        'photoUrl': photoUrl,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      final user = currentUser;
+      if (user != null && user.uid == memberId) {
+        final display = trimmedNickname.isNotEmpty
+            ? trimmedNickname
+            : (data['name']?.toString().trim() ?? '');
+        if (display.isNotEmpty) {
+          await user.updateDisplayName(display);
+        }
+      }
+      return null;
+    } catch (e) {
+      print('회원 프로필 저장 오류: $e');
+      return '프로필 저장에 실패했습니다.';
+    }
+  }
+
+  /// 강사/관리자가 닉네임·프로필 사진을 저장한다. 로그인 이메일은 바꾸지 않는다.
+  static Future<String?> updateStaffDisplayProfile({
+    required String teacherUid,
+    required String nickname,
+    Uint8List? photoBytes,
+    String? photoFileName,
+  }) async {
+    if (teacherUid.isEmpty) return '로그인 정보가 없습니다.';
+    final nicknameError = validateNickname(nickname);
+    if (nicknameError != null) return nicknameError;
+    try {
+      final adminRef = _firestore.collection('admins').doc(teacherUid);
+      final adminSnap = await adminRef.get();
+      if (!adminSnap.exists) return '강사 계정을 찾을 수 없습니다.';
+      final data = adminSnap.data() ?? {};
+      var photoUrl = data['photoUrl']?.toString() ?? '';
+      if (photoBytes != null && photoBytes.isNotEmpty) {
+        try {
+          photoUrl = await uploadTeacherPhoto(
+            teacherUid: teacherUid,
+            bytes: photoBytes,
+            fileName: photoFileName ?? 'photo.jpg',
+          );
+        } catch (e) {
+          return '사진 업로드에 실패했습니다. ${_uploadErrorMessage(e)}';
+        }
+      }
+      final trimmedNickname = nickname.trim();
+      await adminRef.set({
+        'nickname': trimmedNickname,
+        'photoUrl': photoUrl,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      final isOwnerTeacher = data['role']?.toString() != 'teacher';
+      final profileId = OnlineNativeTeacher.profileIdFor(
+        uid: teacherUid,
+        isOwner: isOwnerTeacher,
+        existing: data['nativeProfileId']?.toString() ?? '',
+      );
+      try {
+        await _upsertNativeProfile(
+          teacherUid: teacherUid,
+          profileId: profileId,
+          name: data['name']?.toString() ?? '',
+          email: data['email']?.toString() ?? '',
+          nationality: data['nationality']?.toString() ?? '',
+          intro: data['intro']?.toString() ?? '',
+          photoUrl: photoUrl,
+          nickname: trimmedNickname,
+          isActive: data['isActive'] != false,
+          bookingOffer: TeacherBookingOffer.resolve(
+            data,
+            isOwner: isOwnerTeacher,
+          ),
+        );
+      } catch (e) {
+        print('원어민 프로필 동기화 오류: $e');
+      }
+      return null;
+    } catch (e) {
+      print('강사 프로필 저장 오류: $e');
+      return '프로필 저장에 실패했습니다. ${_uploadErrorMessage(e)}';
+    }
+  }
+
   /// 회원이 본인 휴대폰 번호를 저장한다.
   static Future<String?> updateMemberPhone({
     required String memberId,
@@ -303,6 +486,7 @@ class AuthService {
           nationality: nationality,
           intro: intro,
           photoUrl: photoUrl,
+          nickname: data['nickname']?.toString() ?? '',
           isActive: data['isActive'] != false,
         );
         OnlineNativeTeacher.cacheAll([
@@ -494,6 +678,7 @@ class AuthService {
     required String email,
     required String password,
     required String name,
+    String nickname = '',
     String phone = '',
     String nationality = '',
     String intro = '',
@@ -513,6 +698,8 @@ class AuthService {
       }
       final phoneError = PhoneUtil.validate(phone);
       if (phoneError != null) return phoneError;
+      final nicknameError = validateNickname(nickname);
+      if (nicknameError != null) return nicknameError;
 
       secondaryApp = await Firebase.initializeApp(
         name: 'TeacherRegistration',
@@ -527,7 +714,10 @@ class AuthService {
       final user = result.user;
       if (user == null) return '강사 계정 생성에 실패했습니다.';
 
-      await user.updateDisplayName(name.trim());
+      final trimmedNickname = nickname.trim();
+      await user.updateDisplayName(
+        trimmedNickname.isNotEmpty ? trimmedNickname : name.trim(),
+      );
 
       String photoUrl = '';
       String? photoError;
@@ -552,6 +742,7 @@ class AuthService {
       await _firestore.collection('admins').doc(user.uid).set({
         'email': email.trim(),
         'name': name.trim(),
+        'nickname': trimmedNickname,
         'phone': PhoneUtil.normalize(phone),
         'nationality': nationality.trim(),
         'intro': intro.trim(),
@@ -575,6 +766,7 @@ class AuthService {
           nationality: nationality.trim(),
           intro: intro.trim(),
           photoUrl: photoUrl,
+          nickname: trimmedNickname,
           isActive: true,
         );
       } catch (e) {
@@ -768,6 +960,20 @@ class AuthService {
     required String teacherUid,
     required Uint8List bytes,
     required String fileName,
+  }) {
+    return uploadProfilePhoto(
+      folder: 'teacher_photos',
+      ownerUid: teacherUid,
+      bytes: bytes,
+      fileName: fileName,
+    );
+  }
+
+  static Future<String> uploadProfilePhoto({
+    required String folder,
+    required String ownerUid,
+    required Uint8List bytes,
+    required String fileName,
   }) async {
     if (bytes.isEmpty) {
       throw Exception('사진 파일이 비어 있습니다.');
@@ -782,8 +988,9 @@ class AuthService {
     }
 
     try {
-      return await _uploadTeacherPhotoToStorage(
-        teacherUid: teacherUid,
+      return await _uploadProfilePhotoToStorage(
+        folder: folder,
+        ownerUid: ownerUid,
         bytes: bytes,
         fileName: fileName,
       ).timeout(const Duration(seconds: 12));
@@ -793,13 +1000,14 @@ class AuthService {
     }
   }
 
-  static Future<String> _uploadTeacherPhotoToStorage({
-    required String teacherUid,
+  static Future<String> _uploadProfilePhotoToStorage({
+    required String folder,
+    required String ownerUid,
     required Uint8List bytes,
     required String fileName,
   }) async {
     final path =
-        'teacher_photos/$teacherUid/${DateTime.now().millisecondsSinceEpoch}.jpg';
+        '$folder/$ownerUid/${DateTime.now().millisecondsSinceEpoch}.jpg';
     final ref = _storage.ref().child(path);
     await ref.putData(bytes, SettableMetadata(contentType: 'image/jpeg'));
     return await ref.getDownloadURL();
@@ -820,6 +1028,7 @@ class AuthService {
     String nationality = '',
     String intro = '',
     String photoUrl = '',
+    String nickname = '',
     required bool isActive,
     String? bookingOffer,
   }) async {
@@ -830,6 +1039,7 @@ class AuthService {
       'nationality': nationality,
       'intro': intro,
       'photoUrl': photoUrl,
+      'nickname': nickname,
       'isActive': isActive,
       'updatedAt': FieldValue.serverTimestamp(),
     };
@@ -884,6 +1094,7 @@ class AuthService {
         nationality: data['nationality']?.toString() ?? '',
         intro: data['intro']?.toString() ?? '',
         photoUrl: data['photoUrl']?.toString() ?? '',
+        nickname: data['nickname']?.toString() ?? '',
         isActive: data['isActive'] != false,
         bookingOffer: offer,
       );
@@ -927,6 +1138,7 @@ class AuthService {
   static Future<String?> updateTeacherProfile({
     required String teacherUid,
     required String name,
+    String? nickname,
     String phone = '',
     String nationality = '',
     String intro = '',
@@ -942,6 +1154,10 @@ class AuthService {
       if (trimmed.isEmpty) return '강사 이름을 입력해주세요.';
       final phoneError = PhoneUtil.validate(phone);
       if (phoneError != null) return phoneError;
+      if (nickname != null) {
+        final nicknameError = validateNickname(nickname);
+        if (nicknameError != null) return nicknameError;
+      }
 
       final adminRef = _firestore.collection('admins').doc(teacherUid);
       final adminSnap = await adminRef.get();
@@ -952,6 +1168,7 @@ class AuthService {
       final email = data['email']?.toString() ?? '';
       final isActive = data['isActive'] != false;
       var photoUrl = data['photoUrl']?.toString() ?? '';
+      final nextNickname = nickname?.trim() ?? (data['nickname']?.toString() ?? '');
       final profileId = OnlineNativeTeacher.profileIdFor(
         uid: teacherUid,
         isOwner: isOwnerTeacher,
@@ -972,6 +1189,7 @@ class AuthService {
 
       await adminRef.set({
         'name': trimmed,
+        'nickname': nextNickname,
         'phone': PhoneUtil.normalize(phone),
         'nationality': nationality.trim(),
         'intro': intro.trim(),
@@ -992,6 +1210,7 @@ class AuthService {
           nationality: nationality.trim(),
           intro: intro.trim(),
           photoUrl: photoUrl,
+          nickname: nextNickname,
           isActive: isActive,
           bookingOffer: TeacherBookingOffer.resolve(
             data,
@@ -1105,6 +1324,7 @@ class AuthService {
           nationality: data['nationality']?.toString() ?? '',
           intro: data['intro']?.toString() ?? '',
           photoUrl: data['photoUrl']?.toString() ?? '',
+          nickname: data['nickname']?.toString() ?? '',
           isActive: data['isActive'] != false,
           bookingOffer: TeacherBookingOffer.resolve(
             data,
@@ -1332,6 +1552,7 @@ class AuthService {
         nationality: adminSnap.data()?['nationality']?.toString() ?? '',
         intro: adminSnap.data()?['intro']?.toString() ?? '',
         photoUrl: adminSnap.data()?['photoUrl']?.toString() ?? '',
+        nickname: adminSnap.data()?['nickname']?.toString() ?? '',
         isActive: isActive,
       );
       return null;
