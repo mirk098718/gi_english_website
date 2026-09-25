@@ -43,7 +43,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.gleamisland.app"
+        applicationId "com.gleam.app"
         minSdkVersion 21
         targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
