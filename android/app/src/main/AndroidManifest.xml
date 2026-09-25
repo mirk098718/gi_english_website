@@ -10,7 +10,7 @@
    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
    <application
-        android:label="글림아일랜드"
+        android:label="Gleam"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

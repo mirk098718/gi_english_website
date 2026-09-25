@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
       onPointerDown: (_) => SiteAlertCenter.instance.unlockAudio(),
       child: MaterialApp(
         scrollBehavior: MyCustomScrollBehavior(),
-        title: 'Gleam Island Homepage',
+        title: 'Gleam',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
