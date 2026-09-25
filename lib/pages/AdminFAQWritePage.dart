@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/FAQ.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -8,8 +9,10 @@ import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 // ignore: deprecated_member_use
-import 'dart:html' as html;
-import 'dart:ui_web' as ui;
+import 'package:gi_english_website/util/html_stub.dart'
+    if (dart.library.html) 'dart:html' as html;
+import 'package:gi_english_website/util/ui_web_stub.dart'
+    if (dart.library.html) 'dart:ui_web' as ui;
 
 class AdminFAQWritePage extends StatefulWidget {
   final FAQ? faq; // 수정 모드일 때 사용
@@ -65,23 +68,26 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
       _isImportant = widget.faq!.isImportant;
 
       // HTML input에도 값 설정 (약간의 지연 후)
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          questionInput.value = questionValue;
-          answerInput.value = answerValue;
-          categoryInput.value = categoryValue;
-        }
-      });
+      if (kIsWeb) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            questionInput.value = questionValue;
+            answerInput.value = answerValue;
+            categoryInput.value = categoryValue;
+          }
+        });
+      }
     } else {
       _categoryController.text = '일반';
       categoryValue = '일반';
-      
-      // HTML input에도 값 설정 (약간의 지연 후)
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          categoryInput.value = categoryValue;
-        }
-      });
+
+      if (kIsWeb) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            categoryInput.value = categoryValue;
+          }
+        });
+      }
     }
   }
 
@@ -400,7 +406,16 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
             ),
-            child: HtmlElementView(viewType: categoryViewType),
+            child: kIsWeb
+                ? HtmlElementView(viewType: categoryViewType)
+                : TextField(
+                    controller: _categoryController,
+                    onChanged: (value) => categoryValue = value,
+                    decoration: InputDecoration(
+                      hintText: '카테고리를 입력하세요 (예: 일반, 수업, 교재)',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
           ),
           SizedBox(height: 24),
 
@@ -419,7 +434,16 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
             ),
-            child: HtmlElementView(viewType: questionViewType),
+            child: kIsWeb
+                ? HtmlElementView(viewType: questionViewType)
+                : TextField(
+                    controller: _questionController,
+                    onChanged: (value) => questionValue = value,
+                    decoration: InputDecoration(
+                      hintText: '자주 묻는 질문을 입력하세요',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
           ),
           SizedBox(height: 24),
 
@@ -462,7 +486,19 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
             ),
-            child: HtmlElementView(viewType: answerViewType),
+            child: kIsWeb
+                ? HtmlElementView(viewType: answerViewType)
+                : TextField(
+                    controller: _answerController,
+                    maxLines: null,
+                    expands: true,
+                    textAlignVertical: TextAlignVertical.top,
+                    onChanged: (value) => answerValue = value,
+                    decoration: InputDecoration(
+                      hintText: '답변을 입력하세요',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
           ),
           SizedBox(height: 40),
 

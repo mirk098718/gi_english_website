@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 // ignore: deprecated_member_use
-import 'dart:html' as html;
+import 'package:gi_english_website/util/html_stub.dart'
+    if (dart.library.html) 'dart:html' as html;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
@@ -48,16 +51,15 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
 
   Future<void> _prepare() async {
     try {
-      final loaded = await _HtmlImage.load(widget.bytes);
-      loaded.dispose();
+      final size = await _decodeSize(widget.bytes);
       if (!mounted) return;
-      if (loaded.width <= 0 || loaded.height <= 0) {
+      if (size.width <= 0 || size.height <= 0) {
         setState(() => _loadError = '사진을 읽지 못했습니다. JPG 또는 PNG로 올려 주세요.');
         return;
       }
       setState(() {
-        _imgW = loaded.width;
-        _imgH = loaded.height;
+        _imgW = size.width;
+        _imgH = size.height;
         _resetContain();
         _ready = true;
       });
@@ -65,6 +67,24 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
       if (!mounted) return;
       setState(() => _loadError = '사진을 읽지 못했습니다. JPG 또는 PNG로 올려 주세요.');
     }
+  }
+
+  Future<Size> _decodeSize(Uint8List bytes) async {
+    if (kIsWeb) {
+      final loaded = await _HtmlImage.load(bytes);
+      final size = Size(loaded.width, loaded.height);
+      loaded.dispose();
+      return size;
+    }
+    final codec = await ui.instantiateImageCodec(bytes);
+    final frame = await codec.getNextFrame();
+    final size = Size(
+      frame.image.width.toDouble(),
+      frame.image.height.toDouble(),
+    );
+    frame.image.dispose();
+    codec.dispose();
+    return size;
   }
 
   void _resetContain() {
@@ -116,6 +136,7 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
   }
 
   Future<Uint8List> _exportJpeg() async {
+    if (!kIsWeb) return _exportPng();
     final loaded = await _HtmlImage.load(widget.bytes);
     try {
       const out = 400.0;
@@ -135,6 +156,38 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
     } finally {
       loaded.dispose();
     }
+  }
+
+  Future<Uint8List> _exportPng() async {
+    const out = 400;
+    final codec = await ui.instantiateImageCodec(widget.bytes);
+    final frame = await codec.getNextFrame();
+    final image = frame.image;
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    canvas.drawRect(
+      const Rect.fromLTWH(0, 0, out.toDouble(), out.toDouble()),
+      Paint()..color = const Color(0xFFFFFFFF),
+    );
+    final viewScale = out / _frame;
+    canvas.save();
+    canvas.translate(_offset.dx * viewScale, _offset.dy * viewScale);
+    canvas.scale(_scale * viewScale, _scale * viewScale);
+    canvas.drawImage(
+      image,
+      Offset.zero,
+      Paint()..filterQuality = FilterQuality.high,
+    );
+    canvas.restore();
+    final rendered = await recorder.endRecording().toImage(out, out);
+    final data = await rendered.toByteData(format: ui.ImageByteFormat.png);
+    image.dispose();
+    rendered.dispose();
+    codec.dispose();
+    if (data == null || data.lengthInBytes == 0) {
+      throw Exception('empty image');
+    }
+    return data.buffer.asUint8List();
   }
 
   @override

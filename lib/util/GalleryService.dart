@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:convert';
 // ignore: deprecated_member_use
-import 'dart:html' as html;
+import 'package:gi_english_website/util/html_stub.dart'
+    if (dart.library.html) 'dart:html' as html;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gi_english_website/class/GalleryImage.dart';
 import 'package:gi_english_website/util/AuthService.dart';

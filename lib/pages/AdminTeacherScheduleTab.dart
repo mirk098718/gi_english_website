@@ -1,5 +1,6 @@
 // ignore: deprecated_member_use
-import 'dart:html' as html;
+import 'package:gi_english_website/util/html_stub.dart'
+    if (dart.library.html) 'dart:html' as html;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

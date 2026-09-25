@@ -2,8 +2,11 @@ import 'dart:async';
 import 'dart:typed_data';
 
 // ignore: deprecated_member_use
-import 'dart:html' as html;
+import 'package:gi_english_website/util/html_stub.dart'
+    if (dart.library.html) 'dart:html' as html;
 
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
@@ -3344,7 +3347,21 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
     });
   }
 
-  void _pickVideoFile() {
+  Future<void> _pickVideoFile() async {
+    if (!kIsWeb) {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.video,
+        withData: true,
+      );
+      final file = result?.files.single;
+      final bytes = file?.bytes;
+      if (file == null || bytes == null || !mounted) return;
+      setState(() {
+        _pickedFileName = file.name;
+        _pickedBytes = bytes;
+      });
+      return;
+    }
     final input = html.FileUploadInputElement()..accept = 'video/*';
     input.click();
     input.onChange.listen((event) {

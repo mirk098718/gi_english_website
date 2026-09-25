@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/Notice.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -8,8 +9,10 @@ import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 // ignore: deprecated_member_use
-import 'dart:html' as html;
-import 'dart:ui_web' as ui;
+import 'package:gi_english_website/util/html_stub.dart'
+    if (dart.library.html) 'dart:html' as html;
+import 'package:gi_english_website/util/ui_web_stub.dart'
+    if (dart.library.html) 'dart:ui_web' as ui;
 
 class AdminNoticeWritePage extends StatefulWidget {
   final Notice? notice; // 수정 모드일 때 사용
@@ -57,13 +60,14 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
       contentValue = widget.notice!.content;
       _isImportant = widget.notice!.isImportant;
 
-      // HTML input에도 값 설정 (약간의 지연 후)
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          titleInput.value = titleValue;
-          contentInput.value = contentValue;
-        }
-      });
+      if (kIsWeb) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            titleInput.value = titleValue;
+            contentInput.value = contentValue;
+          }
+        });
+      }
     }
   }
 
@@ -325,7 +329,16 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
             ),
-            child: HtmlElementView(viewType: titleViewType),
+            child: kIsWeb
+                ? HtmlElementView(viewType: titleViewType)
+                : TextField(
+                    controller: _titleController,
+                    onChanged: (value) => titleValue = value,
+                    decoration: InputDecoration(
+                      hintText: '공지사항 제목을 입력하세요',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
           ),
           SizedBox(height: 24),
 
@@ -368,7 +381,19 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
             ),
-            child: HtmlElementView(viewType: contentViewType),
+            child: kIsWeb
+                ? HtmlElementView(viewType: contentViewType)
+                : TextField(
+                    controller: _contentController,
+                    maxLines: null,
+                    expands: true,
+                    textAlignVertical: TextAlignVertical.top,
+                    onChanged: (value) => contentValue = value,
+                    decoration: InputDecoration(
+                      hintText: '공지사항 내용을 입력하세요',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
           ),
           SizedBox(height: 40),
 

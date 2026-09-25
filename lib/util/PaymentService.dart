@@ -9,7 +9,8 @@ import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 // ignore: avoid_web_libraries_in_flutter, deprecated_member_use
-import 'dart:js' as js;
+import 'package:gi_english_website/util/js_stub.dart'
+    if (dart.library.js) 'dart:js' as js;
 
 /// 토스페이먼츠 결제 + 수강 신청 서비스.
 ///

@@ -10,8 +10,16 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleDisplayName</key>
+	<string>글림아일랜드</string>
 	<key>CFBundleName</key>
-	<string>gi_english_website</string>
+	<string>글림아일랜드</string>
+	<key>NSCameraUsageDescription</key>
+	<string>프로필 사진과 화상 수업에 카메라가 필요합니다.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>화상 수업과 Let's Talk에 마이크가 필요합니다.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>프로필 사진을 고르려면 사진 보관함 접근이 필요합니다.</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

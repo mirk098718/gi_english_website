@@ -1006,10 +1006,14 @@ class AuthService {
     required Uint8List bytes,
     required String fileName,
   }) async {
+    final png = _isPng(bytes);
     final path =
-        '$folder/$ownerUid/${DateTime.now().millisecondsSinceEpoch}.jpg';
+        '$folder/$ownerUid/${DateTime.now().millisecondsSinceEpoch}.${png ? 'png' : 'jpg'}';
     final ref = _storage.ref().child(path);
-    await ref.putData(bytes, SettableMetadata(contentType: 'image/jpeg'));
+    await ref.putData(
+      bytes,
+      SettableMetadata(contentType: png ? 'image/png' : 'image/jpeg'),
+    );
     return await ref.getDownloadURL();
   }
 
@@ -1017,7 +1021,16 @@ class AuthService {
     if (bytes.length > 700 * 1024) {
       throw Exception('사진이 너무 큽니다. 자르기 화면에서 얼굴을 맞춘 뒤 다시 저장해주세요.');
     }
-    return 'data:image/jpeg;base64,${base64Encode(bytes)}';
+    final mime = _isPng(bytes) ? 'image/png' : 'image/jpeg';
+    return 'data:$mime;base64,${base64Encode(bytes)}';
+  }
+
+  static bool _isPng(Uint8List bytes) {
+    return bytes.length >= 8 &&
+        bytes[0] == 0x89 &&
+        bytes[1] == 0x50 &&
+        bytes[2] == 0x4E &&
+        bytes[3] == 0x47;
   }
 
   static Future<void> _upsertNativeProfile({

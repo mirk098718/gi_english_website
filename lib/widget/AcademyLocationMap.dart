@@ -1,9 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
 // ignore: deprecated_member_use
-import 'dart:html' as html;
-import 'dart:ui_web' as ui;
+import 'package:gi_english_website/util/html_stub.dart'
+    if (dart.library.html) 'dart:html' as html;
+import 'package:gi_english_website/util/ui_web_stub.dart'
+    if (dart.library.html) 'dart:ui_web' as ui;
 
 /// 오시는 길: 학원 좌표 중심 지도 + 네이버 지도/길찾기.
 class AcademyLocationMap extends StatefulWidget {
@@ -35,7 +38,7 @@ class _AcademyLocationMapState extends State<AcademyLocationMap> {
   @override
   void initState() {
     super.initState();
-    if (_registered) return;
+    if (_registered || !kIsWeb) return;
     _registered = true;
     ui.platformViewRegistry.registerViewFactory(
       _viewType,
@@ -114,7 +117,25 @@ class _AcademyLocationMapState extends State<AcademyLocationMap> {
           child: SizedBox(
             width: double.infinity,
             height: widget.height,
-            child: HtmlElementView(viewType: _viewType),
+            child: kIsWeb
+                ? HtmlElementView(viewType: _viewType)
+                : ColoredBox(
+                    color: Palette.grey50,
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Text(
+                          AcademyLocationMap.address,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'NotoSansKR',
+                            fontSize: 14,
+                            height: 1.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
           ),
         ),
         SizedBox(height: 14),
