@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "129043838101",
+    "project_id": "gleam-island",
+    "storage_bucket": "gleam-island.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:129043838101:android:5453270417bb2e6b03979c",
+        "android_client_info": {
+          "package_name": "com.gleam.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9VDdOypqrgiOBRkHcax3y8vnBPwCjuN8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -7,6 +7,7 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 import '../util/WidgetUtil.dart';
@@ -148,20 +149,11 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
           SizedBox(
             height: 20,
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Container(
-                width: 700, child: Image.asset("assets/optionalPrograms.png")),
-          ),
+          WidgetUtil.pageImage("assets/optionalPrograms.png"),
           SizedBox(
             height: 60,
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Container(
-                width: 700,
-                child: Image.asset("assets/middleSchoolOptionalProgram.png")),
-          ),
+          WidgetUtil.pageImage("assets/middleSchoolOptionalProgram.png"),
           SizedBox(
             height: 50,
           ),
@@ -187,7 +179,7 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/ballPoolImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.coding),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -242,7 +234,6 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
           ],
         ),
       ),
@@ -289,7 +280,7 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
         children.add(Container(
           width: 1,
           height: 40,
-          color: const Color.fromRGBO(96, 165, 250, 1),
+          color: Palette.grey300,
         ));
       }
     }
@@ -320,7 +311,7 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
       child: Stack(
         alignment: Alignment.centerLeft,
         children: [
-          Image.asset("assets/ballPoolImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.coding),
           Container(
             padding: EdgeInsets.only(left: 20),
             child: Column(

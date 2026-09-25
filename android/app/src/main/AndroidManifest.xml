@@ -1,7 +1,16 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.gi_english_website">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+   <uses-permission android:name="android.permission.INTERNET"/>
+   <queries>
+       <intent>
+           <action android:name="android.intent.action.VIEW" />
+           <data android:scheme="https" />
+       </intent>
+   </queries>
+   <uses-permission android:name="android.permission.CAMERA"/>
+   <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+   <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
    <application
-        android:label="gi_english_website"
+        android:label="Gleam"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

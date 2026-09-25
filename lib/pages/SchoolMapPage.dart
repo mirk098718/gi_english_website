@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
-import 'package:gi_english_website/pages/SchoolSystemPage.dart';
 import 'package:gi_english_website/pages/SchoolTeachersPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 import '../util/WidgetUtil.dart';
+import '../widget/AcademyLocationMap.dart';
 import 'SchoolConsultationPage.dart';
 
 class SchoolMapPage extends StatefulWidget {
@@ -22,9 +23,9 @@ class SchoolMapPage extends StatefulWidget {
 class _SchoolMapPageState extends State<SchoolMapPage> {
   List<ButtonState> buttonStateList = [
     ButtonState("Gi글림아일랜드", BehaviorColor.colorOnDefault, SchoolAboutPage()),
-    ButtonState("교원소개", BehaviorColor.colorOnDefault, SchoolTeachersPage()),
-    ButtonState("운영시스템", BehaviorColor.colorOnDefault, SchoolSystemPage()),
-    ButtonState("오시는 길", BehaviorColor.colorOnClick, SchoolMapPage()),
+    ButtonState(
+        "교원/운영시스템 소개", BehaviorColor.colorOnDefault, SchoolTeachersPage()),
+    ButtonState("상담/오시는 길", BehaviorColor.colorOnClick, SchoolMapPage()),
   ];
 
   @override
@@ -82,7 +83,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
         onHover: (value) {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
-              : (i == 3
+              : (i == 2
                   ? BehaviorColor.colorOnClick
                   : BehaviorColor.colorOnDefault);
           print(
@@ -118,28 +119,53 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
 
   Widget content() {
     return Container(
-      width: MediaQuery.of(context).size.width,
+      width: double.infinity,
       padding: EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
       color: Palette.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "오시는 길",
+            "상담/오시는 길",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
-          SizedBox(
-            height: 20,
+          SizedBox(height: 24),
+          Text(
+            "상담 예약하기",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 18),
           ),
-          Text("주소: 경기도 파주시 해올2길2 태산W타워 7층, 701~703호 (다율동 1044)"),
-          SizedBox(
-            height: 20,
+          SizedBox(height: 12),
+          Text(
+            "입학 상담 및 입학 테스트를 원하시는 학부모님께서는 대표번호로 연락 주세요.\n"
+            "\n"
+            "• 상담 요일 : 월요일~금요일 / 토요일 오전\n"
+            "• 상담 시간 : 오후 1시~8시40분 / 토요일 9시~12시\n"
+            "• 상담 절차 : 031 942 0908\n"
+            "  대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n"
+            "\n"
+            "• 전화 상담 : 031 942 0908\n"
+            "• 이메일 : gienglish.paju@gmail.com",
+            style: TextStyle(
+              fontFamily: "NotoSansKR",
+              fontSize: 14,
+              height: 1.6,
+              color: Palette.black,
+            ),
           ),
-          Image.asset("assets/map.jpg"),
-          SizedBox(
-            height: 20,
+          SizedBox(height: 28),
+          Text(
+            "오시는 길",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 18),
           ),
+          SizedBox(height: 12),
+          Text(
+            "주소: ${AcademyLocationMap.address}",
+            style: TextStyle(fontFamily: "NotoSansKR", fontSize: 15, height: 1.5),
+          ),
+          SizedBox(height: 20),
+          AcademyLocationMap(),
+          SizedBox(height: 20),
         ],
       ),
     );
@@ -162,7 +188,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/aboutMainImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.map),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -217,7 +243,6 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             content(),
-            MyWidget.mobileSchoolFooter()
           ],
         ),
       ),
@@ -250,7 +275,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
         onHover: (value) {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
-              : (i == 3
+              : (i == 2
                   ? BehaviorColor.colorOnClick
                   : BehaviorColor.colorOnDefault);
           setState(() {});
@@ -264,7 +289,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
         children.add(Container(
           width: 1,
           height: 40,
-          color: Palette.primaryLight,
+          color: Palette.grey300,
         ));
       }
     }
@@ -286,7 +311,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
       child: Stack(
         alignment: Alignment.centerLeft,
         children: [
-          Image.asset("assets/aboutMainImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.map),
           Container(
             padding: EdgeInsets.only(left: 20),
             child: Column(

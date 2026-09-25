@@ -6,6 +6,7 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -206,10 +207,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           SizedBox(
             height: 40,
           ),
-          SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Container(
-                  width: 800, child: Image.asset("assets/whyNZInfo.png"))),
+          WidgetUtil.pageImage("assets/whyNZInfo.png", maxWidth: 800),
           SizedBox(
             height: 40,
           ),
@@ -219,9 +217,8 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
                   Uri.parse('https://m.youtube.com/watch?v=Ytc6ClRRhw0'),
                 );
               },
-              child: Container(
-                  width: 800,
-                  child: Image.asset("assets/whyChooseNzClip.png"))),
+              child: WidgetUtil.pageImage("assets/whyChooseNzClip.png",
+                  maxWidth: 800)),
           SizedBox(
             height: 40,
           ),
@@ -233,18 +230,13 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           SizedBox(
             height: 40,
           ),
-          SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Container(
-                  width: 800,
-                  child: Image.asset("assets/whyTaurangaInfo.png"))),
+          WidgetUtil.pageImage("assets/whyTaurangaInfo.png", maxWidth: 800),
           SizedBox(
             height: 40,
           ),
           InkWell(
-            child: Container(
-                width: 800,
-                child: Image.asset("assets/whyTaurangaClipWeb.png")),
+            child: WidgetUtil.pageImage("assets/whyTaurangaClipWeb.png",
+                maxWidth: 800),
             onTap: () async {
               UrlUtil.open('https://www.youtube.com/watch?v=uT2IIPu5uuY');
             },
@@ -263,7 +255,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           SizedBox(
             height: 40,
           ),
-          Image.asset("assets/schoolSelection.png"),
+          WidgetUtil.pageImage("assets/schoolSelection.png", maxWidth: 800),
           SizedBox(
             height: 40,
           ),
@@ -275,8 +267,8 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           SizedBox(
             height: 40,
           ),
-          Image.asset("assets/schoolList.png"),
-          Image.asset("assets/nzMiddleSchoolList.png"),
+          WidgetUtil.pageImage("assets/schoolList.png", maxWidth: 800),
+          WidgetUtil.pageImage("assets/nzMiddleSchoolList.png", maxWidth: 800),
           SizedBox(
             height: 40,
           ),
@@ -306,7 +298,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/ballPoolImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.nz),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -361,7 +353,6 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             content(),
-            MyWidget.mobileSchoolFooter()
           ],
         ),
       ),
@@ -408,7 +399,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
         children.add(Container(
           width: 1,
           height: 40,
-          color: Palette.primaryLight,
+          color: Palette.grey300,
         ));
       }
     }
@@ -439,7 +430,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
       child: Stack(
         alignment: Alignment.centerLeft,
         children: [
-          Image.asset("assets/ballPoolImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.nz),
           Container(
             padding: EdgeInsets.only(left: 20),
             child: Column(

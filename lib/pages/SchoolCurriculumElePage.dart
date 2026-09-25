@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
+import 'package:gi_english_website/pages/SchoolCurriculumHighSchoolPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumMiddleSchoolPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
@@ -7,6 +8,7 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/WidgetUtil.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 class SchoolCurriculumElePage extends StatefulWidget {
@@ -22,6 +24,8 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
     ButtonState("정규초등부", BehaviorColor.colorOnClick, SchoolCurriculumElePage()),
     ButtonState("정규중등부", BehaviorColor.colorOnDefault,
         SchoolCurriculumMiddleSchoolPage()),
+    ButtonState("정규고등부", BehaviorColor.colorOnDefault,
+        SchoolCurriculumHighSchoolPage()),
   ];
 
   @override
@@ -106,63 +110,56 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
   }
 
   Widget content() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        alignment: Alignment.topLeft,
-        padding: EdgeInsets.all(20),
-        color: Palette.white,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "정규 초등부 Curriculum",
-              style: TextStyle(
-                fontFamily: "Jalnan",
-                fontSize: 20,
-              ),
+    return Container(
+      width: double.infinity,
+      alignment: Alignment.topLeft,
+      padding: EdgeInsets.all(20),
+      color: Palette.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "정규 초등부 Curriculum",
+            style: TextStyle(
+              fontFamily: "Jalnan",
+              fontSize: 20,
             ),
-            WidgetUtil.myDivider(),
-            SizedBox(height: 20),
-            Container(
-                width: 700, child: Image.asset("assets/eleProgramPeriod.png")),
-            SizedBox(height: 20),
-            Text(
-              "월수금반",
-              style: TextStyle(
-                fontFamily: "Jalnan",
-                fontSize: 15,
-              ),
+          ),
+          WidgetUtil.myDivider(),
+          SizedBox(height: 20),
+          WidgetUtil.pageImage("assets/eleProgramPeriod.png"),
+          SizedBox(height: 20),
+          Text(
+            "월수금반",
+            style: TextStyle(
+              fontFamily: "Jalnan",
+              fontSize: 15,
             ),
-            SizedBox(height: 20),
-            Container(
-                width: 700, child: Image.asset("assets/eleTimetableMWF.png")),
-            SizedBox(height: 20),
-            Text(
-              "화목반",
-              style: TextStyle(
-                fontFamily: "Jalnan",
-                fontSize: 15,
-              ),
+          ),
+          SizedBox(height: 20),
+          WidgetUtil.pageImage("assets/eleTimetableMWF.png"),
+          SizedBox(height: 20),
+          Text(
+            "화목반",
+            style: TextStyle(
+              fontFamily: "Jalnan",
+              fontSize: 15,
             ),
-            SizedBox(height: 20),
-            Container(
-                width: 700,
-                child: Image.asset("assets/eleTimetableTuesThurs.png")),
-            SizedBox(height: 40),
-            Text(
-              "NIE 영자신문 수업",
-              style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
-            ),
-            WidgetUtil.myDivider(),
-            SizedBox(height: 5),
-            Container(
-                margin: EdgeInsets.only(top: 20),
-                width: 1000,
-                child: Image.asset("assets/nie.png")),
-          ],
-        ),
+          ),
+          SizedBox(height: 20),
+          WidgetUtil.pageImage("assets/eleTimetableTuesThurs.png"),
+          SizedBox(height: 40),
+          Text(
+            "NIE 영자신문 수업",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
+          ),
+          WidgetUtil.myDivider(),
+          SizedBox(height: 5),
+          Padding(
+            padding: EdgeInsets.only(top: 20),
+            child: WidgetUtil.pageImage("assets/nie.png", maxWidth: 1000),
+          ),
+        ],
       ),
     );
   }
@@ -173,7 +170,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
         children: [
           mainImage(),
           contentGroup(),
-          SizedBox(height: 213, child: MyWidget.footer()),
+          MyWidget.footer(),
         ],
       ),
     );
@@ -184,7 +181,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/curriculumImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.elementary),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -238,7 +235,6 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
           ],
         ),
       ),
@@ -285,7 +281,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
         children.add(Container(
           width: 1,
           height: 40,
-          color: Palette.primaryLight,
+          color: Palette.grey300,
         ));
       }
     }
@@ -318,7 +314,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
       child: Stack(
         alignment: Alignment.centerLeft,
         children: [
-          Image.asset("assets/curriculumImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.elementary),
           Container(
             padding: EdgeInsets.only(left: 20),
             child: Column(
