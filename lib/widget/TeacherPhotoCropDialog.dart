@@ -166,7 +166,7 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     canvas.drawRect(
-      const Rect.fromLTWH(0, 0, out.toDouble(), out.toDouble()),
+      Rect.fromLTWH(0, 0, out.toDouble(), out.toDouble()),
       Paint()..color = const Color(0xFFFFFFFF),
     );
     final viewScale = out / _frame;
