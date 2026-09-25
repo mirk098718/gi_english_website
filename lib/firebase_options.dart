@@ -21,8 +21,9 @@ class DefaultFirebaseOptions {
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
+        return android;
       case TargetPlatform.iOS:
-        // 폰 앱용 Firebase 앱이 등록되기 전까지 웹 설정을 그대로 쓴다.
+        // iOS 앱이 Firebase에 등록되기 전까지 웹 설정을 그대로 쓴다.
         return web;
       case TargetPlatform.macOS:
         throw UnsupportedError(
@@ -45,6 +46,14 @@ class DefaultFirebaseOptions {
         );
     }
   }
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyD9VDdOypqrgiOBRkHcax3y8vnBPwCjuN8',
+    appId: '1:129043838101:android:5453270417bb2e6b03979c',
+    messagingSenderId: '129043838101',
+    projectId: 'gleam-island',
+    storageBucket: 'gleam-island.appspot.com',
+  );
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyC8nWDyhU0EeZH1LB3hGlya9cbGKOOohBQ',
