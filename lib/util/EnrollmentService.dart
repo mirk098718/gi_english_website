@@ -92,6 +92,35 @@ class EnrollmentService {
   /// 1주차에 기본으로 넣는 실험 인강. 선생님이 따로 등록하지 않아도 모든 과정에 보인다.
   static const String defaultWeek1VideoUrl = 'https://youtu.be/C4Dr_beoGoc';
 
+  static const String beginnerCourseId = 'beginner_phonics';
+
+  /// 왕초보 과정에 연결된 인강. 회차 번호와 강의 순서가 같다.
+  static const List<CatalogLesson> beginnerLessons = [
+    CatalogLesson(
+      order: 1,
+      title: '1강',
+      videoUrl: 'https://youtu.be/UMTr9cXimZM',
+    ),
+    CatalogLesson(
+      order: 2,
+      title: '2강',
+      videoUrl: 'https://youtu.be/ikDXCNb66Yo',
+    ),
+    CatalogLesson(
+      order: 3,
+      title: '3강',
+      videoUrl: 'https://youtu.be/mHrkwI56dVw',
+    ),
+  ];
+
+  static CatalogLesson? catalogLesson(String courseId, int order) {
+    if (courseId != beginnerCourseId) return null;
+    for (final lesson in beginnerLessons) {
+      if (lesson.order == order) return lesson;
+    }
+    return null;
+  }
+
   static String defaultWeekId(String courseId, int weekNumber) =>
       '${courseId}_week_$weekNumber';
 
@@ -123,6 +152,24 @@ class EnrollmentService {
 
   /// 아직 관리자가 등록하지 않은 회차도 예약·학습 UI가 보이도록 하는 자리표시.
   static OnlineWeek defaultWeek(String courseId, int weekNumber) {
+    final catalog = catalogLesson(courseId, weekNumber);
+    if (catalog != null) {
+      return OnlineWeek(
+        id: defaultWeekId(courseId, weekNumber),
+        courseId: courseId,
+        weekNumber: weekNumber,
+        title: catalog.title,
+        description: '왕초보 ${catalog.title} 인강을 시청한 뒤 체크리스트를 확인하세요.',
+        videoUrl: catalog.videoUrl,
+        problemLinks: const [
+          WeekProblemLink(title: '리뷰 및 문제풀이', url: ''),
+        ],
+        checklistItems: const [
+          WeekChecklistItem(id: 'watch_video', label: '인강 시청하기'),
+          WeekChecklistItem(id: 'solve_problems', label: '문제풀이 하기'),
+        ],
+      );
+    }
     if (weekNumber <= 1) {
       return OnlineWeek(
         id: defaultWeekId(courseId, 1),
@@ -153,6 +200,37 @@ class EnrollmentService {
         WeekChecklistItem(id: 'watch_video', label: '인강 시청하기'),
         WeekChecklistItem(id: 'solve_problems', label: '문제풀이 하기'),
       ],
+    );
+  }
+
+  /// 저장된 회차에 영상이 없거나 임시 영상이면 과정 기본 인강으로 채운다.
+  static OnlineWeek withCatalogVideo(OnlineWeek week) {
+    final catalog = catalogLesson(week.courseId, week.weekNumber);
+    if (catalog == null) return week;
+    final url = week.videoUrl.trim();
+    final placeholder = url.isEmpty ||
+        url == defaultWeek1VideoUrl ||
+        url == UrlUtil.normalizeVideoUrl(defaultWeek1VideoUrl);
+    if (!placeholder) return week;
+    final placeholderTitle = week.title.trim().isEmpty ||
+        week.title == '1회차 인강: 관사의 쓰임' ||
+        week.title == '${week.weekNumber}회차 학습';
+    return OnlineWeek(
+      id: week.id,
+      courseId: week.courseId,
+      weekNumber: week.weekNumber,
+      title: placeholderTitle ? catalog.title : week.title,
+      description: week.description.trim().isEmpty
+          ? '왕초보 ${catalog.title} 인강을 시청한 뒤 체크리스트를 확인하세요.'
+          : week.description,
+      videoUrl: catalog.videoUrl,
+      problemLinks: week.problemLinks,
+      checklistItems: week.checklistItems.isEmpty
+          ? const [
+              WeekChecklistItem(id: 'watch_video', label: '인강 시청하기'),
+              WeekChecklistItem(id: 'solve_problems', label: '문제풀이 하기'),
+            ]
+          : week.checklistItems,
     );
   }
 
@@ -255,12 +333,34 @@ class EnrollmentService {
           .map((doc) => OnlineLesson.fromMap(doc.id, doc.data()))
           .toList();
 
-      lessons.sort((a, b) => a.order.compareTo(b.order));
-      return lessons;
+      return _withCatalogLessons(courseId, lessons);
     } catch (e) {
       print('강의 자료 조회 오류: $e');
-      return [];
+      return _withCatalogLessons(courseId, []);
     }
+  }
+
+  static List<OnlineLesson> _withCatalogLessons(
+    String courseId,
+    List<OnlineLesson> lessons,
+  ) {
+    if (courseId == beginnerCourseId) {
+      for (final item in beginnerLessons) {
+        final saved = lessons.any((lesson) =>
+            lesson.order == item.order ||
+            UrlUtil.normalizeVideoUrl(lesson.videoUrl) == item.videoUrl);
+        if (saved) continue;
+        lessons.add(OnlineLesson(
+          id: defaultWeekId(courseId, item.order),
+          title: item.title,
+          description: '왕초보 ${item.title}',
+          videoUrl: item.videoUrl,
+          order: item.order,
+        ));
+      }
+    }
+    lessons.sort((a, b) => a.order.compareTo(b.order));
+    return lessons;
   }
 
   /// 과정의 화상수업 입장 주소.
@@ -1252,8 +1352,12 @@ class EnrollmentService {
 
       final weeks = snapshot.docs
           .map((doc) => OnlineWeek.fromMap(doc.id, doc.data()))
+          .map(withCatalogVideo)
           .toList();
-      final through = ensureThrough < 1 ? 1 : ensureThrough;
+      var through = ensureThrough < 1 ? 1 : ensureThrough;
+      if (courseId == beginnerCourseId && beginnerLessons.length > through) {
+        through = beginnerLessons.length;
+      }
       for (var n = 1; n <= through; n++) {
         if (!weeks.any((week) => week.weekNumber == n)) {
           weeks.add(defaultWeek(courseId, n));
@@ -2606,6 +2710,18 @@ class OnlineWeek {
       checklistItems: checks,
     );
   }
+}
+
+class CatalogLesson {
+  final int order;
+  final String title;
+  final String videoUrl;
+
+  const CatalogLesson({
+    required this.order,
+    required this.title,
+    required this.videoUrl,
+  });
 }
 
 class OnlineLesson {
