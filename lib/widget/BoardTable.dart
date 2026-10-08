@@ -24,11 +24,11 @@ class BoardTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: EdgeInsets.zero,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(width: 1, color: Palette.black),
+          border: Border.all(width: 1, color: Palette.grey200),
         ),
         child: Column(
           children: [
@@ -42,9 +42,9 @@ class BoardTable extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 11),
       decoration: BoxDecoration(
-        color: Palette.grey100,
+        color: Palette.grey50,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(10),
           topRight: Radius.circular(10),
@@ -139,7 +139,7 @@ class BoardTable extends StatelessWidget {
     return InkWell(
       onTap: () => onItemTap(item),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 11),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: isLast
@@ -187,7 +187,7 @@ class BoardTable extends StatelessWidget {
               children: [
                 if (item['isImportant'] ?? false) ...[
                   Icon(Icons.star,
-                      color: Palette.primary, size: isMobile ? 14 : 16),
+                      color: Palette.navy, size: isMobile ? 14 : 16),
                   SizedBox(width: 4),
                 ],
                 Expanded(
@@ -237,7 +237,7 @@ class BoardTable extends StatelessWidget {
                 EdgeInsets.symmetric(horizontal: isMobile ? 4 : 8, vertical: 4),
             decoration: BoxDecoration(
               color: (item['isImportant'] ?? false)
-                  ? Palette.primary.withValues(alpha: 0.1)
+                  ? Palette.navy.withValues(alpha: 0.08)
                   : Palette.grey100,
               borderRadius: BorderRadius.circular(4),
             ),
@@ -247,7 +247,7 @@ class BoardTable extends StatelessWidget {
                 fontSize: isMobile ? 10 : 12, // 모바일에서는 폰트 크기 작게
                 fontFamily: "NotoSansKR",
                 color: (item['isImportant'] ?? false)
-                    ? Palette.primary
+                    ? Palette.navy
                     : Palette.grey600,
               ),
               textAlign: TextAlign.center,
@@ -266,7 +266,7 @@ class BoardTable extends StatelessWidget {
               children: [
                 if (item['isImportant'] ?? false) ...[
                   Icon(Icons.star,
-                      color: Palette.primary, size: isMobile ? 14 : 16),
+                      color: Palette.navy, size: isMobile ? 14 : 16),
                   SizedBox(width: 4),
                 ],
                 Expanded(

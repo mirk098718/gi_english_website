@@ -1,11 +1,14 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/GalleryService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/class/GalleryImage.dart';
 // ignore: deprecated_member_use
-import 'dart:html' as html;
-import 'dart:ui_web' as ui;
+import 'package:gi_english_website/util/html_stub.dart'
+    if (dart.library.html) 'dart:html' as html;
+import 'package:gi_english_website/util/ui_web_stub.dart'
+    if (dart.library.html) 'dart:ui_web' as ui;
 
 class AdminImageEditDialog extends StatefulWidget {
   final GalleryImage image;
@@ -18,6 +21,7 @@ class AdminImageEditDialog extends StatefulWidget {
 
 class _AdminImageEditDialogState extends State<AdminImageEditDialog> {
   String _description = '';
+  final _descriptionController = TextEditingController();
   bool _isUpdating = false;
   String _updateStatus = '';
 
@@ -27,7 +31,14 @@ class _AdminImageEditDialogState extends State<AdminImageEditDialog> {
   void initState() {
     super.initState();
     _description = widget.image.description;
+    _descriptionController.text = _description;
     _registerHtmlTextArea();
+  }
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    super.dispose();
   }
 
   void _registerHtmlTextArea() {
@@ -357,8 +368,21 @@ class _AdminImageEditDialogState extends State<AdminImageEditDialog> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: HtmlElementView(
-                    viewType: 'edit-description-textarea-${widget.image.id}'),
+                child: kIsWeb
+                    ? HtmlElementView(
+                        viewType:
+                            'edit-description-textarea-${widget.image.id}')
+                    : TextField(
+                        controller: _descriptionController,
+                        maxLines: null,
+                        expands: true,
+                        textAlignVertical: TextAlignVertical.top,
+                        onChanged: (value) => _description = value,
+                        decoration: const InputDecoration(
+                          hintText: '이미지에 대한 설명을 입력해주세요 (선택사항)',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
               ),
               const SizedBox(height: 16),
 

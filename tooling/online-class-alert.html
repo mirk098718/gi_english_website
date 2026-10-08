@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gleam Education class alert</title>
+  <style>
+    @font-face {
+      font-family: 'NotoSansKR';
+      src: url('../assets/fonts/NotoSansKR-Regular.otf') format('opentype');
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: 'NotoSansKR';
+      src: url('../assets/fonts/NotoSansKR-Medium.otf') format('opentype');
+      font-weight: 500;
+    }
+    @font-face {
+      font-family: 'NotoSansKR';
+      src: url('../assets/fonts/NotoSansKR-Bold.otf') format('opentype');
+      font-weight: 700;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      width: 1600px;
+      height: 900px;
+      overflow: hidden;
+      font-family: 'NotoSansKR', 'Apple SD Gothic Neo', sans-serif;
+      background: #eef4f4;
+    }
+    .page {
+      width: 1600px;
+      height: 900px;
+      padding: 56px 64px;
+      display: flex;
+      align-items: center;
+      gap: 48px;
+      position: relative;
+    }
+    .logo {
+      position: absolute;
+      top: 28px;
+      left: 36px;
+      height: 40px;
+      width: auto;
+      object-fit: contain;
+      filter: invert(1);
+    }
+    .board {
+      flex: 1;
+      background: #fff;
+      border-radius: 28px;
+      padding: 36px 40px 32px;
+      box-shadow: 0 18px 50px rgba(15, 118, 110, 0.08);
+    }
+    .board-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    h1 {
+      margin: 0;
+      color: #134e4a;
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+    .week-nav {
+      display: flex;
+      gap: 18px;
+      color: #0f766e;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    .week-nav span { opacity: 0.45; }
+    .week-nav strong { font-weight: 700; }
+    .sub {
+      margin: 0 0 22px;
+      color: #64748b;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 64px repeat(7, 1fr);
+      gap: 8px 6px;
+      align-items: center;
+    }
+    .day, .time {
+      text-align: center;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .day { padding-bottom: 4px; }
+    .pill {
+      height: 36px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .open {
+      background: #d7efea;
+      color: #0f766e;
+    }
+    .reserved {
+      background: linear-gradient(180deg, #2dd4bf 0%, #0d9488 100%);
+      color: #fff;
+      box-shadow: 0 6px 12px rgba(13, 148, 136, 0.28);
+    }
+    .featured {
+      box-shadow: 0 0 0 3px #99f6e4, 0 6px 12px rgba(13, 148, 136, 0.28);
+    }
+    .phone-wrap {
+      width: 360px;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .bell {
+      position: absolute;
+      top: -8px;
+      right: 18px;
+      font-size: 42px;
+      filter: drop-shadow(0 6px 10px rgba(250, 204, 21, 0.45));
+    }
+    .phone {
+      width: 280px;
+      height: 560px;
+      margin: 40px auto 0;
+      background: #0f766e;
+      border-radius: 42px;
+      border: 10px solid #111827;
+      box-shadow: 0 24px 50px rgba(15, 23, 42, 0.22);
+      position: relative;
+      overflow: hidden;
+    }
+    .phone::before {
+      content: '';
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 18px;
+      background: #111827;
+      border-radius: 12px;
+    }
+    .notifs {
+      position: absolute;
+      top: 92px;
+      left: -42px;
+      width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .card {
+      background: rgba(255,255,255,0.96);
+      border-radius: 18px;
+      padding: 14px 16px 16px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+    }
+    .card-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .badge {
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .kakao { background: #fee500; color: #191919; }
+    .mail { background: #3b82f6; }
+    .app-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #111827;
+    }
+    .now {
+      margin-left: auto;
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .body {
+      color: #111827;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+    .body .muted {
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <img class="logo" src="../assets/giEmblem.png" alt="Gleam Island" />
+  <div class="page">
+    <section class="board">
+      <div class="board-head">
+        <h1>수업 시간표</h1>
+        <div class="week-nav">
+          <span>‹ 이전 주</span>
+          <strong>다음 주 ›</strong>
+        </div>
+      </div>
+      <p class="sub">30분 단위 · 6:00 AM – 11:30 PM</p>
+      <div class="grid" id="grid"></div>
+    </section>
+    <div class="phone-wrap">
+      <div class="bell">🔔</div>
+      <div class="phone"></div>
+      <div class="notifs">
+        <article class="card">
+          <div class="card-top">
+            <div class="badge kakao">톡</div>
+            <div class="app-name">KakaoTalk</div>
+            <div class="now">now</div>
+          </div>
+          <div class="body">
+            글림 에듀케이션 : 9월 24일 (목) 오후 2:00<br />
+            <span class="muted">화상 수업 1회차 수업 예정<br />강사: James</span>
+          </div>
+        </article>
+        <article class="card">
+          <div class="card-top">
+            <div class="badge mail">✉</div>
+            <div class="app-name">Email</div>
+            <div class="now">now</div>
+          </div>
+          <div class="body">
+            글림 에듀케이션 : 9월 24일 (목) 오후 2:00<br />
+            <span class="muted">화상 수업 1회차 수업 예정<br />강사: James</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+  <script>
+    const days = ['월', '화', '수', '목', '금', '토', '일'];
+    const times = ['13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00'];
+    const reserved = new Set([
+      '화|13:30', '화|14:00', '수|14:00', '목|14:00',
+      '금|13:00', '금|14:30', '토|14:00', '토|15:30'
+    ]);
+    const grid = document.getElementById('grid');
+    grid.appendChild(el('div', ''));
+    days.forEach((d) => grid.appendChild(el('div', d, 'day')));
+    times.forEach((time) => {
+      grid.appendChild(el('div', time, 'time'));
+      days.forEach((d) => {
+        const key = d + '|' + time;
+        const isReserved = reserved.has(key);
+        const pill = el('div', isReserved ? '예약' : time, 'pill ' + (isReserved ? 'reserved' : 'open'));
+        if (d === '목' && time === '14:00') pill.classList.add('featured');
+        grid.appendChild(pill);
+      });
+    });
+    function el(tag, text, className) {
+      const node = document.createElement(tag);
+      node.textContent = text;
+      if (className) node.className = className;
+      return node;
+    }
+  </script>
+</body>
+</html>

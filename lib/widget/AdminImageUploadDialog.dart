@@ -1,11 +1,14 @@
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:gi_english_website/util/GalleryService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 // ignore: deprecated_member_use
-import 'dart:html' as html;
-import 'dart:ui_web' as ui;
+import 'package:gi_english_website/util/html_stub.dart'
+    if (dart.library.html) 'dart:html' as html;
+import 'package:gi_english_website/util/ui_web_stub.dart'
+    if (dart.library.html) 'dart:ui_web' as ui;
 
 class AdminImageUploadDialog extends StatefulWidget {
   const AdminImageUploadDialog({Key? key}) : super(key: key);
@@ -18,6 +21,7 @@ class _AdminImageUploadDialogState extends State<AdminImageUploadDialog> {
   Uint8List? _selectedImageData;
   String? _selectedFileName;
   String _description = '';
+  final _descriptionController = TextEditingController();
   bool _isUploading = false;
   String _uploadStatus = '';
   double _uploadProgress = 0.0;
@@ -79,6 +83,7 @@ class _AdminImageUploadDialogState extends State<AdminImageUploadDialog> {
     _selectedFileName = null;
     _description = '';
     _isUploading = false;
+    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -87,6 +92,7 @@ class _AdminImageUploadDialogState extends State<AdminImageUploadDialog> {
       _selectedImageData = null;
       _selectedFileName = null;
       _description = '';
+      _descriptionController.clear();
       _isUploading = false;
       _uploadStatus = '';
       _uploadProgress = 0.0;
@@ -115,7 +121,8 @@ class _AdminImageUploadDialogState extends State<AdminImageUploadDialog> {
         setState(() {
           _selectedImageData = result.files.single.bytes!;
           _selectedFileName = result.files.single.name;
-          _description = ''; // 설명 초기화
+          _description = '';
+          _descriptionController.clear();
         });
         print(
             '📊 파일 크기: ${(_selectedImageData!.length / 1024 / 1024).toStringAsFixed(2)} MB');
@@ -357,7 +364,19 @@ class _AdminImageUploadDialogState extends State<AdminImageUploadDialog> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: HtmlElementView(viewType: 'description-textarea'),
+                  child: kIsWeb
+                      ? HtmlElementView(viewType: 'description-textarea')
+                      : TextField(
+                          controller: _descriptionController,
+                          maxLines: null,
+                          expands: true,
+                          textAlignVertical: TextAlignVertical.top,
+                          onChanged: (value) => _description = value,
+                          decoration: const InputDecoration(
+                            hintText: '이미지에 대한 설명을 입력해주세요 (선택사항)',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
                 ),
                 const SizedBox(height: 16),
               ],

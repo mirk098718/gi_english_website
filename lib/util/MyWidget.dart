@@ -1,29 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/GleamMark.dart';
 
 class MyWidget {
   static Widget footer() {
     return Container(
         width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Palette.secondaryDark, Color(0xFF022C22)],
-          ),
-        ),
-        padding: EdgeInsets.all(24),
+        color: Palette.grey900,
+        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 40),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Container(
+              width: 32,
+              height: 2,
+              color: Palette.secondary,
+              margin: EdgeInsets.only(bottom: 20),
+            ),
+            GleamMark(height: 36, lightPlate: true),
+            SizedBox(height: 16),
             Text(
-              "Gi Gleam Island 어학원 파주",
+              "글림교육",
               style: TextStyle(
                   color: Palette.white,
                   fontFamily: "NotoSansKR",
-                  fontWeight: FontWeight.w700,
-                  fontSize: 18),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16),
+            ),
+            SizedBox(height: 4),
+            Text(
+              "Gleam Education",
+              style: TextStyle(
+                  color: Palette.grey400,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: FontWeight.w500,
+                  fontSize: 13),
             ),
             SizedBox(
               height: 12,
@@ -34,32 +46,20 @@ class MyWidget {
               "email : gienglish.paju@gmail.com\n"
               "사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희",
               style: TextStyle(
-                  color: Palette.grey300,
-                  fontFamily: "NotoSansKR",
-                  fontWeight: FontWeight.normal,
-                  fontSize: 14,
-                  height: 1.5),
-            ),
-            SizedBox(height: 16),
-            Container(
-              height: 1,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.transparent,
-                    Palette.white.withValues(alpha:0.3),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              "Copyright ⓒ 글림아일랜드어학원",
-              style: TextStyle(
                   color: Palette.grey400,
                   fontFamily: "NotoSansKR",
-                  fontSize: 12),
+                  fontWeight: FontWeight.normal,
+                  fontSize: 13,
+                  height: 1.7),
+            ),
+            SizedBox(height: 24),
+            Text(
+              "Copyright ⓒ 글림교육",
+              style: TextStyle(
+                color: Palette.grey500,
+                fontFamily: "NotoSansKR",
+                fontSize: 12,
+              ),
             ),
           ],
         ));
@@ -80,12 +80,21 @@ class MyWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Gi Gleam Island 어학원 파주",
+            "글림교육",
             style: TextStyle(
                 color: Palette.white,
                 fontFamily: "NotoSansKR",
                 fontWeight: FontWeight.w700,
                 fontSize: 18),
+          ),
+          SizedBox(height: 4),
+          Text(
+            "Gleam Education",
+            style: TextStyle(
+                color: Palette.white.withValues(alpha: 0.8),
+                fontFamily: "NotoSansKR",
+                fontWeight: FontWeight.w500,
+                fontSize: 13),
           ),
           SizedBox(height: 12),
           Text(
@@ -115,7 +124,7 @@ class MyWidget {
           ),
           SizedBox(height: 8),
           Text(
-            "Copyright ⓒ 글림아일랜드교육",
+            "Copyright ⓒ 글림교육",
             style: TextStyle(
                 color: Palette.white.withValues(alpha:0.7),
                 fontFamily: "NotoSansKR",
@@ -129,20 +138,16 @@ class MyWidget {
   static Widget mobileSchoolFooter() {
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Palette.darkTeal, Palette.darkTealDark],
-        ),
-      ),
-      padding: EdgeInsets.all(16),
+      color: Palette.grey900,
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 18),
       child: Text(
-        "ⓒ 글림아일랜드교육",
+        "ⓒ 글림교육",
         textAlign: TextAlign.center,
         style: TextStyle(
-          color: Palette.white,
+          color: Palette.grey400,
           fontFamily: "NotoSansKR",
-          fontWeight: FontWeight.w600,
-          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          fontSize: 12,
         ),
       ),
     );
@@ -158,7 +163,7 @@ class MyWidget {
       ),
       padding: EdgeInsets.all(16),
       child: Text(
-        "ⓒ 글림아일랜드교육",
+        "ⓒ 글림교육",
         textAlign: TextAlign.center,
         style: TextStyle(
           color: Palette.white,
@@ -191,7 +196,7 @@ class MyWidget {
 
   static Widget roundEdgeTextField(
       String hintText, TextEditingController controller,
-      {bool obscureText = false}) {
+      {bool obscureText = false, bool autofocus = false}) {
     return Container(
       margin: EdgeInsets.only(top: 20, bottom: 20),
       padding: EdgeInsets.all(10),
@@ -199,6 +204,7 @@ class MyWidget {
       child: TextField(
         controller: controller,
         obscureText: obscureText,
+        autofocus: autofocus,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.white,
@@ -238,11 +244,16 @@ class MyWidget {
   }
 //좌측메뉴 세분화
 
+  static Color _leftMenuTextColor(Color background) {
+    return background == Palette.navy ? Palette.white : Palette.black;
+  }
+
   static Widget leftMenuTop(Color selectedMenuColor, String content) {
     return Container(
       alignment: Alignment.center,
       width: 192,
-      height: 40,
+      constraints: BoxConstraints(minHeight: 40),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
             topLeft: Radius.circular(10), topRight: Radius.circular(10)),
@@ -251,7 +262,10 @@ class MyWidget {
       child: Text(
         content,
         textAlign: TextAlign.center,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        style: TextStyle(
+            color: _leftMenuTextColor(selectedMenuColor),
+            fontWeight: FontWeight.bold,
+            fontSize: 13),
       ),
     );
   }
@@ -261,10 +275,15 @@ class MyWidget {
       color: menuColor,
       alignment: Alignment.center,
       width: 192,
-      height: 40,
+      constraints: BoxConstraints(minHeight: 40),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: Text(
         menuContent,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            color: _leftMenuTextColor(menuColor),
+            fontWeight: FontWeight.bold,
+            fontSize: 13),
       ),
     );
   }
@@ -273,7 +292,8 @@ class MyWidget {
     return Container(
       alignment: Alignment.center,
       width: 192,
-      height: 40,
+      constraints: BoxConstraints(minHeight: 40),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(10),
@@ -281,7 +301,11 @@ class MyWidget {
           color: menuColor),
       child: Text(
         content,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            color: _leftMenuTextColor(menuColor),
+            fontWeight: FontWeight.bold,
+            fontSize: 13),
       ),
     );
   }
@@ -383,8 +407,9 @@ class MyWidget {
   static Widget mobileLeftMenuStart(Color selectedMenuColor, String content) {
     return Container(
       alignment: Alignment.center,
-      width: 150,
-      height: 40,
+      width: 210,
+      constraints: BoxConstraints(minHeight: 40),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
             topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
@@ -393,7 +418,10 @@ class MyWidget {
       child: Text(
         content,
         textAlign: TextAlign.center,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        style: TextStyle(
+            color: _leftMenuTextColor(selectedMenuColor),
+            fontWeight: FontWeight.bold,
+            fontSize: 12),
       ),
     );
   }
@@ -402,11 +430,16 @@ class MyWidget {
     return Container(
       color: menuColor,
       alignment: Alignment.center,
-      width: 150,
-      height: 40,
+      width: 210,
+      constraints: BoxConstraints(minHeight: 40),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: Text(
         menuContent,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            color: _leftMenuTextColor(menuColor),
+            fontWeight: FontWeight.bold,
+            fontSize: 12),
       ),
     );
   }
@@ -414,15 +447,20 @@ class MyWidget {
   static Widget mobileLeftMenuEnd(Color menuColor, String content) {
     return Container(
       alignment: Alignment.center,
-      width: 150,
-      height: 40,
+      width: 210,
+      constraints: BoxConstraints(minHeight: 40),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
               topRight: Radius.circular(10), bottomRight: Radius.circular(10)),
           color: menuColor),
       child: Text(
         content,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            color: _leftMenuTextColor(menuColor),
+            fontWeight: FontWeight.bold,
+            fontSize: 12),
       ),
     );
   }

@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/Notice.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/NoticeService.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
@@ -22,12 +25,18 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
   Notice? _notice;
   bool _isLoading = true;
   bool _isAdmin = false;
+  StreamSubscription? _roleSub;
 
   @override
   void initState() {
     super.initState();
     _loadNotice();
-    _checkAdminStatus();
+    _roleSub = AuthService.listenRole((role) {
+      if (!mounted) return;
+      setState(() {
+        _isAdmin = role == AdminRole.owner;
+      });
+    });
   }
 
   Future<void> _loadNotice() async {
@@ -57,11 +66,10 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
     }
   }
 
-  Future<void> _checkAdminStatus() async {
-    bool isAdmin = await AuthService.isAdmin();
-    setState(() {
-      _isAdmin = isAdmin;
-    });
+  @override
+  void dispose() {
+    _roleSub?.cancel();
+    super.dispose();
   }
 
   @override
@@ -71,19 +79,19 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
     double width = size.width;
 
     if (width > 768) {
-      return WebSchoolLayout(content: _buildScrollView());
+      return WebSchoolLayout(content: _buildScrollView(includeFooter: true));
     } else {
-      return MobileSchoolLayout(content: _buildScrollView());
+      return MobileSchoolLayout(content: _buildScrollView(includeFooter: false));
     }
   }
 
-  Widget _buildScrollView() {
+  Widget _buildScrollView({required bool includeFooter}) {
     return SingleChildScrollView(
       child: Column(
         children: [
           _buildMainImage(),
           _buildContentGroup(),
-          MyWidget.footer(),
+          if (includeFooter) MyWidget.footer(),
         ],
       ),
     );
@@ -94,7 +102,7 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/communityMainImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.community),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(

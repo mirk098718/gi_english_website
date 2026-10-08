@@ -15,16 +15,37 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta name="description" content="Gleam">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="gi_english_website">
+  <meta name="apple-mobile-web-app-title" content="Gleam">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
-  <title>gi_english_website</title>
+  <title>Gleam</title>
   <link rel="manifest" href="manifest.json">
+  <!-- 토스페이먼츠 결제창 SDK -->
+  <script src="https://js.tosspayments.com/v2/standard"></script>
+  <script>
+    // Flutter(Web)에서 호출하는 토스 결제창 진입점
+    window.gleamTossPay = async function (opts) {
+      const tossPayments = TossPayments(opts.clientKey);
+      const payment = tossPayments.payment({ customerKey: opts.customerKey });
+      await payment.requestPayment({
+        method: "CARD",
+        amount: { currency: "KRW", value: opts.amount },
+        orderId: opts.orderId,
+        orderName: opts.orderName,
+        successUrl: opts.successUrl,
+        failUrl: opts.failUrl,
+        customerEmail: opts.customerEmail || undefined,
+        customerName: opts.customerName || undefined,
+      });
+    };
+  </script>
   <!-- 모바일에서 Flutter 스크롤이 정상 동작하도록 뷰포트 고정 -->
   <style>
     html, body { height: 100%; margin: 0; overflow: hidden; position: fixed; width: 100%; }

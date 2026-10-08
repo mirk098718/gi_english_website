@@ -1,11 +1,11 @@
 {
-    "name": "gi_english_website",
-    "short_name": "gi_english_website",
+    "name": "Gleam",
+    "short_name": "Gleam",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Gleam",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

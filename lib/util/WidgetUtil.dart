@@ -10,6 +10,19 @@ class WidgetUtil {
       (margin: EdgeInsets.only(top: 5, bottom: 5), height: 1,width: double.infinity,color: Palette.black,);
   }
 
+  /// 페이지 폭에 맞춰 줄어드는 이미지. 가로 스크롤을 만들지 않는다.
+  static Widget pageImage(String asset, {double maxWidth = 700}) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: Image.asset(
+        asset,
+        width: double.infinity,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
+      ),
+    );
+  }
+
   static Widget withLabel(String label, Widget widget,
       {bool useExpanded = false}) {
     return Row(

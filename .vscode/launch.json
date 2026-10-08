@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "GI English (Chrome)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "chrome",
+      "toolArgs": [
+        "--web-port=7357",
+        "--web-hostname=127.0.0.1",
+        "--pid-file=.dart_tool/flutter_chrome.pid"
+      ]
+    }
+  ]
+}

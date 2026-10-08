@@ -1,14 +1,18 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/FAQ.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/FAQService.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 // ignore: deprecated_member_use
-import 'dart:html' as html;
-import 'dart:ui_web' as ui;
+import 'package:gi_english_website/util/html_stub.dart'
+    if (dart.library.html) 'dart:html' as html;
+import 'package:gi_english_website/util/ui_web_stub.dart'
+    if (dart.library.html) 'dart:ui_web' as ui;
 
 class AdminFAQWritePage extends StatefulWidget {
   final FAQ? faq; // 수정 모드일 때 사용
@@ -64,23 +68,26 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
       _isImportant = widget.faq!.isImportant;
 
       // HTML input에도 값 설정 (약간의 지연 후)
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          questionInput.value = questionValue;
-          answerInput.value = answerValue;
-          categoryInput.value = categoryValue;
-        }
-      });
+      if (kIsWeb) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            questionInput.value = questionValue;
+            answerInput.value = answerValue;
+            categoryInput.value = categoryValue;
+          }
+        });
+      }
     } else {
       _categoryController.text = '일반';
       categoryValue = '일반';
-      
-      // HTML input에도 값 설정 (약간의 지연 후)
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          categoryInput.value = categoryValue;
-        }
-      });
+
+      if (kIsWeb) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            categoryInput.value = categoryValue;
+          }
+        });
+      }
     }
   }
 
@@ -285,19 +292,19 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
     double width = size.width;
 
     if (width > 768) {
-      return WebSchoolLayout(content: _buildScrollView());
+      return WebSchoolLayout(content: _buildScrollView(includeFooter: true));
     } else {
-      return MobileSchoolLayout(content: _buildScrollView());
+      return MobileSchoolLayout(content: _buildScrollView(includeFooter: false));
     }
   }
 
-  Widget _buildScrollView() {
+  Widget _buildScrollView({required bool includeFooter}) {
     return SingleChildScrollView(
       child: Column(
         children: [
           _buildMainImage(),
           _buildContentGroup(),
-          MyWidget.footer(),
+          if (includeFooter) MyWidget.footer(),
         ],
       ),
     );
@@ -308,7 +315,7 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/communityMainImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.community),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -328,7 +335,7 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.black,
+                      backgroundColor: Palette.navy,
                       foregroundColor: Palette.black,
                     ),
                     onPressed: () {
@@ -369,7 +376,7 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
           Container(
             height: 2,
             width: 100,
-            color: Palette.primary,
+            color: Palette.darkTeal,
           ),
           SizedBox(height: 40),
           _buildForm(),
@@ -399,7 +406,16 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
             ),
-            child: HtmlElementView(viewType: categoryViewType),
+            child: kIsWeb
+                ? HtmlElementView(viewType: categoryViewType)
+                : TextField(
+                    controller: _categoryController,
+                    onChanged: (value) => categoryValue = value,
+                    decoration: InputDecoration(
+                      hintText: '카테고리를 입력하세요 (예: 일반, 수업, 교재)',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
           ),
           SizedBox(height: 24),
 
@@ -418,7 +434,16 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
             ),
-            child: HtmlElementView(viewType: questionViewType),
+            child: kIsWeb
+                ? HtmlElementView(viewType: questionViewType)
+                : TextField(
+                    controller: _questionController,
+                    onChanged: (value) => questionValue = value,
+                    decoration: InputDecoration(
+                      hintText: '자주 묻는 질문을 입력하세요',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
           ),
           SizedBox(height: 24),
 
@@ -432,7 +457,7 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
                     _isImportant = value ?? false;
                   });
                 },
-                activeColor: Palette.primary,
+                activeColor: Palette.darkTeal,
               ),
               Text(
                 "중요한 FAQ",
@@ -461,7 +486,19 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
             ),
-            child: HtmlElementView(viewType: answerViewType),
+            child: kIsWeb
+                ? HtmlElementView(viewType: answerViewType)
+                : TextField(
+                    controller: _answerController,
+                    maxLines: null,
+                    expands: true,
+                    textAlignVertical: TextAlignVertical.top,
+                    onChanged: (value) => answerValue = value,
+                    decoration: InputDecoration(
+                      hintText: '답변을 입력하세요',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
           ),
           SizedBox(height: 40),
 
@@ -504,7 +541,7 @@ class _AdminFAQWritePageState extends State<AdminFAQWritePage> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _saveFAQ,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
+                    backgroundColor: Palette.darkTeal,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),

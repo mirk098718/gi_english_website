@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/widget/GleamMark.dart';
 import 'Palette.dart';
 
 class ModernWidgets {
@@ -326,24 +327,37 @@ class ModernWidgets {
   // 현대적인 푸터
   static Widget modernFooter() {
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Palette.secondaryDark, Color(0xFF022C22)],
-        ),
-      ),
-      padding: EdgeInsets.all(24),
+      width: double.infinity,
+      color: Palette.grey900,
+      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Container(
+            width: 32,
+            height: 2,
+            color: Palette.secondary,
+            margin: EdgeInsets.only(bottom: 20),
+          ),
+          GleamMark(height: 36, lightPlate: true),
+          SizedBox(height: 16),
           Text(
-            "Gi Gleam Island 어학원 파주",
+            "글림교육",
             style: TextStyle(
               color: Palette.white,
               fontFamily: "NotoSansKR",
-              fontWeight: FontWeight.w700,
-              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
+          ),
+          SizedBox(height: 4),
+          Text(
+            "Gleam Education",
+            style: TextStyle(
+              color: Palette.grey400,
+              fontFamily: "NotoSansKR",
+              fontWeight: FontWeight.w500,
+              fontSize: 13,
             ),
           ),
           SizedBox(height: 12),
@@ -353,21 +367,17 @@ class ModernWidgets {
             "email : gienglish.paju@gmail.com\n"
             "사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희",
             style: TextStyle(
-              color: Palette.grey300,
+              color: Palette.grey400,
               fontFamily: "NotoSansKR",
-              fontSize: 14,
-              height: 1.5,
+              fontSize: 13,
+              height: 1.7,
             ),
           ),
-          SizedBox(height: 16),
-          modernDivider(
-            color: Palette.white.withValues(alpha:0.3),
-            margin: EdgeInsets.symmetric(vertical: 8),
-          ),
+          SizedBox(height: 24),
           Text(
-            "Copyright ⓒ 글림아일랜드어학원",
+            "Copyright ⓒ 글림교육",
             style: TextStyle(
-              color: Palette.grey400,
+              color: Palette.grey500,
               fontFamily: "NotoSansKR",
               fontSize: 12,
             ),
@@ -381,24 +391,31 @@ class ModernWidgets {
   static Widget modernMobileFooter() {
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Palette.secondaryDark, Color(0xFF022C22)],
-        ),
-      ),
-      padding: EdgeInsets.all(20),
+      color: Palette.grey900,
+      padding: EdgeInsets.all(28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          GleamMark(height: 32, lightPlate: true),
+          SizedBox(height: 16),
           Text(
-            "Gi Gleam Island 어학원 파주",
+            "글림교육",
             style: TextStyle(
               color: Palette.white,
               fontFamily: "NotoSansKR",
               fontWeight: FontWeight.w700,
               fontSize: 16,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 4),
+          Text(
+            "Gleam Education",
+            style: TextStyle(
+              color: Palette.grey400,
+              fontFamily: "NotoSansKR",
+              fontWeight: FontWeight.w500,
+              fontSize: 13,
             ),
             textAlign: TextAlign.center,
           ),
@@ -414,7 +431,7 @@ class ModernWidgets {
           ),
           SizedBox(height: 8),
           Text(
-            "ⓒ 글림아일랜드교육",
+            "ⓒ 글림교육",
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Palette.grey400,

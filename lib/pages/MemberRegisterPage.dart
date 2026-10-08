@@ -1,0 +1,299 @@
+import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:gi_english_website/pages/MemberLoginPage.dart';
+import 'package:gi_english_website/pages/SchoolOnlineClassroomPage.dart';
+import 'package:gi_english_website/util/AuthService.dart';
+import 'package:gi_english_website/util/MenuUtil.dart';
+import 'package:gi_english_website/util/MyWidget.dart';
+import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/util/PhoneUtil.dart';
+import 'package:gi_english_website/util/ProfilePhotoPicker.dart';
+import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/ProfileAvatar.dart';
+import 'package:gi_english_website/widget/WebSchoolLayout.dart';
+
+import '../util/WidgetUtil.dart';
+
+class MemberRegisterPage extends StatefulWidget {
+  const MemberRegisterPage({Key? key}) : super(key: key);
+
+  @override
+  _MemberRegisterPageState createState() => _MemberRegisterPageState();
+}
+
+class _MemberRegisterPageState extends State<MemberRegisterPage> {
+  final nameController = TextEditingController();
+  final nicknameController = TextEditingController();
+  final emailController = TextEditingController();
+  final phoneController = TextEditingController();
+  final passwordController = TextEditingController();
+  final passwordConfirmController = TextEditingController();
+  Uint8List? _photo;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    nicknameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    passwordController.dispose();
+    passwordConfirmController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    if (width > 768) {
+      return WebSchoolLayout(content: scrollView());
+    }
+    return MobileSchoolLayout(content: mobileScrollView());
+  }
+
+  Widget scrollView() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          content(),
+          MyWidget.footer(),
+        ],
+      ),
+    );
+  }
+
+  Widget mobileScrollView() {
+    return SingleChildScrollView(
+      child: Container(
+        color: Palette.white,
+        child: Column(
+          children: [
+            content(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _register() async {
+    final name = nameController.text.trim();
+    final nickname = nicknameController.text.trim();
+    final email = emailController.text.trim();
+    final phone = phoneController.text.trim();
+    final password = passwordController.text;
+    final passwordConfirm = passwordConfirmController.text;
+
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+      _showMessage('이름, 이메일, 비밀번호는 필수입니다.', isError: true);
+      return;
+    }
+    final nicknameError = AuthService.validateNickname(nickname);
+    if (nicknameError != null) {
+      _showMessage(nicknameError, isError: true);
+      return;
+    }
+    final phoneError = PhoneUtil.validate(phone);
+    if (phoneError != null) {
+      _showMessage(phoneError, isError: true);
+      return;
+    }
+    if (password.length < 6) {
+      _showMessage('비밀번호는 6자 이상으로 입력해주세요.', isError: true);
+      return;
+    }
+    if (password != passwordConfirm) {
+      _showMessage('비밀번호 확인이 일치하지 않습니다.', isError: true);
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final error = await AuthService.registerMember(
+      email: email,
+      password: password,
+      name: name,
+      nickname: nickname,
+      phone: phone,
+      photoBytes: _photo,
+      photoFileName: _photo == null ? null : 'photo.jpg',
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (error != null) {
+      _showMessage(error, isError: true);
+      return;
+    }
+
+    _showMessage('회원가입이 완료되었습니다.');
+    MenuUtil.push(context, SchoolOnlineClassroomPage());
+  }
+
+  void _showMessage(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
+        backgroundColor: isError ? Palette.danger : Palette.success,
+      ),
+    );
+  }
+
+  Widget content() {
+    return Container(
+      width: double.maxFinite,
+      padding: EdgeInsets.all(20),
+      color: Palette.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "회원가입",
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
+          ),
+          WidgetUtil.myDivider(),
+          SizedBox(height: 20),
+          Center(
+            child: Container(
+              width: 420,
+              padding: EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Palette.surfaceVariant,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Palette.grey200),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    "온라인 프로그램 회원 가입",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: "Jalnan",
+                      fontSize: 15,
+                      color: Palette.navy,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "가입 후 관리자 수강 배정이 완료되면 내 강의실에서 프로그램을 이용하실 수 있습니다. "
+                    "로그인은 이메일을 쓰고, 수업에서는 닉네임과 프로필 사진이 보입니다. "
+                    "휴대폰 번호는 화상수업 예약이 확정되면 알림 문자를 보내는 데 사용합니다.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: "NotoSansKR",
+                      fontSize: 13,
+                      color: Palette.grey600,
+                      height: 1.5,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Center(
+                    child: Column(
+                      children: [
+                        ProfileAvatar(
+                          bytes: _photo,
+                          label: nicknameController.text.trim().isNotEmpty
+                              ? nicknameController.text
+                              : nameController.text,
+                          size: 88,
+                        ),
+                        SizedBox(height: 10),
+                        OutlinedButton.icon(
+                          onPressed: _isLoading
+                              ? null
+                              : () async {
+                                  final cropped =
+                                      await ProfilePhotoPicker.pickAndCrop(
+                                    context,
+                                    onError: (message) =>
+                                        _showMessage(message, isError: true),
+                                  );
+                                  if (!mounted ||
+                                      cropped == null ||
+                                      cropped.isEmpty) {
+                                    return;
+                                  }
+                                  setState(() => _photo = cropped);
+                                },
+                          icon: Icon(Icons.photo_camera_outlined, size: 18),
+                          label: Text(
+                            _photo == null ? '프로필 사진 넣기' : '사진 다시 선택',
+                            style: TextStyle(fontFamily: "NotoSansKR"),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  MyWidget.roundEdgeTextField("이름", nameController,
+                      autofocus: true),
+                  MyWidget.roundEdgeTextField(
+                      "닉네임 (선택, 수업에서 보일 이름)", nicknameController),
+                  MyWidget.roundEdgeTextField("이메일", emailController),
+                  MyWidget.roundEdgeTextField("휴대폰 번호 (필수)", phoneController),
+                  MyWidget.roundEdgeTextField("비밀번호 (6자 이상)", passwordController,
+                      obscureText: true),
+                  MyWidget.roundEdgeTextField(
+                      "비밀번호 확인", passwordConfirmController,
+                      obscureText: true),
+                  SizedBox(height: 4),
+                  SizedBox(
+                    height: 48,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Palette.darkTeal,
+                        foregroundColor: Palette.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: _isLoading ? null : _register,
+                      child: _isLoading
+                          ? SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Palette.white,
+                              ),
+                            )
+                          : Text(
+                              "가입하기",
+                              style: TextStyle(
+                                fontFamily: "Jalnan",
+                                color: Palette.white,
+                                fontSize: 15,
+                              ),
+                            ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      MenuUtil.push(context, MemberLoginPage());
+                    },
+                    child: Text(
+                      "이미 회원이신가요? 로그인",
+                      style: TextStyle(
+                        fontFamily: "NotoSansKR",
+                        fontSize: 13,
+                        color: Palette.darkTeal,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 40),
+        ],
+      ),
+    );
+  }
+}

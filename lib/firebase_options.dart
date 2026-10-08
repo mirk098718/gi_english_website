@@ -21,15 +21,9 @@ class DefaultFirebaseOptions {
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for android - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -51,6 +45,23 @@ class DefaultFirebaseOptions {
         );
     }
   }
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyD9VDdOypqrgiOBRkHcax3y8vnBPwCjuN8',
+    appId: '1:129043838101:android:5453270417bb2e6b03979c',
+    messagingSenderId: '129043838101',
+    projectId: 'gleam-island',
+    storageBucket: 'gleam-island.appspot.com',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyDbT0BPHztQdAqWpQli5EzaWtIQeKtLt1A',
+    appId: '1:129043838101:ios:d369afe0261f2d3203979c',
+    messagingSenderId: '129043838101',
+    projectId: 'gleam-island',
+    storageBucket: 'gleam-island.appspot.com',
+    iosBundleId: 'com.gleam.app',
+  );
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyC8nWDyhU0EeZH1LB3hGlya9cbGKOOohBQ',
