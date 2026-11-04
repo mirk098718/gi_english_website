@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // class Human {
@@ -27,10 +28,20 @@ class UrlUtil {
     return trimmed;
   }
 
+  /// 사이트 안 경로(/quizzes/...)는 웹에서는 현재 주소, 앱에서는 호스팅 주소로 연다.
+  static Uri resolveLaunchUri(String url) {
+    final normalized = normalizeVideoUrl(url);
+    final uri = Uri.parse(normalized);
+    if (uri.hasScheme) return uri;
+    final path = normalized.startsWith('/') ? normalized : '/$normalized';
+    if (kIsWeb) return Uri.base.resolve(path);
+    return Uri.parse('https://gleam-island.web.app$path');
+  }
+
   static Future<void> open(String url) async {
     final normalized = normalizeVideoUrl(url);
     if (normalized.isEmpty) return;
-    final uri = Uri.parse(normalized);
+    final uri = resolveLaunchUri(normalized);
     try {
       final launched = await launchUrl(
         uri,

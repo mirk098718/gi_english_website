@@ -100,6 +100,8 @@ class EnrollmentService {
       order: 1,
       title: '1강',
       videoUrl: 'https://youtu.be/UMTr9cXimZM',
+      problemTitle: '1강 연습문제',
+      problemUrl: '/quizzes/gleam-level1-lesson1-quiz.html',
     ),
     CatalogLesson(
       order: 2,
@@ -161,9 +163,7 @@ class EnrollmentService {
         title: catalog.title,
         description: '왕초보 ${catalog.title} 인강을 시청한 뒤 체크리스트를 확인하세요.',
         videoUrl: catalog.videoUrl,
-        problemLinks: const [
-          WeekProblemLink(title: '리뷰 및 문제풀이', url: ''),
-        ],
+        problemLinks: _catalogProblemLinks(catalog),
         checklistItems: const [
           WeekChecklistItem(id: 'watch_video', label: '인강 시청하기'),
           WeekChecklistItem(id: 'solve_problems', label: '문제풀이 하기'),
@@ -203,7 +203,22 @@ class EnrollmentService {
     );
   }
 
+  static List<WeekProblemLink> _catalogProblemLinks(CatalogLesson catalog) {
+    if (catalog.problemUrl.trim().isEmpty) {
+      return const [
+        WeekProblemLink(title: '리뷰 및 문제풀이', url: ''),
+      ];
+    }
+    return [
+      WeekProblemLink(
+        title: catalog.problemTitle,
+        url: catalog.problemUrl,
+      ),
+    ];
+  }
+
   /// 저장된 회차에 영상이 없거나 임시 영상이면 과정 기본 인강으로 채운다.
+  /// 연습문제 링크가 비어 있으면 과정에 등록된 문제 페이지를 붙인다.
   static OnlineWeek withCatalogVideo(OnlineWeek week) {
     final catalog = catalogLesson(week.courseId, week.weekNumber);
     if (catalog == null) return week;
@@ -211,7 +226,9 @@ class EnrollmentService {
     final placeholder = url.isEmpty ||
         url == defaultWeek1VideoUrl ||
         url == UrlUtil.normalizeVideoUrl(defaultWeek1VideoUrl);
-    if (!placeholder) return week;
+    final hasProblem = week.problemLinks.any((link) => link.url.trim().isNotEmpty);
+    final fillProblem = !hasProblem && catalog.problemUrl.trim().isNotEmpty;
+    if (!placeholder && !fillProblem) return week;
     final placeholderTitle = week.title.trim().isEmpty ||
         week.title == '1회차 인강: 관사의 쓰임' ||
         week.title == '${week.weekNumber}회차 학습';
@@ -219,12 +236,12 @@ class EnrollmentService {
       id: week.id,
       courseId: week.courseId,
       weekNumber: week.weekNumber,
-      title: placeholderTitle ? catalog.title : week.title,
+      title: placeholder && placeholderTitle ? catalog.title : week.title,
       description: week.description.trim().isEmpty
           ? '왕초보 ${catalog.title} 인강을 시청한 뒤 체크리스트를 확인하세요.'
           : week.description,
-      videoUrl: catalog.videoUrl,
-      problemLinks: week.problemLinks,
+      videoUrl: placeholder ? catalog.videoUrl : week.videoUrl,
+      problemLinks: fillProblem ? _catalogProblemLinks(catalog) : week.problemLinks,
       checklistItems: week.checklistItems.isEmpty
           ? const [
               WeekChecklistItem(id: 'watch_video', label: '인강 시청하기'),
@@ -2716,11 +2733,15 @@ class CatalogLesson {
   final int order;
   final String title;
   final String videoUrl;
+  final String problemTitle;
+  final String problemUrl;
 
   const CatalogLesson({
     required this.order,
     required this.title,
     required this.videoUrl,
+    this.problemTitle = '리뷰 및 문제풀이',
+    this.problemUrl = '',
   });
 }
 
