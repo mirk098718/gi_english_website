@@ -89,6 +89,37 @@ void main() {
     );
   });
 
+  test('중급 회화 1강은 재생 목록 없이 영상만 연결한다', () {
+    final week =
+        EnrollmentService.defaultWeek('intermediate_grammar_speaking', 1);
+
+    expect(week.title, '1강');
+    expect(week.videoUrl, 'https://youtu.be/Wnp7FbT_AZ0');
+    expect(week.description, '중급 1강 인강을 시청한 뒤 체크리스트를 확인하세요.');
+    expect(
+      UrlUtil.playerUrl(
+        'https://www.youtube.com/watch?v=Wnp7FbT_AZ0&list=PLeelS27LkLHE',
+      ),
+      'https://www.youtube-nocookie.com/embed/Wnp7FbT_AZ0?rel=0&playsinline=1',
+    );
+    expect(
+      UrlUtil.playerUrl(week.videoUrl),
+      'https://www.youtube-nocookie.com/embed/Wnp7FbT_AZ0?rel=0&playsinline=1',
+    );
+
+    final stored = OnlineWeek(
+      id: 'intermediate_grammar_speaking_week_1',
+      courseId: 'intermediate_grammar_speaking',
+      weekNumber: 1,
+      title: '1회차 인강: 관사의 쓰임',
+      description: '',
+      videoUrl: EnrollmentService.defaultWeek1VideoUrl,
+    );
+    final filled = EnrollmentService.withCatalogVideo(stored);
+    expect(filled.title, '1강');
+    expect(filled.videoUrl, 'https://youtu.be/Wnp7FbT_AZ0');
+  });
+
   test('다른 과정 1회차는 기존 임시 인강을 유지한다', () {
     final week = EnrollmentService.defaultWeek('basic_grammar_speaking', 1);
     expect(week.videoUrl, EnrollmentService.defaultWeek1VideoUrl);

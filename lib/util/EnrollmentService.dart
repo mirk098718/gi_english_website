@@ -93,6 +93,7 @@ class EnrollmentService {
   static const String defaultWeek1VideoUrl = 'https://youtu.be/C4Dr_beoGoc';
 
   static const String beginnerCourseId = 'beginner_phonics';
+  static const String intermediateCourseId = 'intermediate_grammar_speaking';
 
   /// 왕초보 과정에 연결된 인강. 회차 번호와 강의 순서가 같다.
   static const List<CatalogLesson> beginnerLessons = [
@@ -124,12 +125,38 @@ class EnrollmentService {
     ),
   ];
 
+  /// 성인 중급영어(중급 회화) 과정에 연결된 인강.
+  static const List<CatalogLesson> intermediateLessons = [
+    CatalogLesson(
+      order: 1,
+      title: '1강',
+      videoUrl: 'https://youtu.be/Wnp7FbT_AZ0',
+    ),
+  ];
+
+  static List<CatalogLesson> catalogLessons(String courseId) {
+    if (courseId == beginnerCourseId) return beginnerLessons;
+    if (courseId == intermediateCourseId) return intermediateLessons;
+    return const [];
+  }
+
   static CatalogLesson? catalogLesson(String courseId, int order) {
-    if (courseId != beginnerCourseId) return null;
-    for (final lesson in beginnerLessons) {
+    for (final lesson in catalogLessons(courseId)) {
       if (lesson.order == order) return lesson;
     }
     return null;
+  }
+
+  static String catalogLevelLabel(String courseId) {
+    if (courseId == beginnerCourseId) return '왕초보';
+    if (courseId == intermediateCourseId) return '중급';
+    return '';
+  }
+
+  static String _catalogWeekDescription(String courseId, String title) {
+    final level = catalogLevelLabel(courseId);
+    final prefix = level.isEmpty ? '' : '$level ';
+    return '$prefix$title 인강을 시청한 뒤 체크리스트를 확인하세요.';
   }
 
   static String defaultWeekId(String courseId, int weekNumber) =>
@@ -170,7 +197,7 @@ class EnrollmentService {
         courseId: courseId,
         weekNumber: weekNumber,
         title: catalog.title,
-        description: '왕초보 ${catalog.title} 인강을 시청한 뒤 체크리스트를 확인하세요.',
+        description: _catalogWeekDescription(courseId, catalog.title),
         videoUrl: catalog.videoUrl,
         problemLinks: _catalogProblemLinks(catalog),
         checklistItems: const [
@@ -247,7 +274,7 @@ class EnrollmentService {
       weekNumber: week.weekNumber,
       title: placeholder && placeholderTitle ? catalog.title : week.title,
       description: week.description.trim().isEmpty
-          ? '왕초보 ${catalog.title} 인강을 시청한 뒤 체크리스트를 확인하세요.'
+          ? _catalogWeekDescription(week.courseId, catalog.title)
           : week.description,
       videoUrl: placeholder ? catalog.videoUrl : week.videoUrl,
       problemLinks: fillProblem ? _catalogProblemLinks(catalog) : week.problemLinks,
@@ -370,20 +397,19 @@ class EnrollmentService {
     String courseId,
     List<OnlineLesson> lessons,
   ) {
-    if (courseId == beginnerCourseId) {
-      for (final item in beginnerLessons) {
-        final saved = lessons.any((lesson) =>
-            lesson.order == item.order ||
-            UrlUtil.normalizeVideoUrl(lesson.videoUrl) == item.videoUrl);
-        if (saved) continue;
-        lessons.add(OnlineLesson(
-          id: defaultWeekId(courseId, item.order),
-          title: item.title,
-          description: '왕초보 ${item.title}',
-          videoUrl: item.videoUrl,
-          order: item.order,
-        ));
-      }
+    final level = catalogLevelLabel(courseId);
+    for (final item in catalogLessons(courseId)) {
+      final saved = lessons.any((lesson) =>
+          lesson.order == item.order ||
+          UrlUtil.normalizeVideoUrl(lesson.videoUrl) == item.videoUrl);
+      if (saved) continue;
+      lessons.add(OnlineLesson(
+        id: defaultWeekId(courseId, item.order),
+        title: item.title,
+        description: level.isEmpty ? item.title : '$level ${item.title}',
+        videoUrl: item.videoUrl,
+        order: item.order,
+      ));
     }
     lessons.sort((a, b) => a.order.compareTo(b.order));
     return lessons;
@@ -1381,9 +1407,8 @@ class EnrollmentService {
           .map(withCatalogVideo)
           .toList();
       var through = ensureThrough < 1 ? 1 : ensureThrough;
-      if (courseId == beginnerCourseId && beginnerLessons.length > through) {
-        through = beginnerLessons.length;
-      }
+      final catalogCount = catalogLessons(courseId).length;
+      if (catalogCount > through) through = catalogCount;
       for (var n = 1; n <= through; n++) {
         if (!weeks.any((week) => week.weekNumber == n)) {
           weeks.add(defaultWeek(courseId, n));
