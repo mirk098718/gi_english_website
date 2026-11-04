@@ -23,6 +23,7 @@ body{
   font-family:var(--sans); color:var(--ink); background:var(--bg);
   background-image:radial-gradient(#e2d3b8 1px, transparent 1px);
   background-size:22px 22px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  word-break:keep-all; overflow-wrap:break-word; /* 한글은 단어 단위로만 줄바꿈 */
 }
 .en{font-family:var(--serif); letter-spacing:.01em}
 .wrap{max-width:880px; margin:0 auto; padding:0 18px}
@@ -31,7 +32,7 @@ body{
 .topbar{position:sticky; top:0; z-index:50; background:rgba(244,236,221,.92); backdrop-filter:blur(8px); border-bottom:1.5px solid var(--line)}
 .topbar .wrap{display:flex; align-items:center; gap:10px; justify-content:space-between; padding-top:10px; padding-bottom:10px; flex-wrap:wrap}
 .brand{font-family:var(--disp); font-size:1.02rem; color:var(--coffee); letter-spacing:.02em; display:flex; align-items:center; gap:6px}
-.brand small{font-family:var(--sans); font-weight:700; color:var(--sub); font-size:.72rem; border:1.5px solid var(--line); border-radius:999px; padding:2px 8px; background:var(--card)}
+.brand small{white-space:nowrap; font-family:var(--sans); font-weight:700; color:var(--sub); font-size:.72rem; border:1.5px solid var(--line); border-radius:999px; padding:2px 8px; background:var(--card)}
 .scores{display:flex; gap:8px; align-items:center; font-weight:800; font-size:.8rem}
 .scores .chip{background:var(--card); border:1.5px solid var(--line); border-radius:999px; padding:4px 12px; color:var(--sub); white-space:nowrap}
 .scores .chip b{color:var(--coffee)}
@@ -39,7 +40,7 @@ body{
 
 /* ── 히어로 ─────────────────────────── */
 .hero{padding:44px 0 10px; text-align:center}
-.lg-badge{display:inline-block; background:var(--coffee); color:#f8ecdb; font-weight:800; font-size:.78rem; letter-spacing:.14em; border-radius:999px; padding:5px 16px}
+.lg-badge{display:inline-block; white-space:nowrap; background:var(--coffee); color:#f8ecdb; font-weight:800; font-size:.78rem; letter-spacing:.14em; border-radius:999px; padding:5px 16px}
 .hero h1{font-family:var(--disp); font-weight:400; font-size:clamp(1.7rem,5vw,2.6rem); line-height:1.28; margin:16px 0 6px; color:var(--ink)}
 .hero h1 .u{color:var(--caramel-deep); background:linear-gradient(transparent 68%, var(--caramel-soft) 68%)}
 .hero p.sub{color:var(--sub); font-weight:600; font-size:.95rem}
@@ -47,7 +48,7 @@ body{
 /* 어순 공식 티켓 (시그니처) */
 .formula{display:flex; align-items:stretch; justify-content:center; gap:0; margin:30px auto 8px; flex-wrap:wrap; max-width:640px}
 .f-chip{flex:1 1 150px; min-width:140px; background:var(--card); border:2px solid var(--ink); border-radius:16px; padding:14px 12px 12px; position:relative; box-shadow:4px 4px 0 rgba(122,74,38,.22); text-align:center}
-.f-chip .role{position:absolute; top:-12px; left:50%; transform:translateX(-50%); font-size:.68rem; font-weight:900; letter-spacing:.1em; color:#fff; background:var(--coffee); border-radius:999px; padding:2px 12px}
+.f-chip .role{position:absolute; top:-12px; left:50%; transform:translateX(-50%); font-size:.68rem; font-weight:900; letter-spacing:.08em; color:#fff; background:var(--coffee); border-radius:999px; padding:2px 11px; white-space:nowrap; max-width:none}
 .f-chip:nth-child(3) .role{background:var(--caramel-deep)}
 .f-chip:nth-child(5) .role{background:#3e7d54}
 .f-chip .en-big{font-family:var(--serif); font-size:1.55rem; font-weight:700; display:block; margin-top:6px}
@@ -71,14 +72,14 @@ body{
 section.block{padding:34px 0 6px}
 .sec-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:6px}
 .sec-head h2{font-family:var(--disp); font-weight:400; font-size:1.45rem; color:var(--coffee)}
-.sec-head .count{font-weight:900; color:var(--caramel-deep); font-size:.9rem; background:var(--caramel-soft); border-radius:999px; padding:3px 14px}
+.sec-head .count{font-weight:900; color:var(--caramel-deep); font-size:.9rem; background:var(--caramel-soft); border-radius:999px; padding:3px 14px; white-space:nowrap}
 .sec-desc{color:var(--sub); font-size:.88rem; font-weight:600; margin-bottom:20px}
 
 /* ── 문제 카드 ──────────────────────── */
 .q-card{background:var(--card); border:1.5px solid var(--line); border-radius:18px; padding:20px 20px 18px; margin-bottom:18px; box-shadow:0 2px 10px rgba(122,74,38,.06)}
 .q-top{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px}
-.stamp{font-family:var(--disp); font-size:.95rem; color:var(--coffee); border:2px solid var(--coffee); border-radius:8px; padding:1px 9px; transform:rotate(-3deg); letter-spacing:.05em; flex:none}
-.tchip{font-size:.72rem; font-weight:900; letter-spacing:.04em; border-radius:999px; padding:4px 12px}
+.stamp{font-family:var(--disp); font-size:.95rem; color:var(--coffee); border:2px solid var(--coffee); border-radius:8px; padding:1px 9px; transform:rotate(-3deg); letter-spacing:.05em; flex:none; white-space:nowrap}
+.tchip{font-size:.72rem; font-weight:900; letter-spacing:.04em; border-radius:999px; padding:4px 12px; white-space:nowrap}
 .tc-concept{background:#f2e3c8; color:#8a5a1f}
 .tc-blank{background:#e3edf6; color:#2e5e83}
 .tc-wrong{background:#f9e0dc; color:#a3403a}
@@ -90,7 +91,7 @@ section.block{padding:34px 0 6px}
 .tc-correct{background:#e2ecdf; color:#3c6b2f}
 .tc-vocab{background:#eceae7; color:#5f5346}
 .tc-write{background:#f8e7c8; color:#a9620f}
-.multi-note{font-size:.74rem; color:var(--caramel-deep); font-weight:800; background:var(--caramel-soft); border-radius:999px; padding:3px 10px}
+.multi-note{font-size:.74rem; color:var(--caramel-deep); font-weight:800; background:var(--caramel-soft); border-radius:999px; padding:3px 10px; white-space:nowrap}
 .q-text{font-size:1.02rem; font-weight:700; margin-bottom:14px}
 .q-text .q-en{font-family:var(--serif); color:var(--coffee)}
 .opts{display:grid; gap:9px}
@@ -103,8 +104,12 @@ section.block{padding:34px 0 6px}
 .opt.sel .box{background:var(--caramel-deep); border-color:var(--caramel-deep); color:#fff}
 .opt.right{border-color:var(--ok); background:var(--ok-bg)}
 .opt.right .box{background:var(--ok); border-color:var(--ok); color:#fff}
+.opt.right .mark{color:var(--ok)}
+.opt.right .mark::after{content:" ✓"; color:var(--ok); font-weight:900}
 .opt.miss{border-color:var(--no); background:var(--no-bg)}
 .opt.miss .box{background:var(--no); border-color:var(--no); color:#fff}
+.opt.miss .mark{color:var(--no)}
+.opt.miss .mark::after{content:" ✗"; color:var(--no); font-weight:900}
 .opt.dim{opacity:.55}
 .q-actions{display:flex; gap:10px; margin-top:14px; align-items:center}
 .btn-check{background:var(--caramel-deep); color:#fff; border:none; border-radius:999px; padding:10px 26px; font-weight:900; font-size:.88rem; cursor:pointer; font-family:var(--sans); transition:opacity .15s, transform .15s}
@@ -123,7 +128,7 @@ section.block{padding:34px 0 6px}
 /* ── 주관식 ─────────────────────────── */
 .situation{background:var(--bg-soft); border:1.5px dashed var(--line); border-radius:12px; padding:13px 15px; font-size:.95rem; margin-bottom:12px}
 .hints{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:12px}
-.hint{font-size:.74rem; font-weight:800; color:var(--coffee); background:var(--caramel-soft); border-radius:999px; padding:3px 11px}
+.hint{font-size:.74rem; font-weight:800; color:var(--coffee); background:var(--caramel-soft); border-radius:999px; padding:3px 11px; white-space:nowrap}
 .hint .en{font-style:normal}
 textarea{width:100%; min-height:86px; border:1.5px solid var(--line); border-radius:12px; background:var(--bg-soft); padding:12px 14px; font-family:var(--sans); font-size:.97rem; color:var(--ink); resize:vertical}
 textarea:focus{outline:2px solid var(--caramel); border-color:var(--caramel)}
@@ -147,7 +152,15 @@ footer{text-align:center; color:var(--sub); font-size:.78rem; font-weight:600; p
 @keyframes pop{0%{transform:scale(.4); opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1); opacity:1}}
 
 button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid var(--caramel-deep); outline-offset:2px}
-@media (max-width:560px){ .f-arrow{padding:0 5px} .f-chip{min-width:120px} .q-card{padding:16px 14px 15px} }
+@media (max-width:560px){
+  .f-arrow{padding:0 3px; font-size:1.05rem}
+  .f-chip{min-width:96px; flex:1 1 96px; padding:13px 8px 10px}
+  .f-chip .role{font-size:.6rem; letter-spacing:.01em; padding:2px 8px}
+  .f-chip .en-big{font-size:1.24rem}
+  .f-chip .kr{font-size:.72rem}
+  .q-card{padding:16px 14px 15px}
+  .lg-badge{font-size:.7rem; letter-spacing:.08em; padding:5px 13px}
+}
 @media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} html{scroll-behavior:auto} }
 </style>
 </head>
@@ -389,8 +402,9 @@ QUIZ.forEach((item, qi)=>{
     st.graded = true; st.correct = isRight;
     opts.forEach((b,oi)=>{
       b.disabled = true;
-      if(item.a.includes(oi)){ b.classList.add("right"); b.querySelector(".box").textContent="✓"; }
-      else if(st.sel.has(oi)){ b.classList.add("miss"); b.querySelector(".box").textContent="✗"; }
+      const box = b.querySelector(".box");   // 다중선택 전용. 단일선택에는 없음(null)
+      if(item.a.includes(oi)){ b.classList.add("right"); if(box) box.textContent="✓"; }
+      else if(st.sel.has(oi)){ b.classList.add("miss"); if(box) box.textContent="✗"; }
       else b.classList.add("dim");
     });
     tag.hidden = false;
