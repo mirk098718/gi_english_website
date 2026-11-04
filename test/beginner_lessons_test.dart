@@ -21,6 +21,11 @@ void main() {
     );
     expect(second.videoUrl, 'https://youtu.be/ikDXCNb66Yo');
     expect(third.videoUrl, 'https://youtu.be/mHrkwI56dVw');
+    expect(third.problemLinks.single.title, '3강 연습문제');
+    expect(
+      third.problemLinks.single.url,
+      '/quizzes/gleam-level1-lesson3-quiz.html',
+    );
   });
 
   test('저장된 왕초보 회차에 임시 영상만 있으면 실제 인강으로 바꾼다', () {

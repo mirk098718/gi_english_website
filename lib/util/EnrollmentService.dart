@@ -114,6 +114,8 @@ class EnrollmentService {
       order: 3,
       title: '3강',
       videoUrl: 'https://youtu.be/mHrkwI56dVw',
+      problemTitle: '3강 연습문제',
+      problemUrl: '/quizzes/gleam-level1-lesson3-quiz.html',
     ),
   ];
 
