@@ -41,16 +41,25 @@ void main() {
       '/quizzes/gleam-level1-lesson3-quiz.html',
     );
     expect(fourth.title, '4강');
-    expect(fourth.videoUrl, 'https://youtu.be/6oYf9w2g-DQ');
+    expect(fourth.videoUrl, 'https://youtu.be/Wnp7FbT_AZ0');
+    expect(fourth.problemLinks.single.title, '4강 연습문제');
     expect(
-      UrlUtil.playerUrl(
-        'https://www.youtube.com/watch?v=6oYf9w2g-DQ&list=PLTyD0pemTuN0',
-      ),
-      'https://www.youtube.com/embed/6oYf9w2g-DQ?rel=0&playsinline=1',
+      fourth.problemLinks.single.url,
+      '/quizzes/gleam-level1-lesson4-quiz.html',
     );
     expect(
-      UrlUtil.playerUrl(fourth.videoUrl),
-      'https://www.youtube.com/embed/6oYf9w2g-DQ?rel=0&playsinline=1',
+      UrlUtil.playerUrl(
+        'https://www.youtube.com/watch?v=Wnp7FbT_AZ0&list=PLeelS27LkLHE',
+      ),
+      'https://www.youtube.com/embed/Wnp7FbT_AZ0?rel=0&playsinline=1',
+    );
+    expect(
+      UrlUtil.playerUrl(fourth.videoUrl, origin: 'https://gleam-island.web.app'),
+      'https://www.youtube.com/embed/Wnp7FbT_AZ0?rel=0&playsinline=1&origin=https%3A%2F%2Fgleam-island.web.app',
+    );
+    expect(
+      UrlUtil.lessonPlayerPath(fourth.videoUrl),
+      '/player.html?v=Wnp7FbT_AZ0',
     );
   });
 
@@ -89,45 +98,23 @@ void main() {
     );
   });
 
-  test('중급 회화 1강은 재생 목록 없이 영상만 연결한다', () {
-    final week =
-        EnrollmentService.defaultWeek('intermediate_grammar_speaking', 1);
-
-    expect(week.title, '1강');
-    expect(week.videoUrl, 'https://youtu.be/Wnp7FbT_AZ0');
-    expect(week.description, '중급 1강 인강을 시청한 뒤 체크리스트를 확인하세요.');
-    expect(
-      UrlUtil.playerUrl(
-        'https://www.youtube.com/watch?v=Wnp7FbT_AZ0&list=PLeelS27LkLHE',
-      ),
-      'https://www.youtube.com/embed/Wnp7FbT_AZ0?rel=0&playsinline=1',
-    );
-    expect(
-      UrlUtil.playerUrl(week.videoUrl),
-      'https://www.youtube.com/embed/Wnp7FbT_AZ0?rel=0&playsinline=1',
-    );
-    expect(
-      UrlUtil.playerUrl(week.videoUrl, origin: 'https://gleam-island.web.app'),
-      'https://www.youtube.com/embed/Wnp7FbT_AZ0?rel=0&playsinline=1&origin=https%3A%2F%2Fgleam-island.web.app',
-    );
-    expect(
-      UrlUtil.lessonPlayerPath(
-        'https://www.youtube.com/watch?v=Wnp7FbT_AZ0&list=PLeelS27LkLHE',
-      ),
-      '/player.html?v=Wnp7FbT_AZ0',
-    );
-
+  test('왕초보 4강에 먼저 넣었던 영상은 새 인강과 퀴즈로 바꾼다', () {
     final stored = OnlineWeek(
-      id: 'intermediate_grammar_speaking_week_1',
-      courseId: 'intermediate_grammar_speaking',
-      weekNumber: 1,
-      title: '1회차 인강: 관사의 쓰임',
-      description: '',
-      videoUrl: EnrollmentService.defaultWeek1VideoUrl,
+      id: 'beginner_phonics_week_4',
+      courseId: 'beginner_phonics',
+      weekNumber: 4,
+      title: '4강',
+      description: '왕초보 4강',
+      videoUrl: 'https://youtu.be/6oYf9w2g-DQ',
     );
+
     final filled = EnrollmentService.withCatalogVideo(stored);
-    expect(filled.title, '1강');
+
     expect(filled.videoUrl, 'https://youtu.be/Wnp7FbT_AZ0');
+    expect(
+      filled.problemLinks.single.url,
+      '/quizzes/gleam-level1-lesson4-quiz.html',
+    );
   });
 
   test('다른 과정 1회차는 기존 임시 인강을 유지한다', () {

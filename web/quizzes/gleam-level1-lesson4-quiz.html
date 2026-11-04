@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>글림 왕초보 영어 제4강 · 문제 풀이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4ecdd; --bg-soft:#faf5ea; --card:#fffdf9;
+  --ink:#33241a; --sub:#82705d; --line:#e7d8c0;
+  --coffee:#7a4a26; --caramel:#d98a2b; --caramel-deep:#a9620f; --caramel-soft:#f8e7c8;
+  --ok:#3e7d54; --ok-bg:#e6f2e6; --no:#bc4741; --no-bg:#fae5e0;
+  --disp:'Black Han Sans', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --serif:Georgia, 'Times New Roman', serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans); color:var(--ink); background:var(--bg);
+  background-image:radial-gradient(#e2d3b8 1px, transparent 1px);
+  background-size:22px 22px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  word-break:keep-all; overflow-wrap:break-word; /* 한글은 단어 단위로만 줄바꿈 */
+}
+.en{font-family:var(--serif); letter-spacing:.01em}
+.wrap{max-width:880px; margin:0 auto; padding:0 18px}
+
+/* ── 상단바 ─────────────────────────── */
+.topbar{position:sticky; top:0; z-index:50; background:rgba(244,236,221,.92); backdrop-filter:blur(8px); border-bottom:1.5px solid var(--line)}
+.topbar .wrap{display:flex; align-items:center; gap:10px; justify-content:space-between; padding-top:10px; padding-bottom:10px; flex-wrap:wrap}
+.brand{font-family:var(--disp); font-size:1.02rem; color:var(--coffee); letter-spacing:.02em; display:flex; align-items:center; gap:6px}
+.brand small{white-space:nowrap; font-family:var(--sans); font-weight:700; color:var(--sub); font-size:.72rem; border:1.5px solid var(--line); border-radius:999px; padding:2px 8px; background:var(--card)}
+.scores{display:flex; gap:8px; align-items:center; font-weight:800; font-size:.8rem}
+.scores .chip{background:var(--card); border:1.5px solid var(--line); border-radius:999px; padding:4px 12px; color:var(--sub); white-space:nowrap}
+.scores .chip b{color:var(--coffee)}
+.scores .chip.ok b{color:var(--ok)}
+
+/* ── 히어로 ─────────────────────────── */
+.hero{padding:44px 0 10px; text-align:center}
+.lg-badge{display:inline-block; white-space:nowrap; background:var(--coffee); color:#f8ecdb; font-weight:800; font-size:.78rem; letter-spacing:.14em; border-radius:999px; padding:5px 16px}
+.hero h1{font-family:var(--disp); font-weight:400; font-size:clamp(1.7rem,5vw,2.6rem); line-height:1.28; margin:16px 0 6px; color:var(--ink)}
+.hero h1 .u{color:var(--caramel-deep); background:linear-gradient(transparent 68%, var(--caramel-soft) 68%)}
+.hero p.sub{color:var(--sub); font-weight:600; font-size:.95rem}
+
+/* 어순 공식 티켓 (시그니처) */
+.formula{display:flex; align-items:stretch; justify-content:center; gap:0; margin:30px auto 8px; flex-wrap:wrap; max-width:640px}
+.f-chip{flex:1 1 120px; min-width:100px; background:var(--card); border:2px solid var(--ink); border-radius:16px; padding:14px 12px 12px; position:relative; box-shadow:4px 4px 0 rgba(122,74,38,.22); text-align:center}
+.f-chip .role{position:absolute; top:-12px; left:50%; transform:translateX(-50%); font-size:.68rem; font-weight:900; letter-spacing:.08em; color:#fff; background:var(--coffee); border-radius:999px; padding:2px 11px; white-space:nowrap; max-width:none}
+.f-chip:nth-child(3) .role{background:var(--caramel-deep)}
+.f-chip:nth-child(5) .role{background:#3e7d54}
+.f-chip .en-big{font-family:var(--serif); font-size:1.55rem; font-weight:700; display:block; margin-top:6px}
+.f-chip .kr{font-size:.78rem; color:var(--sub); font-weight:700}
+.f-arrow{align-self:center; font-size:1.3rem; color:var(--caramel-deep); padding:0 10px; font-weight:900}
+.formula-note{color:var(--sub); font-size:.83rem; font-weight:700; margin-bottom:6px}
+.formula-note s{color:#b0473f}
+
+/* 요점 복습 */
+.recap{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:30px 0 8px}
+.r-card{background:var(--card); border:1.5px solid var(--line); border-radius:16px; padding:18px 16px; text-align:left}
+.r-card h3{font-size:.85rem; color:var(--caramel-deep); letter-spacing:.08em; font-weight:900; margin-bottom:8px}
+.r-card .ex{font-size:.95rem; margin-top:6px}
+.vs-box{background:var(--bg-soft); border:1px dashed var(--line); border-radius:10px; padding:8px 10px; margin-top:4px; font-size:.88rem}
+.vs-box .bad{color:#b0473f; font-weight:700}
+.vs-box .good{color:var(--ok); font-weight:800}
+.start-btn{display:inline-block; margin:26px 0 6px; background:var(--coffee); color:#fff7ec; font-weight:900; font-size:1rem; border:none; border-radius:999px; padding:14px 34px; cursor:pointer; box-shadow:0 6px 18px rgba(122,74,38,.32); transition:transform .15s, box-shadow .15s}
+.start-btn:hover{transform:translateY(-2px); box-shadow:0 10px 22px rgba(122,74,38,.38)}
+
+/* ── 섹션 공통 ──────────────────────── */
+section.block{padding:34px 0 6px}
+.sec-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:6px}
+.sec-head h2{font-family:var(--disp); font-weight:400; font-size:1.45rem; color:var(--coffee)}
+.sec-head .count{font-weight:900; color:var(--caramel-deep); font-size:.9rem; background:var(--caramel-soft); border-radius:999px; padding:3px 14px; white-space:nowrap}
+.sec-desc{color:var(--sub); font-size:.88rem; font-weight:600; margin-bottom:20px}
+
+/* ── 문제 카드 ──────────────────────── */
+.q-card{background:var(--card); border:1.5px solid var(--line); border-radius:18px; padding:20px 20px 18px; margin-bottom:18px; box-shadow:0 2px 10px rgba(122,74,38,.06)}
+.q-top{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px}
+.stamp{font-family:var(--disp); font-size:.95rem; color:var(--coffee); border:2px solid var(--coffee); border-radius:8px; padding:1px 9px; transform:rotate(-3deg); letter-spacing:.05em; flex:none; white-space:nowrap}
+.tchip{font-size:.72rem; font-weight:900; letter-spacing:.04em; border-radius:999px; padding:4px 12px; white-space:nowrap}
+.tc-concept{background:#f2e3c8; color:#8a5a1f}
+.tc-blank{background:#e3edf6; color:#2e5e83}
+.tc-wrong{background:#f9e0dc; color:#a3403a}
+.tc-multi{background:#e9e2f5; color:#5b4a8a}
+.tc-order{background:#ddefe4; color:#2f6e4f}
+.tc-dialog{background:#fce8ee; color:#96374f}
+.tc-trans{background:#e0eef0; color:#22626b}
+.tc-part{background:#f6ecd8; color:#7a641f}
+.tc-correct{background:#e2ecdf; color:#3c6b2f}
+.tc-vocab{background:#eceae7; color:#5f5346}
+.tc-write{background:#f8e7c8; color:#a9620f}
+.multi-note{font-size:.74rem; color:var(--caramel-deep); font-weight:800; background:var(--caramel-soft); border-radius:999px; padding:3px 10px; white-space:nowrap}
+.q-text{font-size:1.02rem; font-weight:700; margin-bottom:14px}
+.q-text .q-en{font-family:var(--serif); color:var(--coffee)}
+.opts{display:grid; gap:9px}
+.opt{display:flex; align-items:flex-start; gap:10px; width:100%; text-align:left; background:var(--bg-soft); border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; cursor:pointer; font-family:var(--sans); font-size:.95rem; color:var(--ink); transition:border-color .12s, background .12s, transform .12s}
+.opt:hover:not(:disabled){border-color:var(--caramel); transform:translateX(2px)}
+.opt:disabled{cursor:default}
+.opt .mark{font-weight:900; color:var(--caramel-deep); flex:none}
+.opt .box{flex:none; width:18px; height:18px; border:2px solid var(--sub); border-radius:5px; margin-top:2px; display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; color:transparent; font-weight:900}
+.opt.sel{border-color:var(--caramel-deep); background:var(--caramel-soft)}
+.opt.sel .box{background:var(--caramel-deep); border-color:var(--caramel-deep); color:#fff}
+.opt.right{border-color:var(--ok); background:var(--ok-bg)}
+.opt.right .box{background:var(--ok); border-color:var(--ok); color:#fff}
+.opt.right .mark{color:var(--ok)}
+.opt.right .mark::after{content:" ✓"; color:var(--ok); font-weight:900}
+.opt.miss{border-color:var(--no); background:var(--no-bg)}
+.opt.miss .box{background:var(--no); border-color:var(--no); color:#fff}
+.opt.miss .mark{color:var(--no)}
+.opt.miss .mark::after{content:" ✗"; color:var(--no); font-weight:900}
+.opt.dim{opacity:.55}
+.q-actions{display:flex; gap:10px; margin-top:14px; align-items:center}
+.btn-check{background:var(--caramel-deep); color:#fff; border:none; border-radius:999px; padding:10px 26px; font-weight:900; font-size:.88rem; cursor:pointer; font-family:var(--sans); transition:opacity .15s, transform .15s}
+.btn-check:hover:not(:disabled){transform:translateY(-1px)}
+.btn-check:disabled{opacity:.35; cursor:not-allowed}
+.graded-tag{font-weight:900; font-size:.85rem}
+.graded-tag.good{color:var(--ok)} .graded-tag.bad{color:var(--no)}
+.feedback{display:none; margin-top:14px; border-top:1.5px dashed var(--line); padding-top:13px}
+.feedback.show{display:block; animation:slidein .25s ease}
+@keyframes slidein{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+.fb-title{font-weight:900; font-size:.9rem; margin-bottom:5px}
+.fb-title.good{color:var(--ok)} .fb-title.bad{color:var(--no)}
+.fb-exp{font-size:.9rem; color:var(--ink); background:var(--bg-soft); border-radius:10px; padding:10px 13px}
+.fb-exp .en{color:var(--coffee)}
+
+/* ── 주관식 ─────────────────────────── */
+.situation{background:var(--bg-soft); border:1.5px dashed var(--line); border-radius:12px; padding:13px 15px; font-size:.95rem; margin-bottom:12px}
+.hints{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:12px}
+.hint{font-size:.74rem; font-weight:800; color:var(--coffee); background:var(--caramel-soft); border-radius:999px; padding:3px 11px; white-space:nowrap}
+.hint .en{font-style:normal}
+textarea{width:100%; min-height:86px; border:1.5px solid var(--line); border-radius:12px; background:var(--bg-soft); padding:12px 14px; font-family:var(--sans); font-size:.97rem; color:var(--ink); resize:vertical}
+textarea:focus{outline:2px solid var(--caramel); border-color:var(--caramel)}
+.model{display:none; margin-top:14px; background:#f2ede2; border-radius:12px; padding:12px 15px; font-size:.93rem}
+.model.show{display:block; animation:slidein .25s ease}
+.model b{color:var(--coffee)}
+
+/* ── 결과 ───────────────────────────── */
+.result{background:var(--card); border:2px solid var(--ink); border-radius:20px; box-shadow:6px 6px 0 rgba(122,74,38,.2); padding:26px 22px; margin:34px 0 10px; text-align:center}
+.result .big{font-family:var(--disp); font-size:2.5rem; color:var(--coffee); line-height:1.1}
+.result .msg{font-weight:800; margin-top:6px}
+.type-table{width:100%; border-collapse:collapse; margin-top:16px; font-size:.85rem}
+.type-table th,.type-table td{border-bottom:1px dashed var(--line); padding:7px 6px; text-align:center}
+.type-table th{color:var(--sub); font-size:.76rem; letter-spacing:.05em}
+.type-table td:first-child{text-align:left; font-weight:700}
+.btn-reset{margin-top:18px; background:transparent; color:var(--no); border:2px solid var(--no); border-radius:999px; padding:10px 26px; font-weight:900; cursor:pointer; font-family:var(--sans); font-size:.88rem}
+.btn-reset:hover{background:var(--no-bg)}
+footer{text-align:center; color:var(--sub); font-size:.78rem; font-weight:600; padding:26px 0 40px}
+.all-done{display:none; font-size:2.6rem; margin-top:4px}
+.all-done.show{display:block; animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.4); opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1); opacity:1}}
+
+button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid var(--caramel-deep); outline-offset:2px}
+/* 칩이 4개(칩+화살표 = 자식 7개)면 좁은 화면에서 2+2 그리드:
+   화살표는 줄바꿈 시 방향이 어긋나므로 숨기고, 두 줄로 균등 배치 + 줄 간격 확보 */
+@media (max-width:680px){
+  .formula:has(.f-chip:nth-child(7)){gap:18px 14px}
+  .formula:has(.f-chip:nth-child(7)) .f-chip{flex:1 1 calc(50% - 7px); min-width:calc(50% - 7px); padding:14px 10px 11px}
+  .formula:has(.f-chip:nth-child(7)) .f-arrow{display:none}
+}
+@media (max-width:560px){
+  .f-arrow{padding:0 3px; font-size:1.05rem}
+  .f-chip{min-width:96px; flex:1 1 96px; padding:13px 8px 10px}
+  .f-chip .role{font-size:.6rem; letter-spacing:.01em; padding:2px 8px}
+  .f-chip .en-big{font-size:1.24rem}
+  .f-chip .kr{font-size:.72rem}
+  .q-card{padding:16px 14px 15px}
+  .lg-badge{font-size:.7rem; letter-spacing:.08em; padding:5px 13px}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} html{scroll-behavior:auto} }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">☕ 글림 왕초보 영어 <small>제4강 문제 풀이</small></div>
+    <div class="scores">
+      <span class="chip">채점 <b id="gradedN">0</b> / 25</span>
+      <span class="chip ok">정답 <b id="correctN">0</b> / 25</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <span class="lg-badge">제 04강 · This, That, These, Those</span>
+    <h1>가까운 건 This, 먼 건 That<br/><span class="u">손가락 매직</span> 확인 문제</h1>
+    <p class="sub">핵심 표현 · <span class="en">What's that? / These are delicious.</span> — 30문항으로 지시대명사 4총사를 완전히 내 것으로 만들어 보세요.</p>
+
+    <div class="formula" aria-label="지시대명사 4총사 공식">
+      <div class="f-chip"><span class="role">가까운 · 하나</span><span class="en-big en">This</span><span class="kr">이것</span></div>
+      <div class="f-arrow">→</div>
+      <div class="f-chip"><span class="role">가까운 · 여럿</span><span class="en-big en">These</span><span class="kr">이것들</span></div>
+      <div class="f-arrow">→</div>
+      <div class="f-chip"><span class="role">먼 · 하나</span><span class="en-big en">That</span><span class="kr">저것</span></div>
+      <div class="f-arrow">→</div>
+      <div class="f-chip"><span class="role">먼 · 여럿</span><span class="en-big en">Those</span><span class="kr">저것들</span></div>
+    </div>
+    <p class="formula-note">한국어식 <s>this shoes</s> ✗ &nbsp;→&nbsp; 개수가 여럿이면 <b style="color:var(--caramel-deep)">these / those!</b></p>
+
+    <div class="recap">
+      <div class="r-card">
+        <h3>1. 거리 × 개수, 4칸 표</h3>
+        <div class="vs-box"><span class="good">가까움</span> <span class="en">this</span> (하나) · <span class="en">these</span> (여럿) [디-이즈]</div>
+        <div class="vs-box"><span class="bad">멀리</span> <span class="en">that</span> (하나) · <span class="en">those</span> (여럿) [도우즈]</div>
+      </div>
+      <div class="r-card">
+        <h3>2. 쇼핑·주문 만능 표현</h3>
+        <p class="ex en">I'd like <b>this one</b>, please.</p>
+        <p class="ex en">How much are <b>these</b> shoes?</p>
+        <p style="font-size:.84rem; font-weight:700; color:var(--sub)">가리키며 말하면 주문 끝!</p>
+      </div>
+      <div class="r-card">
+        <h3>3. 전화 통화의 손가락 매직</h3>
+        <p class="ex en">This is Chulsoo.</p>
+        <p class="ex en">Is that John?</p>
+        <p style="font-size:.84rem; font-weight:700; color:var(--sub)">'나'는 this, '너'는 that으로!</p>
+      </div>
+    </div>
+
+    <a href="#mcq"><button class="start-btn">객관식 25문제 풀기 ↓</button></a>
+  </section>
+
+  <section class="block" id="mcq">
+    <div class="sec-head"><h2>객관식 문제</h2><span class="count">25문제</span></div>
+    <p class="sec-desc">유형별로 구성되어 있어요: 개념 이해 · 빈칸 채우기 · 틀린 문장 찾기 · 모두 고르기 · 단어 배열 · 대화 문제 · 뜻 고르기 · 바른 문장 찾기 · 어휘. 답을 고르고 <b>채점하기</b>를 누르면 바로 해설이 나옵니다.</p>
+    <div id="mcqList"></div>
+  </section>
+
+  <section class="block" id="essay">
+    <div class="sec-head"><h2>주관식 작문</h2><span class="count">5문제</span></div>
+    <p class="sec-desc">상황을 읽고 직접 영어 문장을 써 보세요. 그다음 <b>모범답안 보기</b>를 눌러 내 답과 비교해 보세요. 정답은 하나가 아닐 수도 있어요!</p>
+    <div id="essayList"></div>
+  </section>
+
+  <section class="result" id="result">
+    <div class="all-done" id="allDone">🎉</div>
+    <div class="big"><span id="finalScore">0</span><span style="font-size:1.2rem; color:var(--sub)"> / 25</span></div>
+    <div class="msg" id="resultMsg">문제를 풀면 결과가 여기에 표시돼요.</div>
+    <table class="type-table" id="typeTable" aria-label="유형별 정답률">
+      <thead><tr><th>유형</th><th>정답 / 채점</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button class="btn-reset" id="btnReset">모두 다시 풀기</button>
+  </section>
+
+</main>
+<footer>글림 왕초보 영어 · 제 04강 「This, That, These, Those」 — 오늘 하루 물건을 볼 때마다 가까우면 this/these, 멀면 that/those를 소리 내어 말해 보세요. 다음 5강 관사 편에서 만나요!</footer>
+
+<script>
+/* ─────────── 문제 데이터 ─────────── */
+const TYPE = {
+  concept:{label:"개념 이해", cls:"tc-concept"}, blank:{label:"빈칸 채우기", cls:"tc-blank"},
+  wrong:{label:"틀린 문장 찾기", cls:"tc-wrong"}, multi:{label:"모두 고르기", cls:"tc-multi"},
+  order:{label:"단어 배열", cls:"tc-order"}, dialog:{label:"대화 문제", cls:"tc-dialog"},
+  trans:{label:"뜻 고르기", cls:"tc-trans"}, correct:{label:"바른 문장 찾기", cls:"tc-correct"},
+  vocab:{label:"어휘", cls:"tc-vocab"}, write:{label:"작문", cls:"tc-write"}
+};
+const QUIZ = [
+ {t:"concept", q:"손에 닿을 만큼 가까이 있는 것 '하나'를 가리킬 때 쓰는 말은?",
+  o:["this","these","that","those"], a:[0],
+  e:"가까운 것 하나 = this! 손가락으로 콕 찍어 가리키며 '디스'라고 말해 보세요."},
+ {t:"concept", q:"저 멀리 떨어져 있는 것 '여러 개'를 가리킬 때 쓰는 말은?",
+  o:["this","that","these","those"], a:[3],
+  e:"먼 것 + 여러 개 = those [도우즈]. 손가락을 쭉 뻗어 가리키는 느낌이에요."},
+ {t:"concept", q:"this와 that의 공통점으로 알맞은 것은?",
+  o:["둘 다 여러 개를 가리킨다","둘 다 하나(단수)를 가리킨다","둘 다 먼 것을 가리킨다","둘 다 사람에게만 쓴다"],
+  a:[1],
+  e:"this(이것)와 that(저것)은 둘 다 '하나'! 거리만 다르고 개수는 똑같이 단수예요."},
+ {t:"concept", q:"단수와 복수의 짝이 바르게 연결된 것은?",
+  o:["this - these, that - those","this - those, that - these","this - that, these - those","this - these, those - that"],
+  a:[0],
+  e:"this→these(가까운 것), that→those(먼 것). s가 붙으면 여러 개라고 기억하면 쉬워요!"},
+ {t:"concept", q:"전화 통화에서 상대방에게 '너 John이야?'라고 물을 때 알맞은 것은?",
+  o:["Is this John?","Are these John?","Are those John?","Is that John?"],
+  a:[3],
+  e:"전화에서는 '나'를 this, '너(상대)'를 that으로 가리켜요. → Is that John?"},
+
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>___ is my bag.</span> (가까이에 있는 가방을 가리키며)",
+  o:["This","These","Those","They"], a:[0],
+  e:"가까운 것 하나 + 단수 동사 is → This is my bag."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>___ are my shoes.</span> (저기 멀리 있는 신발들을 가리키며)",
+  o:["This","Those","That","These"], a:[1],
+  e:"멀리 있는 여러 개 = those, 그리고 복수라서 are! → Those are my shoes."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>How much ___ these shoes?</span>",
+  o:["is","are","am","be"], a:[1],
+  e:"these shoes는 여러 개(복수)라서 be동사는 are! → How much are these shoes?"},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>___ cookies are really delicious.</span> (바로 앞에 있는 쿠키들을 먹어 보며)",
+  o:["This","That","These","It"], a:[2],
+  e:"가까이 있고 여러 개니까 these! cookies(복수)와 짝이 맞아요."},
+
+ {t:"wrong", q:"다음 중 틀린 문장은?",
+  o:["These shoes are expensive.","This shoes are expensive.","That shirt is expensive.","Those bags are expensive."], a:[1],
+  e:"this는 단수인데 shoes는 복수! 개수를 맞춰 These shoes are expensive.로 씁니다."},
+ {t:"wrong", q:"다음 중 틀린 문장은?",
+  o:["Those people are waiting in line.","These cookies are delicious.","That speakers is new.","What's that over there?"], a:[2],
+  e:"speakers는 복수라서 that이 아니라 those! → Those speakers are new."},
+ {t:"wrong", q:"다음 중 틀린 문장은?",
+  o:["I'd like this one, please.","I'd like that one, please.","I'd like those ones, please.","I'd like these one, please."], a:[3],
+  e:"one은 '하나'라는 뜻의 단수라서 these와 못 써요. → I'd like these ones, please. 또는 this one."},
+
+ {t:"multi", q:"'가까운 것'을 가리키는 말을 모두 고르시오.",
+  o:["this","these","that","those"], a:[0,1],
+  e:"가까우면 this(하나)·these(여럿). that/those는 멀리 있는 것을 가리킬 때 씁니다."},
+ {t:"multi", q:"'여러 개(복수)'를 가리키는 말을 모두 고르시오.",
+  o:["this","that","these","those"], a:[2,3],
+  e:"복수는 these와 those 둘뿐! this/that은 하나를 가리키는 단수예요."},
+ {t:"multi", q:"문장이 바르게 쓰인 것을 모두 고르시오.",
+  o:["These are delicious.","This cookies are delicious.","Those people are waiting in line.","That headphones are on sale."], a:[0,2],
+  e:"This cookies → These cookies, That headphones → Those headphones. 단수·복수 짝을 꼭 맞춰야 해요!"},
+
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( is / what / that / over there )",
+  o:["That is what over there?","What that is over there?","What is that over there?","What is over there that?"], a:[2],
+  e:"의문사 What + is + that(저것) + over there(저기)! → What is that over there?"},
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( are / these / how much / headphones )",
+  o:["How much these headphones are?","How much are these headphones?","These headphones how much are?","Are how much these headphones?"], a:[1],
+  e:"How much + are + these headphones 순서! 가게에서 그대로 써먹는 문장이에요."},
+
+ {t:"dialog", q:"대화의 빈칸을 채워 보세요. — Clerk: Hello, can I help you find something? / David: Yes, what's ___ over there on the top shelf?",
+  o:["this","these","those","that"], a:[3],
+  e:"저기 맨 위 선반(멀리)에 있는 것 '하나'를 가리키니 that! → What's that over there?"},
+ {t:"dialog", q:"대화의 빈칸을 채워 보세요. — David: How about these headphones here? / Clerk: ___ are on sale today!",
+  o:["These","This","That","It"], a:[0],
+  e:"바로 앞(headphones here)의 여러 개를 받으니 These! → These are on sale today!"},
+
+ {t:"trans", q:"<span class='q-en'>What's that?</span> 의 뜻은?",
+  o:["이건 뭐야?","이것들은 뭐야?","저건 뭐야?","저것들은 뭐야?"], a:[2],
+  e:"that은 멀리 있는 것 '하나'! What's = What is, 그래서 '저건 뭐야?'가 됩니다."},
+ {t:"trans", q:"<span class='q-en'>These are delicious.</span> 의 뜻은?",
+  o:["저것들은 맛있어요.","이것들은 맛있어요.","이것은 맛있어요.","저것은 맛있어요."], a:[1],
+  e:"These는 가까운 것 '여러 개'! 그래서 '이것들은 맛있어요.'"},
+ {t:"trans", q:"<span class='q-en'>Those people are waiting in line.</span> 의 뜻은?",
+  o:["저 사람들은 줄 서서 기다리고 있어요.","이 사람들은 줄 서서 기다리고 있어요.","저 사람은 줄 서서 기다리고 있어요.","이 사람들은 계산하고 있어요."], a:[0],
+  e:"those(저것들) + people(사람들) + waiting in line(줄 서서 기다리다)."},
+
+ {t:"correct", q:"다음 중 바르게 쓰인 문장은?",
+  o:["This shoes are nice.","These shoes are nice.","These shoes is nice.","This shoes is nice."], a:[1],
+  e:"shoes는 복수 → These shoes + are. 개수와 be동사를 함께 맞추는 게 포인트!"},
+ {t:"correct", q:"전화로 '나 철수야'라고 할 때 바른 문장은?",
+  o:["I am this Chulsoo.","These is Chulsoo.","That are Chulsoo.","This is Chulsoo."], a:[3],
+  e:"전화에서는 '나'를 this로 가리켜요. → This is Chulsoo."},
+ {t:"vocab", q:"'저것들'을 뜻하는 영어 단어는?",
+  o:["this","these","those","that"], a:[2],
+  e:"this 이것 / these 이것들 / that 저것 / those 저것들. 멀고 여러 개면 those!"}
+];
+const ESSAYS = [
+ {q:"기본 표현 쓰기", sit:"책상 위, 손이 닿는 곳에 내 가방이 있어요. <b>『이것은 내 가방이에요.』</b>를 영어로 써 보세요.",
+  hints:["this","bag"],
+  model:"This is my bag.", modelKr:"이것은 내 가방이에요."},
+ {q:"상황 작문 1", sit:"가게에 들어갔어요. 저기 맨 위 선반에 있는 물건이 궁금해서 점원에게 <b>『저건 뭐예요?』</b>라고 묻고 싶어요.",
+  hints:["what","over there"],
+  model:"What's that over there?", modelKr:"저기 저건 뭐예요?"},
+ {q:"상황 작문 2", sit:"카페에서 쿠키를 한입 먹어 봤는데 정말 맛있어요. 친구에게 <b>『이 쿠키들 진짜 맛있어요.』</b>라고 말해 보세요.",
+  hints:["cookies","delicious"],
+  model:"These cookies are really delicious.", modelKr:"이 쿠키들 진짜 맛있어요."},
+ {q:"상황 작문 3", sit:"신발 가게에서 저 멀리 진열된 신발들의 가격이 궁금해요. 점원에게 <b>『저 신발들 얼마예요?』</b>라고 물어보세요.",
+  hints:["how much","shoes"],
+  model:"How much are those shoes?", modelKr:"저 신발들 얼마예요?"},
+ {q:"자유 작문", sit:"가게에서 점원에게 <b>『이걸로 주세요.』</b>와 <b>『저것들은 뭐예요?』</b>를 차례로 말해 보세요. 두 문장으로 써 주세요.",
+  hints:["this one","those"],
+  model:"I'd like this one, please. What are those?", modelKr:"이걸로 주세요. 저것들은 뭐예요?"}
+];
+
+/* ─────────── 렌더링 ─────────── */
+const state = QUIZ.map(()=>({sel:new Set(), graded:false, correct:false}));
+const marks = ["①","②","③","④"];
+const mcqList = document.getElementById("mcqList");
+
+QUIZ.forEach((item, qi)=>{
+  const meta = TYPE[item.t];
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">Q.${String(qi+1).padStart(2,"0")}</span>
+      <span class="tchip ${meta.cls}">${meta.label}</span>
+      ${item.a.length>1 ? '<span class="multi-note">정답 '+item.a.length+'개를 모두 고르세요</span>' : ''}
+    </div>
+    <p class="q-text">${item.q}</p>
+    <div class="opts">${item.o.map((op,oi)=>`
+      <button type="button" class="opt" data-oi="${oi}" aria-pressed="false">
+        ${item.a.length>1 ? '<span class="box">✓</span>' : '<span class="mark">'+marks[oi]+'</span>'}
+        <span class="${/^[A-Za-z]/.test(op) ? 'en' : ''}">${op}</span>
+      </button>`).join("")}
+    </div>
+    <div class="q-actions">
+      <button type="button" class="btn-check" disabled>채점하기</button>
+      <span class="graded-tag" hidden></span>
+    </div>
+    <div class="feedback"><p class="fb-title"></p><p class="fb-exp"></p></div>`;
+  mcqList.appendChild(card);
+
+  const opts = [...card.querySelectorAll(".opt")];
+  const btn = card.querySelector(".btn-check");
+  const tag = card.querySelector(".graded-tag");
+  const fb = card.querySelector(".feedback");
+  const fbTitle = card.querySelector(".fb-title");
+  const fbExp = card.querySelector(".fb-exp");
+
+  opts.forEach((b,oi)=>b.addEventListener("click", ()=>{
+    if(state[qi].graded) return;
+    if(item.a.length>1){
+      state[qi].sel.has(oi) ? state[qi].sel.delete(oi) : state[qi].sel.add(oi);
+      b.classList.toggle("sel"); b.setAttribute("aria-pressed", b.classList.contains("sel"));
+    } else {
+      state[qi].sel.clear();
+      opts.forEach(o=>{o.classList.remove("sel"); o.setAttribute("aria-pressed","false");});
+      state[qi].sel.add(oi); b.classList.add("sel"); b.setAttribute("aria-pressed","true");
+    }
+    btn.disabled = state[qi].sel.size===0;
+  }));
+
+  btn.addEventListener("click", ()=>{
+    const st = state[qi];
+    if(st.graded || st.sel.size===0) return;
+    const isRight = st.sel.size===item.a.length && item.a.every(x=>st.sel.has(x));
+    st.graded = true; st.correct = isRight;
+    opts.forEach((b,oi)=>{
+      b.disabled = true;
+      const box = b.querySelector(".box");   // 다중선택 전용. 단일선택에는 없음(null)
+      if(item.a.includes(oi)){ b.classList.add("right"); if(box) box.textContent="✓"; }
+      else if(st.sel.has(oi)){ b.classList.add("miss"); if(box) box.textContent="✗"; }
+      else b.classList.add("dim");
+    });
+    tag.hidden = false;
+    tag.textContent = isRight ? "정답!" : "다시 확인해 보세요";
+    tag.className = "graded-tag " + (isRight ? "good" : "bad");
+    fb.classList.add("show");
+    fbTitle.textContent = (isRight ? "⭕ 정답입니다! " : "❌ 아쉬워요. 정답은 " + item.a.map(i=>marks[i]).join(", ") + " ");
+    fbTitle.className = "fb-title " + (isRight ? "good" : "bad");
+    fbExp.innerHTML = "💡 " + item.e;
+    updateScores();
+  });
+});
+
+/* ── 주관식 ── */
+const essayList = document.getElementById("essayList");
+ESSAYS.forEach((item, ei)=>{
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">W.${ei+1}</span>
+      <span class="tchip ${TYPE.write.cls}">${item.q}</span>
+    </div>
+    <div class="situation">${item.sit}</div>
+    <div class="hints">${item.hints.map(h=>'<span class="hint">힌트 · <span class="en">'+h+'</span></span>').join("")}</div>
+    <textarea placeholder="여기에 영어 문장을 직접 써 보세요." aria-label="${item.q} 답안 입력"></textarea>
+    <div class="q-actions">
+      <button type="button" class="btn-check">모범답안 보기</button>
+      <span style="font-size:.78rem; color:var(--sub); font-weight:700">정답은 하나가 아닐 수도 있어요</span>
+    </div>
+    <div class="model"><b>모범답안 · <span class="en" style="font-size:1.02rem">${item.model}</span></b><br/><span style="color:var(--sub); font-size:.85rem">${item.modelKr}</span></div>`;
+  essayList.appendChild(card);
+
+  const btn = card.querySelector(".btn-check");
+  const model = card.querySelector(".model");
+  btn.addEventListener("click", ()=>{
+    const open = model.classList.toggle("show");
+    btn.textContent = open ? "모범답안 숨기기" : "모범답안 보기";
+  });
+});
+
+/* ── 점수 집계 ── */
+function updateScores(){
+  const graded = state.filter(s=>s.graded).length;
+  const correct = state.filter(s=>s.correct).length;
+  document.getElementById("gradedN").textContent = graded;
+  document.getElementById("correctN").textContent = correct;
+  document.getElementById("finalScore").textContent = correct;
+
+  const tbody = document.querySelector("#typeTable tbody");
+  tbody.innerHTML = "";
+  Object.entries(TYPE).forEach(([key, meta])=>{
+    if(key==="write") return;
+    const rows = QUIZ.map((q,i)=>({q, s:state[i]})).filter(x=>x.q.t===key);
+    if(!rows.length) return;
+    const g = rows.filter(x=>x.s.graded).length;
+    const c = rows.filter(x=>x.s.correct).length;
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>"+meta.label+"</td><td>"+(g ? c+" / "+g : "–")+"</td>";
+    tbody.appendChild(tr);
+  });
+
+  const msg = document.getElementById("resultMsg");
+  const emoji = document.getElementById("allDone");
+  if(graded===QUIZ.length){
+    emoji.classList.add("show");
+    if(correct===25) msg.textContent = "만점! 손가락 매직을 완벽하게 익혔어요. 5강 관사 편에서 만나요!";
+    else if(correct>=20) msg.textContent = "훌륭해요! 틀린 문제의 해설만 다시 보면 완벽합니다.";
+    else if(correct>=14) msg.textContent = "절반 이상 성공! this/these, that/those 짝을 다시 정리해 보세요.";
+    else if(correct>=7) msg.textContent = "조금 아쉬워요. 위의 4칸 표를 다시 복습하고 같은 문제에 다시 도전!";
+    else msg.textContent = "괜찮아요, 시작이 반이에요! 손가락으로 가리키며 this·that부터 다시 익혀 보세요.";
+  } else {
+    emoji.classList.remove("show");
+    msg.textContent = "채점한 문제: " + graded + " / 25 — 계속 풀어 보세요!";
+  }
+}
+document.getElementById("btnReset").addEventListener("click", ()=>{ location.reload(); });
+updateScores();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
