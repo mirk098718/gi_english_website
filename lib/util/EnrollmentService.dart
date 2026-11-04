@@ -136,6 +136,13 @@ class EnrollmentService {
       problemTitle: '1강 연습문제',
       problemUrl: '/quizzes/gleam-level3-lesson1-quiz.html',
     ),
+    CatalogLesson(
+      order: 2,
+      title: '2강',
+      videoUrl: 'https://youtu.be/ycjiMoPOpy8',
+      problemTitle: '2강 연습문제',
+      problemUrl: '/quizzes/gleam-level3-lesson2-quiz.html',
+    ),
   ];
 
   static List<CatalogLesson> catalogLessons(String courseId) {

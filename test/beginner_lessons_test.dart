@@ -131,6 +131,29 @@ void main() {
     );
   });
 
+  test('중급 2강 영상과 연습문제를 연결한다', () {
+    final week =
+        EnrollmentService.defaultWeek('intermediate_grammar_speaking', 2);
+
+    expect(week.title, '2강');
+    expect(week.videoUrl, 'https://youtu.be/ycjiMoPOpy8');
+    expect(week.problemLinks.single.title, '2강 연습문제');
+    expect(
+      week.problemLinks.single.url,
+      '/quizzes/gleam-level3-lesson2-quiz.html',
+    );
+    expect(
+      UrlUtil.playerUrl(
+        'https://www.youtube.com/watch?v=ycjiMoPOpy8&list=PLeelS27LkLHE&index=2',
+      ),
+      'https://www.youtube.com/embed/ycjiMoPOpy8?rel=0&playsinline=1',
+    );
+    expect(
+      UrlUtil.lessonPlayerPath(week.videoUrl),
+      '/player.html?v=ycjiMoPOpy8',
+    );
+  });
+
   test('다른 과정 1회차는 기존 임시 인강을 유지한다', () {
     final week = EnrollmentService.defaultWeek('basic_grammar_speaking', 1);
     expect(week.videoUrl, EnrollmentService.defaultWeek1VideoUrl);
