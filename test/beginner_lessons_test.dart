@@ -3,10 +3,11 @@ import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
 
 void main() {
-  test('왕초보 1강부터 3강 인강 주소를 회차에 연결한다', () {
+  test('왕초보 1강부터 4강 인강 주소를 회차에 연결한다', () {
     final first = EnrollmentService.defaultWeek('beginner_phonics', 1);
     final second = EnrollmentService.defaultWeek('beginner_phonics', 2);
     final third = EnrollmentService.defaultWeek('beginner_phonics', 3);
+    final fourth = EnrollmentService.defaultWeek('beginner_phonics', 4);
 
     expect(first.title, '1강');
     expect(first.videoUrl, 'https://youtu.be/UMTr9cXimZM');
@@ -38,6 +39,18 @@ void main() {
     expect(
       third.problemLinks.single.url,
       '/quizzes/gleam-level1-lesson3-quiz.html',
+    );
+    expect(fourth.title, '4강');
+    expect(fourth.videoUrl, 'https://youtu.be/6oYf9w2g-DQ');
+    expect(
+      UrlUtil.playerUrl(
+        'https://www.youtube.com/watch?v=6oYf9w2g-DQ&list=PLTyD0pemTuN0',
+      ),
+      'https://www.youtube-nocookie.com/embed/6oYf9w2g-DQ?rel=0&playsinline=1',
+    );
+    expect(
+      UrlUtil.playerUrl(fourth.videoUrl),
+      'https://www.youtube-nocookie.com/embed/6oYf9w2g-DQ?rel=0&playsinline=1',
     );
   });
 
