@@ -45,6 +45,12 @@ class Url {
   static void revokeObjectUrl(String url) {}
 }
 
+class IFrameElement {
+  String src = '';
+  final CssStyleDeclaration style = CssStyleDeclaration();
+  void setAttribute(String name, String value) {}
+}
+
 class ImageElement {
   String src = '';
   int? width = 0;

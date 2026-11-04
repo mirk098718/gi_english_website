@@ -15,6 +15,7 @@ import 'package:gi_english_website/util/UrlIUtil.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
+import 'package:gi_english_website/widget/YoutubeLessonPlayer.dart';
 
 import '../util/WidgetUtil.dart';
 
@@ -1026,16 +1027,9 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                     color: Palette.grey500),
               )
             else
-              Align(
-                alignment: Alignment.centerLeft,
-                child: OutlinedButton.icon(
-                  onPressed: () => UrlUtil.openPlayer(week.videoUrl),
-                  icon: Icon(Icons.play_circle_outline),
-                  label: Text(
-                    week.title.isNotEmpty ? week.title : '인강 시청하기',
-                    style: TextStyle(fontFamily: "NotoSansKR"),
-                  ),
-                ),
+              YoutubeLessonPlayer(
+                videoUrl: week.videoUrl,
+                title: week.title.isNotEmpty ? week.title : '인강 시청하기',
               ),
             SizedBox(height: 16),
             Align(
@@ -1592,50 +1586,50 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Palette.grey200),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.play_circle_fill,
-              size: 28, color: widget.course.accentColor),
-          SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  lesson.title,
-                  style: TextStyle(
-                    fontFamily: "NotoSansKR",
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Palette.black,
-                  ),
-                ),
-                if (lesson.description.isNotEmpty) ...[
-                  SizedBox(height: 4),
-                  Text(
-                    lesson.description,
-                    style: TextStyle(
-                      fontFamily: "NotoSansKR",
-                      fontSize: 13,
-                      color: Palette.grey600,
+          Row(
+            children: [
+              Icon(Icons.play_circle_fill,
+                  size: 28, color: widget.course.accentColor),
+              SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      lesson.title,
+                      style: TextStyle(
+                        fontFamily: "NotoSansKR",
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Palette.black,
+                      ),
                     ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          if (lesson.videoUrl.isNotEmpty)
-            TextButton(
-              onPressed: () => UrlUtil.openPlayer(lesson.videoUrl),
-              child: Text(
-                "시청하기",
-                style: TextStyle(
-                  fontFamily: "NotoSansKR",
-                  fontSize: 13,
-                  color: Palette.secondaryDark,
+                    if (lesson.description.isNotEmpty) ...[
+                      SizedBox(height: 4),
+                      Text(
+                        lesson.description,
+                        style: TextStyle(
+                          fontFamily: "NotoSansKR",
+                          fontSize: 13,
+                          color: Palette.grey600,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
+            ],
+          ),
+          if (lesson.videoUrl.isNotEmpty) ...[
+            SizedBox(height: 12),
+            YoutubeLessonPlayer(
+              videoUrl: lesson.videoUrl,
+              title: lesson.title.isNotEmpty ? lesson.title : '시청하기',
             ),
+          ],
         ],
       ),
     );
