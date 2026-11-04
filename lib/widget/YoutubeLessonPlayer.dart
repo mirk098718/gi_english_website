@@ -35,7 +35,6 @@ class _YoutubeLessonPlayerState extends State<YoutubeLessonPlayer> {
     if (!kIsWeb || id == null || !_registered.add(_viewType)) return;
     ui.platformViewRegistry.registerViewFactory(_viewType, (int viewId) {
       final iframe = html.IFrameElement()
-        ..src = UrlUtil.playerUrl(widget.videoUrl)
         ..style.border = 'none'
         ..style.width = '100%'
         ..style.height = '100%';
@@ -46,6 +45,10 @@ class _YoutubeLessonPlayerState extends State<YoutubeLessonPlayer> {
       iframe.setAttribute('allowfullscreen', 'true');
       iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
       iframe.setAttribute('title', widget.title);
+      iframe.src = UrlUtil.playerUrl(
+        widget.videoUrl,
+        origin: Uri.base.origin,
+      );
       return iframe;
     });
   }

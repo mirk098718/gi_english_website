@@ -25,15 +25,15 @@ void main() {
     expect(third.videoUrl, 'https://youtu.be/mHrkwI56dVw');
     expect(
       UrlUtil.playerUrl(first.videoUrl),
-      'https://www.youtube-nocookie.com/embed/UMTr9cXimZM?rel=0&playsinline=1',
+      'https://www.youtube.com/embed/UMTr9cXimZM?rel=0&playsinline=1',
     );
     expect(
       UrlUtil.playerUrl(second.videoUrl),
-      'https://www.youtube-nocookie.com/embed/ikDXCNb66Yo?rel=0&playsinline=1',
+      'https://www.youtube.com/embed/ikDXCNb66Yo?rel=0&playsinline=1',
     );
     expect(
       UrlUtil.playerUrl(third.videoUrl),
-      'https://www.youtube-nocookie.com/embed/mHrkwI56dVw?rel=0&playsinline=1',
+      'https://www.youtube.com/embed/mHrkwI56dVw?rel=0&playsinline=1',
     );
     expect(third.problemLinks.single.title, '3강 연습문제');
     expect(
@@ -46,11 +46,11 @@ void main() {
       UrlUtil.playerUrl(
         'https://www.youtube.com/watch?v=6oYf9w2g-DQ&list=PLTyD0pemTuN0',
       ),
-      'https://www.youtube-nocookie.com/embed/6oYf9w2g-DQ?rel=0&playsinline=1',
+      'https://www.youtube.com/embed/6oYf9w2g-DQ?rel=0&playsinline=1',
     );
     expect(
       UrlUtil.playerUrl(fourth.videoUrl),
-      'https://www.youtube-nocookie.com/embed/6oYf9w2g-DQ?rel=0&playsinline=1',
+      'https://www.youtube.com/embed/6oYf9w2g-DQ?rel=0&playsinline=1',
     );
   });
 
@@ -100,11 +100,21 @@ void main() {
       UrlUtil.playerUrl(
         'https://www.youtube.com/watch?v=Wnp7FbT_AZ0&list=PLeelS27LkLHE',
       ),
-      'https://www.youtube-nocookie.com/embed/Wnp7FbT_AZ0?rel=0&playsinline=1',
+      'https://www.youtube.com/embed/Wnp7FbT_AZ0?rel=0&playsinline=1',
     );
     expect(
       UrlUtil.playerUrl(week.videoUrl),
-      'https://www.youtube-nocookie.com/embed/Wnp7FbT_AZ0?rel=0&playsinline=1',
+      'https://www.youtube.com/embed/Wnp7FbT_AZ0?rel=0&playsinline=1',
+    );
+    expect(
+      UrlUtil.playerUrl(week.videoUrl, origin: 'https://gleam-island.web.app'),
+      'https://www.youtube.com/embed/Wnp7FbT_AZ0?rel=0&playsinline=1&origin=https%3A%2F%2Fgleam-island.web.app',
+    );
+    expect(
+      UrlUtil.lessonPlayerPath(
+        'https://www.youtube.com/watch?v=Wnp7FbT_AZ0&list=PLeelS27LkLHE',
+      ),
+      '/player.html?v=Wnp7FbT_AZ0',
     );
 
     final stored = OnlineWeek(

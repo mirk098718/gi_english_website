@@ -37,10 +37,23 @@ class UrlUtil {
   }
 
   /// 유튜브 페이지 전체가 아니라 영상 재생기만 여는 주소.
-  static String playerUrl(String url) {
+  /// [origin]을 넣어야 유튜브가 재생기를 허용한다. 없으면 Error 153이 난다.
+  static String playerUrl(String url, {String? origin}) {
     final id = youtubeVideoId(url);
     if (id == null) return url.trim();
-    return 'https://www.youtube-nocookie.com/embed/$id?rel=0&playsinline=1';
+    final query = StringBuffer('rel=0&playsinline=1');
+    final site = origin?.trim() ?? '';
+    if (site.isNotEmpty) {
+      query.write('&origin=${Uri.encodeComponent(site)}');
+    }
+    return 'https://www.youtube.com/embed/$id?$query';
+  }
+
+  /// 재생기를 우리 페이지에 붙여 연다. 유튜브 주소를 바로 열면 Referer가 빠져 Error 153이 난다.
+  static String lessonPlayerPath(String url) {
+    final id = youtubeVideoId(url);
+    if (id == null) return url.trim();
+    return '/player.html?v=$id';
   }
 
   /// 사이트 안 경로(/quizzes/...)는 웹에서는 현재 주소, 앱에서는 호스팅 주소로 연다.
@@ -54,7 +67,9 @@ class UrlUtil {
   }
 
   static Future<void> openPlayer(String url) {
-    return _launch(playerUrl(url), alreadyResolved: true);
+    final id = youtubeVideoId(url);
+    if (id == null) return open(url);
+    return _launch(lessonPlayerPath(url));
   }
 
   static Future<void> open(String url) async {
