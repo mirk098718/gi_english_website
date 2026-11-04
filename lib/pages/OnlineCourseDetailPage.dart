@@ -1029,7 +1029,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: OutlinedButton.icon(
-                  onPressed: () => UrlUtil.open(week.videoUrl),
+                  onPressed: () => UrlUtil.openPlayer(week.videoUrl),
                   icon: Icon(Icons.play_circle_outline),
                   label: Text(
                     week.title.isNotEmpty ? week.title : '인강 시청하기',
@@ -1626,7 +1626,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
           ),
           if (lesson.videoUrl.isNotEmpty)
             TextButton(
-              onPressed: () => UrlUtil.open(lesson.videoUrl),
+              onPressed: () => UrlUtil.openPlayer(lesson.videoUrl),
               child: Text(
                 "시청하기",
                 style: TextStyle(

@@ -129,6 +129,7 @@ class StudentLearningProgressPanel extends StatelessWidget {
             title: week.videoLabel,
             url: week.videoUrl,
             done: week.videoChecked,
+            asPlayer: true,
           ),
           ...problems.map((link) => _line(
                 label: '문제',
@@ -146,6 +147,7 @@ class StudentLearningProgressPanel extends StatelessWidget {
     required String title,
     required String url,
     required bool done,
+    bool asPlayer = false,
   }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 4),
@@ -175,7 +177,7 @@ class StudentLearningProgressPanel extends StatelessWidget {
                 ),
                 if (url.trim().isNotEmpty)
                   InkWell(
-                    onTap: () => UrlUtil.open(url),
+                    onTap: () => asPlayer ? UrlUtil.openPlayer(url) : UrlUtil.open(url),
                     child: Text(
                       '열기',
                       style: TextStyle(

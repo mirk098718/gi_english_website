@@ -28,6 +28,21 @@ class UrlUtil {
     return trimmed;
   }
 
+  static final RegExp _youtubeId = RegExp(
+    r'(?:studio\.youtube\.com/video/|youtube\.com/watch\?[^#]*v=|youtu\.be/|youtube\.com/embed/|youtube\.com/shorts/)([A-Za-z0-9_-]{6,})',
+  );
+
+  static String? youtubeVideoId(String url) {
+    return _youtubeId.firstMatch(url.trim())?.group(1);
+  }
+
+  /// 유튜브 페이지 전체가 아니라 영상 재생기만 여는 주소.
+  static String playerUrl(String url) {
+    final id = youtubeVideoId(url);
+    if (id == null) return url.trim();
+    return 'https://www.youtube-nocookie.com/embed/$id?rel=0&playsinline=1';
+  }
+
   /// 사이트 안 경로(/quizzes/...)는 웹에서는 현재 주소, 앱에서는 호스팅 주소로 연다.
   static Uri resolveLaunchUri(String url) {
     final normalized = normalizeVideoUrl(url);
@@ -38,10 +53,19 @@ class UrlUtil {
     return Uri.parse('https://gleam-island.web.app$path');
   }
 
+  static Future<void> openPlayer(String url) {
+    return _launch(playerUrl(url), alreadyResolved: true);
+  }
+
   static Future<void> open(String url) async {
     final normalized = normalizeVideoUrl(url);
     if (normalized.isEmpty) return;
-    final uri = resolveLaunchUri(normalized);
+    return _launch(normalized);
+  }
+
+  static Future<void> _launch(String url, {bool alreadyResolved = false}) async {
+    if (url.isEmpty) return;
+    final uri = alreadyResolved ? Uri.parse(url) : resolveLaunchUri(url);
     try {
       final launched = await launchUrl(
         uri,

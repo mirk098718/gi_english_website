@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
+import 'package:gi_english_website/util/UrlIUtil.dart';
 
 void main() {
   test('왕초보 1강부터 3강 인강 주소를 회차에 연결한다', () {
@@ -21,6 +22,18 @@ void main() {
     );
     expect(second.videoUrl, 'https://youtu.be/ikDXCNb66Yo');
     expect(third.videoUrl, 'https://youtu.be/mHrkwI56dVw');
+    expect(
+      UrlUtil.playerUrl(first.videoUrl),
+      'https://www.youtube-nocookie.com/embed/UMTr9cXimZM?rel=0&playsinline=1',
+    );
+    expect(
+      UrlUtil.playerUrl(second.videoUrl),
+      'https://www.youtube-nocookie.com/embed/ikDXCNb66Yo?rel=0&playsinline=1',
+    );
+    expect(
+      UrlUtil.playerUrl(third.videoUrl),
+      'https://www.youtube-nocookie.com/embed/mHrkwI56dVw?rel=0&playsinline=1',
+    );
     expect(third.problemLinks.single.title, '3강 연습문제');
     expect(
       third.problemLinks.single.url,
