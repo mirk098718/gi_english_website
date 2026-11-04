@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>글림 중급 영어 제1강 · 문제 풀이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4ecdd; --bg-soft:#faf5ea; --card:#fffdf9;
+  --ink:#33241a; --sub:#82705d; --line:#e7d8c0;
+  --coffee:#7a4a26; --caramel:#d98a2b; --caramel-deep:#a9620f; --caramel-soft:#f8e7c8;
+  --ok:#3e7d54; --ok-bg:#e6f2e6; --no:#bc4741; --no-bg:#fae5e0;
+  --disp:'Black Han Sans', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --serif:Georgia, 'Times New Roman', serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans); color:var(--ink); background:var(--bg);
+  background-image:radial-gradient(#e2d3b8 1px, transparent 1px);
+  background-size:22px 22px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  word-break:keep-all; overflow-wrap:break-word; /* 한글은 단어 단위로만 줄바꿈 */
+}
+.en{font-family:var(--serif); letter-spacing:.01em}
+.wrap{max-width:880px; margin:0 auto; padding:0 18px}
+
+/* ── 상단바 ─────────────────────────── */
+.topbar{position:sticky; top:0; z-index:50; background:rgba(244,236,221,.92); backdrop-filter:blur(8px); border-bottom:1.5px solid var(--line)}
+.topbar .wrap{display:flex; align-items:center; gap:10px; justify-content:space-between; padding-top:10px; padding-bottom:10px; flex-wrap:wrap}
+.brand{font-family:var(--disp); font-size:1.02rem; color:var(--coffee); letter-spacing:.02em; display:flex; align-items:center; gap:6px}
+.brand small{white-space:nowrap; font-family:var(--sans); font-weight:700; color:var(--sub); font-size:.72rem; border:1.5px solid var(--line); border-radius:999px; padding:2px 8px; background:var(--card)}
+.scores{display:flex; gap:8px; align-items:center; font-weight:800; font-size:.8rem}
+.scores .chip{background:var(--card); border:1.5px solid var(--line); border-radius:999px; padding:4px 12px; color:var(--sub); white-space:nowrap}
+.scores .chip b{color:var(--coffee)}
+.scores .chip.ok b{color:var(--ok)}
+
+/* ── 히어로 ─────────────────────────── */
+.hero{padding:44px 0 10px; text-align:center}
+.lg-badge{display:inline-block; white-space:nowrap; background:var(--coffee); color:#f8ecdb; font-weight:800; font-size:.78rem; letter-spacing:.14em; border-radius:999px; padding:5px 16px}
+.hero h1{font-family:var(--disp); font-weight:400; font-size:clamp(1.7rem,5vw,2.6rem); line-height:1.28; margin:16px 0 6px; color:var(--ink)}
+.hero h1 .u{color:var(--caramel-deep); background:linear-gradient(transparent 68%, var(--caramel-soft) 68%)}
+.hero p.sub{color:var(--sub); font-weight:600; font-size:.95rem}
+
+/* 어순 공식 티켓 (시그니처) */
+.formula{display:flex; align-items:stretch; justify-content:center; gap:0; margin:30px auto 8px; flex-wrap:wrap; max-width:640px}
+.f-chip{flex:1 1 120px; min-width:100px; background:var(--card); border:2px solid var(--ink); border-radius:16px; padding:14px 12px 12px; position:relative; box-shadow:4px 4px 0 rgba(122,74,38,.22); text-align:center}
+.f-chip .role{position:absolute; top:-12px; left:50%; transform:translateX(-50%); font-size:.68rem; font-weight:900; letter-spacing:.08em; color:#fff; background:var(--coffee); border-radius:999px; padding:2px 11px; white-space:nowrap; max-width:none}
+.f-chip:nth-child(3) .role{background:var(--caramel-deep)}
+.f-chip:nth-child(5) .role{background:#3e7d54}
+.f-chip .en-big{font-family:var(--serif); font-size:1.55rem; font-weight:700; display:block; margin-top:6px}
+.f-chip .kr{font-size:.78rem; color:var(--sub); font-weight:700}
+.f-arrow{align-self:center; font-size:1.3rem; color:var(--caramel-deep); padding:0 10px; font-weight:900}
+.formula-note{color:var(--sub); font-size:.83rem; font-weight:700; margin-bottom:6px}
+.formula-note s{color:#b0473f}
+
+/* 요점 복습 */
+.recap{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:30px 0 8px}
+.r-card{background:var(--card); border:1.5px solid var(--line); border-radius:16px; padding:18px 16px; text-align:left}
+.r-card h3{font-size:.85rem; color:var(--caramel-deep); letter-spacing:.08em; font-weight:900; margin-bottom:8px}
+.r-card .ex{font-size:.95rem; margin-top:6px}
+.vs-box{background:var(--bg-soft); border:1px dashed var(--line); border-radius:10px; padding:8px 10px; margin-top:4px; font-size:.88rem}
+.vs-box .bad{color:#b0473f; font-weight:700}
+.vs-box .good{color:var(--ok); font-weight:800}
+.start-btn{display:inline-block; margin:26px 0 6px; background:var(--coffee); color:#fff7ec; font-weight:900; font-size:1rem; border:none; border-radius:999px; padding:14px 34px; cursor:pointer; box-shadow:0 6px 18px rgba(122,74,38,.32); transition:transform .15s, box-shadow .15s}
+.start-btn:hover{transform:translateY(-2px); box-shadow:0 10px 22px rgba(122,74,38,.38)}
+
+/* ── 섹션 공통 ──────────────────────── */
+section.block{padding:34px 0 6px}
+.sec-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:6px}
+.sec-head h2{font-family:var(--disp); font-weight:400; font-size:1.45rem; color:var(--coffee)}
+.sec-head .count{font-weight:900; color:var(--caramel-deep); font-size:.9rem; background:var(--caramel-soft); border-radius:999px; padding:3px 14px; white-space:nowrap}
+.sec-desc{color:var(--sub); font-size:.88rem; font-weight:600; margin-bottom:20px}
+
+/* ── 문제 카드 ──────────────────────── */
+.q-card{background:var(--card); border:1.5px solid var(--line); border-radius:18px; padding:20px 20px 18px; margin-bottom:18px; box-shadow:0 2px 10px rgba(122,74,38,.06)}
+.q-top{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px}
+.stamp{font-family:var(--disp); font-size:.95rem; color:var(--coffee); border:2px solid var(--coffee); border-radius:8px; padding:1px 9px; transform:rotate(-3deg); letter-spacing:.05em; flex:none; white-space:nowrap}
+.tchip{font-size:.72rem; font-weight:900; letter-spacing:.04em; border-radius:999px; padding:4px 12px; white-space:nowrap}
+.tc-concept{background:#f2e3c8; color:#8a5a1f}
+.tc-blank{background:#e3edf6; color:#2e5e83}
+.tc-wrong{background:#f9e0dc; color:#a3403a}
+.tc-multi{background:#e9e2f5; color:#5b4a8a}
+.tc-order{background:#ddefe4; color:#2f6e4f}
+.tc-dialog{background:#fce8ee; color:#96374f}
+.tc-trans{background:#e0eef0; color:#22626b}
+.tc-part{background:#f6ecd8; color:#7a641f}
+.tc-correct{background:#e2ecdf; color:#3c6b2f}
+.tc-vocab{background:#eceae7; color:#5f5346}
+.tc-write{background:#f8e7c8; color:#a9620f}
+.multi-note{font-size:.74rem; color:var(--caramel-deep); font-weight:800; background:var(--caramel-soft); border-radius:999px; padding:3px 10px; white-space:nowrap}
+.q-text{font-size:1.02rem; font-weight:700; margin-bottom:14px}
+.q-text .q-en{font-family:var(--serif); color:var(--coffee)}
+.opts{display:grid; gap:9px}
+.opt{display:flex; align-items:flex-start; gap:10px; width:100%; text-align:left; background:var(--bg-soft); border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; cursor:pointer; font-family:var(--sans); font-size:.95rem; color:var(--ink); transition:border-color .12s, background .12s, transform .12s}
+.opt:hover:not(:disabled){border-color:var(--caramel); transform:translateX(2px)}
+.opt:disabled{cursor:default}
+.opt .mark{font-weight:900; color:var(--caramel-deep); flex:none}
+.opt .box{flex:none; width:18px; height:18px; border:2px solid var(--sub); border-radius:5px; margin-top:2px; display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; color:transparent; font-weight:900}
+.opt.sel{border-color:var(--caramel-deep); background:var(--caramel-soft)}
+.opt.sel .box{background:var(--caramel-deep); border-color:var(--caramel-deep); color:#fff}
+.opt.right{border-color:var(--ok); background:var(--ok-bg)}
+.opt.right .box{background:var(--ok); border-color:var(--ok); color:#fff}
+.opt.right .mark{color:var(--ok)}
+.opt.right .mark::after{content:" ✓"; color:var(--ok); font-weight:900}
+.opt.miss{border-color:var(--no); background:var(--no-bg)}
+.opt.miss .box{background:var(--no); border-color:var(--no); color:#fff}
+.opt.miss .mark{color:var(--no)}
+.opt.miss .mark::after{content:" ✗"; color:var(--no); font-weight:900}
+.opt.dim{opacity:.55}
+.q-actions{display:flex; gap:10px; margin-top:14px; align-items:center}
+.btn-check{background:var(--caramel-deep); color:#fff; border:none; border-radius:999px; padding:10px 26px; font-weight:900; font-size:.88rem; cursor:pointer; font-family:var(--sans); transition:opacity .15s, transform .15s}
+.btn-check:hover:not(:disabled){transform:translateY(-1px)}
+.btn-check:disabled{opacity:.35; cursor:not-allowed}
+.graded-tag{font-weight:900; font-size:.85rem}
+.graded-tag.good{color:var(--ok)} .graded-tag.bad{color:var(--no)}
+.feedback{display:none; margin-top:14px; border-top:1.5px dashed var(--line); padding-top:13px}
+.feedback.show{display:block; animation:slidein .25s ease}
+@keyframes slidein{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+.fb-title{font-weight:900; font-size:.9rem; margin-bottom:5px}
+.fb-title.good{color:var(--ok)} .fb-title.bad{color:var(--no)}
+.fb-exp{font-size:.9rem; color:var(--ink); background:var(--bg-soft); border-radius:10px; padding:10px 13px}
+.fb-exp .en{color:var(--coffee)}
+
+/* ── 주관식 ─────────────────────────── */
+.situation{background:var(--bg-soft); border:1.5px dashed var(--line); border-radius:12px; padding:13px 15px; font-size:.95rem; margin-bottom:12px}
+.hints{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:12px}
+.hint{font-size:.74rem; font-weight:800; color:var(--coffee); background:var(--caramel-soft); border-radius:999px; padding:3px 11px; white-space:nowrap}
+.hint .en{font-style:normal}
+textarea{width:100%; min-height:86px; border:1.5px solid var(--line); border-radius:12px; background:var(--bg-soft); padding:12px 14px; font-family:var(--sans); font-size:.97rem; color:var(--ink); resize:vertical}
+textarea:focus{outline:2px solid var(--caramel); border-color:var(--caramel)}
+.model{display:none; margin-top:14px; background:#f2ede2; border-radius:12px; padding:12px 15px; font-size:.93rem}
+.model.show{display:block; animation:slidein .25s ease}
+.model b{color:var(--coffee)}
+
+/* ── 결과 ───────────────────────────── */
+.result{background:var(--card); border:2px solid var(--ink); border-radius:20px; box-shadow:6px 6px 0 rgba(122,74,38,.2); padding:26px 22px; margin:34px 0 10px; text-align:center}
+.result .big{font-family:var(--disp); font-size:2.5rem; color:var(--coffee); line-height:1.1}
+.result .msg{font-weight:800; margin-top:6px}
+.type-table{width:100%; border-collapse:collapse; margin-top:16px; font-size:.85rem}
+.type-table th,.type-table td{border-bottom:1px dashed var(--line); padding:7px 6px; text-align:center}
+.type-table th{color:var(--sub); font-size:.76rem; letter-spacing:.05em}
+.type-table td:first-child{text-align:left; font-weight:700}
+.btn-reset{margin-top:18px; background:transparent; color:var(--no); border:2px solid var(--no); border-radius:999px; padding:10px 26px; font-weight:900; cursor:pointer; font-family:var(--sans); font-size:.88rem}
+.btn-reset:hover{background:var(--no-bg)}
+footer{text-align:center; color:var(--sub); font-size:.78rem; font-weight:600; padding:26px 0 40px}
+.all-done{display:none; font-size:2.6rem; margin-top:4px}
+.all-done.show{display:block; animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.4); opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1); opacity:1}}
+
+button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid var(--caramel-deep); outline-offset:2px}
+/* 칩이 4개(칩+화살표 = 자식 7개)면 좁은 화면에서 2+2 그리드:
+   화살표는 줄바꿈 시 방향이 어긋나므로 숨기고, 두 줄로 균등 배치 + 줄 간격 확보 */
+@media (max-width:680px){
+  .formula:has(.f-chip:nth-child(7)){gap:18px 14px}
+  .formula:has(.f-chip:nth-child(7)) .f-chip{flex:1 1 calc(50% - 7px); min-width:calc(50% - 7px); padding:14px 10px 11px}
+  .formula:has(.f-chip:nth-child(7)) .f-arrow{display:none}
+}
+@media (max-width:560px){
+  .f-arrow{padding:0 3px; font-size:1.05rem}
+  .f-chip{min-width:96px; flex:1 1 96px; padding:13px 8px 10px}
+  .f-chip .role{font-size:.6rem; letter-spacing:.01em; padding:2px 8px}
+  .f-chip .en-big{font-size:1.24rem}
+  .f-chip .kr{font-size:.72rem}
+  .q-card{padding:16px 14px 15px}
+  .lg-badge{font-size:.7rem; letter-spacing:.08em; padding:5px 13px}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} html{scroll-behavior:auto} }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">☕ 글림 중급 영어 <small>제1강 문제 풀이</small></div>
+    <div class="scores">
+      <span class="chip">채점 <b id="gradedN">0</b> / 25</span>
+      <span class="chip ok">정답 <b id="correctN">0</b> / 25</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <span class="lg-badge">제 01강 · 현재완료진행</span>
+    <h1><span class="en">I've been doing this for years</span><br/><span class="u">have been -ing</span> 확인 문제</h1>
+    <p class="sub">핵심 표현 · <span class="en">I've been waiting for you.</span> / <span class="en">How long have you been learning English?</span> — 30문항으로 '쉼 없이 이어온 땀방울'을 영어로 말하는 감각을 완성해 보세요.</p>
+
+    <div class="formula" aria-label="현재완료진행 공식">
+      <div class="f-chip"><span class="role">조동사 · 주어에 맞춰</span><span class="en-big en">have / has</span><span class="kr">~해 왔다</span></div>
+      <div class="f-arrow">→</div>
+      <div class="f-chip"><span class="role">be동사 · 고정</span><span class="en-big en">been</span><span class="kr">계속 ~인 상태로</span></div>
+      <div class="f-arrow">→</div>
+      <div class="f-chip"><span class="role">본동사 · -ing</span><span class="en-big en">-ing</span><span class="kr">지금도 하고 있다</span></div>
+    </div>
+    <p class="formula-note">결과만 말하면 <s>I have painted the room.</s> ✗ &nbsp;→&nbsp; 땀방울까지 보여주려면 <b style="color:var(--caramel-deep)">have been -ing</b></p>
+
+    <div class="recap">
+      <div class="r-card">
+        <h3>1. 현재완료 vs 현재완료진행</h3>
+        <div class="vs-box"><span class="bad">결과·완료</span> <span class="en">I have painted the room.</span> <span class="bad">(다 끝냈어)</span></div>
+        <div class="vs-box"><span class="good">과정·지속</span> <span class="en">I have been painting the room all morning.</span> <span class="good">(아침 내내 땀범벅!)</span></div>
+      </div>
+      <div class="r-card">
+        <h3>2. 단짝 표현 &amp; 질문 공식</h3>
+        <p style="font-size:.88rem; font-weight:700"><b>all day</b> · <b>lately / recently</b> · <b>for hours</b></p>
+        <p class="ex en">How long have you been + <b>-ing</b>?</p>
+        <p style="font-size:.82rem; color:var(--sub); font-weight:700">얼마나 오랫동안 ~해 오고 계신가요?</p>
+      </div>
+      <div class="r-card">
+        <h3>3. 오늘의 한 문장</h3>
+        <p style="font-size:.88rem; font-weight:700">근황 토크에서 프로페셔널한 인상 주는 문장</p>
+        <p class="ex en">I've been <b>working on</b> ~</p>
+        <p style="font-size:.82rem; color:var(--sub); font-weight:700">요즘 ~ 작업을 계속 진행 중이에요</p>
+      </div>
+    </div>
+
+    <a href="#mcq"><button class="start-btn">객관식 25문제 풀기 ↓</button></a>
+  </section>
+
+  <section class="block" id="mcq">
+    <div class="sec-head"><h2>객관식 문제</h2><span class="count">25문제</span></div>
+    <p class="sec-desc">유형별로 구성되어 있어요: 개념 이해 · 빈칸 채우기 · 틀린 문장 찾기 · 모두 고르기 · 단어 배열 · 대화 문제 · 뜻 고르기 · 서술어 찾기. 답을 고르고 <b>채점하기</b>를 누르면 바로 해설이 나옵니다.</p>
+    <div id="mcqList"></div>
+  </section>
+
+  <section class="block" id="essay">
+    <div class="sec-head"><h2>주관식 작문</h2><span class="count">5문제</span></div>
+    <p class="sec-desc">상황을 읽고 직접 영어 문장을 써 보세요. 그다음 <b>모범답안 보기</b>를 눌러 내 답과 비교해 보세요. 정답은 하나가 아닐 수도 있어요!</p>
+    <div id="essayList"></div>
+  </section>
+
+  <section class="result" id="result">
+    <div class="all-done" id="allDone">🎉</div>
+    <div class="big"><span id="finalScore">0</span><span style="font-size:1.2rem; color:var(--sub)"> / 25</span></div>
+    <div class="msg" id="resultMsg">문제를 풀면 결과가 여기에 표시돼요.</div>
+    <table class="type-table" id="typeTable" aria-label="유형별 정답률">
+      <thead><tr><th>유형</th><th>정답 / 채점</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button class="btn-reset" id="btnReset">모두 다시 풀기</button>
+  </section>
+
+</main>
+<footer>글림 중급 영어 · 제 01강 「현재완료진행」 — 오늘 자기소개에서 I've been working on ~ 한 문장을 꼭 꺼내 보세요. 열정은 have been -ing로 말할 때 가장 생생합니다. 2강 과거완료 편에서 만나요!</footer>
+
+<script>
+/* ─────────── 문제 데이터 ─────────── */
+const TYPE = {
+  concept:{label:"개념 이해", cls:"tc-concept"}, blank:{label:"빈칸 채우기", cls:"tc-blank"},
+  wrong:{label:"틀린 문장 찾기", cls:"tc-wrong"}, multi:{label:"모두 고르기", cls:"tc-multi"},
+  order:{label:"단어 배열", cls:"tc-order"}, dialog:{label:"대화 문제", cls:"tc-dialog"},
+  trans:{label:"뜻 고르기", cls:"tc-trans"}, part:{label:"서술어 찾기", cls:"tc-part"},
+  correct:{label:"바른 문장 찾기", cls:"tc-correct"}, vocab:{label:"어휘", cls:"tc-vocab"},
+  write:{label:"작문", cls:"tc-write"}
+};
+const QUIZ = [
+ {t:"concept", q:"현재완료진행을 만드는 기본 형태로 알맞은 것은?",
+  o:["have / has + p.p.","have / has been + -ing","be동사 + -ing","will have + p.p."], a:[1],
+  e:"현재완료진행은 have/has + been + -ing! been은 주어와 상관없이 항상 been으로 고정입니다."},
+ {t:"concept", q:"현재완료(have p.p.)와 현재완료진행(have been -ing)의 뉘앙스 차이를 가장 잘 설명한 것은?",
+  o:["현재완료는 과정을, 현재완료진행은 결과를 강조한다","둘은 언제나 똑같은 뜻이라 바꿔 써도 된다","현재완료는 결과·완료를, 현재완료진행은 과정·지속을 강조한다","현재완료진행은 과거의 한 시점만 말한다"], a:[2],
+  e:"I have painted the room.(끝냈다, 결과) vs I have been painting the room all morning.(아침 내내 계속, 과정). 땀방울을 보여주는 쪽이 have been -ing입니다."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>I ___ for you for over an hour!</span> (나 너 한 시간 넘게 기다리고 있었어!)",
+  o:["have been waiting","has been waiting","have waiting","am been waiting"], a:[0],
+  e:"주어 I → have, 그 뒤에 been, 본동사는 -ing! → I have been waiting for you for over an hour."},
+ {t:"wrong", q:"다음 중 형태가 틀린 문장은?",
+  o:["I have been waiting for 30 minutes.","She has been studying all day.","They have been working since morning.","He have been running for an hour."], a:[3],
+  e:"주어가 He(3인칭 단수)면 has! → He has been running for an hour."},
+ {t:"concept", q:"<span class='q-en'>I have been painting the room all morning.</span> 이 문장이 강조하는 것은?",
+  o:["페인트칠을 다 끝냈다는 결과","아침 내내 쉬지 않고 계속 해 오고 있다는 과정","내일 페인트칠을 하겠다는 예정","페인트칠을 한 번도 안 해 봤다는 경험"], a:[1],
+  e:"all morning(아침 내내)이 붙으면 과정·지속이 살아납니다. 옷에 페인트 묻고 땀 흘린 모습이 그려지는 표현이에요."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>How long ___ English?</span> (영어를 얼마나 오래 배워 오셨나요?)",
+  o:["do you learn","did you learn","have you been learning","are you learn"], a:[2],
+  e:"How long have you been + -ing? 는 '얼마나 오랫동안 ~해 오고 있나요'를 묻는 인터뷰 필수 질문입니다."},
+ {t:"wrong", q:"다음 중 틀린 문장은?",
+  o:["I have been waited for about 30 minutes.","I have been waiting for about 30 minutes.","She has been studying English every single day.","How long have you been living in Seoul?"], a:[0],
+  e:"been 뒤에는 반드시 -ing! waited(p.p.)가 아니라 waiting이 와야 합니다. → I have been waiting for about 30 minutes."},
+ {t:"concept", q:"현재완료진행과 가장 자연스럽게 어울리지 않는 표현은?",
+  o:["all day (하루 종일)","lately (요즘 들어)","for hours (몇 시간 동안)","yesterday (어제)"], a:[3],
+  e:"yesterday처럼 끝난 과거를 콕 집는 표현은 현재완료진행과 어울리지 않아요. all day·lately·recently·for hours가 단짝입니다."},
+ {t:"multi", q:"다음 중 현재완료진행 문장을 모두 고르시오.",
+  o:["I have painted the room.","I have been painting the room all morning.","She has finished her homework.","They have been waiting for the bus."], a:[1,3],
+  e:"have/has been + -ing가 보이면 현재완료진행! painted·finished는 p.p.만 쓰인 현재완료(결과)입니다."},
+ {t:"trans", q:"<span class='q-en'>I've been developing a new AI features module for our app.</span> 의 뜻은?",
+  o:["나는 우리 앱에 들어갈 새로운 AI 기능 모듈을 개발해 냈다.","나는 우리 앱에 들어갈 새로운 AI 기능 모듈을 계속 개발해 오고 있다.","나는 우리 앱의 AI 기능 모듈을 개발할 예정이다.","나는 우리 앱의 AI 기능 모듈을 개발한 적이 없다."], a:[1],
+  e:"have been developing = 계속 개발해 오고 있다(진행). 개발을 '완료'한 것이 아니라 지금도 이어지는 작업이라는 점이 핵심!"},
+ {t:"part", q:"<span class='q-en'>She has been studying English every single day.</span> 에서 현재완료진행을 만드는 <b>조동사 + be동사</b> 부분은?",
+  o:["has been","studying","English","every single day"], a:[0],
+  e:"has been이 현재완료진행의 뼈대(조동사+be동사), studying이 -ing 본동사입니다."},
+ {t:"dialog", q:"대화의 빈칸을 채워 보세요. — Chloe: <span class='q-en'>Have you been waiting long?</span> / Minwoo: <span class='q-en'>I ___ for about 30 minutes, but it's totally fine.</span>",
+  o:["wait","waited","'ve been waiting","'m waiting"], a:[2],
+  e:"Chloe가 Have you been waiting long?으로 물었으니 대답도 I've been waiting으로 받아주면 자연스럽습니다."},
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( I / have / been / waiting / for 30 minutes )",
+  o:["I have waiting been for 30 minutes.","I have been waiting for 30 minutes.","I been have waiting for 30 minutes.","I have been for 30 minutes waiting."], a:[1],
+  e:"주어(I) + have + been + -ing(waiting) + for 30 minutes 순서! been과 -ing 사이에는 아무것도 끼어들지 않습니다."},
+ {t:"trans", q:"'나는 요즘 계속 운동하고 있어.'를 영어로 옮긴 것은?",
+  o:["I exercise yesterday.","I have exercised once.","I will work out soon.","I've been working out lately."], a:[3],
+  e:"lately(요즘 들어) + have been working out(계속 운동해 오고 있다). '요즘 계속'은 have been -ing의 대표 무대입니다."},
+ {t:"concept", q:"<span class='q-en'>How long have you been + -ing?</span> 는 언제 쓰는 질문인가요?",
+  o:["얼마나 오랫동안 ~해 오고 있는지 물을 때","~을 몇 시에 했는지 물을 때","~을 앞으로 할 것인지 물을 때","~을 누구와 함께 했는지 물을 때"], a:[0],
+  e:"How long(얼마나 오래) + have you been -ing = 지금까지 이어온 기간을 묻는 질문! How long have you been living in Seoul?처럼 씁니다."},
+ {t:"wrong", q:"다음 중 틀린 문장은?",
+  o:["We have been waiting for hours.","Chloe has been reading an article.","I've been working on a new module.","She has been study English every day."], a:[3],
+  e:"has been 뒤에는 -ing! study가 아니라 studying이 와야 합니다. → She has been studying English every day."},
+ {t:"multi", q:"현재완료진행과 자연스럽게 어울리는 표현을 모두 고르시오.",
+  o:["for hours","yesterday","all day","last night"], a:[0,2],
+  e:"for hours(몇 시간 동안), all day(하루 종일)는 지속을 나타내 현재완료진행의 단짝! yesterday·last night은 끝난 과거라 어울리지 않습니다."},
+ {t:"part", q:"<span class='q-en'>I have been waiting for you.</span> 에서 <b>서술어(동사 부분 전체)</b>는?",
+  o:["I","have been waiting","you","for"], a:[1],
+  e:"'기다리고 있다'라는 서술어 전체가 have been waiting입니다. I는 주어, you는 전치사의 목적어예요."},
+ {t:"vocab", q:"<span class='q-en'>lately</span>의 뜻으로 알맞은 것은?",
+  o:["나중에","오랫동안","요즘 들어","먼저"], a:[2],
+  e:"lately = recently, 요즘 들어(계속). I've been working out lately. 처럼 현재완료진행과 자주 붙어 다닙니다."},
+ {t:"trans", q:"<span class='q-en'>She has been studying English every single day.</span> 의 뜻은?",
+  o:["그녀는 어제 영어를 공부했다.","그녀는 매일 영어를 공부할 계획이다.","그녀는 영어 공부를 그만두었다.","그녀는 매일매일 영어를 공부해 오고 있다."], a:[3],
+  e:"every single day(매일매일) + has been studying = 지금까지 하루도 빠짐없이 이어온 공부. 그래서 '공부해 오고 있다'입니다."},
+ {t:"correct", q:"다음 중 형태와 어순이 모두 바른 문장은?",
+  o:["I have been waiting for you for over an hour.","I have waiting for you for over an hour.","I has been waiting for you for over an hour.","I have been wait for you for over an hour."], a:[0],
+  e:"I + have + been + waiting(-ing) + for over an hour! have waiting(be동사 누락), has(주어 불일치), wait(-ing 누락)는 모두 오류입니다."},
+ {t:"multi", q:"다음 중 틀린 문장을 모두 고르시오.",
+  o:["I have been reading an article.","I have been waited for 30 minutes.","She has been study English every day.","How long have you been living in Seoul?"], a:[1,2],
+  e:"been 뒤에는 -ing만! waited(p.p.)와 study(원형)는 둘 다 오류입니다. → I have been waiting / She has been studying."},
+ {t:"dialog", q:"대화의 빈칸을 채워 보세요. — Chloe: <span class='q-en'>What have you been working on lately?</span> / Minwoo: <span class='q-en'>I ___ a new AI features module for our app.</span>",
+  o:["develop","developed","have developed","'ve been developing"], a:[3],
+  e:"What have you been working on lately?에 대한 대답은 I've been developing ~. 지금도 이어지는 작업이라 진행형이 자연스럽습니다."},
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( been / has / English / studying / she / every single day )",
+  o:["She has been studying English every single day.","She has studying been English every single day.","She been has studying English every single day.","She has been studying every single day English."], a:[0],
+  e:"주어(She) + has + been + studying(-ing) + 목적어(English) + 시간(every single day) 순서!"},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>She ___ English every single day.</span>",
+  o:["has studying","have been studying","has been studying","is been studying"], a:[2],
+  e:"주어 She → has, 그 뒤에 been + studying! has studying(been 누락)과 have(주어 불일치)는 오류입니다."}
+];
+const ESSAYS = [
+ {q:"기본 표현 쓰기", sit:"친구를 한 시간 넘게 기다렸어요. <b>『나는 너를 한 시간 넘게 기다리고 있었어.』</b>를 영어로 써 보세요.",
+  hints:["waiting","over an hour"],
+  model:"I've been waiting for you for over an hour.", modelKr:"나는 너를 한 시간 넘게 기다리고 있었어."},
+ {q:"상황 작문 1", sit:"늦게 도착한 친구에게 <b>『오래 기다렸어?』</b>라고 물어보세요. (현재완료진행 의문문)",
+  hints:["waiting","long"],
+  model:"Have you been waiting long?", modelKr:"오래 기다렸어?"},
+ {q:"상황 작문 2", sit:"요즘 우리 앱에 들어갈 새 AI 기능 모듈을 계속 개발하고 있어요. <b>『나는 우리 앱에 들어갈 새로운 AI 기능 모듈을 계속 개발해 오고 있어.』</b>를 영어로 써 보세요.",
+  hints:["developing","AI features module"],
+  model:"I've been developing a new AI features module for our app.", modelKr:"나는 우리 앱에 들어갈 새로운 AI 기능 모듈을 계속 개발해 오고 있어."},
+ {q:"상황 작문 3", sit:"새로 만난 사람에게 <b>『서울에서 얼마나 오래 살아오셨나요?』</b>라고 정중히 물어보세요.",
+  hints:["living","Seoul"],
+  model:"How long have you been living in Seoul?", modelKr:"서울에서 얼마나 오래 살아오셨나요?"},
+ {q:"자유 작문", sit:"요즘 내가 몰입하고 있는 일을 <b>『I've been + -ing』</b> 문장 <b>2개</b>로 써 보세요. (예시: I've been studying English every day.)",
+  hints:["I've been -ing ×2","lately / for hours"],
+  model:"I've been studying English every day. I've been working out for hours lately.", modelKr:"예시 — I've been reading a lot lately. / I've been learning to code for three months. 처럼 자유롭게!"}
+];
+
+/* ─────────── 렌더링 ─────────── */
+const state = QUIZ.map(()=>({sel:new Set(), graded:false, correct:false}));
+const marks = ["①","②","③","④"];
+const mcqList = document.getElementById("mcqList");
+
+QUIZ.forEach((item, qi)=>{
+  const meta = TYPE[item.t];
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">Q.${String(qi+1).padStart(2,"0")}</span>
+      <span class="tchip ${meta.cls}">${meta.label}</span>
+      ${item.a.length>1 ? '<span class="multi-note">정답 '+item.a.length+'개를 모두 고르세요</span>' : ''}
+    </div>
+    <p class="q-text">${item.q}</p>
+    <div class="opts">${item.o.map((op,oi)=>`
+      <button type="button" class="opt" data-oi="${oi}" aria-pressed="false">
+        ${item.a.length>1 ? '<span class="box">✓</span>' : '<span class="mark">'+marks[oi]+'</span>'}
+        <span class="${/^[A-Za-z]/.test(op) ? 'en' : ''}">${op}</span>
+      </button>`).join("")}
+    </div>
+    <div class="q-actions">
+      <button type="button" class="btn-check" disabled>채점하기</button>
+      <span class="graded-tag" hidden></span>
+    </div>
+    <div class="feedback"><p class="fb-title"></p><p class="fb-exp"></p></div>`;
+  mcqList.appendChild(card);
+
+  const opts = [...card.querySelectorAll(".opt")];
+  const btn = card.querySelector(".btn-check");
+  const tag = card.querySelector(".graded-tag");
+  const fb = card.querySelector(".feedback");
+  const fbTitle = card.querySelector(".fb-title");
+  const fbExp = card.querySelector(".fb-exp");
+
+  opts.forEach((b,oi)=>b.addEventListener("click", ()=>{
+    if(state[qi].graded) return;
+    if(item.a.length>1){
+      state[qi].sel.has(oi) ? state[qi].sel.delete(oi) : state[qi].sel.add(oi);
+      b.classList.toggle("sel"); b.setAttribute("aria-pressed", b.classList.contains("sel"));
+    } else {
+      state[qi].sel.clear();
+      opts.forEach(o=>{o.classList.remove("sel"); o.setAttribute("aria-pressed","false");});
+      state[qi].sel.add(oi); b.classList.add("sel"); b.setAttribute("aria-pressed","true");
+    }
+    btn.disabled = state[qi].sel.size===0;
+  }));
+
+  btn.addEventListener("click", ()=>{
+    const st = state[qi];
+    if(st.graded || st.sel.size===0) return;
+    const isRight = st.sel.size===item.a.length && item.a.every(x=>st.sel.has(x));
+    st.graded = true; st.correct = isRight;
+    opts.forEach((b,oi)=>{
+      b.disabled = true;
+      const box = b.querySelector(".box");   // 다중선택 전용. 단일선택에는 없음(null)
+      if(item.a.includes(oi)){ b.classList.add("right"); if(box) box.textContent="✓"; }
+      else if(st.sel.has(oi)){ b.classList.add("miss"); if(box) box.textContent="✗"; }
+      else b.classList.add("dim");
+    });
+    tag.hidden = false;
+    tag.textContent = isRight ? "정답!" : "다시 확인해 보세요";
+    tag.className = "graded-tag " + (isRight ? "good" : "bad");
+    fb.classList.add("show");
+    fbTitle.textContent = (isRight ? "⭕ 정답입니다! " : "❌ 아쉬워요. 정답은 " + item.a.map(i=>marks[i]).join(", ") + " ");
+    fbTitle.className = "fb-title " + (isRight ? "good" : "bad");
+    fbExp.innerHTML = "💡 " + item.e;
+    updateScores();
+  });
+});
+
+/* ── 주관식 ── */
+const essayList = document.getElementById("essayList");
+ESSAYS.forEach((item, ei)=>{
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">W.${ei+1}</span>
+      <span class="tchip ${TYPE.write.cls}">${item.q}</span>
+    </div>
+    <div class="situation">${item.sit}</div>
+    <div class="hints">${item.hints.map(h=>'<span class="hint">힌트 · <span class="en">'+h+'</span></span>').join("")}</div>
+    <textarea placeholder="여기에 영어 문장을 직접 써 보세요." aria-label="${item.q} 답안 입력"></textarea>
+    <div class="q-actions">
+      <button type="button" class="btn-check">모범답안 보기</button>
+      <span style="font-size:.78rem; color:var(--sub); font-weight:700">정답은 하나가 아닐 수도 있어요</span>
+    </div>
+    <div class="model"><b>모범답안 · <span class="en" style="font-size:1.02rem">${item.model}</span></b><br/><span style="color:var(--sub); font-size:.85rem">${item.modelKr}</span></div>`;
+  essayList.appendChild(card);
+
+  const btn = card.querySelector(".btn-check");
+  const model = card.querySelector(".model");
+  btn.addEventListener("click", ()=>{
+    const open = model.classList.toggle("show");
+    btn.textContent = open ? "모범답안 숨기기" : "모범답안 보기";
+  });
+});
+
+/* ── 점수 집계 ── */
+function updateScores(){
+  const graded = state.filter(s=>s.graded).length;
+  const correct = state.filter(s=>s.correct).length;
+  document.getElementById("gradedN").textContent = graded;
+  document.getElementById("correctN").textContent = correct;
+  document.getElementById("finalScore").textContent = correct;
+
+  const tbody = document.querySelector("#typeTable tbody");
+  tbody.innerHTML = "";
+  Object.entries(TYPE).forEach(([key, meta])=>{
+    if(key==="write") return;
+    const rows = QUIZ.map((q,i)=>({q, s:state[i]})).filter(x=>x.q.t===key);
+    if(!rows.length) return;
+    const g = rows.filter(x=>x.s.graded).length;
+    const c = rows.filter(x=>x.s.correct).length;
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>"+meta.label+"</td><td>"+(g ? c+" / "+g : "–")+"</td>";
+    tbody.appendChild(tr);
+  });
+
+  const msg = document.getElementById("resultMsg");
+  const emoji = document.getElementById("allDone");
+  if(graded===QUIZ.length){
+    emoji.classList.add("show");
+    if(correct===25) msg.textContent = "만점! have been -ing의 뼈대와 뉘앙스를 완벽하게 잡았어요. 바로 2강으로 갈 준비 끝!";
+    else if(correct>=20) msg.textContent = "훌륭해요! 틀린 문제의 해설만 다시 보면 완벽합니다.";
+    else if(correct>=14) msg.textContent = "절반 이상 성공! have/has been -ing 형태와 현재완료와의 차이를 다시 읽고 틀린 문제를 정리해 보세요.";
+    else if(correct>=7) msg.textContent = "조금 아쉬워요. 위의 핵심 정리를 다시 복습하고 같은 문제에 다시 도전!";
+    else msg.textContent = "괜찮아요, 시작이 반이에요! 핵심 정리를 읽고 천천히 다시 풀어 보세요.";
+  } else {
+    emoji.classList.remove("show");
+    msg.textContent = "채점한 문제: " + graded + " / 25 — 계속 풀어 보세요!";
+  }
+}
+document.getElementById("btnReset").addEventListener("click", ()=>{ location.reload(); });
+updateScores();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

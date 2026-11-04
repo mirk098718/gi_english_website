@@ -109,6 +109,11 @@ void main() {
 
     expect(week.title, '1강');
     expect(week.videoUrl, 'https://youtu.be/Wnp7FbT_AZ0');
+    expect(week.problemLinks.single.title, '1강 연습문제');
+    expect(
+      week.problemLinks.single.url,
+      '/quizzes/gleam-level3-lesson1-quiz.html',
+    );
     expect(week.description, '중급 1강 인강을 시청한 뒤 체크리스트를 확인하세요.');
     expect(
       UrlUtil.playerUrl(
