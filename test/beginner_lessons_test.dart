@@ -14,7 +14,11 @@ void main() {
       first.problemLinks.single.url,
       '/quizzes/gleam-level1-lesson1-quiz.html',
     );
-    expect(second.problemLinks.single.url, '');
+    expect(second.problemLinks.single.title, '2강 연습문제');
+    expect(
+      second.problemLinks.single.url,
+      '/quizzes/gleam-level2-lesson02-quiz.html',
+    );
     expect(second.videoUrl, 'https://youtu.be/ikDXCNb66Yo');
     expect(third.videoUrl, 'https://youtu.be/mHrkwI56dVw');
   });

@@ -107,6 +107,8 @@ class EnrollmentService {
       order: 2,
       title: '2강',
       videoUrl: 'https://youtu.be/ikDXCNb66Yo',
+      problemTitle: '2강 연습문제',
+      problemUrl: '/quizzes/gleam-level2-lesson02-quiz.html',
     ),
     CatalogLesson(
       order: 3,
