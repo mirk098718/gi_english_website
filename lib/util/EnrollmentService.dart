@@ -121,14 +121,24 @@ class EnrollmentService {
     CatalogLesson(
       order: 4,
       title: '4강',
-      videoUrl: 'https://youtu.be/Wnp7FbT_AZ0',
+      videoUrl: 'https://youtu.be/6oYf9w2g-DQ',
       problemTitle: '4강 연습문제',
       problemUrl: '/quizzes/gleam-level1-lesson4-quiz.html',
     ),
   ];
 
+  /// 성인 중급영어 과정에 연결된 인강.
+  static const List<CatalogLesson> intermediateLessons = [
+    CatalogLesson(
+      order: 1,
+      title: '1강',
+      videoUrl: 'https://youtu.be/Wnp7FbT_AZ0',
+    ),
+  ];
+
   static List<CatalogLesson> catalogLessons(String courseId) {
     if (courseId == beginnerCourseId) return beginnerLessons;
+    if (courseId == intermediateCourseId) return intermediateLessons;
     return const [];
   }
 
@@ -252,9 +262,11 @@ class EnrollmentService {
     if (catalog == null) return week;
     final url = week.videoUrl.trim();
     final normalized = UrlUtil.normalizeVideoUrl(url);
+    final catalogVideo = UrlUtil.normalizeVideoUrl(catalog.videoUrl);
     final placeholder = url.isEmpty ||
         normalized == UrlUtil.normalizeVideoUrl(defaultWeek1VideoUrl) ||
-        normalized == 'https://youtu.be/6oYf9w2g-DQ';
+        (normalized == 'https://youtu.be/Wnp7FbT_AZ0' &&
+            normalized != catalogVideo);
     final hasProblem = week.problemLinks.any((link) => link.url.trim().isNotEmpty);
     final fillProblem = !hasProblem && catalog.problemUrl.trim().isNotEmpty;
     if (!placeholder && !fillProblem) return week;

@@ -41,25 +41,11 @@ void main() {
       '/quizzes/gleam-level1-lesson3-quiz.html',
     );
     expect(fourth.title, '4강');
-    expect(fourth.videoUrl, 'https://youtu.be/Wnp7FbT_AZ0');
+    expect(fourth.videoUrl, 'https://youtu.be/6oYf9w2g-DQ');
     expect(fourth.problemLinks.single.title, '4강 연습문제');
     expect(
       fourth.problemLinks.single.url,
       '/quizzes/gleam-level1-lesson4-quiz.html',
-    );
-    expect(
-      UrlUtil.playerUrl(
-        'https://www.youtube.com/watch?v=Wnp7FbT_AZ0&list=PLeelS27LkLHE',
-      ),
-      'https://www.youtube.com/embed/Wnp7FbT_AZ0?rel=0&playsinline=1',
-    );
-    expect(
-      UrlUtil.playerUrl(fourth.videoUrl, origin: 'https://gleam-island.web.app'),
-      'https://www.youtube.com/embed/Wnp7FbT_AZ0?rel=0&playsinline=1&origin=https%3A%2F%2Fgleam-island.web.app',
-    );
-    expect(
-      UrlUtil.lessonPlayerPath(fourth.videoUrl),
-      '/player.html?v=Wnp7FbT_AZ0',
     );
   });
 
@@ -98,22 +84,45 @@ void main() {
     );
   });
 
-  test('왕초보 4강에 먼저 넣었던 영상은 새 인강과 퀴즈로 바꾼다', () {
+  test('왕초보 4강에 잘못 넣은 중급 영상은 4강 인강으로 되돌린다', () {
     final stored = OnlineWeek(
       id: 'beginner_phonics_week_4',
       courseId: 'beginner_phonics',
       weekNumber: 4,
       title: '4강',
       description: '왕초보 4강',
-      videoUrl: 'https://youtu.be/6oYf9w2g-DQ',
+      videoUrl: 'https://youtu.be/Wnp7FbT_AZ0',
     );
 
     final filled = EnrollmentService.withCatalogVideo(stored);
 
-    expect(filled.videoUrl, 'https://youtu.be/Wnp7FbT_AZ0');
+    expect(filled.videoUrl, 'https://youtu.be/6oYf9w2g-DQ');
     expect(
       filled.problemLinks.single.url,
       '/quizzes/gleam-level1-lesson4-quiz.html',
+    );
+  });
+
+  test('중급 1강 영상을 재생 목록 없이 연결한다', () {
+    final week =
+        EnrollmentService.defaultWeek('intermediate_grammar_speaking', 1);
+
+    expect(week.title, '1강');
+    expect(week.videoUrl, 'https://youtu.be/Wnp7FbT_AZ0');
+    expect(week.description, '중급 1강 인강을 시청한 뒤 체크리스트를 확인하세요.');
+    expect(
+      UrlUtil.playerUrl(
+        'https://www.youtube.com/watch?v=Wnp7FbT_AZ0&list=PLeelS27LkLHE',
+      ),
+      'https://www.youtube.com/embed/Wnp7FbT_AZ0?rel=0&playsinline=1',
+    );
+    expect(
+      UrlUtil.playerUrl(week.videoUrl, origin: 'https://gleam-island.web.app'),
+      'https://www.youtube.com/embed/Wnp7FbT_AZ0?rel=0&playsinline=1&origin=https%3A%2F%2Fgleam-island.web.app',
+    );
+    expect(
+      UrlUtil.lessonPlayerPath(week.videoUrl),
+      '/player.html?v=Wnp7FbT_AZ0',
     );
   });
 
