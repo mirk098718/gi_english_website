@@ -26,10 +26,15 @@ class QuizResult {
     required this.updatedAt,
   });
 
-  /// 한 문제 1점. 화면의 25점 만점과 같다.
-  int get score => correctCount;
+  /// 맞은 개수를 전체 문제 수 기준 퍼센트로 반올림한다.
+  int get percent => percentFor(correctCount, totalCount);
 
-  String get scoreLabel => '$correctCount / $totalCount문제 · $correctCount점';
+  String get scoreLabel => '$correctCount / $totalCount문제 · $percent%';
+
+  static int percentFor(int correct, int total) {
+    if (total <= 0) return 0;
+    return ((correct * 100) / total).round();
+  }
 
   String get savedAtLabel {
     final time = updatedAt?.toLocal();

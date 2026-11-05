@@ -53,6 +53,11 @@
     return name.slice(0, -10);
   }
 
+  function percentFor(correct, total) {
+    if (!total) return 0;
+    return Math.round((correct * 100) / total);
+  }
+
   function shouldSave(snapshot) {
     if (!snapshot || snapshot.complete !== true) return false;
     if (snapshot.total !== 25) return false;
@@ -129,7 +134,7 @@
       var section = document.createElement("section");
       section.id = "gleamSaved";
       section.hidden = true;
-      section.innerHTML = '<h2>최근 결과</h2><p class="score"></p><p class="status"></p><div class="essays"></div><p class="note">다시 풀고 25문제를 모두 채점하면 이 점수와 주관식 답이 방금 풀이로 바뀝니다.</p>';
+      section.innerHTML = '<h2>최근 결과</h2><p class="score"></p><p class="status"></p><div class="essays"></div><p class="note">다시 풀고 25문제를 모두 채점하면 이 정답률과 주관식 답이 방금 풀이로 바뀝니다.</p>';
       main.insertBefore(section, main.firstChild);
       return section;
     }
@@ -147,7 +152,7 @@
         essaysEl.innerHTML = "";
       } else {
         var title = data.title ? data.title + " · " : "";
-        score.textContent = title + correct + " / 25문제 · " + correct + "점";
+        score.textContent = title + correct + " / 25문제 · " + percentFor(correct, 25) + "%";
         var essays = Array.isArray(data.essays) ? data.essays : [];
         essaysEl.innerHTML = essays.map(function (essay) {
           var heading = essay.title || ("주관식 " + (essay.index || ""));
@@ -238,6 +243,7 @@
   return {
     META: META,
     quizIdFromPath: quizIdFromPath,
+    percentFor: percentFor,
     shouldSave: shouldSave,
     buildPayload: buildPayload,
     report: function (snapshot) {

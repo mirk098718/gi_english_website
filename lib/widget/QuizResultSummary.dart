@@ -64,7 +64,7 @@ class QuizResultSummary extends StatelessWidget {
           ),
           if (!dense)
             Text(
-              '다시 풀고 25문제를 모두 채점하면 이 점수와 주관식 답이 최근 풀이로 바뀝니다.',
+              '다시 풀고 25문제를 모두 채점하면 이 정답률과 주관식 답이 최근 풀이로 바뀝니다.',
               style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 11,

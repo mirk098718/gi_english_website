@@ -37,6 +37,8 @@ test("다시 저장할 문서는 최근 점수와 최근 주관식으로 덮어�
   assert.equal(second.quizId, first.quizId);
   assert.equal(second.userId, first.userId);
   assert.equal(second.essays[0].answer, "I like coffee.");
+  assert.equal(quiz.percentFor(18, 25), 72);
+  assert.equal(quiz.percentFor(14, 25), 56);
   assert.equal(second.completed, true);
   assert.equal(second.totalCount, 25);
 });

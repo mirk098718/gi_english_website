@@ -65,7 +65,9 @@ void main() {
 
     expect(kept.length, 1);
     expect(kept[earlier.quizId]!.correctCount, 14);
-    expect(kept[earlier.quizId]!.scoreLabel, '14 / 25문제 · 14점');
+    expect(kept[earlier.quizId]!.percent, 56);
+    expect(QuizResult.percentFor(18, 25), 72);
+    expect(kept[earlier.quizId]!.scoreLabel, '14 / 25문제 · 56%');
     expect(kept[earlier.quizId]!.essays.single.answer, 'I like coffee.');
   });
 

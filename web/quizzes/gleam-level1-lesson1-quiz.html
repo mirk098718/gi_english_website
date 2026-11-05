@@ -229,7 +229,7 @@ button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid 
 
   <section class="result" id="result">
     <div class="all-done" id="allDone">🎉</div>
-    <div class="big"><span id="finalScore">0</span><span style="font-size:1.2rem; color:var(--sub)"> / 25</span></div>
+    <div class="big"><span id="finalScore">0</span><span style="font-size:1.2rem; color:var(--sub)">%</span></div>
     <div class="msg" id="resultMsg">문제를 풀면 결과가 여기에 표시돼요.</div>
     <table class="type-table" id="typeTable" aria-label="유형별 정답률">
       <thead><tr><th>유형</th><th>정답 / 채점</th></tr></thead>
@@ -456,7 +456,7 @@ function updateScores(){
   const correct = state.filter(s=>s.correct).length;
   document.getElementById("gradedN").textContent = graded;
   document.getElementById("correctN").textContent = correct;
-  document.getElementById("finalScore").textContent = correct;
+  document.getElementById("finalScore").textContent = Math.round(correct * 100 / 25);
 
   const tbody = document.querySelector("#typeTable tbody");
   tbody.innerHTML = "";

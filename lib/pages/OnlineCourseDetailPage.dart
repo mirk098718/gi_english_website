@@ -1191,7 +1191,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
       return Padding(
         padding: EdgeInsets.only(top: 8),
         child: Text(
-          '25문제를 모두 채점하면 맞은 개수와 점수가 여기에 남습니다. 다시 풀면 최근 점수로 바뀌고, 주관식도 최근 답으로 바뀝니다.',
+          '25문제를 모두 채점하면 맞은 개수와 정답률이 여기에 남습니다. 다시 풀면 최근 정답률로 바뀌고, 주관식도 최근 답으로 바뀝니다.',
           style: TextStyle(
             fontFamily: "NotoSansKR",
             fontSize: 12,
