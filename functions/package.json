@@ -2,7 +2,7 @@
   "name": "functions",
   "description": "Gleam Island Cloud Functions (Toss Payments confirm)",
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "main": "index.js",
   "dependencies": {
