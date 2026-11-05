@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/AcademyNavMenu.dart';
 import 'package:gi_english_website/widget/GleamMark.dart';
 import 'package:gi_english_website/widget/HeaderSocialLinks.dart';
 import 'package:gi_english_website/widget/LetsTalkNavChip.dart';
@@ -25,6 +26,7 @@ class MobileSchoolLayout extends StatefulWidget {
 class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
   AdminRole _adminRole = AdminRole.none;
   bool _isMemberLoggedIn = AuthService.currentUser != null;
+  bool _academyMenuOpen = false;
   StreamSubscription<User?>? _authSub;
 
   @override
@@ -49,6 +51,20 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
 
   bool get _isStaff =>
       _adminRole == AdminRole.owner || _adminRole == AdminRole.teacher;
+
+  void _closeAcademyMenu() {
+    if (!_academyMenuOpen) return;
+    setState(() => _academyMenuOpen = false);
+  }
+
+  void _toggleAcademyMenu() {
+    setState(() => _academyMenuOpen = !_academyMenuOpen);
+  }
+
+  void _go(VoidCallback action) {
+    _closeAcademyMenu();
+    action();
+  }
 
   Future<void> _checkAdminStatus() async {
     final role = await AuthService.getAdminRole();
@@ -114,6 +130,27 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                 ],
               ),
             ),
+            if (_academyMenuOpen) ...[
+              Positioned(
+                top: topBarHeight,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: GestureDetector(
+                  onTap: _closeAcademyMenu,
+                  behavior: HitTestBehavior.opaque,
+                  child: ColoredBox(
+                    color: Palette.black.withValues(alpha: 0.28),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: topBarHeight,
+                left: 0,
+                right: 0,
+                child: _academyMenu(viewportHeight - topBarHeight),
+              ),
+            ],
             Positioned(top: 56, left: 0, right: 0, child: _navRow()),
             Positioned(top: 0, left: 0, right: 0, child: _topBar()),
           ],
@@ -242,22 +279,25 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
           children: [
             _navLink(
               '과정',
-              () => SiteNav.goCourses(context),
+              () => _go(() => SiteNav.goCourses(context)),
               enabled: _isMemberLoggedIn,
             ),
             _navLink(
               '레벨 진단',
-              () => SiteNav.openPlacement(context),
+              () => _go(() => SiteNav.openPlacement(context)),
               enabled: _isMemberLoggedIn,
             ),
             _navLink(
               '내 강의실',
-              () => SiteNav.goClassroom(context),
+              () => _go(() => SiteNav.goClassroom(context)),
               enabled: _isMemberLoggedIn,
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 8),
-              child: LetsTalkNavChip(compact: true),
+              child: LetsTalkNavChip(
+                compact: true,
+                onTap: () => _go(() => SiteNav.goLetsTalk(context)),
+              ),
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 6),
@@ -265,10 +305,33 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
             ),
             _navLink(
               '글림아일랜드 어학원',
-              () => SiteNav.goAcademy(context),
+              _toggleAcademyMenu,
               color: Palette.darkTeal,
+              selected: _academyMenuOpen,
+              expandable: true,
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _academyMenu(double maxHeight) {
+    return Material(
+      color: Palette.white,
+      elevation: 6,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: maxHeight),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: Palette.grey200)),
+          ),
+          child: AcademyNavMenu(
+            onSelect: (item) {
+              _closeAcademyMenu();
+              SiteNav.openPage(context, item);
+            },
+          ),
         ),
       ),
     );
@@ -279,23 +342,40 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
     VoidCallback onTap, {
     Color? color,
     bool enabled = true,
+    bool selected = false,
+    bool expandable = false,
   }) {
+    final tone = enabled ? (color ?? Palette.black) : Palette.grey400;
     return InkWell(
       onTap: enabled ? onTap : null,
-      child: Padding(
+      child: Container(
+        color: selected ? Palette.darkTeal.withValues(alpha: 0.08) : null,
         padding: EdgeInsets.symmetric(horizontal: 12),
         child: SizedBox(
           height: widget.height,
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                color: enabled ? (color ?? Palette.black) : Palette.grey400,
-                fontFamily: "NotoSansKR",
-                fontWeight: FontWeight.w500,
-                fontSize: 13,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: tone,
+                  fontFamily: "NotoSansKR",
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  fontSize: 13,
+                ),
               ),
-            ),
+              if (expandable) ...[
+                SizedBox(width: 2),
+                Icon(
+                  selected
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                  size: 16,
+                  color: enabled ? tone : Palette.grey400,
+                ),
+              ],
+            ],
           ),
         ),
       ),

@@ -47,6 +47,7 @@ class Url {
 
 class IFrameElement {
   String src = '';
+  String srcdoc = '';
   final CssStyleDeclaration style = CssStyleDeclaration();
   void setAttribute(String name, String value) {}
 }

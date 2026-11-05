@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
+import 'package:gi_english_website/class/QuizResult.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/util/QuizResultService.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
+import 'package:gi_english_website/widget/QuizResultSummary.dart';
 
-/// 강사/관리자가 수강생 카드에서 보는 회차별 인강·문제 체크.
-class StudentLearningProgressPanel extends StatelessWidget {
+/// 강사/관리자가 수강생 카드에서 보는 회차별 인강·문제 체크와 최근 퀴즈 결과.
+class StudentLearningProgressPanel extends StatefulWidget {
   final List<EnrollmentRecord> enrollments;
   final Map<String, List<StudentWeekProgress>> progressByEnrollment;
   final int? onlyWeekNumber;
@@ -20,14 +23,69 @@ class StudentLearningProgressPanel extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<StudentLearningProgressPanel> createState() =>
+      _StudentLearningProgressPanelState();
+}
+
+class _StudentLearningProgressPanelState
+    extends State<StudentLearningProgressPanel> {
+  Map<String, QuizResultLookup>? _quizByUser;
+  int _ticket = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadQuizzes();
+  }
+
+  @override
+  void didUpdateWidget(covariant StudentLearningProgressPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.enrollments, widget.enrollments) ||
+        !identical(oldWidget.progressByEnrollment, widget.progressByEnrollment)) {
+      _loadQuizzes();
+    }
+  }
+
+  Future<void> _loadQuizzes() async {
+    final ticket = ++_ticket;
+    final idsByUser = <String, Set<String>>{};
+    for (final enrollment in widget.enrollments) {
+      if (enrollment.userId.isEmpty) continue;
+      final ids = idsByUser.putIfAbsent(enrollment.userId, () => <String>{});
+      for (final week in widget.progressByEnrollment[enrollment.id] ??
+          const <StudentWeekProgress>[]) {
+        for (final link in week.problemLinks) {
+          final quizId = QuizResult.quizIdFromUrl(link.url);
+          if (quizId.isNotEmpty) ids.add(quizId);
+        }
+      }
+      for (final lesson in EnrollmentService.catalogLessons(enrollment.courseId)) {
+        final quizId = QuizResult.quizIdFromUrl(lesson.problemUrl);
+        if (quizId.isNotEmpty) ids.add(quizId);
+      }
+    }
+
+    final loaded = <String, QuizResultLookup>{};
+    await Future.wait(idsByUser.entries.map((entry) async {
+      loaded[entry.key] = await QuizResultService.fetchForUser(
+        userId: entry.key,
+        quizIds: entry.value,
+      );
+    }));
+    if (!mounted || ticket != _ticket) return;
+    setState(() => _quizByUser = loaded);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final records = enrollments.where((item) => item.isActive).toList();
+    final records = widget.enrollments.where((item) => item.isActive).toList();
     if (records.isEmpty) {
       return Text(
         '수강 배정 정보가 없습니다.',
         style: TextStyle(
           fontFamily: "NotoSansKR",
-          fontSize: dense ? 12 : 13,
+          fontSize: widget.dense ? 12 : 13,
           color: Palette.grey500,
         ),
       );
@@ -37,7 +95,7 @@ class StudentLearningProgressPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         for (var i = 0; i < records.length; i++) ...[
-          if (i > 0) SizedBox(height: dense ? 10 : 14),
+          if (i > 0) SizedBox(height: widget.dense ? 10 : 14),
           _enrollmentBlock(records[i]),
         ],
       ],
@@ -46,9 +104,11 @@ class StudentLearningProgressPanel extends StatelessWidget {
 
   Widget _enrollmentBlock(EnrollmentRecord enrollment) {
     final course = enrollment.course ?? OnlineCourse.findById(enrollment.courseId);
-    final weeks = (progressByEnrollment[enrollment.id] ?? const <StudentWeekProgress>[])
+    final weeks = (widget.progressByEnrollment[enrollment.id] ??
+            const <StudentWeekProgress>[])
         .where((week) =>
-            onlyWeekNumber == null || week.weekNumber == onlyWeekNumber)
+            widget.onlyWeekNumber == null ||
+            week.weekNumber == widget.onlyWeekNumber)
         .toList();
     final title = course?.title ?? enrollment.courseId;
 
@@ -56,14 +116,14 @@ class StudentLearningProgressPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          dense ? '학습 진도 · $title' : '학습 진도',
+          widget.dense ? '학습 진도 · $title' : '학습 진도',
           style: TextStyle(
             fontFamily: "Jalnan",
-            fontSize: dense ? 12 : 13,
+            fontSize: widget.dense ? 12 : 13,
             color: Palette.secondaryDark,
           ),
         ),
-        if (!dense) ...[
+        if (!widget.dense) ...[
           SizedBox(height: 4),
           Text(
             title.isEmpty ? enrollment.courseId : title,
@@ -77,9 +137,9 @@ class StudentLearningProgressPanel extends StatelessWidget {
         SizedBox(height: 8),
         if (weeks.isEmpty)
           Text(
-            onlyWeekNumber == null
+            widget.onlyWeekNumber == null
                 ? '아직 체크한 학습이 없습니다.'
-                : '$onlyWeekNumber회차 학습 체크가 없습니다.',
+                : '${widget.onlyWeekNumber}회차 학습 체크가 없습니다.',
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 12,
@@ -87,25 +147,27 @@ class StudentLearningProgressPanel extends StatelessWidget {
             ),
           )
         else
-          ...weeks.map(_weekBlock),
+          ...weeks.map((week) => _weekBlock(week, enrollment.userId)),
       ],
     );
   }
 
-  Widget _weekBlock(StudentWeekProgress week) {
+  Widget _weekBlock(StudentWeekProgress week, String userId) {
     final problems = week.problemLinks.isEmpty
         ? const [WeekProblemLink(title: '등록된 문제 없음', url: '')]
         : week.problemLinks;
 
     return Container(
       width: double.maxFinite,
-      margin: EdgeInsets.only(bottom: dense ? 6 : 8),
-      padding: EdgeInsets.all(dense ? 10 : 12),
+      margin: EdgeInsets.only(bottom: widget.dense ? 6 : 8),
+      padding: EdgeInsets.all(widget.dense ? 10 : 12),
       decoration: BoxDecoration(
         color: Palette.grey50,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: week.readyToBook ? Palette.secondary.withValues(alpha: 0.35) : Palette.grey200,
+          color: week.readyToBook
+              ? Palette.secondary.withValues(alpha: 0.35)
+              : Palette.grey200,
         ),
       ),
       child: Column(
@@ -137,8 +199,47 @@ class StudentLearningProgressPanel extends StatelessWidget {
                 url: link.url,
                 done: week.problemsChecked,
               )),
+          _quizSection(week, userId),
         ],
       ),
+    );
+  }
+
+  Widget _quizSection(StudentWeekProgress week, String userId) {
+    final quizIds = week.problemLinks
+        .map((link) => QuizResult.quizIdFromUrl(link.url))
+        .where((id) => id.isNotEmpty)
+        .toList();
+    if (quizIds.isEmpty) return SizedBox.shrink();
+    final lookup = _quizByUser?[userId];
+    if (lookup == null || lookup.unavailable) return SizedBox.shrink();
+
+    final results = <QuizResult>[];
+    for (final quizId in quizIds) {
+      final result = lookup.results[quizId];
+      if (result != null) results.add(result);
+    }
+    if (results.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.only(top: 6),
+        child: Text(
+          '저장된 퀴즈 결과가 없습니다.',
+          style: TextStyle(
+            fontFamily: "NotoSansKR",
+            fontSize: 12,
+            color: Palette.grey500,
+          ),
+        ),
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: results
+          .map((result) => QuizResultSummary(
+                result: result,
+                dense: widget.dense,
+              ))
+          .toList(),
     );
   }
 
@@ -177,7 +278,8 @@ class StudentLearningProgressPanel extends StatelessWidget {
                 ),
                 if (url.trim().isNotEmpty)
                   InkWell(
-                    onTap: () => asPlayer ? UrlUtil.openPlayer(url) : UrlUtil.open(url),
+                    onTap: () =>
+                        asPlayer ? UrlUtil.openPlayer(url) : UrlUtil.open(url),
                     child: Text(
                       '열기',
                       style: TextStyle(

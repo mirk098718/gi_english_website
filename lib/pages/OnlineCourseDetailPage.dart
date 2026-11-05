@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
+import 'package:gi_english_website/class/QuizResult.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonFeedbackService.dart';
@@ -10,11 +11,13 @@ import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/TeacherScheduleService.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/util/QuizResultService.dart';
 import 'package:gi_english_website/util/JitsiJoin.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
+import 'package:gi_english_website/widget/QuizResultSummary.dart';
 import 'package:gi_english_website/widget/YoutubeLessonPlayer.dart';
 
 import '../util/WidgetUtil.dart';
@@ -35,6 +38,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
   List<OnlineWeek> _weeks = [];
   EnrollmentRecord? _enrollment;
   Map<String, List<String>> _weekProgress = {};
+  Map<String, QuizResult> _quizResults = {};
   List<WeekBooking> _bookings = [];
   List<LessonFeedback> _feedbacks = [];
   List<LessonRating> _ratings = [];
@@ -82,6 +86,22 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
     List<LessonFeedback> feedbacks = [];
     List<LessonRating> ratings = [];
     TeacherAvailability availability = TeacherAvailability(teacherUid: '');
+    final uid = AuthService.currentUser?.uid ?? '';
+    Map<String, QuizResult> quizResults = {};
+    if (uid.isNotEmpty) {
+      final quizIds = <String>{};
+      for (final week in weeks) {
+        for (final link in week.problemLinks) {
+          final quizId = QuizResult.quizIdFromUrl(link.url);
+          if (quizId.isNotEmpty) quizIds.add(quizId);
+        }
+      }
+      final lookup = await QuizResultService.fetchForUser(
+        userId: uid,
+        quizIds: quizIds,
+      );
+      quizResults = lookup.results;
+    }
     if (enrollment != null) {
       progress = await EnrollmentService.weekProgress(enrollment.id);
       bookings =
@@ -106,6 +126,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
       _weeks = weeks;
       _enrollment = enrollment;
       _weekProgress = progress;
+      _quizResults = quizResults;
       _bookings = bookings;
       _feedbacks = feedbacks;
       _ratings = ratings;
@@ -1070,6 +1091,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                 ],
               ),
             ),
+            _quizResultSection(week),
             SizedBox(height: 16),
             Align(
               alignment: Alignment.centerLeft,
@@ -1151,6 +1173,39 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _quizResultSection(OnlineWeek week) {
+    final quizIds = week.problemLinks
+        .map((link) => QuizResult.quizIdFromUrl(link.url))
+        .where((id) => id.isNotEmpty)
+        .toList();
+    if (quizIds.isEmpty) return SizedBox.shrink();
+    final results = <QuizResult>[];
+    for (final quizId in quizIds) {
+      final result = _quizResults[quizId];
+      if (result != null) results.add(result);
+    }
+    if (results.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.only(top: 8),
+        child: Text(
+          '25문제를 모두 채점하면 맞은 개수와 정답률이 여기에 남습니다. 다시 풀면 최근 정답률로 바뀌고, 주관식도 최근 답으로 바뀝니다.',
+          style: TextStyle(
+            fontFamily: "NotoSansKR",
+            fontSize: 12,
+            height: 1.45,
+            color: Palette.grey500,
+          ),
+        ),
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: results
+          .map((result) => QuizResultSummary(result: result))
+          .toList(),
     );
   }
 
