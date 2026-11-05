@@ -29,10 +29,10 @@ class SchoolAboutPage extends StatelessWidget {
         child: Column(
           children: [
             _hero(context, compact: false),
+            HomeDailyWordBlock(),
             AcademyHomeCards(),
             AcademyBulletinBoards(),
             _philosophy(compact: false),
-            HomeDailyWordBlock(),
             ModernWidgets.modernFooter(),
           ],
         ),
@@ -45,10 +45,10 @@ class SchoolAboutPage extends StatelessWidget {
       child: Column(
         children: [
           _hero(context, compact: true),
+          HomeDailyWordBlock(compact: true),
           AcademyHomeCards(compact: true),
           AcademyBulletinBoards(compact: true),
           _philosophy(compact: true),
-          HomeDailyWordBlock(compact: true),
         ],
       ),
     );

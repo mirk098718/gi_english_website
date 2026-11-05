@@ -234,11 +234,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         child: Column(
           children: [
             mainImage(),
+            HomeDailyWordBlock(),
             HomeWeeklyLoopBand(),
             HomeClassAlertBand(),
             HomeAudienceCards(),
             HomeTrustBand(),
-            HomeDailyWordBlock(),
             ModernWidgets.modernFooter(),
           ],
         ),
@@ -254,11 +254,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         child: Column(
           children: [
             mobileMainImage(),
+            HomeDailyWordBlock(compact: true),
             HomeWeeklyLoopBand(compact: true),
             HomeClassAlertBand(compact: true),
             HomeAudienceCards(compact: true),
             HomeTrustBand(compact: true),
-            HomeDailyWordBlock(compact: true),
           ],
         ),
       ),
