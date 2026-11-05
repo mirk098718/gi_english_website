@@ -4,6 +4,7 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/ModernWidgets.dart';
 import 'package:gi_english_website/widget/EasyKeyboardListener.dart';
 import 'package:gi_english_website/widget/HomeAudienceCards.dart';
+import 'package:gi_english_website/widget/HomeDailyWordBlock.dart';
 import 'package:gi_english_website/widget/HomeClassAlertBand.dart';
 import 'package:gi_english_website/widget/HomeTrustBand.dart';
 import 'package:gi_english_website/widget/HomeWeeklyLoopBand.dart';
@@ -237,6 +238,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             HomeClassAlertBand(),
             HomeAudienceCards(),
             HomeTrustBand(),
+            HomeDailyWordBlock(),
             ModernWidgets.modernFooter(),
           ],
         ),
@@ -256,6 +258,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             HomeClassAlertBand(compact: true),
             HomeAudienceCards(compact: true),
             HomeTrustBand(compact: true),
+            HomeDailyWordBlock(compact: true),
           ],
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/ModernWidgets.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/AcademyBulletinBoards.dart';
+import 'package:gi_english_website/widget/HomeDailyWordBlock.dart';
 import 'package:gi_english_website/widget/AcademyHomeCards.dart';
 import 'package:gi_english_website/widget/AcademyLmsLinks.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
@@ -31,6 +32,7 @@ class SchoolAboutPage extends StatelessWidget {
             AcademyHomeCards(),
             AcademyBulletinBoards(),
             _philosophy(compact: false),
+            HomeDailyWordBlock(),
             ModernWidgets.modernFooter(),
           ],
         ),
@@ -46,6 +48,7 @@ class SchoolAboutPage extends StatelessWidget {
           AcademyHomeCards(compact: true),
           AcademyBulletinBoards(compact: true),
           _philosophy(compact: true),
+          HomeDailyWordBlock(compact: true),
         ],
       ),
     );
