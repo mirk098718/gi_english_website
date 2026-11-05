@@ -160,7 +160,8 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       padding: EdgeInsets.all(20),
       child: Container(
         decoration: BoxDecoration(
@@ -174,7 +175,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
           children: children,
         ),
       ),
-    );
+    ));
   }
 
 
@@ -477,7 +478,8 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       alignment: Alignment.center,
       width: MediaQuery.of(context).size.width,
       color: Palette.white,
@@ -490,7 +492,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget mobileMainImage() {

@@ -100,7 +100,8 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       padding: EdgeInsets.all(20),
       child: Container(
         decoration: BoxDecoration(
@@ -114,7 +115,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
           children: children,
         ),
       ),
-    );
+    ));
   }
 
   Widget content() {
@@ -294,7 +295,8 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       color: Palette.white,
       padding: EdgeInsets.all(20),
       child: SingleChildScrollView(
@@ -303,7 +305,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
           children: children,
         ),
       ),
-    );
+    ));
   }
 
   Widget mobileMainImage() {

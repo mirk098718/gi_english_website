@@ -92,7 +92,8 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       padding: EdgeInsets.all(20),
       child: Container(
         decoration: BoxDecoration(
@@ -106,7 +107,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
           children: children,
         ),
       ),
-    );
+    ));
   }
 
   Widget content() {
@@ -286,7 +287,8 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       alignment: Alignment.center,
       width: MediaQuery.of(context).size.width,
       color: Palette.white,
@@ -306,7 +308,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget mobileMainImage() {

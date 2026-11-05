@@ -98,7 +98,8 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       padding: EdgeInsets.all(20),
       child: Container(
         decoration: BoxDecoration(
@@ -112,7 +113,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
           children: children,
         ),
       ),
-    );
+    ));
   }
 
   Widget content() {
@@ -295,7 +296,8 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       color: Palette.white,
       padding: EdgeInsets.all(20),
       child: Container(
@@ -313,7 +315,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget mobileMainImage() {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/GleamMark.dart';
+import 'package:gi_english_website/widget/HomeDailyWordBlock.dart';
 
 class MyWidget {
   static Widget footer() {
@@ -462,6 +463,21 @@ class MyWidget {
             fontWeight: FontWeight.bold,
             fontSize: 12),
       ),
+    );
+  }
+
+  /// 왼쪽 메뉴 아래에 오늘의 단어 카드를 붙인다.
+  static Widget menuWithDailyWord(Widget menu) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        menu,
+        const Padding(
+          padding: EdgeInsets.fromLTRB(20, 0, 20, 24),
+          child: HomeDailyWordBlock(sidebar: true),
+        ),
+      ],
     );
   }
 }

@@ -90,7 +90,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
         children.add(Divider(height: 1));
       }
     }
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       padding: EdgeInsets.all(20),
       child: Container(
         decoration: BoxDecoration(
@@ -104,7 +105,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           children: children,
         ),
       ),
-    );
+    ));
   }
 
   Widget content() {
@@ -628,7 +629,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       color: Palette.white,
       padding: EdgeInsets.all(20),
       child: Container(
@@ -646,7 +648,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget mobileMainImage() {

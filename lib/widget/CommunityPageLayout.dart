@@ -102,7 +102,8 @@ class _CommunityPageLayoutState extends State<CommunityPageLayout> {
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       padding: EdgeInsets.all(20),
       child: Container(
         decoration: BoxDecoration(
@@ -111,7 +112,7 @@ class _CommunityPageLayoutState extends State<CommunityPageLayout> {
         ),
         child: Column(children: children),
       ),
-    );
+    ));
   }
 
   Widget _buildMainImage() {
@@ -224,7 +225,8 @@ class _CommunityPageLayoutState extends State<CommunityPageLayout> {
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       color: Palette.white,
       padding: EdgeInsets.all(20),
       child: Container(
@@ -233,6 +235,6 @@ class _CommunityPageLayoutState extends State<CommunityPageLayout> {
           child: Row(children: children),
         ),
       ),
-    );
+    ));
   }
 }

@@ -94,7 +94,8 @@ class _SchoolCurriculumHighSchoolPageState
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       padding: EdgeInsets.all(20),
       child: Container(
         decoration: BoxDecoration(
@@ -108,7 +109,7 @@ class _SchoolCurriculumHighSchoolPageState
           children: children,
         ),
       ),
-    );
+    ));
   }
 
   Widget content() {
@@ -250,7 +251,8 @@ class _SchoolCurriculumHighSchoolPageState
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       alignment: Alignment.center,
       width: MediaQuery.of(context).size.width,
       color: Palette.white,
@@ -263,6 +265,6 @@ class _SchoolCurriculumHighSchoolPageState
           ),
         ),
       ),
-    );
+    ));
   }
 }

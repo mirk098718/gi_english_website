@@ -15,7 +15,6 @@ import 'package:gi_english_website/util/NotificationService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
-import 'package:gi_english_website/widget/HomeDailyWordBlock.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/widget/ProfileEditDialog.dart';
@@ -405,7 +404,6 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
         child: Column(
           children: [
             OnlineProgramSideMenu(selectedIndex: 1, isMobile: true),
-            HomeDailyWordBlock(compact: true),
             content(),
           ],
         ),
@@ -421,15 +419,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
         children: [
           SizedBox(
             width: 232,
-            child: Column(
-              children: [
-                OnlineProgramSideMenu(selectedIndex: 1),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                  child: HomeDailyWordBlock(sidebar: true),
-                ),
-              ],
-            ),
+            child: OnlineProgramSideMenu(selectedIndex: 1),
           ),
           Expanded(child: content()),
         ],
