@@ -4,15 +4,21 @@ import 'package:gi_english_website/util/DailyWordLookup.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
 
-/// 학원 홈과 온라인 홈의 히어로 바로 아래에 두는 오늘의 단어.
+enum DailyWordTone { home, talk }
+
+/// 오늘의 단어. 홈은 남색 띠, 렛츠 토크는 코랄 띠, 내 강의실은 왼쪽 메뉴 아래 카드.
 class HomeDailyWordBlock extends StatefulWidget {
   final bool compact;
+  final bool sidebar;
+  final DailyWordTone tone;
   final DateTime? date;
   final DailyWord? word;
 
   const HomeDailyWordBlock({
     Key? key,
     this.compact = false,
+    this.sidebar = false,
+    this.tone = DailyWordTone.home,
     this.date,
     this.word,
   }) : super(key: key);
@@ -41,23 +47,26 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
     setState(() => _word = loaded);
   }
 
+  _WordLook get _look => widget.tone == DailyWordTone.talk
+      ? const _WordLook.talk()
+      : const _WordLook.home();
+
   @override
   Widget build(BuildContext context) {
     final today = widget.date ?? DateTime.now();
     final word = _word;
-    final compact = widget.compact;
-    return Container(
+    final compact = widget.compact || widget.sidebar;
+    final look = _look;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(widget.sidebar ? 16 : 0),
+      child: Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF071526),
-            Color(0xFF0B3A4A),
-            Color(0xFF0F766E),
-          ],
-          stops: [0.0, 0.55, 1.0],
+          colors: look.gradient,
+          stops: const [0.0, 0.55, 1.0],
         ),
       ),
       child: Stack(
@@ -70,16 +79,16 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
               height: compact ? 160 : 240,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Palette.talkMango.withValues(alpha: 0.16),
+                color: look.blob,
               ),
             ),
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(
-              compact ? 20 : 48,
-              compact ? 22 : 28,
-              compact ? 20 : 48,
-              compact ? 22 : 28,
+              widget.sidebar ? 14 : (compact ? 20 : 48),
+              widget.sidebar ? 14 : (compact ? 22 : 28),
+              widget.sidebar ? 14 : (compact ? 20 : 48),
+              widget.sidebar ? 14 : (compact ? 22 : 28),
             ),
             child: Center(
               child: ConstrainedBox(
@@ -88,10 +97,10 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      width: 72,
+                      width: widget.sidebar ? 36 : 72,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Palette.talkMango,
+                        color: look.accent,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -103,7 +112,7 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
                               fontFamily: 'NotoSansKR',
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: Palette.white,
+                              color: look.word,
                             ),
                           )
                         : _body(today, word),
@@ -114,16 +123,18 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
           ),
         ],
       ),
+    ),
     );
   }
 
   Widget _body(DateTime today, DailyWord word) {
-    final compact = widget.compact;
+    final compact = widget.compact || widget.sidebar;
     final wordSide = _wordSide(today, word);
     final expressionSide = _expressionCard(word);
     return LayoutBuilder(
       builder: (context, constraints) {
-        final sideBySide = !compact && constraints.maxWidth >= 860;
+        final sideBySide =
+            !widget.sidebar && !compact && constraints.maxWidth >= 860;
         if (!sideBySide) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,7 +158,9 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
   }
 
   Widget _wordSide(DateTime today, DailyWord word) {
-    final compact = widget.compact;
+    final look = _look;
+    final sidebar = widget.sidebar;
+    final compact = widget.compact || sidebar;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -155,38 +168,41 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
           '${today.month}월 ${today.day}일 · 오늘의 단어',
           style: TextStyle(
             fontFamily: 'NotoSansKR',
-            fontSize: compact ? 13 : 14,
+            fontSize: sidebar ? 11 : (compact ? 13 : 14),
             fontWeight: FontWeight.w700,
-            color: Palette.talkMango,
-            letterSpacing: 0.4,
+            color: look.accent,
+            letterSpacing: 0.2,
           ),
         ),
-        SizedBox(height: 8),
+        SizedBox(height: sidebar ? 6 : 8),
         Text(
           word.word,
           style: TextStyle(
             fontFamily: 'NotoSansKR',
-            fontSize: compact ? 40 : 56,
+            fontSize: sidebar ? 28 : (compact ? 40 : 56),
             fontWeight: FontWeight.w800,
-            color: Palette.white,
+            color: look.word,
             height: 1.05,
-            letterSpacing: -0.8,
+            letterSpacing: -0.6,
           ),
         ),
-        SizedBox(height: 12),
+        SizedBox(height: sidebar ? 8 : 12),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: EdgeInsets.symmetric(
+            horizontal: sidebar ? 10 : 12,
+            vertical: sidebar ? 4 : 6,
+          ),
           decoration: BoxDecoration(
-            color: Palette.white,
+            color: look.meaningFill,
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(
             word.meaning,
             style: TextStyle(
               fontFamily: 'NotoSansKR',
-              fontSize: compact ? 14 : 16,
+              fontSize: sidebar ? 12 : (compact ? 14 : 16),
               fontWeight: FontWeight.w800,
-              color: Palette.navy,
+              color: look.meaningText,
             ),
           ),
         ),
@@ -195,14 +211,16 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
   }
 
   Widget _expressionCard(DailyWord word) {
-    final compact = widget.compact;
+    final look = _look;
+    final sidebar = widget.sidebar;
+    final compact = widget.compact || sidebar;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(
-        compact ? 16 : 22,
-        compact ? 16 : 20,
-        compact ? 16 : 22,
-        compact ? 16 : 18,
+        sidebar ? 12 : (compact ? 16 : 22),
+        sidebar ? 12 : (compact ? 16 : 20),
+        sidebar ? 12 : (compact ? 16 : 22),
+        sidebar ? 12 : (compact ? 16 : 18),
       ),
       decoration: BoxDecoration(
         color: Palette.white,
@@ -224,21 +242,23 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
                 '“',
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
-                  fontSize: 28,
+                  fontSize: sidebar ? 22 : 28,
                   height: 0.8,
                   fontWeight: FontWeight.w800,
-                  color: Palette.darkTeal,
+                  color: look.quote,
                 ),
               ),
               SizedBox(width: 8),
-              Text(
+              Flexible(
+                child: Text(
                 '오늘의 표현',
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
-                  fontSize: compact ? 13 : 14,
+                  fontSize: sidebar ? 12 : (compact ? 13 : 14),
                   fontWeight: FontWeight.w800,
-                  color: Palette.darkTeal,
+                  color: look.quote,
                 ),
+              ),
               ),
             ],
           ),
@@ -247,10 +267,10 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
             word.expression,
             style: TextStyle(
               fontFamily: 'NotoSansKR',
-              fontSize: compact ? 16 : 20,
+              fontSize: sidebar ? 13 : (compact ? 16 : 20),
               fontWeight: FontWeight.w800,
               height: 1.45,
-              color: Palette.navy,
+              color: look.expression,
             ),
           ),
           if (word.expressionMeaning.isNotEmpty) ...[
@@ -259,7 +279,7 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
               word.expressionMeaning,
               style: TextStyle(
                 fontFamily: 'NotoSansKR',
-                fontSize: compact ? 14 : 15,
+                fontSize: sidebar ? 12 : (compact ? 14 : 15),
                 height: 1.5,
                 color: Palette.grey600,
               ),
@@ -284,4 +304,54 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
       ),
     );
   }
+}
+
+class _WordLook {
+  final List<Color> gradient;
+  final Color accent;
+  final Color blob;
+  final Color word;
+  final Color meaningFill;
+  final Color meaningText;
+  final Color quote;
+  final Color expression;
+
+  const _WordLook({
+    required this.gradient,
+    required this.accent,
+    required this.blob,
+    required this.word,
+    required this.meaningFill,
+    required this.meaningText,
+    required this.quote,
+    required this.expression,
+  });
+
+  const _WordLook.home()
+      : gradient = const [
+          Color(0xFF071526),
+          Color(0xFF0B3A4A),
+          Color(0xFF0F766E),
+        ],
+        accent = Palette.talkMango,
+        blob = const Color(0x29FFB020),
+        word = Palette.white,
+        meaningFill = Palette.white,
+        meaningText = Palette.navy,
+        quote = Palette.darkTeal,
+        expression = Palette.navy;
+
+  const _WordLook.talk()
+      : gradient = const [
+          Color(0xFFE23B55),
+          Color(0xFFFF5B6B),
+          Color(0xFFFF7A45),
+        ],
+        accent = Palette.talkCream,
+        blob = const Color(0x33FFFFFF),
+        word = Palette.white,
+        meaningFill = Palette.talkCream,
+        meaningText = Palette.talkCoralDark,
+        quote = Palette.talkCoralDark,
+        expression = Palette.talkInk;
 }

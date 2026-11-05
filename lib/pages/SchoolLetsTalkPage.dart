@@ -8,6 +8,7 @@ import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/TalkService.dart';
+import 'package:gi_english_website/widget/HomeDailyWordBlock.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
@@ -312,6 +313,10 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
       child: Column(
         children: [
           _hero(compact: !wide),
+          HomeDailyWordBlock(
+            compact: !wide,
+            tone: DailyWordTone.talk,
+          ),
           _body(compact: !wide),
           if (wide) MyWidget.footer(),
         ],
