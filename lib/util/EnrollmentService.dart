@@ -127,7 +127,7 @@ class EnrollmentService {
     ),
   ];
 
-  /// 성인 중급영어 과정에 연결된 인강.
+  /// 글림 중급영어 과정에 연결된 인강.
   static const List<CatalogLesson> intermediateLessons = [
     CatalogLesson(
       order: 1,

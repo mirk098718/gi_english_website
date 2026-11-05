@@ -36,7 +36,7 @@ class OnlineCourse {
     OnlineCourse(
       id: 'beginner_phonics',
       order: 1,
-      title: '성인 왕초보 영어',
+      title: '글림 왕초보 영어',
       subtitle: '파닉스 + 기초회화',
       description:
           '알파벳과 발음부터 차근차근 시작하는 왕초보 과정입니다. 짧은 표현으로 말문을 열고, 영어에 대한 부담을 덜어 드립니다.',
@@ -53,7 +53,7 @@ class OnlineCourse {
     OnlineCourse(
       id: 'basic_grammar_speaking',
       order: 2,
-      title: '성인 기초영어',
+      title: '글림 기초영어',
       subtitle: '영문법 + 원어민 회화',
       description:
           '꼭 필요한 기초 문법과 일상 회화를 함께 익히는 과정입니다. 바로 쓰는 표현으로 말하기 자신감을 키웁니다.',
@@ -70,7 +70,7 @@ class OnlineCourse {
     OnlineCourse(
       id: 'intermediate_grammar_speaking',
       order: 3,
-      title: '성인 중급영어',
+      title: '글림 중급영어',
       subtitle: '영문법 + 원어민 회화',
       description:
           '중급 문법을 체계적으로 정리하고, 자연스러운 표현으로 회화의 폭을 넓히는 과정입니다.',
@@ -87,7 +87,7 @@ class OnlineCourse {
     OnlineCourse(
       id: 'business_english',
       order: 4,
-      title: '실전 비즈니스 영어회화',
+      title: '글림 실전 비즈니스 영어',
       subtitle: '실무 중심 비즈니스 커뮤니케이션',
       description:
           '회의, 이메일, 프레젠테이션처럼 업무에서 바로 마주치는 상황에서 쓰는 실전 영어를 익힙니다.',
@@ -104,7 +104,7 @@ class OnlineCourse {
     OnlineCourse(
       id: 'advanced_premium_speaking',
       order: 5,
-      title: '성인 고급 영어회화',
+      title: '글림 고급영어',
       subtitle: '프리미엄 스피킹',
       description:
           '고급 표현과 뉘앙스까지 다루며, 토론·시사 주제로 유창하고 세련된 말하기를 완성하는 과정입니다.',
