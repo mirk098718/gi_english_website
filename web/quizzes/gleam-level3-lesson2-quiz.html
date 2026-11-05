@@ -234,7 +234,7 @@ button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid 
 
   <section class="result" id="result">
     <div class="all-done" id="allDone">🎉</div>
-    <div class="big"><span id="finalScore">0</span><span style="font-size:1.2rem; color:var(--sub)"> / 25</span></div>
+    <div class="big"><span id="finalScore">0</span><span style="font-size:1.2rem; color:var(--sub)">%</span></div>
     <div class="msg" id="resultMsg">문제를 풀면 결과가 여기에 표시돼요.</div>
     <table class="type-table" id="typeTable" aria-label="유형별 정답률">
       <thead><tr><th>유형</th><th>정답 / 채점</th></tr></thead>
@@ -246,6 +246,10 @@ button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid 
 </main>
 <footer>글림 중급 영어 · 제 02강 「I Had Already Left — 과거완료(대과거)」 — 과거의 에피소드를 떠올리며 먼저 일어난 일에 had p.p.를 찍어 보세요. 다음 3강 과거완료진행 편에서 만나요!</footer>
 
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore-compat.js"></script>
+<script src="quiz-result.js"></script>
 <script>
 /* ─────────── 문제 데이터 ─────────── */
 const TYPE = {
@@ -457,7 +461,7 @@ function updateScores(){
   const correct = state.filter(s=>s.correct).length;
   document.getElementById("gradedN").textContent = graded;
   document.getElementById("correctN").textContent = correct;
-  document.getElementById("finalScore").textContent = correct;
+  document.getElementById("finalScore").textContent = Math.round(correct * 100 / 25);
 
   const tbody = document.querySelector("#typeTable tbody");
   tbody.innerHTML = "";
@@ -487,6 +491,38 @@ function updateScores(){
   }
 }
 document.getElementById("btnReset").addEventListener("click", ()=>{ location.reload(); });
+if (window.GleamQuiz) {
+  try {
+    var readQuizSnapshot = function () {
+      var graded = state.filter(function (item) { return item.graded; }).length;
+      var correct = state.filter(function (item) { return item.correct; }).length;
+      var areas = document.querySelectorAll("#essayList textarea");
+      var essays = ESSAYS.map(function (item, index) {
+        var area = areas[index];
+        var prompt = String(item.sit || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+        return {
+          index: index + 1,
+          title: String(item.q || ""),
+          prompt: prompt,
+          answer: area ? String(area.value || "").trim() : ""
+        };
+      });
+      return {
+        graded: graded,
+        correct: correct,
+        total: QUIZ.length,
+        complete: QUIZ.length === 25 && graded === 25,
+        essays: essays
+      };
+    };
+    var originalUpdateScores = updateScores;
+    updateScores = function () {
+      originalUpdateScores();
+      GleamQuiz.report(readQuizSnapshot());
+    };
+    GleamQuiz.start(readQuizSnapshot);
+  } catch (error) {}
+}
 updateScores();
 </script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
