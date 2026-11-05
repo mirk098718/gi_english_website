@@ -4,21 +4,25 @@ class DailyWord {
   final String meaning;
   final String expression;
   final String expressionMeaning;
+  final String sourceUrl;
 
   const DailyWord({
     required this.word,
     required this.meaning,
     required this.expression,
     required this.expressionMeaning,
+    this.sourceUrl = '',
   });
+
+  static int indexFor(DateTime date, int length) {
+    final day = DateTime(date.year, date.month, date.day);
+    final diff = day.difference(DateTime(2026, 1, 1)).inDays;
+    return ((diff % length) + length) % length;
+  }
 
   /// 같은 날짜에는 같은 단어, 다음 날에는 다음 단어.
   static DailyWord forDate(DateTime date) {
-    final day = DateTime(date.year, date.month, date.day);
-    final diff = day.difference(DateTime(2026, 1, 1)).inDays;
-    final length = words.length;
-    final index = ((diff % length) + length) % length;
-    return words[index];
+    return words[indexFor(date, words.length)];
   }
 
   static const List<DailyWord> words = [

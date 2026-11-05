@@ -11,7 +11,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: HomeDailyWordBlock(date: date),
+          body: HomeDailyWordBlock(date: date, word: word),
         ),
       ),
     );

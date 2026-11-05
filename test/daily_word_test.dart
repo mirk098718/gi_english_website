@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gi_english_website/util/DailyWord.dart';
+import 'package:gi_english_website/util/DailyWordLookup.dart';
 
 void main() {
   test('같은 날짜에는 같은 단어와 표현을 보여 준다', () {
@@ -28,5 +29,84 @@ void main() {
 
     expect(wrapped.word, start.word);
     expect(wrapped.expression, start.expression);
+  });
+
+  test('위키낱말사전 항목에서 뜻과 예문을 고른다', () {
+    final word = DailyWordLookup.parseWiktionaryEntry({
+      'word': 'ready',
+      'source': {
+        'url': 'https://en.wiktionary.org/wiki/ready',
+        'license': {'name': 'CC BY-SA 4.0'},
+      },
+      'entries': [
+        {
+          'partOfSpeech': 'adjective',
+          'senses': [
+            {
+              'definition': 'Prepared for immediate action or use.',
+              'examples': ['The troops are ready for battle.'],
+              'translations': [
+                {
+                  'language': {'code': 'ko', 'name': 'Korean'},
+                  'word': '준비된',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(word, isNotNull);
+    expect(word!.word, 'ready');
+    expect(word.meaning, '준비된');
+    expect(word.expression, 'The troops are ready for battle.');
+    expect(word.sourceUrl, 'https://en.wiktionary.org/wiki/ready');
+  });
+
+  test('한국어 뜻이 있는 뜻풀이의 예문을 고른다', () {
+    final word = DailyWordLookup.parseWiktionaryEntry({
+      'word': 'still',
+      'source': {'url': 'https://en.wiktionary.org/wiki/still'},
+      'entries': [
+        {
+          'senses': [
+            {
+              'definition': 'Not moving; calm.',
+              'examples': ['Sit there and stay still!'],
+              'translations': [],
+            },
+            {
+              'definition': 'Up to a time, as in the preceding time.',
+              'examples': ['Is it still raining?'],
+              'translations': [
+                {
+                  'language': {'code': 'ko', 'name': 'Korean'},
+                  'word': '여전히',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(word!.meaning, '여전히');
+    expect(word.expression, 'Is it still raining?');
+  });
+
+  test('예문이 없으면 그 단어는 건너뛴다', () {
+    final word = DailyWordLookup.parseWiktionaryEntry({
+      'word': 'quiet',
+      'entries': [
+        {
+          'senses': [
+            {'definition': 'Making little noise.', 'examples': []},
+          ],
+        },
+      ],
+    });
+
+    expect(word, isNull);
   });
 }
