@@ -21,9 +21,23 @@ class Palette {
   static const Color danger = Color(0xFFEF4444); // 모던 레드
   static const Color success = Color(0xFF10B981); // 성공 그린
 
-  // 헤더/푸터용 진한 청록색
-  static const Color darkTeal = Color(0xFF0F766E); // 진한 청록색
-  static const Color darkTealDark = Color(0xFF134E4A); // 더 진한 청록색
+  // 브랜드: 청록 · 진한 남색 · 검정
+  static const Color darkTeal = Color(0xFF0F766E);
+  static const Color darkTealDark = Color(0xFF134E4A);
+  static const Color navy = Color(0xFF0B1F3A);
+  static const Color navyDark = Color(0xFF071526);
+
+  // Let's Talk Cafe — 학습 메뉴와 구분되는 코랄 톤
+  static const Color talkCoral = Color(0xFFFF5B6B);
+  static const Color talkCoralDark = Color(0xFFE23B55);
+  static const Color talkMango = Color(0xFFFFB020);
+  static const Color talkCream = Color(0xFFFFF4EB);
+  static const Color talkInk = Color(0xFF2A1420);
+  static const LinearGradient talkGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [talkCoral, Color(0xFFFF7A45)],
+  );
 
   // 그레이 계열 - 현대적인 뉴트럴 색상
   static const Color grey50 = Color(0xFFF9FAFB);
@@ -102,4 +116,42 @@ class Palette {
     end: Alignment.bottomCenter,
     colors: [white, grey50],
   );
+
+  static const LinearGradient adminGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [navy, darkTealDark],
+  );
+
+  /// 관리자·로그인 화면: 남색 헤더, 청록 액션.
+  static ThemeData adminTheme(ThemeData base) {
+    return base.copyWith(
+      primaryColor: darkTeal,
+      colorScheme: base.colorScheme.copyWith(
+        primary: darkTeal,
+        secondary: navy,
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: navy,
+        foregroundColor: white,
+        elevation: 0,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: darkTeal,
+          foregroundColor: white,
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(foregroundColor: darkTeal),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: navy,
+          side: const BorderSide(color: navy),
+        ),
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(color: darkTeal),
+    );
+  }
 }

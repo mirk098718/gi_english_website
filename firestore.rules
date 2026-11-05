@@ -2,44 +2,521 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // 공지(notices): 누구나 읽기 가능, 쓰기는 관리자만
+    function adminDoc() {
+      return get(/databases/$(database)/documents/admins/$(request.auth.uid)).data;
+    }
+
+    function isLoggedIn() {
+      return request.auth != null;
+    }
+
+    // AuthService.ownerEmail 과 동일. 학원 콘텐츠(갤러리/공지/FAQ)와
+    // 온라인 메인 관리자는 이 계정이다. role 이 teacher 로 잘못 저장돼도
+    // 이메일이 맞으면 메인 관리자로 본다.
+    function isOwnerEmail() {
+      return isLoggedIn()
+        && request.auth.token.email is string
+        && request.auth.token.email.lower() == 'gienglish.paju@gmail.com';
+    }
+
+    // 메인 관리자: 지정 이메일이거나, admins.role 이 owner(또는 없음)
+    function isOwner() {
+      return isOwnerEmail()
+        || (isLoggedIn()
+          && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+          && (!('isActive' in adminDoc()) || adminDoc().isActive != false)
+          && (!('role' in adminDoc()) || adminDoc().role == 'owner'));
+    }
+
+    // 서브 강사 (메인 관리자 이메일은 제외)
+    function isTeacher() {
+      return isLoggedIn()
+        && !isOwnerEmail()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && (!('isActive' in adminDoc()) || adminDoc().isActive != false)
+        && adminDoc().role == 'teacher';
+    }
+
+    function isStaff() {
+      return isOwner() || isTeacher();
+    }
+
+    function memberDoc(memberId) {
+      return get(/databases/$(database)/documents/members/$(memberId)).data;
+    }
+
+    function isAssignedTeacher(memberId) {
+      return isTeacher()
+        && exists(/databases/$(database)/documents/members/$(memberId))
+        && (memberDoc(memberId).teacherId == request.auth.uid
+            || memberDoc(memberId).nativeTeacherUid == request.auth.uid);
+    }
+
+    // 공지(notices): 누구나 읽기, 쓰기는 메인 관리자만
     match /notices/{noticeId} {
       allow read: if true;
-      allow create, update, delete: if request.auth != null
-        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
-        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isActive == true;
+      allow create, update, delete: if isOwner();
     }
 
-    // FAQ: 누구나 읽기 가능, 쓰기는 관리자만
+    // FAQ: 누구나 읽기, 쓰기는 메인 관리자만
     match /faqs/{faqId} {
       allow read: if true;
-      allow create, update, delete: if request.auth != null
-        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
-        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isActive == true;
+      allow create, update, delete: if isOwner();
     }
 
-    // 갤러리(gallery_images): 누구나 읽기 가능, 쓰기는 관리자만
+    // 갤러리: 누구나 읽기, 쓰기는 메인 관리자만
     match /gallery_images/{imageId} {
       allow read: if true;
-      allow create, update, delete: if request.auth != null
-        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
-        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isActive == true;
+      allow create, update, delete: if isOwner();
     }
 
-    // 입학상담/질문(SchoolVisitor): 누구나 제출(create) 가능, 읽기/수정/삭제는 관리자만
+    // 입학상담/질문: 누구나 제출, 읽기/수정/삭제는 메인 관리자만
     match /SchoolVisitor/{visitorId} {
       allow create: if true;
-      allow read, update, delete: if request.auth != null
-        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
-        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isActive == true;
+      allow read, update, delete: if isOwner();
     }
 
-    // admins: 본인 문서만 읽기 (관리자 여부 확인용)
-    // 생성은 로그인한 사용자가 본인 uid로만 가능 (최초 관리자 등록용)
+    // 수강 정보: 본인 / 스태프(담당·대체 강사가 진도를 볼 수 있게)
+    match /enrollments/{enrollmentId} {
+      allow read: if isOwner()
+        || (isLoggedIn() && resource.data.userId == request.auth.uid)
+        || isStaff();
+
+      allow create: if isOwner();
+
+      // 담당 강사는 화상수업 종료 시 진도(completedSessions)만 갱신할 수 있다.
+      allow update: if isOwner()
+        || (isAssignedTeacher(resource.data.userId)
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['completedSessions', 'remainingSessions',
+                        'lastSessionAt', 'updatedAt']));
+
+      allow delete: if isOwner();
+
+      match /session_logs/{logId} {
+        allow read: if isOwner()
+          || (isLoggedIn()
+            && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId == request.auth.uid)
+          || isAssignedTeacher(
+              get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId);
+
+        allow create: if isOwner()
+          || isAssignedTeacher(
+              get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId);
+
+        allow update, delete: if isOwner();
+      }
+
+      match /week_progress/{weekId} {
+        allow read: if isOwner()
+          || (isLoggedIn()
+            && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId == request.auth.uid)
+          || isStaff();
+
+        allow create, update: if isOwner()
+          || (isLoggedIn()
+            && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId == request.auth.uid);
+
+        allow delete: if isOwner();
+      }
+    }
+
+    // 주간 학습(인강·문제·체크리스트): 로그인 회원 읽기, 쓰기는 메인 관리자만
+    match /online_weeks/{weekId} {
+      allow read: if isLoggedIn();
+      allow create, update, delete: if isOwner();
+    }
+
+    // 온라인 과정 정보: 로그인 회원/스태프 읽기, 쓰기는 메인 관리자만
+    match /online_courses/{courseId} {
+      allow read: if isLoggedIn();
+      allow create, update, delete: if isOwner();
+    }
+
+    // 강의 영상 자료: 로그인 회원/스태프 읽기, 쓰기는 메인 관리자만
+    match /online_lessons/{lessonId} {
+      allow read: if isLoggedIn();
+      allow create, update, delete: if isOwner();
+    }
+
+    // 회차별 화상수업: 로그인 회원 읽기, 생성·시작/종료는 관리자와 강사
+    match /online_sessions/{sessionId} {
+      allow read: if isLoggedIn();
+      allow create, update, delete: if isStaff();
+    }
+
+    // 주차별 원어민 수업 예약: 본인 신청, 담당 원어민 강사/메인 관리자 확인
+    match /week_bookings/{bookingId} {
+      allow read: if isOwner()
+        || (isLoggedIn() && resource.data.userId == request.auth.uid)
+        || (isTeacher() && (
+             resource.data.teacherId == request.auth.uid
+             || resource.data.nativeTeacherUid == request.auth.uid));
+
+      allow create: if isLoggedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'pending';
+
+      allow update: if isOwner()
+        || (isTeacher() && (
+             resource.data.teacherId == request.auth.uid
+             || resource.data.nativeTeacherUid == request.auth.uid));
+
+      allow delete: if isOwner();
+    }
+
+    // 회차별 화상수업 피드백. 스태프 작성/수정, 해당 수강생 읽기.
+    match /lesson_feedbacks/{feedbackId} {
+      // 없는 문서 get도 스태프는 통과해야 저장 전 조회가 가능함
+      allow read: if isStaff()
+        || (resource != null
+          && isLoggedIn()
+          && resource.data.userId == request.auth.uid);
+
+      allow create, update: if isStaff();
+
+      allow delete: if isOwner();
+    }
+
+    // 원어민 프로필(Emma 등) ↔ 강사 계정 연결. 로그인 회원 읽기.
+    match /native_teacher_accounts/{profileId} {
+      allow read: if true;
+      allow create: if isOwner()
+        || (isStaff() && request.resource.data.teacherUid == request.auth.uid);
+      allow update: if isOwner()
+        || (isStaff()
+          && resource.data.teacherUid == request.auth.uid
+          && request.resource.data.teacherUid == resource.data.teacherUid);
+      allow delete: if isOwner();
+    }
+
+    // 강사가 닫아 둔 시간. 로그인 회원은 예약 가능 여부 확인용으로 읽기.
+    match /teacher_closed_slots/{slotId} {
+      allow read: if isLoggedIn();
+      allow create: if isOwner()
+        || (isStaff() && request.resource.data.teacherId == request.auth.uid);
+      allow delete: if isStaff()
+        && (!exists(/databases/$(database)/documents/teacher_closed_slots/$(slotId))
+            || resource.data.teacherId == request.auth.uid
+            || isOwner());
+      allow update: if isOwner()
+        || (isStaff()
+          && resource.data.teacherId == request.auth.uid
+          && request.resource.data.teacherId == request.auth.uid);
+    }
+
+    // 매주 같은 요일·시간을 닫아 두는 루틴. 해제는 delete.
+    match /teacher_closed_routines/{routineId} {
+      allow read: if isLoggedIn();
+      allow create: if isOwner()
+        || (isStaff() && request.resource.data.teacherId == request.auth.uid);
+      allow delete: if isStaff()
+        && (!exists(/databases/$(database)/documents/teacher_closed_routines/$(routineId))
+            || resource.data.teacherId == request.auth.uid
+            || isOwner());
+      allow update: if isOwner()
+        || (isStaff()
+          && resource.data.teacherId == request.auth.uid
+          && request.resource.data.teacherId == request.auth.uid);
+    }
+
+    // 루틴으로 닫혀 있어도 이번 주만 여는 예외.
+    match /teacher_open_exceptions/{slotId} {
+      allow read: if isLoggedIn();
+      allow create: if isOwner()
+        || (isStaff() && request.resource.data.teacherId == request.auth.uid);
+      allow delete: if isStaff()
+        && (!exists(/databases/$(database)/documents/teacher_open_exceptions/$(slotId))
+            || resource.data.teacherId == request.auth.uid
+            || isOwner());
+      allow update: if isOwner()
+        || (isStaff()
+          && resource.data.teacherId == request.auth.uid
+          && request.resource.data.teacherId == request.auth.uid);
+    }
+
+    // 이미 신청된 시간(이름 없이 점유만). 수강생이 열린 시간만 보도록 읽기.
+    match /teacher_occupied_slots/{slotId} {
+      allow read: if isLoggedIn();
+      allow create: if isLoggedIn();
+      allow delete: if isStaff();
+      allow update: if isStaff();
+    }
+
+    // 결제(payments): 본인 생성/읽기, 메인 관리자 전체 읽기
+    // status 갱신은 Cloud Functions(Admin SDK)가 수행
+    match /payments/{orderId} {
+      allow read: if isOwner()
+        || (isLoggedIn() && resource.data.userId == request.auth.uid);
+
+      allow create: if isLoggedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'pending';
+
+      // 회원: 본인 pending 주문의 토스 인증 결과(authorized)만 갱신 가능
+      allow update: if isOwner()
+        || (isLoggedIn()
+          && resource.data.userId == request.auth.uid
+          && resource.data.status == 'pending'
+          && request.resource.data.status == 'authorized'
+          && request.resource.data.userId == resource.data.userId
+          && request.resource.data.amount == resource.data.amount
+          && request.resource.data.courseId == resource.data.courseId);
+
+      allow delete: if isOwner();
+    }
+
+    // 회원: 본인 / 메인관리자 / 담당 강사
+    match /members/{memberId} {
+      allow read: if isOwner()
+        || (isLoggedIn() && request.auth.uid == memberId)
+        || (isTeacher() && resource.data.teacherId == request.auth.uid);
+
+      allow create: if isLoggedIn() && request.auth.uid == memberId;
+
+      allow update: if isOwner()
+        || (isLoggedIn()
+          && request.auth.uid == memberId
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['nickname', 'photoUrl', 'phone', 'updatedAt']));
+
+      allow delete: if isOwner();
+    }
+
+    // admins: 본인 읽기, 메인 관리자는 전체 읽기/강사 등록
     match /admins/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null && request.auth.uid == userId;
-      allow update, delete: if false;  // 수정/삭제는 Firebase 콘솔에서만
+      allow read: if isLoggedIn()
+        && (request.auth.uid == userId || isOwner());
+
+      allow create: if (isLoggedIn() && request.auth.uid == userId)
+        || isOwner();
+
+      allow update: if isOwner()
+        || (isStaff()
+          && request.auth.uid == userId
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.email == resource.data.email);
+
+      allow delete: if false;
+    }
+
+    // Let's Talk: 로그인한 수강생끼리 Jitsi 방을 열고 참여한다.
+    match /talk_rooms/{roomId} {
+      allow read: if isLoggedIn();
+
+      allow create: if isLoggedIn()
+        && request.resource.data.hostId == request.auth.uid
+        && request.resource.data.type in ['group', 'oneToOne']
+        && request.resource.data.level in ['beginner', 'elementary', 'intermediate', 'advanced']
+        && request.resource.data.topic is string
+        && request.resource.data.topic.size() > 0
+        && request.resource.data.topic.size() <= 40
+        && request.resource.data.maxPeople is int
+        && request.resource.data.maxPeople >= 2
+        && request.resource.data.maxPeople <= 6
+        && (request.resource.data.type == 'group' || request.resource.data.maxPeople == 2)
+        && request.resource.data.memberIds is list
+        && request.resource.data.memberIds.size() == 1
+        && request.resource.data.memberIds[0] == request.auth.uid
+        && request.resource.data.meetingUrl == 'https://meet.jit.si/GleamTalk-' + roomId
+        && request.resource.data.status == 'open';
+
+      allow update: if isLoggedIn() && (
+        isOwner()
+        || (
+          resource.data.hostId == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['status', 'updatedAt'])
+          && request.resource.data.status == 'closed'
+        )
+        || (
+          resource.data.status == 'open'
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['memberIds', 'memberNames', 'memberPhotos', 'status', 'updatedAt'])
+          && request.resource.data.hostId == resource.data.hostId
+          && request.resource.data.type == resource.data.type
+          && request.resource.data.topic == resource.data.topic
+          && request.resource.data.level == resource.data.level
+          && request.resource.data.maxPeople == resource.data.maxPeople
+          && request.resource.data.meetingUrl == resource.data.meetingUrl
+          && request.resource.data.memberIds.hasAll(resource.data.memberIds)
+          && request.resource.data.memberIds.size() == resource.data.memberIds.size() + 1
+          && request.auth.uid in request.resource.data.memberIds
+          && !(request.auth.uid in resource.data.memberIds)
+          && request.resource.data.memberIds.size() <= resource.data.maxPeople
+          && request.auth.uid in request.resource.data.memberNames
+          && (request.resource.data.memberIds.size() == resource.data.maxPeople
+              ? request.resource.data.status == 'full'
+              : request.resource.data.status == 'open')
+        )
+        || (
+          resource.data.status in ['open', 'full']
+          && request.auth.uid in resource.data.memberIds
+          && !(request.auth.uid in request.resource.data.memberIds)
+          && resource.data.memberIds.hasAll(request.resource.data.memberIds)
+          && request.resource.data.memberIds.size() == resource.data.memberIds.size() - 1
+          && request.resource.data.type == resource.data.type
+          && request.resource.data.topic == resource.data.topic
+          && request.resource.data.level == resource.data.level
+          && request.resource.data.maxPeople == resource.data.maxPeople
+          && request.resource.data.meetingUrl == resource.data.meetingUrl
+          && request.resource.data.memberIds.size() == 0
+          && request.resource.data.status == 'closed'
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['memberIds', 'status', 'updatedAt'])
+        )
+        || (
+          resource.data.status in ['open', 'full']
+          && request.auth.uid in resource.data.memberIds
+          && !(request.auth.uid in request.resource.data.memberIds)
+          && resource.data.memberIds.hasAll(request.resource.data.memberIds)
+          && request.resource.data.memberIds.size() == resource.data.memberIds.size() - 1
+          && request.resource.data.memberIds.size() > 0
+          && resource.data.hostId != request.auth.uid
+          && request.resource.data.hostId == resource.data.hostId
+          && request.resource.data.status == 'open'
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['memberIds', 'status', 'updatedAt'])
+        )
+        || (
+          resource.data.status in ['open', 'full']
+          && request.auth.uid in resource.data.memberIds
+          && !(request.auth.uid in request.resource.data.memberIds)
+          && resource.data.memberIds.hasAll(request.resource.data.memberIds)
+          && request.resource.data.memberIds.size() == resource.data.memberIds.size() - 1
+          && request.resource.data.memberIds.size() > 0
+          && resource.data.hostId == request.auth.uid
+          && request.resource.data.hostId in request.resource.data.memberIds
+          && request.resource.data.hostId != request.auth.uid
+          && request.resource.data.status == 'open'
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['memberIds', 'status', 'updatedAt', 'hostId', 'hostName', 'hostPhotoUrl'])
+        )
+      );
+
+      allow delete: if isOwner();
+    }
+
+    match /talk_contacts/{contactId} {
+      allow read: if isLoggedIn() && request.auth.uid in resource.data.userIds;
+      allow create: if isLoggedIn()
+        && request.auth.uid in request.resource.data.userIds
+        && request.resource.data.userIds.size() == 2;
+      allow update: if isLoggedIn()
+        && request.auth.uid in resource.data.userIds
+        && request.auth.uid in request.resource.data.userIds
+        && request.resource.data.userIds.size() == 2;
+      allow delete: if false;
+    }
+
+    match /talk_blocks/{blockId} {
+      allow read: if isLoggedIn()
+        && (resource.data.blockerId == request.auth.uid
+          || resource.data.blockedId == request.auth.uid);
+      allow create: if isLoggedIn()
+        && request.resource.data.blockerId == request.auth.uid
+        && request.resource.data.blockedId is string
+        && request.resource.data.blockedId.size() > 0
+        && request.resource.data.blockedId != request.auth.uid;
+      allow update: if false;
+      allow delete: if isLoggedIn()
+        && resource.data.blockerId == request.auth.uid;
+    }
+
+    match /talk_reports/{reportId} {
+      allow read: if isStaff()
+        || (isLoggedIn() && resource.data.reporterId == request.auth.uid);
+      allow create: if isLoggedIn()
+        && request.resource.data.reporterId == request.auth.uid
+        && request.resource.data.targetId is string
+        && request.resource.data.targetId.size() > 0
+        && request.resource.data.targetId != request.auth.uid
+        && request.resource.data.reason is string
+        && request.resource.data.reason.size() > 0
+        && request.resource.data.status == 'pending';
+      allow update: if isOwner()
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['status', 'reviewedAt', 'reviewerId'])
+        && request.resource.data.status == 'reviewed';
+      allow delete: if isOwner();
+    }
+
+    // 회차별 화상수업 평가. 스태프가 게이트를 열고, 해당 수강생이 별점을 남긴다.
+    match /lesson_ratings/{ratingId} {
+      allow read: if isOwner()
+        || (isLoggedIn() && resource.data.userId == request.auth.uid)
+        || (isTeacher() && resource.data.teacherId == request.auth.uid);
+
+      allow create: if isStaff()
+        && request.resource.data.userId is string
+        && request.resource.data.userId.size() > 0
+        && request.resource.data.status in ['awaiting_feedback', 'pending']
+        && (!('stars' in request.resource.data)
+          || request.resource.data.stars == 0);
+
+      allow update: if isOwner()
+        || (
+          isStaff()
+          && request.resource.data.userId == resource.data.userId
+          && request.resource.data.teacherId == resource.data.teacherId
+          && request.resource.data.bookingId == resource.data.bookingId
+          && resource.data.status != 'rated'
+          && request.resource.data.status in ['awaiting_feedback', 'pending']
+          && request.resource.data.stars == resource.data.stars
+        )
+        || (
+          isLoggedIn()
+          && resource.data.userId == request.auth.uid
+          && request.resource.data.userId == resource.data.userId
+          && request.resource.data.teacherId == resource.data.teacherId
+          && request.resource.data.bookingId == resource.data.bookingId
+          && resource.data.status == 'pending'
+          && (
+            (
+              request.resource.data.status == 'pending'
+              && request.resource.data.diff(resource.data).affectedKeys()
+                  .hasOnly(['dismissedAt', 'updatedAt'])
+            )
+            || (
+              request.resource.data.status == 'rated'
+              && request.resource.data.stars is int
+              && request.resource.data.stars >= 1
+              && request.resource.data.stars <= 5
+              && request.resource.data.diff(resource.data).affectedKeys()
+                  .hasOnly(['stars', 'review', 'status', 'ratedAt', 'updatedAt', 'dismissedAt'])
+            )
+          )
+        );
+
+      allow delete: if isOwner();
+    }
+
+    // 예약·수업·피드백 알림. 본인만 읽고 읽음 처리. 강사는 수강생에게 생성.
+    // Let's Talk 메시지는 로그인 회원이 상대에게만 생성할 수 있다.
+    match /notifications/{notificationId} {
+      allow read: if isLoggedIn() && resource.data.userId == request.auth.uid;
+      allow update: if isLoggedIn()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == resource.data.userId;
+      allow create: if (
+        isStaff()
+        && request.resource.data.userId is string
+        && request.resource.data.userId.size() > 0
+        && request.resource.data.read == false
+      ) || (
+        isLoggedIn()
+        && request.resource.data.type == 'talk_message'
+        && request.resource.data.senderId == request.auth.uid
+        && request.resource.data.userId is string
+        && request.resource.data.userId.size() > 0
+        && request.resource.data.userId != request.auth.uid
+        && request.resource.data.read == false
+        && request.resource.data.title is string
+        && request.resource.data.body is string
+        && request.resource.data.body.size() > 0
+        && request.resource.data.body.size() <= 400
+      );
+      allow delete: if false;
     }
   }
 }

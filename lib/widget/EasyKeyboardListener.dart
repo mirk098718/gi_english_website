@@ -35,14 +35,31 @@ class EasyKeyboardListener extends StatefulWidget {
 }
 
 class _EasyKeyboardListenerState extends State<EasyKeyboardListener> {
-  final focusNode = FocusNode();
+  final focusNode = FocusNode(debugLabel: "EasyKeyboardListener");
   String input = "";
 
   @override
+  void dispose() {
+    focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    FocusScope.of(context).requestFocus(focusNode);
+    // 빌드마다 requestFocus를 호출하면 다른 페이지의 TextField가 포커스를 얻지 못해
+    // 글자 입력이 불가능해진다. 현재 화면일 때만 포커스를 가진다.
+    final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
+    if (!isCurrentRoute && focusNode.hasFocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !(ModalRoute.of(context)?.isCurrent ?? true)) {
+          focusNode.unfocus();
+        }
+      });
+    }
+
     return KeyboardListener(
       focusNode: focusNode,
+      autofocus: isCurrentRoute,
       onKeyEvent: (keyEvent) {
         if (keyEvent is KeyDownEvent) {
           setState(() {

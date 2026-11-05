@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>글림 왕초보 영어 제1강 · 문제 풀이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4ecdd; --bg-soft:#faf5ea; --card:#fffdf9;
+  --ink:#33241a; --sub:#82705d; --line:#e7d8c0;
+  --coffee:#7a4a26; --caramel:#d98a2b; --caramel-deep:#a9620f; --caramel-soft:#f8e7c8;
+  --ok:#3e7d54; --ok-bg:#e6f2e6; --no:#bc4741; --no-bg:#fae5e0;
+  --disp:'Black Han Sans', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --serif:Georgia, 'Times New Roman', serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans); color:var(--ink); background:var(--bg);
+  background-image:radial-gradient(#e2d3b8 1px, transparent 1px);
+  background-size:22px 22px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  word-break:keep-all; overflow-wrap:break-word; /* 한글은 단어 단위로만 줄바꿈 */
+}
+.en{font-family:var(--serif); letter-spacing:.01em}
+.wrap{max-width:880px; margin:0 auto; padding:0 18px}
+
+/* ── 상단바 ─────────────────────────── */
+.topbar{position:sticky; top:0; z-index:50; background:rgba(244,236,221,.92); backdrop-filter:blur(8px); border-bottom:1.5px solid var(--line)}
+.topbar .wrap{display:flex; align-items:center; gap:10px; justify-content:space-between; padding-top:10px; padding-bottom:10px; flex-wrap:wrap}
+.brand{font-family:var(--disp); font-size:1.02rem; color:var(--coffee); letter-spacing:.02em; display:flex; align-items:center; gap:6px}
+.brand small{white-space:nowrap; font-family:var(--sans); font-weight:700; color:var(--sub); font-size:.72rem; border:1.5px solid var(--line); border-radius:999px; padding:2px 8px; background:var(--card)}
+.scores{display:flex; gap:8px; align-items:center; font-weight:800; font-size:.8rem}
+.scores .chip{background:var(--card); border:1.5px solid var(--line); border-radius:999px; padding:4px 12px; color:var(--sub); white-space:nowrap}
+.scores .chip b{color:var(--coffee)}
+.scores .chip.ok b{color:var(--ok)}
+
+/* ── 히어로 ─────────────────────────── */
+.hero{padding:44px 0 10px; text-align:center}
+.lg-badge{display:inline-block; white-space:nowrap; background:var(--coffee); color:#f8ecdb; font-weight:800; font-size:.78rem; letter-spacing:.14em; border-radius:999px; padding:5px 16px}
+.hero h1{font-family:var(--disp); font-weight:400; font-size:clamp(1.7rem,5vw,2.6rem); line-height:1.28; margin:16px 0 6px; color:var(--ink)}
+.hero h1 .u{color:var(--caramel-deep); background:linear-gradient(transparent 68%, var(--caramel-soft) 68%)}
+.hero p.sub{color:var(--sub); font-weight:600; font-size:.95rem}
+
+/* 어순 공식 티켓 (시그니처) */
+.formula{display:flex; align-items:stretch; justify-content:center; gap:0; margin:30px auto 8px; flex-wrap:wrap; max-width:640px}
+.f-chip{flex:1 1 150px; min-width:140px; background:var(--card); border:2px solid var(--ink); border-radius:16px; padding:14px 12px 12px; position:relative; box-shadow:4px 4px 0 rgba(122,74,38,.22); text-align:center}
+.f-chip .role{position:absolute; top:-12px; left:50%; transform:translateX(-50%); font-size:.68rem; font-weight:900; letter-spacing:.08em; color:#fff; background:var(--coffee); border-radius:999px; padding:2px 11px; white-space:nowrap; max-width:none}
+.f-chip:nth-child(3) .role{background:var(--caramel-deep)}
+.f-chip:nth-child(5) .role{background:#3e7d54}
+.f-chip .en-big{font-family:var(--serif); font-size:1.55rem; font-weight:700; display:block; margin-top:6px}
+.f-chip .kr{font-size:.78rem; color:var(--sub); font-weight:700}
+.f-arrow{align-self:center; font-size:1.3rem; color:var(--caramel-deep); padding:0 10px; font-weight:900}
+.formula-note{color:var(--sub); font-size:.83rem; font-weight:700; margin-bottom:6px}
+.formula-note s{color:#b0473f}
+
+/* 요점 복습 */
+.recap{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:30px 0 8px}
+.r-card{background:var(--card); border:1.5px solid var(--line); border-radius:16px; padding:18px 16px; text-align:left}
+.r-card h3{font-size:.85rem; color:var(--caramel-deep); letter-spacing:.08em; font-weight:900; margin-bottom:8px}
+.r-card .ex{font-size:.95rem; margin-top:6px}
+.vs-box{background:var(--bg-soft); border:1px dashed var(--line); border-radius:10px; padding:8px 10px; margin-top:4px; font-size:.88rem}
+.vs-box .bad{color:#b0473f; font-weight:700}
+.vs-box .good{color:var(--ok); font-weight:800}
+.start-btn{display:inline-block; margin:26px 0 6px; background:var(--coffee); color:#fff7ec; font-weight:900; font-size:1rem; border:none; border-radius:999px; padding:14px 34px; cursor:pointer; box-shadow:0 6px 18px rgba(122,74,38,.32); transition:transform .15s, box-shadow .15s}
+.start-btn:hover{transform:translateY(-2px); box-shadow:0 10px 22px rgba(122,74,38,.38)}
+
+/* ── 섹션 공통 ──────────────────────── */
+section.block{padding:34px 0 6px}
+.sec-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:6px}
+.sec-head h2{font-family:var(--disp); font-weight:400; font-size:1.45rem; color:var(--coffee)}
+.sec-head .count{font-weight:900; color:var(--caramel-deep); font-size:.9rem; background:var(--caramel-soft); border-radius:999px; padding:3px 14px; white-space:nowrap}
+.sec-desc{color:var(--sub); font-size:.88rem; font-weight:600; margin-bottom:20px}
+
+/* ── 문제 카드 ──────────────────────── */
+.q-card{background:var(--card); border:1.5px solid var(--line); border-radius:18px; padding:20px 20px 18px; margin-bottom:18px; box-shadow:0 2px 10px rgba(122,74,38,.06)}
+.q-top{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px}
+.stamp{font-family:var(--disp); font-size:.95rem; color:var(--coffee); border:2px solid var(--coffee); border-radius:8px; padding:1px 9px; transform:rotate(-3deg); letter-spacing:.05em; flex:none; white-space:nowrap}
+.tchip{font-size:.72rem; font-weight:900; letter-spacing:.04em; border-radius:999px; padding:4px 12px; white-space:nowrap}
+.tc-concept{background:#f2e3c8; color:#8a5a1f}
+.tc-blank{background:#e3edf6; color:#2e5e83}
+.tc-wrong{background:#f9e0dc; color:#a3403a}
+.tc-multi{background:#e9e2f5; color:#5b4a8a}
+.tc-order{background:#ddefe4; color:#2f6e4f}
+.tc-dialog{background:#fce8ee; color:#96374f}
+.tc-trans{background:#e0eef0; color:#22626b}
+.tc-part{background:#f6ecd8; color:#7a641f}
+.tc-correct{background:#e2ecdf; color:#3c6b2f}
+.tc-vocab{background:#eceae7; color:#5f5346}
+.tc-write{background:#f8e7c8; color:#a9620f}
+.multi-note{font-size:.74rem; color:var(--caramel-deep); font-weight:800; background:var(--caramel-soft); border-radius:999px; padding:3px 10px; white-space:nowrap}
+.q-text{font-size:1.02rem; font-weight:700; margin-bottom:14px}
+.q-text .q-en{font-family:var(--serif); color:var(--coffee)}
+.opts{display:grid; gap:9px}
+.opt{display:flex; align-items:flex-start; gap:10px; width:100%; text-align:left; background:var(--bg-soft); border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; cursor:pointer; font-family:var(--sans); font-size:.95rem; color:var(--ink); transition:border-color .12s, background .12s, transform .12s}
+.opt:hover:not(:disabled){border-color:var(--caramel); transform:translateX(2px)}
+.opt:disabled{cursor:default}
+.opt .mark{font-weight:900; color:var(--caramel-deep); flex:none}
+.opt .box{flex:none; width:18px; height:18px; border:2px solid var(--sub); border-radius:5px; margin-top:2px; display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; color:transparent; font-weight:900}
+.opt.sel{border-color:var(--caramel-deep); background:var(--caramel-soft)}
+.opt.sel .box{background:var(--caramel-deep); border-color:var(--caramel-deep); color:#fff}
+.opt.right{border-color:var(--ok); background:var(--ok-bg)}
+.opt.right .box{background:var(--ok); border-color:var(--ok); color:#fff}
+.opt.right .mark{color:var(--ok)}
+.opt.right .mark::after{content:" ✓"; color:var(--ok); font-weight:900}
+.opt.miss{border-color:var(--no); background:var(--no-bg)}
+.opt.miss .box{background:var(--no); border-color:var(--no); color:#fff}
+.opt.miss .mark{color:var(--no)}
+.opt.miss .mark::after{content:" ✗"; color:var(--no); font-weight:900}
+.opt.dim{opacity:.55}
+.q-actions{display:flex; gap:10px; margin-top:14px; align-items:center}
+.btn-check{background:var(--caramel-deep); color:#fff; border:none; border-radius:999px; padding:10px 26px; font-weight:900; font-size:.88rem; cursor:pointer; font-family:var(--sans); transition:opacity .15s, transform .15s}
+.btn-check:hover:not(:disabled){transform:translateY(-1px)}
+.btn-check:disabled{opacity:.35; cursor:not-allowed}
+.graded-tag{font-weight:900; font-size:.85rem}
+.graded-tag.good{color:var(--ok)} .graded-tag.bad{color:var(--no)}
+.feedback{display:none; margin-top:14px; border-top:1.5px dashed var(--line); padding-top:13px}
+.feedback.show{display:block; animation:slidein .25s ease}
+@keyframes slidein{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+.fb-title{font-weight:900; font-size:.9rem; margin-bottom:5px}
+.fb-title.good{color:var(--ok)} .fb-title.bad{color:var(--no)}
+.fb-exp{font-size:.9rem; color:var(--ink); background:var(--bg-soft); border-radius:10px; padding:10px 13px}
+.fb-exp .en{color:var(--coffee)}
+
+/* ── 주관식 ─────────────────────────── */
+.situation{background:var(--bg-soft); border:1.5px dashed var(--line); border-radius:12px; padding:13px 15px; font-size:.95rem; margin-bottom:12px}
+.hints{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:12px}
+.hint{font-size:.74rem; font-weight:800; color:var(--coffee); background:var(--caramel-soft); border-radius:999px; padding:3px 11px; white-space:nowrap}
+.hint .en{font-style:normal}
+textarea{width:100%; min-height:86px; border:1.5px solid var(--line); border-radius:12px; background:var(--bg-soft); padding:12px 14px; font-family:var(--sans); font-size:.97rem; color:var(--ink); resize:vertical}
+textarea:focus{outline:2px solid var(--caramel); border-color:var(--caramel)}
+.model{display:none; margin-top:14px; background:#f2ede2; border-radius:12px; padding:12px 15px; font-size:.93rem}
+.model.show{display:block; animation:slidein .25s ease}
+.model b{color:var(--coffee)}
+
+/* ── 결과 ───────────────────────────── */
+.result{background:var(--card); border:2px solid var(--ink); border-radius:20px; box-shadow:6px 6px 0 rgba(122,74,38,.2); padding:26px 22px; margin:34px 0 10px; text-align:center}
+.result .big{font-family:var(--disp); font-size:2.5rem; color:var(--coffee); line-height:1.1}
+.result .msg{font-weight:800; margin-top:6px}
+.type-table{width:100%; border-collapse:collapse; margin-top:16px; font-size:.85rem}
+.type-table th,.type-table td{border-bottom:1px dashed var(--line); padding:7px 6px; text-align:center}
+.type-table th{color:var(--sub); font-size:.76rem; letter-spacing:.05em}
+.type-table td:first-child{text-align:left; font-weight:700}
+.btn-reset{margin-top:18px; background:transparent; color:var(--no); border:2px solid var(--no); border-radius:999px; padding:10px 26px; font-weight:900; cursor:pointer; font-family:var(--sans); font-size:.88rem}
+.btn-reset:hover{background:var(--no-bg)}
+footer{text-align:center; color:var(--sub); font-size:.78rem; font-weight:600; padding:26px 0 40px}
+.all-done{display:none; font-size:2.6rem; margin-top:4px}
+.all-done.show{display:block; animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.4); opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1); opacity:1}}
+
+button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid var(--caramel-deep); outline-offset:2px}
+@media (max-width:560px){
+  .f-arrow{padding:0 3px; font-size:1.05rem}
+  .f-chip{min-width:96px; flex:1 1 96px; padding:13px 8px 10px}
+  .f-chip .role{font-size:.6rem; letter-spacing:.01em; padding:2px 8px}
+  .f-chip .en-big{font-size:1.24rem}
+  .f-chip .kr{font-size:.72rem}
+  .q-card{padding:16px 14px 15px}
+  .lg-badge{font-size:.7rem; letter-spacing:.08em; padding:5px 13px}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} html{scroll-behavior:auto} }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">☕ 글림 왕초보 영어 <small>제1강 문제 풀이</small></div>
+    <div class="scores">
+      <span class="chip">채점 <b id="gradedN">0</b> / 25</span>
+      <span class="chip ok">정답 <b id="correctN">0</b> / 25</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <span class="lg-badge">제 01강 · 영어 문장은 어떻게 만들어질까?</span>
+    <h1>주어 + 동사 + 목적어<br/><span class="u">영어 어순의 비밀</span> 확인 문제</h1>
+    <p class="sub">핵심 표현 · <span class="en">I like coffee.</span> — 30문항으로 오늘 배운 어순의 황금률을 완전히 내 것으로 만들어 보세요.</p>
+
+    <div class="formula" aria-label="영어 어순 공식">
+      <div class="f-chip"><span class="role">주어 · 누가</span><span class="en-big en">I</span><span class="kr">나는</span></div>
+      <div class="f-arrow">→</div>
+      <div class="f-chip"><span class="role">동사 · 한다</span><span class="en-big en">like</span><span class="kr">좋아해요</span></div>
+      <div class="f-arrow">→</div>
+      <div class="f-chip"><span class="role">목적어 · 무엇을</span><span class="en-big en">coffee</span><span class="kr">커피를</span></div>
+    </div>
+    <p class="formula-note">한국어식 <s>나는 · 커피를 · 좋아해요</s> ✗ &nbsp;→&nbsp; 영어는 <b style="color:var(--caramel-deep)">동사가 주어 바로 뒤!</b></p>
+
+    <div class="recap">
+      <div class="r-card">
+        <h3>1. 한국어 vs 영어 어순</h3>
+        <div class="vs-box"><span class="bad">한국어</span> 나는 + 커피를 + 좋아한다 <span class="bad">(동사 맨 뒤)</span></div>
+        <div class="vs-box"><span class="good">영어</span> <span class="en">I + like + coffee</span> <span class="good">(주어 바로 뒤 동사!)</span></div>
+      </div>
+      <div class="r-card">
+        <h3>2. 문장 확장 공식</h3>
+        <p style="font-size:.88rem; font-weight:700">주어 + 동사 + 목적어 + <b>장소/시간</b></p>
+        <p class="ex en">We drink coffee <b>at the cafe</b>.</p>
+        <p class="ex en">I study English <b>every day</b>.</p>
+      </div>
+      <div class="r-card">
+        <h3>3. 오늘의 2초 말문 트기</h3>
+        <p style="font-size:.88rem; font-weight:700">[누가] + [한다] 를 먼저 내뱉고,</p>
+        <p style="font-size:.88rem; font-weight:700">그 뒤에 [무엇을]을 덧붙이기!</p>
+        <p class="ex en">I <b>eat</b> … / I <b>watch</b> …</p>
+      </div>
+    </div>
+
+    <a href="#mcq"><button class="start-btn">객관식 25문제 풀기 ↓</button></a>
+  </section>
+
+  <section class="block" id="mcq">
+    <div class="sec-head"><h2>객관식 문제</h2><span class="count">25문제</span></div>
+    <p class="sec-desc">유형별로 구성되어 있어요: 개념 이해 · 빈칸 채우기 · 틀린 문장 찾기 · 모두 고르기 · 단어 배열 · 대화 문제 · 뜻 고르기 · 주어·동사 찾기. 답을 고르고 <b>채점하기</b>를 누르면 바로 해설이 나옵니다.</p>
+    <div id="mcqList"></div>
+  </section>
+
+  <section class="block" id="essay">
+    <div class="sec-head"><h2>주관식 작문</h2><span class="count">5문제</span></div>
+    <p class="sec-desc">상황을 읽고 직접 영어 문장을 써 보세요. 그다음 <b>모범답안 보기</b>를 눌러 내 답과 비교해 보세요. 정답은 하나가 아닐 수도 있어요!</p>
+    <div id="essayList"></div>
+  </section>
+
+  <section class="result" id="result">
+    <div class="all-done" id="allDone">🎉</div>
+    <div class="big"><span id="finalScore">0</span><span style="font-size:1.2rem; color:var(--sub)"> / 25</span></div>
+    <div class="msg" id="resultMsg">문제를 풀면 결과가 여기에 표시돼요.</div>
+    <table class="type-table" id="typeTable" aria-label="유형별 정답률">
+      <thead><tr><th>유형</th><th>정답 / 채점</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button class="btn-reset" id="btnReset">모두 다시 풀기</button>
+  </section>
+
+</main>
+<footer>글림 왕초보 영어 · 제 01강 「영어 문장은 어떻게 만들어질까?」 — 오늘 하루 마주치는 행동을 I eat…, I watch… 처럼 2단어로 먼저 내뱉어 보세요. 다음 2강에서 만나요!</footer>
+
+<script>
+/* ─────────── 문제 데이터 ─────────── */
+const TYPE = {
+  concept:{label:"개념 이해", cls:"tc-concept"}, blank:{label:"빈칸 채우기", cls:"tc-blank"},
+  wrong:{label:"틀린 문장 찾기", cls:"tc-wrong"}, multi:{label:"모두 고르기", cls:"tc-multi"},
+  order:{label:"단어 배열", cls:"tc-order"}, dialog:{label:"대화 문제", cls:"tc-dialog"},
+  trans:{label:"뜻 고르기", cls:"tc-trans"}, part:{label:"주어·동사 찾기", cls:"tc-part"},
+  correct:{label:"바른 문장 찾기", cls:"tc-correct"}, vocab:{label:"어휘", cls:"tc-vocab"},
+  write:{label:"작문", cls:"tc-write"}
+};
+const QUIZ = [
+ {t:"concept", q:"영어 문장의 기본 어순으로 알맞은 것은?",
+  o:["주어 + 목적어 + 동사","동사 + 주어 + 목적어","주어 + 동사 + 목적어","목적어 + 동사 + 주어"], a:[2],
+  e:"영어는 성격이 급해서 '누가(주어)'와 '한다(동사)'를 먼저 던지고 '무엇을(목적어)'은 나중에 말합니다. → I like coffee."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>I ___ English every day.</span> (나는 매일 영어를 공부해요.)",
+  o:["studying","study","studies","to study"], a:[1],
+  e:"주어가 I일 때 동사는 항상 원형! study를 그대로 쓰면 됩니다."},
+ {t:"wrong", q:"다음 중 어순이 틀린 문장은?",
+  o:["I like coffee.","We drink coffee at the cafe.","I drink iced Americano first.","I every day study English."], a:[3],
+  e:"시간 표현 every day(매일)는 문장 끝에! → I study English every day."},
+ {t:"multi", q:"다음 중 'is'를 써야 하는(맞는) 문장을 모두 고르시오.",
+  o:["He is drinks water.","She is a teacher.","I is a student.","The coffee is hot."], a:[1,3],
+  e:"is는 '~이에요/있어요'의 be동사예요. 일반동사(drinks)와 함께 쓸 수 없고, I와도 짝이 아닙니다(I am)."},
+ {t:"trans", q:"'우리는 카페에서 커피를 마셔요.'를 영어로 옮긴 것은?",
+  o:["We drink coffee at the cafe.","We at the cafe drink coffee.","We coffee drink at the cafe.","Drink we coffee at the cafe."], a:[0],
+  e:"주어+동사+목적어가 기본! 장소 표현(at the cafe)은 그 뒤에 붙입니다."},
+ {t:"part", q:"<span class='q-en'>Minwoo drinks warm water.</span> 에서 '동사'는?",
+  o:["Minwoo","warm","drinks","water"], a:[2],
+  e:"'한다'에 해당하는 drinks가 동사예요. 문장 맨 앞의 Minwoo는 주어!"},
+ {t:"part", q:"<span class='q-en'>I study English every day.</span> 에서 '주어'는?",
+  o:["study","English","every day","I"], a:[3],
+  e:"문장 맨 앞의 '누가'가 주어! study는 동사, English는 목적어, every day는 시간 표현이에요."},
+ {t:"concept", q:"영어 문장 확장 공식으로 알맞은 것은?",
+  o:["주어 + 동사 + 목적어 + 장소/시간","주어 + 장소/시간 + 동사 + 목적어","동사 + 주어 + 목적어 + 장소/시간","목적어 + 주어 + 동사 + 장소/시간"], a:[0],
+  e:"기본 문장을 만든 뒤 장소·시간을 덧붙여 확장합니다. → We drink coffee at the cafe."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>We ___ breakfast together.</span>",
+  o:["makes","making","make","to make"], a:[2],
+  e:"주어 We(우리)일 때 동사는 원형! → We make breakfast together."},
+ {t:"wrong", q:"다음 중 틀린 문장은?",
+  o:["I read the news.","I water drink every morning.","We make breakfast together.","I study English."], a:[1],
+  e:"한국어 어순(나는 물을 ~ 마셔요)을 그대로 옮기면 안 돼요! → I drink water every morning."},
+ {t:"dialog", q:"대화의 빈칸을 채워 보세요. — Mia: What do you usually do in the morning? / Minwoo: <span class='q-en'>I ___ warm water and ___ the news.</span>",
+  o:["drinks / reads","drink / reads","drinks / read","drink / read"], a:[3],
+  e:"주어가 I이면 and로 동사가 두 개 연결되어도 둘 다 원형! drink와 read를 그대로 씁니다."},
+ {t:"trans", q:"<span class='q-en'>I drink iced Americano first.</span> 의 뜻은?",
+  o:["나는 아이스 아메리카노를 만들어요.","나는 뜨거운 아메리카노를 마셔요.","나는 아이스 아메리카노를 먼저 마셔요.","나는 따뜻한 물을 마셔요."], a:[2],
+  e:"drink(마시다) + iced Americano(아이스 아메리카노) + first(먼저)!"},
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( I / English / every day / study )",
+  o:["English I study every day.","I study English every day.","I study every day English.","I English study every day."], a:[1],
+  e:"주어(I) → 동사(study) → 목적어(English) → 시간(every day) 순서!"},
+ {t:"concept", q:"'2초 말문 트기 훈련'에서 가장 먼저 입 밖으로 내뱉어야 할 두 단어는?",
+  o:["[누가] + [한다]","[무엇을] + [어디서]","[언제] + [누가]","[한다] + [무엇을]"], a:[0],
+  e:"영어는 [누가(주어)] + [한다(동사)]를 먼저! 그다음 [무엇을(목적어)]을 덧붙입니다."},
+ {t:"multi", q:"다음 빈칸에 'is'가 들어갈 수 있는 문장을 모두 고르시오.",
+  o:["The water ___ warm.","I ___ a student.","The cafe ___ quiet.","We ___ students."], a:[0,2],
+  e:"한 사람·한 가지(단수)에는 is! I에는 am, We에는 are를 씁니다."},
+ {t:"multi", q:"다음 중 어순이 바른 문장을 모두 고르시오.",
+  o:["I coffee like.","I like coffee.","We at the cafe coffee drink.","We drink coffee at the cafe."], a:[1,3],
+  e:"주어+동사+목적어(+장소/시간)! 'I coffee like'처럼 동사가 목적어 뒤로 가면 한국어식 어순이 돼요."},
+ {t:"trans", q:"'나는 매일 아침 뉴스를 읽어요.'를 영어로 옮긴 것은?",
+  o:["I the news read every morning.","I read every morning the news.","I read the news every morning.","Every morning read I the news."], a:[2],
+  e:"동사 read는 주어 바로 뒤, 시간 표현 every morning은 문장 끝!"},
+ {t:"correct", q:"다음 중 어순이 알맞게 쓰인 문장은?",
+  o:["I coffee like.","Like I coffee.","Coffee I like.","I like coffee."], a:[3],
+  e:"I(주어) + like(동사) + coffee(목적어)! 영어는 동사가 주어 바로 뒤에 와요."},
+ {t:"concept", q:"'우리는 카페에서 커피를 마셔요.'에서 '카페에서(at the cafe)'는 문장 어디에 놓이는 게 자연스러울까요?",
+  o:["주어 앞","목적어 뒤","주어와 동사 사이","동사와 목적어 사이"], a:[1],
+  e:"장소·시간 표현은 목적어 뒤! → We drink coffee at the cafe."},
+ {t:"vocab", q:"'공부하다'를 뜻하는 영어 동사는?",
+  o:["drink","read","make","study"], a:[3],
+  e:"study 공부하다 / drink 마시다 / read 읽다 / make 만들다."},
+ {t:"dialog", q:"Minwoo: <span class='q-en'>I drink warm water and read the news.</span> — Minwoo가 아침에 하는 일로 알맞은 것은?",
+  o:["따뜻한 물 마시기와 뉴스 읽기","커피 마시기와 뉴스 읽기","아침 만들기와 영어 공부하기","아이스 아메리카노 마시기와 물 마시기"], a:[0],
+  e:"drink warm water(따뜻한 물 마시기) + read the news(뉴스 읽기). and로 두 동사가 연결된 문장이에요."},
+ {t:"wrong", q:"다음 중 틀린 문장은?",
+  o:["I am a student.","I like coffee.","I am drink water.","The coffee is hot."], a:[2],
+  e:"be동사(am)와 일반동사(drink)를 한 문장에 같이 쓸 수 없어요! → I drink water."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>I study English ___.</span> (매일)",
+  o:["at the cafe","every day","together","first"], a:[1],
+  e:"every day(매일)는 시간 표현이라 문장 끝에 옵니다."},
+ {t:"concept", q:"한국어와 영어의 가장 결정적인 어순 차이는?",
+  o:["한국어는 동사가 맨 뒤, 영어는 주어 바로 뒤에 동사가 온다","영어는 목적어가 항상 맨 앞에 온다","한국어에는 주어가 없다","한국어는 동사가 항상 맨 앞에 온다"], a:[0],
+  e:"'나는 커피를 좋아한다' vs 'I like coffee'! 동사의 위치가 두 언어의 핵심 차이예요."},
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( make / together / we / breakfast )",
+  o:["We breakfast make together.","Make we breakfast together.","We together make breakfast.","We make breakfast together."], a:[3],
+  e:"We(주어) + make(동사) + breakfast(목적어) + together(함께)."}
+];
+const ESSAYS = [
+ {q:"기본 표현 쓰기", sit:"<b>『나는 커피를 좋아해요.』</b>를 영어로 써 보세요.",
+  hints:["like","coffee"],
+  model:"I like coffee.", modelKr:"나는 커피를 좋아해요."},
+ {q:"상황 작문 1", sit:"오늘부터 영어 공부를 시작했어요. <b>『나는 매일 영어를 공부해요.』</b>라고 말하고 싶어요. 영어로 써 보세요.",
+  hints:["study","every day"],
+  model:"I study English every day.", modelKr:"나는 매일 영어를 공부해요."},
+ {q:"상황 작문 2", sit:"친구와 카페에 왔어요. <b>『우리는 카페에서 커피를 마셔요.』</b>를 영어로 써 보세요.",
+  hints:["drink","at the cafe"],
+  model:"We drink coffee at the cafe.", modelKr:"우리는 카페에서 커피를 마셔요."},
+ {q:"상황 작문 3", sit:"나만의 아침 루틴을 소개할 차례! <b>『나는 아침에 따뜻한 물을 마시고 뉴스를 읽어요.』</b>를 영어로 써 보세요.",
+  hints:["warm water","read the news"],
+  model:"I drink warm water and read the news in the morning.", modelKr:"나는 아침에 따뜻한 물을 마시고 뉴스를 읽어요."},
+ {q:"자유 작문", sit:"오늘 아침에 한 일을 <b>『I + 동사 + 목적어』</b> 문장 <b>2개</b>로 써 보세요. (예시: I eat bread.)",
+  hints:["I + 동사 + 목적어 ×2"],
+  model:"I drink coffee. I read the news.", modelKr:"예시 — I drink coffee. / I read the news. / I make breakfast. 처럼 자유롭게!"}
+];
+
+/* ─────────── 렌더링 ─────────── */
+const state = QUIZ.map(()=>({sel:new Set(), graded:false, correct:false}));
+const marks = ["①","②","③","④"];
+const mcqList = document.getElementById("mcqList");
+
+QUIZ.forEach((item, qi)=>{
+  const meta = TYPE[item.t];
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">Q.${String(qi+1).padStart(2,"0")}</span>
+      <span class="tchip ${meta.cls}">${meta.label}</span>
+      ${item.a.length>1 ? '<span class="multi-note">정답 '+item.a.length+'개를 모두 고르세요</span>' : ''}
+    </div>
+    <p class="q-text">${item.q}</p>
+    <div class="opts">${item.o.map((op,oi)=>`
+      <button type="button" class="opt" data-oi="${oi}" aria-pressed="false">
+        ${item.a.length>1 ? '<span class="box">✓</span>' : '<span class="mark">'+marks[oi]+'</span>'}
+        <span class="${/^[A-Za-z]/.test(op) ? 'en' : ''}">${op}</span>
+      </button>`).join("")}
+    </div>
+    <div class="q-actions">
+      <button type="button" class="btn-check" disabled>채점하기</button>
+      <span class="graded-tag" hidden></span>
+    </div>
+    <div class="feedback"><p class="fb-title"></p><p class="fb-exp"></p></div>`;
+  mcqList.appendChild(card);
+
+  const opts = [...card.querySelectorAll(".opt")];
+  const btn = card.querySelector(".btn-check");
+  const tag = card.querySelector(".graded-tag");
+  const fb = card.querySelector(".feedback");
+  const fbTitle = card.querySelector(".fb-title");
+  const fbExp = card.querySelector(".fb-exp");
+
+  opts.forEach((b,oi)=>b.addEventListener("click", ()=>{
+    if(state[qi].graded) return;
+    if(item.a.length>1){
+      state[qi].sel.has(oi) ? state[qi].sel.delete(oi) : state[qi].sel.add(oi);
+      b.classList.toggle("sel"); b.setAttribute("aria-pressed", b.classList.contains("sel"));
+    } else {
+      state[qi].sel.clear();
+      opts.forEach(o=>{o.classList.remove("sel"); o.setAttribute("aria-pressed","false");});
+      state[qi].sel.add(oi); b.classList.add("sel"); b.setAttribute("aria-pressed","true");
+    }
+    btn.disabled = state[qi].sel.size===0;
+  }));
+
+  btn.addEventListener("click", ()=>{
+    const st = state[qi];
+    if(st.graded || st.sel.size===0) return;
+    const isRight = st.sel.size===item.a.length && item.a.every(x=>st.sel.has(x));
+    st.graded = true; st.correct = isRight;
+    opts.forEach((b,oi)=>{
+      b.disabled = true;
+      const box = b.querySelector(".box");   // 다중선택 전용. 단일선택에는 없음(null)
+      if(item.a.includes(oi)){ b.classList.add("right"); if(box) box.textContent="✓"; }
+      else if(st.sel.has(oi)){ b.classList.add("miss"); if(box) box.textContent="✗"; }
+      else b.classList.add("dim");
+    });
+    tag.hidden = false;
+    tag.textContent = isRight ? "정답!" : "다시 확인해 보세요";
+    tag.className = "graded-tag " + (isRight ? "good" : "bad");
+    fb.classList.add("show");
+    fbTitle.textContent = (isRight ? "⭕ 정답입니다! " : "❌ 아쉬워요. 정답은 " + item.a.map(i=>marks[i]).join(", ") + " ");
+    fbTitle.className = "fb-title " + (isRight ? "good" : "bad");
+    fbExp.innerHTML = "💡 " + item.e;
+    updateScores();
+  });
+});
+
+/* ── 주관식 ── */
+const essayList = document.getElementById("essayList");
+ESSAYS.forEach((item, ei)=>{
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">W.${ei+1}</span>
+      <span class="tchip ${TYPE.write.cls}">${item.q}</span>
+    </div>
+    <div class="situation">${item.sit}</div>
+    <div class="hints">${item.hints.map(h=>'<span class="hint">힌트 · <span class="en">'+h+'</span></span>').join("")}</div>
+    <textarea placeholder="여기에 영어 문장을 직접 써 보세요." aria-label="${item.q} 답안 입력"></textarea>
+    <div class="q-actions">
+      <button type="button" class="btn-check">모범답안 보기</button>
+      <span style="font-size:.78rem; color:var(--sub); font-weight:700">정답은 하나가 아닐 수도 있어요</span>
+    </div>
+    <div class="model"><b>모범답안 · <span class="en" style="font-size:1.02rem">${item.model}</span></b><br/><span style="color:var(--sub); font-size:.85rem">${item.modelKr}</span></div>`;
+  essayList.appendChild(card);
+
+  const btn = card.querySelector(".btn-check");
+  const model = card.querySelector(".model");
+  btn.addEventListener("click", ()=>{
+    const open = model.classList.toggle("show");
+    btn.textContent = open ? "모범답안 숨기기" : "모범답안 보기";
+  });
+});
+
+/* ── 점수 집계 ── */
+function updateScores(){
+  const graded = state.filter(s=>s.graded).length;
+  const correct = state.filter(s=>s.correct).length;
+  document.getElementById("gradedN").textContent = graded;
+  document.getElementById("correctN").textContent = correct;
+  document.getElementById("finalScore").textContent = correct;
+
+  const tbody = document.querySelector("#typeTable tbody");
+  tbody.innerHTML = "";
+  Object.entries(TYPE).forEach(([key, meta])=>{
+    if(key==="write") return;
+    const rows = QUIZ.map((q,i)=>({q, s:state[i]})).filter(x=>x.q.t===key);
+    if(!rows.length) return;
+    const g = rows.filter(x=>x.s.graded).length;
+    const c = rows.filter(x=>x.s.correct).length;
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>"+meta.label+"</td><td>"+(g ? c+" / "+g : "–")+"</td>";
+    tbody.appendChild(tr);
+  });
+
+  const msg = document.getElementById("resultMsg");
+  const emoji = document.getElementById("allDone");
+  if(graded===QUIZ.length){
+    emoji.classList.add("show");
+    if(correct===25) msg.textContent = "만점! 어순의 황금률을 완벽하게 잡았어요. 바로 2강으로 갈 준비 끝!";
+    else if(correct>=20) msg.textContent = "훌륭해요! 틀린 문제의 해설만 다시 보면 완벽합니다.";
+    else if(correct>=14) msg.textContent = "절반 이상 성공! 주어+동사+목적어 순서를 다시 읽고 틀린 문제를 정리해 보세요.";
+    else if(correct>=7) msg.textContent = "조금 아쉬워요. 위의 핵심 정리를 다시 복습하고 같은 문제에 다시 도전!";
+    else msg.textContent = "괜찮아요, 시작이 반이에요! 핵심 정리를 읽고 천천히 다시 풀어 보세요.";
+  } else {
+    emoji.classList.remove("show");
+    msg.textContent = "채점한 문제: " + graded + " / 25 — 계속 풀어 보세요!";
+  }
+}
+document.getElementById("btnReset").addEventListener("click", ()=>{ location.reload(); });
+updateScores();
+</script>
+</body>
+</html>

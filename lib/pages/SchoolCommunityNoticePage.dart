@@ -1,8 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/Notice.dart';
 import 'package:gi_english_website/pages/AdminNoticeWritePage.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
-import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityBoardPage.dart';
 import 'package:gi_english_website/pages/NoticeDetailPage.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -11,7 +12,6 @@ import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/CommunityPageLayout.dart';
 import 'package:gi_english_website/widget/BoardTable.dart';
-import 'package:gi_english_website/util/WidgetUtil.dart';
 import 'package:intl/intl.dart';
 
 class SchoolCommunityNoticePage extends StatefulWidget {
@@ -24,6 +24,7 @@ class SchoolCommunityNoticePage extends StatefulWidget {
 
 class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
   bool _isAdmin = false;
+  StreamSubscription? _roleSub;
 
   List<ButtonState> get buttonStateList => [
         ButtonState("Notice Board", BehaviorColor.colorOnClick,
@@ -32,23 +33,23 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
             "FAQ", BehaviorColor.colorOnDefault, SchoolCommunityBoardPage()),
         ButtonState(
             "Gallery", BehaviorColor.colorOnDefault, SchoolGalleryPage()),
-        ButtonState(
-            "입학상담", BehaviorColor.colorOnDefault, SchoolConsultationPage()),
       ];
 
   @override
   void initState() {
     super.initState();
-    _checkAdminStatus();
+    _roleSub = AuthService.listenRole((role) {
+      if (!mounted) return;
+      setState(() {
+        _isAdmin = role == AdminRole.owner;
+      });
+    });
   }
 
-  Future<void> _checkAdminStatus() async {
-    bool isAdmin = await AuthService.isAdmin();
-    if (mounted) {
-      setState(() {
-        _isAdmin = isAdmin;
-      });
-    }
+  @override
+  void dispose() {
+    _roleSub?.cancel();
+    super.dispose();
   }
 
   @override
@@ -62,7 +63,7 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
 
   Widget _buildContent() {
     return Container(
-      width: MediaQuery.of(context).size.width,
+      width: double.infinity,
       padding: EdgeInsets.all(20),
       color: Palette.white,
       child: Column(
@@ -89,17 +90,18 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
                 ),
             ],
           ),
-          WidgetUtil.myDivider(),
-          SizedBox(height: 20),
+          SizedBox(height: 8),
+          Container(height: 1, color: Palette.grey200),
+          SizedBox(height: 12),
           Text(
             "글림아일랜드의 최신 소식과 공지사항을 확인하세요.",
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               color: Palette.grey600,
               fontFamily: "NotoSansKR",
             ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 12),
           _buildNoticeBoard()
         ],
       ),

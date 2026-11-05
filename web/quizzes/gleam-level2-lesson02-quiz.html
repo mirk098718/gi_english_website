@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>글림 왕초보 영어 제2강 · 문제 풀이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4ecdd; --bg-soft:#faf5ea; --card:#fffdf9;
+  --ink:#33241a; --sub:#82705d; --line:#e7d8c0;
+  --coffee:#7a4a26; --caramel:#d98a2b; --caramel-deep:#a9620f; --caramel-soft:#f8e7c8;
+  --ok:#3e7d54; --ok-bg:#e6f2e6; --no:#bc4741; --no-bg:#fae5e0;
+  --disp:'Black Han Sans', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --serif:Georgia, 'Times New Roman', serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans); color:var(--ink); background:var(--bg);
+  background-image:radial-gradient(#e2d3b8 1px, transparent 1px);
+  background-size:22px 22px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  word-break:keep-all; overflow-wrap:break-word; /* 한글은 단어 단위로만 줄바꿈 */
+}
+.en{font-family:var(--serif); letter-spacing:.01em}
+.wrap{max-width:880px; margin:0 auto; padding:0 18px}
+
+/* ── 상단바 ─────────────────────────── */
+.topbar{position:sticky; top:0; z-index:50; background:rgba(244,236,221,.92); backdrop-filter:blur(8px); border-bottom:1.5px solid var(--line)}
+.topbar .wrap{display:flex; align-items:center; gap:10px; justify-content:space-between; padding-top:10px; padding-bottom:10px; flex-wrap:wrap}
+.brand{font-family:var(--disp); font-size:1.02rem; color:var(--coffee); letter-spacing:.02em; display:flex; align-items:center; gap:6px}
+.brand small{white-space:nowrap; font-family:var(--sans); font-weight:700; color:var(--sub); font-size:.72rem; border:1.5px solid var(--line); border-radius:999px; padding:2px 8px; background:var(--card)}
+.scores{display:flex; gap:8px; align-items:center; font-weight:800; font-size:.8rem}
+.scores .chip{background:var(--card); border:1.5px solid var(--line); border-radius:999px; padding:4px 12px; color:var(--sub); white-space:nowrap}
+.scores .chip b{color:var(--coffee)}
+.scores .chip.ok b{color:var(--ok)}
+
+/* ── 히어로 ─────────────────────────── */
+.hero{padding:44px 0 10px; text-align:center}
+.lg-badge{display:inline-block; white-space:nowrap; background:var(--coffee); color:#f8ecdb; font-weight:800; font-size:.78rem; letter-spacing:.14em; border-radius:999px; padding:5px 16px}
+.hero h1{font-family:var(--disp); font-weight:400; font-size:clamp(1.7rem,5vw,2.6rem); line-height:1.28; margin:16px 0 6px; color:var(--ink)}
+.hero h1 .u{color:var(--caramel-deep); background:linear-gradient(transparent 68%, var(--caramel-soft) 68%)}
+.hero p.sub{color:var(--sub); font-weight:600; font-size:.95rem}
+
+/* 어순 공식 티켓 (시그니처) */
+.formula{display:flex; align-items:stretch; justify-content:center; gap:0; margin:30px auto 8px; flex-wrap:wrap; max-width:640px}
+.f-chip{flex:1 1 150px; min-width:140px; background:var(--card); border:2px solid var(--ink); border-radius:16px; padding:14px 12px 12px; position:relative; box-shadow:4px 4px 0 rgba(122,74,38,.22); text-align:center}
+.f-chip .role{position:absolute; top:-12px; left:50%; transform:translateX(-50%); font-size:.68rem; font-weight:900; letter-spacing:.08em; color:#fff; background:var(--coffee); border-radius:999px; padding:2px 11px; white-space:nowrap; max-width:none}
+.f-chip:nth-child(3) .role{background:var(--caramel-deep)}
+.f-chip:nth-child(5) .role{background:#3e7d54}
+.f-chip .en-big{font-family:var(--serif); font-size:1.55rem; font-weight:700; display:block; margin-top:6px}
+.f-chip .kr{font-size:.78rem; color:var(--sub); font-weight:700}
+.f-arrow{align-self:center; font-size:1.3rem; color:var(--caramel-deep); padding:0 10px; font-weight:900}
+.formula-note{color:var(--sub); font-size:.83rem; font-weight:700; margin-bottom:6px}
+.formula-note s{color:#b0473f}
+
+/* 요점 복습 */
+.recap{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:30px 0 8px}
+.r-card{background:var(--card); border:1.5px solid var(--line); border-radius:16px; padding:18px 16px; text-align:left}
+.r-card h3{font-size:.85rem; color:var(--caramel-deep); letter-spacing:.08em; font-weight:900; margin-bottom:8px}
+.r-card .ex{font-size:.95rem; margin-top:6px}
+.vs-box{background:var(--bg-soft); border:1px dashed var(--line); border-radius:10px; padding:8px 10px; margin-top:4px; font-size:.88rem}
+.vs-box .bad{color:#b0473f; font-weight:700}
+.vs-box .good{color:var(--ok); font-weight:800}
+.start-btn{display:inline-block; margin:26px 0 6px; background:var(--coffee); color:#fff7ec; font-weight:900; font-size:1rem; border:none; border-radius:999px; padding:14px 34px; cursor:pointer; box-shadow:0 6px 18px rgba(122,74,38,.32); transition:transform .15s, box-shadow .15s}
+.start-btn:hover{transform:translateY(-2px); box-shadow:0 10px 22px rgba(122,74,38,.38)}
+
+/* ── 섹션 공통 ──────────────────────── */
+section.block{padding:34px 0 6px}
+.sec-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:6px}
+.sec-head h2{font-family:var(--disp); font-weight:400; font-size:1.45rem; color:var(--coffee)}
+.sec-head .count{font-weight:900; color:var(--caramel-deep); font-size:.9rem; background:var(--caramel-soft); border-radius:999px; padding:3px 14px; white-space:nowrap}
+.sec-desc{color:var(--sub); font-size:.88rem; font-weight:600; margin-bottom:20px}
+
+/* ── 문제 카드 ──────────────────────── */
+.q-card{background:var(--card); border:1.5px solid var(--line); border-radius:18px; padding:20px 20px 18px; margin-bottom:18px; box-shadow:0 2px 10px rgba(122,74,38,.06)}
+.q-top{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px}
+.stamp{font-family:var(--disp); font-size:.95rem; color:var(--coffee); border:2px solid var(--coffee); border-radius:8px; padding:1px 9px; transform:rotate(-3deg); letter-spacing:.05em; flex:none; white-space:nowrap}
+.tchip{font-size:.72rem; font-weight:900; letter-spacing:.04em; border-radius:999px; padding:4px 12px; white-space:nowrap}
+.tc-concept{background:#f2e3c8; color:#8a5a1f}
+.tc-blank{background:#e3edf6; color:#2e5e83}
+.tc-wrong{background:#f9e0dc; color:#a3403a}
+.tc-multi{background:#e9e2f5; color:#5b4a8a}
+.tc-order{background:#ddefe4; color:#2f6e4f}
+.tc-dialog{background:#fce8ee; color:#96374f}
+.tc-trans{background:#e0eef0; color:#22626b}
+.tc-part{background:#f6ecd8; color:#7a641f}
+.tc-correct{background:#e2ecdf; color:#3c6b2f}
+.tc-vocab{background:#eceae7; color:#5f5346}
+.tc-write{background:#f8e7c8; color:#a9620f}
+.multi-note{font-size:.74rem; color:var(--caramel-deep); font-weight:800; background:var(--caramel-soft); border-radius:999px; padding:3px 10px; white-space:nowrap}
+.q-text{font-size:1.02rem; font-weight:700; margin-bottom:14px}
+.q-text .q-en{font-family:var(--serif); color:var(--coffee)}
+.opts{display:grid; gap:9px}
+.opt{display:flex; align-items:flex-start; gap:10px; width:100%; text-align:left; background:var(--bg-soft); border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; cursor:pointer; font-family:var(--sans); font-size:.95rem; color:var(--ink); transition:border-color .12s, background .12s, transform .12s}
+.opt:hover:not(:disabled){border-color:var(--caramel); transform:translateX(2px)}
+.opt:disabled{cursor:default}
+.opt .mark{font-weight:900; color:var(--caramel-deep); flex:none}
+.opt .box{flex:none; width:18px; height:18px; border:2px solid var(--sub); border-radius:5px; margin-top:2px; display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; color:transparent; font-weight:900}
+.opt.sel{border-color:var(--caramel-deep); background:var(--caramel-soft)}
+.opt.sel .box{background:var(--caramel-deep); border-color:var(--caramel-deep); color:#fff}
+.opt.right{border-color:var(--ok); background:var(--ok-bg)}
+.opt.right .box{background:var(--ok); border-color:var(--ok); color:#fff}
+.opt.right .mark{color:var(--ok)}
+.opt.right .mark::after{content:" ✓"; color:var(--ok); font-weight:900}
+.opt.miss{border-color:var(--no); background:var(--no-bg)}
+.opt.miss .box{background:var(--no); border-color:var(--no); color:#fff}
+.opt.miss .mark{color:var(--no)}
+.opt.miss .mark::after{content:" ✗"; color:var(--no); font-weight:900}
+.opt.dim{opacity:.55}
+.q-actions{display:flex; gap:10px; margin-top:14px; align-items:center}
+.btn-check{background:var(--caramel-deep); color:#fff; border:none; border-radius:999px; padding:10px 26px; font-weight:900; font-size:.88rem; cursor:pointer; font-family:var(--sans); transition:opacity .15s, transform .15s}
+.btn-check:hover:not(:disabled){transform:translateY(-1px)}
+.btn-check:disabled{opacity:.35; cursor:not-allowed}
+.graded-tag{font-weight:900; font-size:.85rem}
+.graded-tag.good{color:var(--ok)} .graded-tag.bad{color:var(--no)}
+.feedback{display:none; margin-top:14px; border-top:1.5px dashed var(--line); padding-top:13px}
+.feedback.show{display:block; animation:slidein .25s ease}
+@keyframes slidein{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+.fb-title{font-weight:900; font-size:.9rem; margin-bottom:5px}
+.fb-title.good{color:var(--ok)} .fb-title.bad{color:var(--no)}
+.fb-exp{font-size:.9rem; color:var(--ink); background:var(--bg-soft); border-radius:10px; padding:10px 13px}
+.fb-exp .en{color:var(--coffee)}
+
+/* ── 주관식 ─────────────────────────── */
+.situation{background:var(--bg-soft); border:1.5px dashed var(--line); border-radius:12px; padding:13px 15px; font-size:.95rem; margin-bottom:12px}
+.hints{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:12px}
+.hint{font-size:.74rem; font-weight:800; color:var(--coffee); background:var(--caramel-soft); border-radius:999px; padding:3px 11px; white-space:nowrap}
+.hint .en{font-style:normal}
+textarea{width:100%; min-height:86px; border:1.5px solid var(--line); border-radius:12px; background:var(--bg-soft); padding:12px 14px; font-family:var(--sans); font-size:.97rem; color:var(--ink); resize:vertical}
+textarea:focus{outline:2px solid var(--caramel); border-color:var(--caramel)}
+.model{display:none; margin-top:14px; background:#f2ede2; border-radius:12px; padding:12px 15px; font-size:.93rem}
+.model.show{display:block; animation:slidein .25s ease}
+.model b{color:var(--coffee)}
+
+/* ── 결과 ───────────────────────────── */
+.result{background:var(--card); border:2px solid var(--ink); border-radius:20px; box-shadow:6px 6px 0 rgba(122,74,38,.2); padding:26px 22px; margin:34px 0 10px; text-align:center}
+.result .big{font-family:var(--disp); font-size:2.5rem; color:var(--coffee); line-height:1.1}
+.result .msg{font-weight:800; margin-top:6px}
+.type-table{width:100%; border-collapse:collapse; margin-top:16px; font-size:.85rem}
+.type-table th,.type-table td{border-bottom:1px dashed var(--line); padding:7px 6px; text-align:center}
+.type-table th{color:var(--sub); font-size:.76rem; letter-spacing:.05em}
+.type-table td:first-child{text-align:left; font-weight:700}
+.btn-reset{margin-top:18px; background:transparent; color:var(--no); border:2px solid var(--no); border-radius:999px; padding:10px 26px; font-weight:900; cursor:pointer; font-family:var(--sans); font-size:.88rem}
+.btn-reset:hover{background:var(--no-bg)}
+footer{text-align:center; color:var(--sub); font-size:.78rem; font-weight:600; padding:26px 0 40px}
+.all-done{display:none; font-size:2.6rem; margin-top:4px}
+.all-done.show{display:block; animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.4); opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1); opacity:1}}
+
+button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid var(--caramel-deep); outline-offset:2px}
+@media (max-width:560px){
+  .f-arrow{padding:0 3px; font-size:1.05rem}
+  .f-chip{min-width:96px; flex:1 1 96px; padding:13px 8px 10px}
+  .f-chip .role{font-size:.6rem; letter-spacing:.01em; padding:2px 8px}
+  .f-chip .en-big{font-size:1.24rem}
+  .f-chip .kr{font-size:.72rem}
+  .q-card{padding:16px 14px 15px}
+  .lg-badge{font-size:.7rem; letter-spacing:.08em; padding:5px 13px}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} html{scroll-behavior:auto} }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">☕ 글림 왕초보 영어 <small>제2강 문제 풀이</small></div>
+    <div class="scores">
+      <span class="chip">채점 <b id="gradedN">0</b> / 25</span>
+      <span class="chip ok">정답 <b id="correctN">0</b> / 25</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <span class="lg-badge">제 02강 · I'm Mia! He is Tom!</span>
+    <h1>am / is / are<br/><span class="u">주어와 짝꿍 be동사</span> 확인 문제</h1>
+    <p class="sub">핵심 표현 · <span class="en">I'm from Korea. / He is happy.</span> — 30문항으로 신분·감정·출신을 말하는 be동사를 완전히 내 것으로 만들어 보세요.</p>
+
+    <div class="formula" aria-label="be동사 공식">
+      <div class="f-chip"><span class="role">주어 · 누가</span><span class="en-big en">I</span><span class="kr">나는</span></div>
+      <div class="f-arrow">=</div>
+      <div class="f-chip"><span class="role">be동사 · 등호</span><span class="en-big en">am</span><span class="kr">~이에요</span></div>
+      <div class="f-arrow">→</div>
+      <div class="f-chip"><span class="role">신분·감정·출신</span><span class="en-big en">a student</span><span class="kr">학생</span></div>
+    </div>
+    <p class="formula-note">한국어식 <s>나는 · 학생 · 이에요</s> ✗ &nbsp;→&nbsp; 영어는 <b style="color:var(--caramel-deep)">주어 바로 뒤에 be동사!</b></p>
+
+    <div class="recap">
+      <div class="r-card">
+        <h3>1. 주어별 짝꿍 be동사</h3>
+        <div class="vs-box"><span class="good">I</span> → <span class="en">am</span> &nbsp;/&nbsp; <span class="good">You · We · They</span> → <span class="en">are</span></div>
+        <div class="vs-box"><span class="good">He · She · It</span> → <span class="en">is</span></div>
+        <p class="ex en">I am a student. / She is kind.</p>
+      </div>
+      <div class="r-card">
+        <h3>2. be동사 3가지 치트키</h3>
+        <p style="font-size:.88rem; font-weight:700">① 신분·직업 ② 감정·상태 ③ 출신·장소</p>
+        <p class="ex en">I am an office worker.</p>
+        <p class="ex en">She is very tired today.</p>
+        <p class="ex en">I'm from Korea. / They are at home.</p>
+      </div>
+      <div class="r-card">
+        <h3>3. 원어민은 줄임말 90%</h3>
+        <p style="font-size:.88rem; font-weight:700"><span class="en">I am → I'm</span> / <span class="en">He is → He's</span> / <span class="en">They are → They're</span></p>
+        <p class="ex en">I'm Mia. He's Tom.</p>
+        <p style="font-size:.82rem; color:var(--sub); font-weight:700">줄임말 발음에 익숙해지면 말하기·리스닝이 2배 빨라져요.</p>
+      </div>
+    </div>
+
+    <a href="#mcq"><button class="start-btn">객관식 25문제 풀기 ↓</button></a>
+  </section>
+
+  <section class="block" id="mcq">
+    <div class="sec-head"><h2>객관식 문제</h2><span class="count">25문제</span></div>
+    <p class="sec-desc">유형별로 구성되어 있어요: 개념 이해 · 빈칸 채우기 · 틀린 문장 찾기 · 모두 고르기 · 단어 배열 · 대화 문제 · 뜻 고르기 · 주어·be동사 찾기. 답을 고르고 <b>채점하기</b>를 누르면 바로 해설이 나옵니다.</p>
+    <div id="mcqList"></div>
+  </section>
+
+  <section class="block" id="essay">
+    <div class="sec-head"><h2>주관식 작문</h2><span class="count">5문제</span></div>
+    <p class="sec-desc">상황을 읽고 직접 영어 문장을 써 보세요. 그다음 <b>모범답안 보기</b>를 눌러 내 답과 비교해 보세요. 정답은 하나가 아닐 수도 있어요!</p>
+    <div id="essayList"></div>
+  </section>
+
+  <section class="result" id="result">
+    <div class="all-done" id="allDone">🎉</div>
+    <div class="big"><span id="finalScore">0</span><span style="font-size:1.2rem; color:var(--sub)"> / 25</span></div>
+    <div class="msg" id="resultMsg">문제를 풀면 결과가 여기에 표시돼요.</div>
+    <table class="type-table" id="typeTable" aria-label="유형별 정답률">
+      <thead><tr><th>유형</th><th>정답 / 채점</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button class="btn-reset" id="btnReset">모두 다시 풀기</button>
+  </section>
+
+</main>
+<footer>글림 왕초보 영어 · 제 02강 「I'm Mia! He is Tom!」 — 오늘 거울을 보며 <span class="en">I am happy, I am smart</span> 3번 외쳐 보세요. 다음 3강에서 만나요!</footer>
+
+<script>
+/* ─────────── 문제 데이터 ─────────── */
+const TYPE = {
+  concept:{label:"개념 이해", cls:"tc-concept"}, blank:{label:"빈칸 채우기", cls:"tc-blank"},
+  wrong:{label:"틀린 문장 찾기", cls:"tc-wrong"}, multi:{label:"모두 고르기", cls:"tc-multi"},
+  order:{label:"단어 배열", cls:"tc-order"}, dialog:{label:"대화 문제", cls:"tc-dialog"},
+  trans:{label:"뜻 고르기", cls:"tc-trans"}, part:{label:"주어·be동사 찾기", cls:"tc-part"},
+  correct:{label:"바른 문장 찾기", cls:"tc-correct"}, vocab:{label:"어휘", cls:"tc-vocab"},
+  write:{label:"작문", cls:"tc-write"}
+};
+const QUIZ = [
+ {t:"concept", q:"be동사(am / is / are)의 기본 의미로 가장 알맞은 것은?",
+  o:["~을 하다 (행동을 나타낸다)","~을 좋아한다","~이 아니다","주어와 이름·직업·기분을 연결하는 '등호(=)'"], a:[3],
+  e:"be동사는 '이다, 있다'로 외우기보다, 주어와 그 사람의 이름·직업·기분을 이어 주는 등호(=)라고 생각하면 훨씬 쉽습니다. → I am Mia. (나 = 미아)"},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>I ___ a student.</span> (나는 학생이에요.)",
+  o:["are","am","is","be"], a:[1],
+  e:"주어 I의 짝꿍은 am! I am = I'm 입니다. is는 He·She·It, are는 You·We·They의 짝꿍이에요."},
+ {t:"trans", q:"'그녀는 오늘 아주 피곤해요.'를 영어로 옮긴 것은?",
+  o:["She very tired today.","She are very tired today.","She is very tired today.","She am very tired today."], a:[2],
+  e:"She의 짝꿍은 is! 감정·상태는 be동사 + 형용사(tired)로 표현합니다. → She is very tired today."},
+ {t:"wrong", q:"다음 중 be동사의 짝이 틀린 문장은?",
+  o:["I is a student.","I am a student.","He is happy.","They are at home."], a:[0],
+  e:"I의 짝꿍은 am이에요. → I am a student. (I is ✗ / I are ✗)"},
+ {t:"concept", q:"주어와 be동사의 짝이 바르게 연결된 것은?",
+  o:["I → is","He → are","They → am","We → are"], a:[3],
+  e:"I → am / You·We·They → are / He·She·It → is. 이 세 줄만 외우면 be동사는 끝입니다."},
+ {t:"multi", q:"다음 중 be동사의 줄임말로 바른 것을 모두 고르세요.",
+  o:["I'm","They're","I'am","He're"], a:[0,1],
+  e:"I am → I'm, They are → They're. I'am, He're처럼 아포스트로피 위치를 바꾸거나 짝이 다른 형태는 틀린 철자예요. (He is → He's)"},
+ {t:"part", q:"다음 문장에서 be동사(am / is / are)는? — <span class='q-en'>They are at home.</span>",
+  o:["They","are","at home","home"], a:[1],
+  e:"'~이에요/있어요' 역할을 하는 are가 be동사! They는 주어, at home은 장소 표현입니다."},
+ {t:"dialog", q:"대화의 빈칸을 채워 보세요. — Mia: <span class='q-en'>Hello! I'm Mia. ___ you the new team member?</span>",
+  o:["Am","Is","Do","Are"], a:[3],
+  e:"주어 you의 짝꿍은 are! 의문문에서는 be동사가 주어 앞으로 나옵니다. → Are you the new team member?"},
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( from / I'm / Korea )",
+  o:["Korea I'm from.","From Korea I'm.","I'm from Korea.","I'm Korea from."], a:[2],
+  e:"주어 + be동사 + 출신 표현! I'm(I am) + from + Korea. '한국에서 왔어요' = I'm from Korea."},
+ {t:"trans", q:"'우리는 미팅 준비가 됐어요.'를 영어로 옮긴 것은?",
+  o:["We are ready for the meeting.","We is ready for the meeting.","We am ready for the meeting.","We ready for the meeting are."], a:[0],
+  e:"We의 짝꿍은 are! 상태를 나타내는 ready는 be동사 뒤에 옵니다. → We are ready for the meeting."},
+ {t:"concept", q:"be동사로 말할 수 있는 세 가지를 바르게 묶은 것은?",
+  o:["과거 · 미래 · 현재","신분/직업 · 감정/상태 · 출신/장소","주어 · 동사 · 목적어","먹다 · 마시다 · 자다"], a:[1],
+  e:"be동사 치트키 3가지! ① 신분·직업(I am an office worker.) ② 감정·상태(She is tired.) ③ 출신·장소(I'm from Korea. / They are at home.)"},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>She ___ very busy right now.</span> (그녀는 지금 정말 바빠요.)",
+  o:["am","are","be","is"], a:[3],
+  e:"She의 짝꿍은 is! '지금 바쁘다'는 상태이므로 be동사 + busy로 표현합니다."},
+ {t:"multi", q:"다음 중 'are'를 써야 하는 문장을 모두 고르세요.",
+  o:["You are kind.","He are kind.","They are at home.","She are tired."], a:[0,2],
+  e:"You·We·They에는 are! He·She·It에는 is를 씁니다. → He is kind. / She is tired."},
+ {t:"wrong", q:"다음 중 틀린 문장은?",
+  o:["She is kind.","They are ready.","He are happy.","I am from Korea."], a:[2],
+  e:"He의 짝꿍은 is예요. → He is happy. are는 You·We·They에만 씁니다."},
+ {t:"correct", q:"다음 중 be동사를 바르게 쓴 문장은?",
+  o:["We are so excited to work with you.","We is so excited to work with you.","We am so excited to work with you.","We be so excited to work with you."], a:[0],
+  e:"We의 짝꿍은 are! 대화문 그대로, 함께 일하게 되어 기쁘다는 감정 표현입니다."},
+ {t:"vocab", q:"'~출신이다'를 뜻하는 표현은?",
+  o:["at home","be from","be ready","be tired"], a:[1],
+  e:"be from = ~출신이다. I'm from Korea. (저는 한국 출신이에요.) at home은 '집에', be ready는 '준비되다', be tired는 '피곤하다'예요."},
+ {t:"dialog", q:"대화의 빈칸을 채워 보세요. — Mia: Are you the new team member? / Tom: <span class='q-en'>Yes, I'm Tom. I'm ___ Canada.</span>",
+  o:["at","in","on","from"], a:[3],
+  e:"출신은 from! I'm from Canada. = 캐나다에서 왔습니다. at은 '~에(장소)', in은 '~안에'예요."},
+ {t:"part", q:"다음 문장에서 주어는? — <span class='q-en'>We are ready for the meeting.</span>",
+  o:["are","ready","We","for the meeting"], a:[2],
+  e:"'누가'에 해당하는 We가 주어! are는 be동사, ready는 상태, for the meeting은 '미팅을 위해'라는 표현입니다."},
+ {t:"concept", q:"원어민이 일상 대화에서 I am, He is 대신 가장 자주 쓰는 것은?",
+  o:["I am, He is를 항상 또박또박","I'm, He's 같은 줄임말","is am, are is 같은 형태","be be처럼 반복하는 형태"], a:[1],
+  e:"원어민은 I'm, He's, They're 같은 줄임말을 90% 이상 씁니다. 줄임말 발음에 익숙해지면 말하기 속도와 리스닝이 단숨에 2배 빨라져요."},
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( very / is / She / busy )",
+  o:["She is very busy.","She very is busy.","She is busy very.","Is very she busy."], a:[0],
+  e:"주어(She) + be동사(is) + 상태(very busy) 순서! 정도를 나타내는 very는 형용사 busy 앞에 옵니다."},
+ {t:"trans", q:"'그들은 집에 있어요.'를 영어로 옮긴 것은?",
+  o:["They is at home.","They are home at.","They am at home.","They are at home."], a:[3],
+  e:"They의 짝꿍은 are, 장소 at home은 뒤에! → They are at home."},
+ {t:"multi", q:"다음 중 be동사가 바르게 쓰인 문장을 모두 고르세요.",
+  o:["I are happy.","She am smart.","I'm happy.","He's from Canada."], a:[2,3],
+  e:"I am → I'm, He is → He's. I에는 am, She에는 is가 와야 하므로 I are / She am은 틀린 문장이에요."},
+ {t:"blank", q:"대화의 빈칸에 알맞은 것은? — A: <span class='q-en'>___ you the new team member?</span> B: <span class='q-en'>Yes, I'm Tom.</span>",
+  o:["Is","Are","Am","Do"], a:[1],
+  e:"주어 you의 짝꿍은 are이고, 의문문이라 문장 맨 앞에 옵니다. → Are you the new team member?"},
+ {t:"wrong", q:"다음 중 틀린 문장은?",
+  o:["I'm Mia.","She is very busy right now.","They is at home.","We are ready."], a:[2],
+  e:"They의 짝꿍은 are! → They are at home. is는 He·She·It에만 씁니다."},
+ {t:"concept", q:"<span class='q-en'>I am an office worker.</span> 가 표현하는 것은?",
+  o:["신분·직업","감정·상태","출신·장소","시간·날씨"], a:[0],
+  e:"'나는 회사원이에요'는 신분·직업을 나타내는 be동사! 그래서 직업 앞에는 a/an을 붙여 an office worker라고 합니다."}
+];
+const ESSAYS = [
+ {q:"기본 표현 쓰기", sit:"처음 만난 외국인 동료에게 <b>『저는 한국 출신이에요.』</b>라고 말해 보세요.",
+  hints:["from","Korea"],
+  model:"I'm from Korea.", modelKr:"저는 한국 출신이에요. (I am from Korea. 로 써도 좋아요.)"},
+ {q:"상황 작문 1", sit:"옆자리 동료가 오늘 유난히 지쳐 보여요. <b>『그녀는 지금 정말 바빠요.』</b>를 영어로 써 보세요.",
+  hints:["busy","right now"],
+  model:"She is very busy right now.", modelKr:"그녀는 지금 정말 바빠요."},
+ {q:"상황 작문 2", sit:"회의 시작 1분 전, 팀원들에게 <b>『우리는 미팅 준비가 됐어요.』</b>라고 외쳐 보세요.",
+  hints:["ready","meeting"],
+  model:"We are ready for the meeting.", modelKr:"우리는 미팅 준비가 됐어요."},
+ {q:"상황 작문 3", sit:"새로 온 팀원에게 자기소개를 해요. <b>『저는 미아예요. 저는 회사원이에요.』</b>를 두 문장으로 써 보세요.",
+  hints:["office worker"],
+  model:"I'm Mia. I am an office worker.", modelKr:"저는 미아예요. 저는 회사원이에요."},
+ {q:"자유 작문", sit:"나와 가까운 사람을 소개하는 문장을 <b>『I'm ___ . / He is ___ .』</b> 또는 <b>『She is ___ .』</b> 형태로 <b>2문장</b> 써 보세요. (이름·직업·기분·출신 중 자유롭게)",
+  hints:["happy","smart"],
+  model:"I'm Mina. He is Tom. He's from Canada.", modelKr:"예시 — I'm happy. / She is my teacher. / We are ready. 처럼 자유롭게!"}
+];
+
+/* ─────────── 렌더링 ─────────── */
+const state = QUIZ.map(()=>({sel:new Set(), graded:false, correct:false}));
+const marks = ["①","②","③","④"];
+const mcqList = document.getElementById("mcqList");
+
+QUIZ.forEach((item, qi)=>{
+  const meta = TYPE[item.t];
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">Q.${String(qi+1).padStart(2,"0")}</span>
+      <span class="tchip ${meta.cls}">${meta.label}</span>
+      ${item.a.length>1 ? '<span class="multi-note">정답 '+item.a.length+'개를 모두 고르세요</span>' : ''}
+    </div>
+    <p class="q-text">${item.q}</p>
+    <div class="opts">${item.o.map((op,oi)=>`
+      <button type="button" class="opt" data-oi="${oi}" aria-pressed="false">
+        ${item.a.length>1 ? '<span class="box">✓</span>' : '<span class="mark">'+marks[oi]+'</span>'}
+        <span class="${/^[A-Za-z]/.test(op) ? 'en' : ''}">${op}</span>
+      </button>`).join("")}
+    </div>
+    <div class="q-actions">
+      <button type="button" class="btn-check" disabled>채점하기</button>
+      <span class="graded-tag" hidden></span>
+    </div>
+    <div class="feedback"><p class="fb-title"></p><p class="fb-exp"></p></div>`;
+  mcqList.appendChild(card);
+
+  const opts = [...card.querySelectorAll(".opt")];
+  const btn = card.querySelector(".btn-check");
+  const tag = card.querySelector(".graded-tag");
+  const fb = card.querySelector(".feedback");
+  const fbTitle = card.querySelector(".fb-title");
+  const fbExp = card.querySelector(".fb-exp");
+
+  opts.forEach((b,oi)=>b.addEventListener("click", ()=>{
+    if(state[qi].graded) return;
+    if(item.a.length>1){
+      state[qi].sel.has(oi) ? state[qi].sel.delete(oi) : state[qi].sel.add(oi);
+      b.classList.toggle("sel"); b.setAttribute("aria-pressed", b.classList.contains("sel"));
+    } else {
+      state[qi].sel.clear();
+      opts.forEach(o=>{o.classList.remove("sel"); o.setAttribute("aria-pressed","false");});
+      state[qi].sel.add(oi); b.classList.add("sel"); b.setAttribute("aria-pressed","true");
+    }
+    btn.disabled = state[qi].sel.size===0;
+  }));
+
+  btn.addEventListener("click", ()=>{
+    const st = state[qi];
+    if(st.graded || st.sel.size===0) return;
+    const isRight = st.sel.size===item.a.length && item.a.every(x=>st.sel.has(x));
+    st.graded = true; st.correct = isRight;
+    opts.forEach((b,oi)=>{
+      b.disabled = true;
+      const box = b.querySelector(".box");   // 다중선택 전용. 단일선택에는 없음(null)
+      if(item.a.includes(oi)){ b.classList.add("right"); if(box) box.textContent="✓"; }
+      else if(st.sel.has(oi)){ b.classList.add("miss"); if(box) box.textContent="✗"; }
+      else b.classList.add("dim");
+    });
+    tag.hidden = false;
+    tag.textContent = isRight ? "정답!" : "다시 확인해 보세요";
+    tag.className = "graded-tag " + (isRight ? "good" : "bad");
+    fb.classList.add("show");
+    fbTitle.textContent = (isRight ? "⭕ 정답입니다! " : "❌ 아쉬워요. 정답은 " + item.a.map(i=>marks[i]).join(", ") + " ");
+    fbTitle.className = "fb-title " + (isRight ? "good" : "bad");
+    fbExp.innerHTML = "💡 " + item.e;
+    updateScores();
+  });
+});
+
+/* ── 주관식 ── */
+const essayList = document.getElementById("essayList");
+ESSAYS.forEach((item, ei)=>{
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">W.${ei+1}</span>
+      <span class="tchip ${TYPE.write.cls}">${item.q}</span>
+    </div>
+    <div class="situation">${item.sit}</div>
+    <div class="hints">${item.hints.map(h=>'<span class="hint">힌트 · <span class="en">'+h+'</span></span>').join("")}</div>
+    <textarea placeholder="여기에 영어 문장을 직접 써 보세요." aria-label="${item.q} 답안 입력"></textarea>
+    <div class="q-actions">
+      <button type="button" class="btn-check">모범답안 보기</button>
+      <span style="font-size:.78rem; color:var(--sub); font-weight:700">정답은 하나가 아닐 수도 있어요</span>
+    </div>
+    <div class="model"><b>모범답안 · <span class="en" style="font-size:1.02rem">${item.model}</span></b><br/><span style="color:var(--sub); font-size:.85rem">${item.modelKr}</span></div>`;
+  essayList.appendChild(card);
+
+  const btn = card.querySelector(".btn-check");
+  const model = card.querySelector(".model");
+  btn.addEventListener("click", ()=>{
+    const open = model.classList.toggle("show");
+    btn.textContent = open ? "모범답안 숨기기" : "모범답안 보기";
+  });
+});
+
+/* ── 점수 집계 ── */
+function updateScores(){
+  const graded = state.filter(s=>s.graded).length;
+  const correct = state.filter(s=>s.correct).length;
+  document.getElementById("gradedN").textContent = graded;
+  document.getElementById("correctN").textContent = correct;
+  document.getElementById("finalScore").textContent = correct;
+
+  const tbody = document.querySelector("#typeTable tbody");
+  tbody.innerHTML = "";
+  Object.entries(TYPE).forEach(([key, meta])=>{
+    if(key==="write") return;
+    const rows = QUIZ.map((q,i)=>({q, s:state[i]})).filter(x=>x.q.t===key);
+    if(!rows.length) return;
+    const g = rows.filter(x=>x.s.graded).length;
+    const c = rows.filter(x=>x.s.correct).length;
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>"+meta.label+"</td><td>"+(g ? c+" / "+g : "–")+"</td>";
+    tbody.appendChild(tr);
+  });
+
+  const msg = document.getElementById("resultMsg");
+  const emoji = document.getElementById("allDone");
+  if(graded===QUIZ.length){
+    emoji.classList.add("show");
+    if(correct===25) msg.textContent = "만점! 주어와 be동사 짝 맞추기를 완벽하게 끝냈어요. 바로 3강으로 갈 준비 끝!";
+    else if(correct>=20) msg.textContent = "훌륭해요! 틀린 문제의 해설만 다시 보면 완벽합니다.";
+    else if(correct>=14) msg.textContent = "절반 이상 성공! am / is / are 짝꿍 표를 다시 읽고 틀린 문제를 정리해 보세요.";
+    else if(correct>=7) msg.textContent = "조금 아쉬워요. 위의 핵심 정리를 다시 복습하고 같은 문제에 다시 도전!";
+    else msg.textContent = "괜찮아요, 시작이 반이에요! 주어별 짝꿍 be동사를 읽고 천천히 다시 풀어 보세요.";
+  } else {
+    emoji.classList.remove("show");
+    msg.textContent = "채점한 문제: " + graded + " / 25 — 계속 풀어 보세요!";
+  }
+}
+document.getElementById("btnReset").addEventListener("click", ()=>{ location.reload(); });
+updateScores();
+</script>
+</body>
+</html>

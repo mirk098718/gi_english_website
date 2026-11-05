@@ -1,14 +1,18 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/Notice.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/NoticeService.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 // ignore: deprecated_member_use
-import 'dart:html' as html;
-import 'dart:ui_web' as ui;
+import 'package:gi_english_website/util/html_stub.dart'
+    if (dart.library.html) 'dart:html' as html;
+import 'package:gi_english_website/util/ui_web_stub.dart'
+    if (dart.library.html) 'dart:ui_web' as ui;
 
 class AdminNoticeWritePage extends StatefulWidget {
   final Notice? notice; // 수정 모드일 때 사용
@@ -56,13 +60,14 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
       contentValue = widget.notice!.content;
       _isImportant = widget.notice!.isImportant;
 
-      // HTML input에도 값 설정 (약간의 지연 후)
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          titleInput.value = titleValue;
-          contentInput.value = contentValue;
-        }
-      });
+      if (kIsWeb) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            titleInput.value = titleValue;
+            contentInput.value = contentValue;
+          }
+        });
+      }
     }
   }
 
@@ -210,19 +215,19 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
     double width = size.width;
 
     if (width > 768) {
-      return WebSchoolLayout(content: _buildScrollView());
+      return WebSchoolLayout(content: _buildScrollView(includeFooter: true));
     } else {
-      return MobileSchoolLayout(content: _buildScrollView());
+      return MobileSchoolLayout(content: _buildScrollView(includeFooter: false));
     }
   }
 
-  Widget _buildScrollView() {
+  Widget _buildScrollView({required bool includeFooter}) {
     return SingleChildScrollView(
       child: Column(
         children: [
           _buildMainImage(),
           _buildContentGroup(),
-          MyWidget.footer(),
+          if (includeFooter) MyWidget.footer(),
         ],
       ),
     );
@@ -233,7 +238,7 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/communityMainImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.community),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -253,7 +258,7 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
                   height: 40,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.black,
+                      backgroundColor: Palette.navy,
                       foregroundColor: Palette.black,
                     ),
                     onPressed: () {
@@ -294,7 +299,7 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
           Container(
             height: 2,
             width: 100,
-            color: Palette.primary,
+            color: Palette.darkTeal,
           ),
           SizedBox(height: 40),
           _buildForm(),
@@ -324,7 +329,16 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
             ),
-            child: HtmlElementView(viewType: titleViewType),
+            child: kIsWeb
+                ? HtmlElementView(viewType: titleViewType)
+                : TextField(
+                    controller: _titleController,
+                    onChanged: (value) => titleValue = value,
+                    decoration: InputDecoration(
+                      hintText: '공지사항 제목을 입력하세요',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
           ),
           SizedBox(height: 24),
 
@@ -338,7 +352,7 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
                     _isImportant = value ?? false;
                   });
                 },
-                activeColor: Palette.primary,
+                activeColor: Palette.darkTeal,
               ),
               Text(
                 "중요 공지사항",
@@ -367,7 +381,19 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
             ),
-            child: HtmlElementView(viewType: contentViewType),
+            child: kIsWeb
+                ? HtmlElementView(viewType: contentViewType)
+                : TextField(
+                    controller: _contentController,
+                    maxLines: null,
+                    expands: true,
+                    textAlignVertical: TextAlignVertical.top,
+                    onChanged: (value) => contentValue = value,
+                    decoration: InputDecoration(
+                      hintText: '공지사항 내용을 입력하세요',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
           ),
           SizedBox(height: 40),
 
@@ -410,7 +436,7 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _saveNotice,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
+                    backgroundColor: Palette.darkTeal,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),

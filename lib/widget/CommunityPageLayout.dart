@@ -5,6 +5,7 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 class CommunityPageLayout extends StatefulWidget {
@@ -101,7 +102,8 @@ class _CommunityPageLayoutState extends State<CommunityPageLayout> {
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       padding: EdgeInsets.all(20),
       child: Container(
         decoration: BoxDecoration(
@@ -110,7 +112,7 @@ class _CommunityPageLayoutState extends State<CommunityPageLayout> {
         ),
         child: Column(children: children),
       ),
-    );
+    ));
   }
 
   Widget _buildMainImage() {
@@ -118,7 +120,7 @@ class _CommunityPageLayoutState extends State<CommunityPageLayout> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/communityMainImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.community),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -172,7 +174,6 @@ class _CommunityPageLayoutState extends State<CommunityPageLayout> {
             color: Colors.white,
             child: widget.content,
           ),
-          SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
         ],
       ),
     );
@@ -219,12 +220,13 @@ class _CommunityPageLayoutState extends State<CommunityPageLayout> {
         children.add(Container(
           width: 1,
           height: 40,
-          color: Palette.primaryLight,
+          color: Palette.grey300,
         ));
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       color: Palette.white,
       padding: EdgeInsets.all(20),
       child: Container(
@@ -233,6 +235,6 @@ class _CommunityPageLayoutState extends State<CommunityPageLayout> {
           child: Row(children: children),
         ),
       ),
-    );
+    ));
   }
 }

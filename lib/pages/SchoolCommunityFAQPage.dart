@@ -7,6 +7,7 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
 import '../util/WidgetUtil.dart';
@@ -23,7 +24,6 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
     ButtonState("Notice Board", BehaviorColor.colorOnDefault,
         SchoolCommunityNoticePage()),
     ButtonState("Gallery", BehaviorColor.colorOnDefault, SchoolGalleryPage()),
-    ButtonState("입학상담", BehaviorColor.colorOnDefault, SchoolConsultationPage()),
     ButtonState("FAQ", BehaviorColor.colorOnClick, SchoolCommunityFAQPage()),
   ];
 
@@ -82,7 +82,7 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
         onHover: (value) {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
-              : (i == 3
+              : (isLast
                   ? BehaviorColor.colorOnClick
                   : BehaviorColor.colorOnDefault);
           print(
@@ -99,7 +99,8 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       padding: EdgeInsets.all(20),
       child: Container(
         decoration: BoxDecoration(
@@ -113,12 +114,12 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
           children: children,
         ),
       ),
-    );
+    ));
   }
 
   Widget content() {
     return Container(
-      width: MediaQuery.of(context).size.width,
+      width: double.infinity,
       padding: EdgeInsets.all(20),
       color: Palette.white,
       child: Column(
@@ -160,7 +161,7 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          Image.asset("assets/communityMainImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.community),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -215,7 +216,6 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
             // mobileMainImage(),
             mobileLeftMenu(),
             content(),
-            SizedBox(height: 51, child: MyWidget.mobileSchoolFooter())
           ],
         ),
       ),
@@ -248,7 +248,7 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
         onHover: (value) {
           buttonState.color = value
               ? BehaviorColor.colorOnHover
-              : (i == 3
+              : (isLast
                   ? BehaviorColor.colorOnClick
                   : BehaviorColor.colorOnDefault);
           setState(() {});
@@ -262,12 +262,13 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
         children.add(Container(
           width: 1,
           height: 40,
-          color: const Color.fromRGBO(96, 165, 250, 1),
+          color: Palette.grey300,
         ));
       }
     }
 
-    return Container(
+    return MyWidget.menuWithDailyWord(
+    Container(
       color: Palette.white,
       padding: EdgeInsets.all(20),
       child: Container(
@@ -285,7 +286,7 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget mobileMainImage() {
@@ -293,7 +294,7 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
       child: Stack(
         alignment: Alignment.centerLeft,
         children: [
-          Image.asset("assets/communityMainImage.png"),
+          AcademyHeroBanner.photo(AcademyHeroBanner.community),
           Container(
             padding: EdgeInsets.only(left: 20),
             child: Column(
