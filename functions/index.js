@@ -687,6 +687,35 @@ exports.onWeekBookingCreated = functions
         });
       }
     }
+    await grantQuizResultReaders(data);
+  });
+
+async function grantQuizResultReaders(data) {
+  const userId = String((data && data.userId) || "");
+  if (!userId) return;
+  const teachers = [
+    String((data && data.teacherId) || ""),
+    String((data && data.nativeTeacherUid) || ""),
+  ];
+  const seen = {};
+  for (const teacherUid of teachers) {
+    if (!teacherUid || seen[teacherUid]) continue;
+    seen[teacherUid] = true;
+    await admin.firestore().collection("quiz_result_readers").doc(teacherUid + "_" + userId).set({
+      teacherId: teacherUid,
+      userId: userId,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+  }
+}
+
+exports.grantQuizResultReader = functions
+  .region("asia-northeast3")
+  .firestore.document("week_bookings/{bookingId}")
+  .onWrite(async (change) => {
+    if (!change.after.exists) return null;
+    await grantQuizResultReaders(change.after.data() || {});
+    return null;
   });
 
 function scheduledAtFromBooking(data) {

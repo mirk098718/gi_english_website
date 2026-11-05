@@ -248,6 +248,10 @@ button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid 
 </main>
 <footer>글림 중급 영어 · 제 01강 「현재완료진행」 — 오늘 자기소개에서 I've been working on ~ 한 문장을 꼭 꺼내 보세요. 열정은 have been -ing로 말할 때 가장 생생합니다. 2강 과거완료 편에서 만나요!</footer>
 
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore-compat.js"></script>
+<script src="quiz-result.js"></script>
 <script>
 /* ─────────── 문제 데이터 ─────────── */
 const TYPE = {
@@ -489,6 +493,38 @@ function updateScores(){
   }
 }
 document.getElementById("btnReset").addEventListener("click", ()=>{ location.reload(); });
+if (window.GleamQuiz) {
+  try {
+    var readQuizSnapshot = function () {
+      var graded = state.filter(function (item) { return item.graded; }).length;
+      var correct = state.filter(function (item) { return item.correct; }).length;
+      var areas = document.querySelectorAll("#essayList textarea");
+      var essays = ESSAYS.map(function (item, index) {
+        var area = areas[index];
+        var prompt = String(item.sit || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+        return {
+          index: index + 1,
+          title: String(item.q || ""),
+          prompt: prompt,
+          answer: area ? String(area.value || "").trim() : ""
+        };
+      });
+      return {
+        graded: graded,
+        correct: correct,
+        total: QUIZ.length,
+        complete: QUIZ.length === 25 && graded === 25,
+        essays: essays
+      };
+    };
+    var originalUpdateScores = updateScores;
+    updateScores = function () {
+      originalUpdateScores();
+      GleamQuiz.report(readQuizSnapshot());
+    };
+    GleamQuiz.start(readQuizSnapshot);
+  } catch (error) {}
+}
 updateScores();
 </script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>

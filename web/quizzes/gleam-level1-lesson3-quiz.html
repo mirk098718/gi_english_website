@@ -244,6 +244,10 @@ button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid 
 </main>
 <footer>글림 왕초보 영어 · 제 03강 「I, Me, My, Mine! 인칭대명사 종결자」 — 주변 물건을 가리키며 <span class="en">This is my cup, this is mine!</span> 을 연습해 보세요. 다음 4강 지시대명사 편에서 만나요!</footer>
 
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore-compat.js"></script>
+<script src="quiz-result.js"></script>
 <script>
 /* ─────────── 문제 데이터 ─────────── */
 const TYPE = {
@@ -485,6 +489,38 @@ function updateScores(){
   }
 }
 document.getElementById("btnReset").addEventListener("click", ()=>{ location.reload(); });
+if (window.GleamQuiz) {
+  try {
+    var readQuizSnapshot = function () {
+      var graded = state.filter(function (item) { return item.graded; }).length;
+      var correct = state.filter(function (item) { return item.correct; }).length;
+      var areas = document.querySelectorAll("#essayList textarea");
+      var essays = ESSAYS.map(function (item, index) {
+        var area = areas[index];
+        var prompt = String(item.sit || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+        return {
+          index: index + 1,
+          title: String(item.q || ""),
+          prompt: prompt,
+          answer: area ? String(area.value || "").trim() : ""
+        };
+      });
+      return {
+        graded: graded,
+        correct: correct,
+        total: QUIZ.length,
+        complete: QUIZ.length === 25 && graded === 25,
+        essays: essays
+      };
+    };
+    var originalUpdateScores = updateScores;
+    updateScores = function () {
+      originalUpdateScores();
+      GleamQuiz.report(readQuizSnapshot());
+    };
+    GleamQuiz.start(readQuizSnapshot);
+  } catch (error) {}
+}
 updateScores();
 </script>
 </body>
