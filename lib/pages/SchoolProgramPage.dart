@@ -698,8 +698,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
                   MenuUtil.push(context, SchoolConsultationPage());
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.accent,
-                  foregroundColor: Palette.black,
+                  backgroundColor: Palette.black,
+                  foregroundColor: Palette.white,
                   padding: EdgeInsets.zero,
                 ),
               ),
