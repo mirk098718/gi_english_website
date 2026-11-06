@@ -467,17 +467,23 @@ class MyWidget {
   }
 
   /// 왼쪽 메뉴 아래에 오늘의 단어 카드를 붙인다.
+  /// 모바일 너비에서는 카드를 빼 둔다. 화면 아래 작은 띠가 단어를 보여 준다.
   static Widget menuWithDailyWord(Widget menu) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        menu,
-        const Padding(
-          padding: EdgeInsets.fromLTRB(20, 0, 20, 24),
-          child: HomeDailyWordBlock(sidebar: true),
-        ),
-      ],
+    return Builder(
+      builder: (context) {
+        if (MediaQuery.sizeOf(context).width <= 768) return menu;
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            menu,
+            const Padding(
+              padding: EdgeInsets.fromLTRB(20, 0, 20, 24),
+              child: HomeDailyWordBlock(sidebar: true),
+            ),
+          ],
+        );
+      },
     );
   }
 }

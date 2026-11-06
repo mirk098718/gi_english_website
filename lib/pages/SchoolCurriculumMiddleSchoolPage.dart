@@ -5,6 +5,7 @@ import 'package:gi_english_website/pages/SchoolCurriculumHighSchoolPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/AcademyLmsLinks.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
@@ -209,6 +210,14 @@ class _SchoolCurriculumMiddleSchoolPageState
         alignment: Alignment.bottomLeft,
         children: [
           AcademyHeroBanner.photo(AcademyHeroBanner.middle),
+          Positioned(
+            right: 28,
+            bottom: 20,
+            child: AcademyLmsLinks(
+              showHeading: false,
+              showElementary: false,
+            ),
+          ),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -259,7 +268,7 @@ class _SchoolCurriculumMiddleSchoolPageState
       child: Container(
         child: Column(
           children: [
-            // mobileMainImage(),
+            mobileMainImage(),
             mobileLeftMenu(),
             content(),
           ],
@@ -335,5 +344,77 @@ class _SchoolCurriculumMiddleSchoolPageState
         ),
       ),
     ));
+  }
+
+  Widget mobileMainImage() {
+    return Container(
+      child: Stack(
+        alignment: Alignment.bottomLeft,
+        children: [
+          AcademyHeroBanner.photo(AcademyHeroBanner.middle, compact: true),
+          Positioned(
+            left: 16,
+            right: 12,
+            bottom: 12,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Curriculum",
+                      style: TextStyle(
+                          color: Palette.white,
+                          fontSize: 20,
+                          fontFamily: "LucidaCalligraphy"),
+                    ),
+                    SizedBox(height: 8),
+                    SizedBox(
+                      width: 108,
+                      height: 34,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Palette.black,
+                          foregroundColor: Palette.white,
+                          padding: EdgeInsets.zero,
+                        ),
+                        onPressed: () {
+                          MenuUtil.push(context, SchoolConsultationPage());
+                        },
+                        child: Text(
+                          "상담신청",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: "Jalnan",
+                            color: Palette.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(width: 8),
+                Flexible(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: 248),
+                      child: AcademyLmsLinks(
+                        showHeading: false,
+                        showElementary: false,
+                        compact: true,
+                        centered: true,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

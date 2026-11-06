@@ -56,11 +56,7 @@ void main() {
             alignment: Alignment.topLeft,
             child: SizedBox(
               width: 192,
-              child: HomeDailyWordBlock(
-                date: date,
-                word: word,
-                sidebar: true,
-              ),
+              child: HomeDailyWordBlock(date: date, word: word, sidebar: true),
             ),
           ),
         ),
@@ -70,6 +66,38 @@ void main() {
     expect(find.text(word.word), findsOneWidget);
     expect(find.text('오늘의 표현'), findsOneWidget);
     expect(find.text(word.expression), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('모바일 띠는 단어와 뜻을 한 줄로 보여주고 누르면 표현이 열린다', (tester) async {
+    final date = DateTime(2026, 11, 5);
+    final word = DailyWord.forDate(date);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Align(
+            alignment: Alignment.bottomCenter,
+            child: HomeDailyWordBlock(date: date, word: word, bar: true),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('오늘의 단어'), findsOneWidget);
+    expect(find.text(word.word), findsOneWidget);
+    expect(find.text(word.meaning), findsOneWidget);
+    expect(find.text(word.expression), findsNothing);
+    expect(
+      tester.getSize(find.byType(HomeDailyWordBlock)).height,
+      lessThan(64),
+    );
+
+    await tester.tap(find.text('오늘의 단어'));
+    await tester.pump();
+
+    expect(find.text(word.expression), findsOneWidget);
+    expect(find.text(word.expressionMeaning), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
