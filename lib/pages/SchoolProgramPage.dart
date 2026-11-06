@@ -115,7 +115,6 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AcademyLmsLinks(),
           Text(
             "정규 프로그램",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
@@ -334,7 +333,6 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AcademyLmsLinks(),
           Text(
             "정규 프로그램",
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
@@ -524,6 +522,13 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
         alignment: Alignment.bottomLeft,
         children: [
           AcademyHeroBanner.photo(AcademyHeroBanner.program),
+          Positioned(
+            top: 24,
+            right: 28,
+            child: AcademyLmsLinks(
+              showHeading: false,
+            ),
+          ),
           Container(
             padding: EdgeInsets.only(left: 40, bottom: 20),
             child: Column(
@@ -575,7 +580,7 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
         color: Colors.white,
         child: Column(
           children: [
-            // mobileMainImage(),
+            mobileMainImage(),
             mobileLeftMenu(),
             mobileContent(),
           ],
@@ -656,43 +661,50 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
       child: Stack(
         alignment: Alignment.centerLeft,
         children: [
-          AcademyHeroBanner.photo(AcademyHeroBanner.program),
-          Container(
-            padding: EdgeInsets.only(left: 20),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  "Program",
-                  style: TextStyle(
-                      color: Palette.white,
-                      fontSize: 20,
-                      fontFamily: "LucidaCalligraphy"),
-                ),
-                Spacer(),
-                Container(
-                  width: 150,
-                  height: 40,
-                  child: ElevatedButton(
-                    child: Text(
-                      "상담신청",
-                      style:
-                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
-                    ),
-                    onPressed: () {
-                      MenuUtil.push(context, SchoolConsultationPage());
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.accent,
-                      foregroundColor: Palette.black,
-                    ),
-                  ),
-                ),
-                SizedBox(width: 20)
-              ],
+          AcademyHeroBanner.photo(AcademyHeroBanner.program, compact: true),
+          Positioned(
+            top: 12,
+            left: 12,
+            right: 12,
+            child: AcademyLmsLinks(
+              showHeading: false,
+              compact: true,
+              centered: true,
             ),
-          )
+          ),
+          Positioned(
+            left: 16,
+            bottom: 14,
+            child: Text(
+              "Program",
+              style: TextStyle(
+                  color: Palette.white,
+                  fontSize: 20,
+                  fontFamily: "LucidaCalligraphy"),
+            ),
+          ),
+          Positioned(
+            right: 12,
+            bottom: 12,
+            child: SizedBox(
+              width: 120,
+              height: 36,
+              child: ElevatedButton(
+                child: Text(
+                  "상담신청",
+                  style: TextStyle(fontFamily: "Jalnan", color: Palette.white),
+                ),
+                onPressed: () {
+                  MenuUtil.push(context, SchoolConsultationPage());
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.accent,
+                  foregroundColor: Palette.black,
+                  padding: EdgeInsets.zero,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
