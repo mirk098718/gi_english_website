@@ -8,6 +8,8 @@ class AcademyLmsLinks extends StatelessWidget {
   final bool onDark;
   final bool compact;
   final bool centered;
+  final bool showElementary;
+  final bool showMiddle;
 
   const AcademyLmsLinks({
     Key? key,
@@ -15,7 +17,10 @@ class AcademyLmsLinks extends StatelessWidget {
     this.onDark = false,
     this.compact = false,
     this.centered = false,
-  }) : super(key: key);
+    this.showElementary = true,
+    this.showMiddle = true,
+  })  : assert(showElementary || showMiddle),
+        super(key: key);
 
   static const String _middleUrl = 'http://gienglish.theclip.net/';
   static const String _eleUrl =
@@ -39,25 +44,20 @@ class AcademyLmsLinks extends StatelessWidget {
       fill: fill,
     );
 
-    final Widget buttons;
-    if (centered) {
-      buttons = Row(
-        children: [
-          Expanded(child: ele),
-          SizedBox(width: compact ? 8 : 10),
-          Expanded(child: middle),
+    final items = <Widget>[
+      if (showElementary) ele,
+      if (showMiddle) middle,
+    ];
+    final gap = SizedBox(width: centered && compact ? 8 : 10);
+    final Widget buttons = Row(
+      mainAxisSize: centered ? MainAxisSize.max : MainAxisSize.min,
+      children: [
+        for (var i = 0; i < items.length; i++) ...[
+          if (i > 0) gap,
+          if (centered) Expanded(child: items[i]) else items[i],
         ],
-      );
-    } else {
-      buttons = Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ele,
-          SizedBox(width: 10),
-          middle,
-        ],
-      );
-    }
+      ],
+    );
 
     return Padding(
       padding: EdgeInsets.only(bottom: showHeading ? 24 : 0),
