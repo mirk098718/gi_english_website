@@ -523,8 +523,8 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
         children: [
           AcademyHeroBanner.photo(AcademyHeroBanner.program),
           Positioned(
-            top: 24,
             right: 28,
+            bottom: 20,
             child: AcademyLmsLinks(
               showHeading: false,
             ),
@@ -663,46 +663,60 @@ class _SchoolProgramPageState extends State<SchoolProgramPage> {
         children: [
           AcademyHeroBanner.photo(AcademyHeroBanner.program, compact: true),
           Positioned(
-            top: 12,
-            left: 12,
-            right: 12,
-            child: AcademyLmsLinks(
-              showHeading: false,
-              compact: true,
-              centered: true,
-            ),
-          ),
-          Positioned(
             left: 16,
-            bottom: 14,
-            child: Text(
-              "Program",
-              style: TextStyle(
-                  color: Palette.white,
-                  fontSize: 20,
-                  fontFamily: "LucidaCalligraphy"),
-            ),
-          ),
-          Positioned(
             right: 12,
             bottom: 12,
-            child: SizedBox(
-              width: 120,
-              height: 36,
-              child: ElevatedButton(
-                child: Text(
-                  "상담신청",
-                  style: TextStyle(fontFamily: "Jalnan", color: Palette.white),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Program",
+                      style: TextStyle(
+                          color: Palette.white,
+                          fontSize: 20,
+                          fontFamily: "LucidaCalligraphy"),
+                    ),
+                    SizedBox(height: 8),
+                    SizedBox(
+                      width: 108,
+                      height: 34,
+                      child: ElevatedButton(
+                        child: Text(
+                          "상담신청",
+                          style: TextStyle(
+                              fontFamily: "Jalnan", color: Palette.white),
+                        ),
+                        onPressed: () {
+                          MenuUtil.push(context, SchoolConsultationPage());
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Palette.black,
+                          foregroundColor: Palette.white,
+                          padding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                onPressed: () {
-                  MenuUtil.push(context, SchoolConsultationPage());
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.black,
-                  foregroundColor: Palette.white,
-                  padding: EdgeInsets.zero,
+                SizedBox(width: 8),
+                Flexible(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: 520),
+                      child: AcademyLmsLinks(
+                        showHeading: false,
+                        compact: true,
+                        centered: true,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ],

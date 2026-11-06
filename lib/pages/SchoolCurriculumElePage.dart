@@ -185,8 +185,8 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
         children: [
           AcademyHeroBanner.photo(AcademyHeroBanner.elementary),
           Positioned(
-            top: 24,
             right: 28,
+            bottom: 20,
             child: AcademyLmsLinks(
               showHeading: false,
               showMiddle: false,
@@ -327,54 +327,59 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
         children: [
           AcademyHeroBanner.photo(AcademyHeroBanner.elementary, compact: true),
           Positioned(
-            top: 12,
-            left: 12,
+            left: 16,
             right: 12,
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 248),
-                child: AcademyLmsLinks(
-                  showHeading: false,
-                  showMiddle: false,
-                  compact: true,
-                  centered: true,
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 16, bottom: 14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+            bottom: 12,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  "Curriculum",
-                  style: TextStyle(
-                      color: Palette.white,
-                      fontSize: 20,
-                      fontFamily: "LucidaCalligraphy"),
-                ),
-                SizedBox(height: 10),
-                SizedBox(
-                  width: 120,
-                  height: 36,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.black,
-                      foregroundColor: Palette.white,
-                      padding: EdgeInsets.zero,
-                    ),
-                    onPressed: () {
-                      MenuUtil.push(context, SchoolConsultationPage());
-                    },
-                    child: Text(
-                      "상담신청",
-                      textAlign: TextAlign.center,
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Curriculum",
                       style: TextStyle(
-                        fontFamily: "Jalnan",
-                        color: Palette.white,
+                          color: Palette.white,
+                          fontSize: 20,
+                          fontFamily: "LucidaCalligraphy"),
+                    ),
+                    SizedBox(height: 8),
+                    SizedBox(
+                      width: 108,
+                      height: 34,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Palette.black,
+                          foregroundColor: Palette.white,
+                          padding: EdgeInsets.zero,
+                        ),
+                        onPressed: () {
+                          MenuUtil.push(context, SchoolConsultationPage());
+                        },
+                        child: Text(
+                          "상담신청",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: "Jalnan",
+                            color: Palette.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(width: 8),
+                Flexible(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: 248),
+                      child: AcademyLmsLinks(
+                        showHeading: false,
+                        showMiddle: false,
+                        compact: true,
+                        centered: true,
                       ),
                     ),
                   ),
