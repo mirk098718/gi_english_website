@@ -11,6 +11,7 @@ import 'package:gi_english_website/widget/HomeWeeklyLoopBand.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/SiteNav.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
+
 import '../admin/page/AdminLoginPage.dart';
 
 class SchoolMainPage extends StatefulWidget {
@@ -226,7 +227,6 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
     );
   }
 
-
   Widget scrollView() {
     return SingleChildScrollView(
       child: Container(
@@ -254,7 +254,6 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         child: Column(
           children: [
             mobileMainImage(),
-            HomeDailyWordBlock(compact: true),
             HomeWeeklyLoopBand(compact: true),
             HomeClassAlertBand(compact: true),
             HomeAudienceCards(compact: true),
@@ -264,5 +263,4 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
       ),
     );
   }
-
 }

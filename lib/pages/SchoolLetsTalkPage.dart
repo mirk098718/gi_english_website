@@ -313,16 +313,19 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
       child: Column(
         children: [
           _hero(compact: !wide),
-          HomeDailyWordBlock(
-            compact: !wide,
-            tone: DailyWordTone.talk,
-          ),
+          if (wide)
+            const HomeDailyWordBlock(tone: DailyWordTone.talk),
           _body(compact: !wide),
           if (wide) MyWidget.footer(),
         ],
       ),
     );
-    return wide ? WebSchoolLayout(content: body) : MobileSchoolLayout(content: body);
+    return wide
+        ? WebSchoolLayout(content: body)
+        : MobileSchoolLayout(
+            content: body,
+            dailyWordTone: DailyWordTone.talk,
+          );
   }
 
   Widget _hero({required bool compact}) {
