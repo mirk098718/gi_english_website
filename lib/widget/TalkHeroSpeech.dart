@@ -32,39 +32,6 @@ class TalkHeroSpeech extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 10),
-        Padding(
-          padding: EdgeInsets.only(left: mascotW + gap),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final rule = TalkSpeechBubble(
-                title: TalkCopy.ruleTitle,
-                body: TalkCopy.ruleBody,
-                accent: Palette.talkCoral,
-                titleColor: Palette.talkCoralDark,
-              );
-              final safety = TalkSpeechBubble(
-                title: TalkCopy.safetyTitle,
-                body: TalkCopy.safetyBody,
-                accent: const Color(0xFFFF8A80),
-                titleColor: Palette.danger,
-              );
-              if (constraints.maxWidth < 520) {
-                return Column(
-                  children: [rule, const SizedBox(height: 8), safety],
-                );
-              }
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: rule),
-                  const SizedBox(width: 10),
-                  Expanded(child: safety),
-                ],
-              );
-            },
-          ),
-        ),
       ],
     );
   }
