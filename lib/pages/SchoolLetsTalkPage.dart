@@ -458,7 +458,7 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
     final cards = [
       _CreateLaunchCard(
         eyebrow: 'Group Chat',
-        title: '그룹 채팅 열기',
+        title: '그룹 대화방 열기',
         body: '주제와 레벨을 고르고, 2~6명까지 인원을 정해요.',
         icon: Icons.groups_2_rounded,
         onTap: () => _createRoom(TalkRoomType.group),
@@ -1284,7 +1284,7 @@ class _CreateTalkRoomDialogState extends State<_CreateTalkRoomDialog> {
       surfaceTintColor: Palette.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       title: Text(
-        group ? '그룹 채팅 열기' : '1:1 대화방 열기',
+        group ? '그룹 대화방 열기' : '일대일 대화방 열기',
         style: const TextStyle(fontFamily: 'Jalnan', color: Palette.talkInk),
       ),
       content: SizedBox(
