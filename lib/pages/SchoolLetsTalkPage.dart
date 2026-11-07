@@ -9,6 +9,8 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/TalkService.dart';
 import 'package:gi_english_website/widget/HomeDailyWordBlock.dart';
+import 'package:gi_english_website/widget/TalkHeroSpeech.dart';
+import 'package:gi_english_website/widget/TalkTopicBoard.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
@@ -313,9 +315,10 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
       child: Column(
         children: [
           _hero(compact: !wide),
+          _lounge(compact: !wide),
+          TalkTopicBoard(compact: !wide),
           if (wide)
             const HomeDailyWordBlock(tone: DailyWordTone.talk),
-          _body(compact: !wide),
           if (wide) MyWidget.footer(),
         ],
       ),
@@ -394,86 +397,17 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
                       color: Palette.talkInk,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    TalkCopy.lead,
-                    style: TextStyle(
-                      fontFamily: 'NotoSansKR',
-                      fontSize: compact ? 15 : 17,
-                      height: 1.35,
-                      fontWeight: FontWeight.w700,
-                      color: Palette.talkInk,
-                    ),
-                  ),
+                  const SizedBox(height: 14),
+                  TalkHeroSpeech(compact: compact),
                   const SizedBox(height: 12),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final two = constraints.maxWidth >= 720;
-                      final noteW = two
-                          ? (constraints.maxWidth - 10) / 2
-                          : constraints.maxWidth;
-                      return Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: [
-                          SizedBox(
-                            width: noteW,
-                            child: _heroNote(
-                              TalkCopy.ruleTitle,
-                              TalkCopy.ruleBody,
-                              Palette.talkCoralDark,
-                              Palette.talkCoral,
-                            ),
-                          ),
-                          SizedBox(
-                            width: noteW,
-                            child: _heroNote(
-                              TalkCopy.safetyTitle,
-                              TalkCopy.safetyBody,
-                              Palette.danger,
-                              Palette.danger,
-                            ),
-                          ),
-                        ],
-                      );
-                    },
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: (compact ? 104 : 136) + (compact ? 4 : 8),
+                    ),
+                    child: _createRow(compact: compact),
                   ),
                 ],
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _heroNote(String title, String body, Color titleColor, Color border) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-      decoration: BoxDecoration(
-        color: Palette.white.withValues(alpha: 0.82),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: border.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontFamily: 'Jalnan',
-              fontSize: 13,
-              color: titleColor,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            body,
-            style: const TextStyle(
-              fontFamily: 'NotoSansKR',
-              fontSize: 12,
-              height: 1.4,
-              color: Palette.grey700,
             ),
           ),
         ],
@@ -491,37 +425,30 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
     );
   }
 
-  Widget _body({required bool compact}) {
+  Widget _lounge({required bool compact}) {
     return Container(
       width: double.infinity,
       color: Palette.white,
       padding: EdgeInsets.fromLTRB(
         compact ? 20 : 56,
-        compact ? 18 : 22,
+        compact ? 8 : 10,
         compact ? 20 : 56,
-        compact ? 40 : 64,
+        compact ? 22 : 28,
       ),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1080),
-        child: StreamBuilder<User?>(
-          stream: _auth,
-          initialData: AuthService.currentUser,
-          builder: (context, authSnap) {
-            final loggedIn =
-                authSnap.data != null || AuthService.currentUser != null;
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _createRow(compact: compact),
-                const SizedBox(height: 36),
-                if (!loggedIn) _loginHint() else ...[
-                  _roomsBlock(),
-                  const SizedBox(height: 40),
-                  _contactsBlock(),
-                ],
-              ],
-            );
-          },
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1080),
+          child: StreamBuilder<User?>(
+            stream: _auth,
+            initialData: AuthService.currentUser,
+            builder: (context, authSnap) {
+              final loggedIn =
+                  authSnap.data != null || AuthService.currentUser != null;
+              if (!loggedIn) return _loginHint();
+              return _roomsBlock();
+            },
+          ),
         ),
       ),
     );
@@ -531,7 +458,7 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
     final cards = [
       _CreateLaunchCard(
         eyebrow: 'Group Chat',
-        title: '그룹 채팅 열기',
+        title: '그룹 대화방 열기',
         body: '주제와 레벨을 고르고, 2~6명까지 인원을 정해요.',
         icon: Icons.groups_2_rounded,
         onTap: () => _createRoom(TalkRoomType.group),
@@ -625,11 +552,7 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _sectionKicker(
-                    'Live rooms',
-                    '지금 열려 있는 대화방',
-                    hint: TalkCopy.leaveHint,
-                  ),
+                  _roomsHeader(),
                   const SizedBox(height: 16),
                   _emptyNote(
                     '대화방을 불러오지 못했어요. 로그인 상태와 네트워크를 확인한 뒤 다시 열어 주세요.',
@@ -644,11 +567,7 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _sectionKicker(
-                  'Live rooms',
-                  '지금 열려 있는 대화방',
-                  hint: TalkCopy.leaveHint,
-                ),
+                _roomsHeader(),
                 const SizedBox(height: 16),
                 if (waiting)
                   const Padding(
@@ -706,6 +625,106 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
     );
   }
 
+  Widget _roomsHeader() {
+    final button = OutlinedButton.icon(
+      onPressed: _showContacts,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: Palette.talkCoralDark,
+        side: BorderSide(color: Palette.talkCoral.withValues(alpha: 0.45)),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      icon: const Icon(Icons.people_alt_rounded, size: 18),
+      label: const Text(
+        '내가 채팅한 회원',
+        style: TextStyle(
+          fontFamily: 'NotoSansKR',
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+    final title = _sectionKicker(
+      'Live rooms',
+      '지금 열려 있는 대화방',
+      hint: TalkCopy.leaveHint,
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 640) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              title,
+              const SizedBox(height: 12),
+              button,
+            ],
+          );
+        }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: title),
+            const SizedBox(width: 16),
+            button,
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showContacts() {
+    return showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        final height = MediaQuery.sizeOf(dialogContext).height;
+        return Dialog(
+          backgroundColor: Palette.white,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 560, maxHeight: height * 0.8),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 8, 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          '내가 채팅한 회원',
+                          style: TextStyle(
+                            fontFamily: 'Jalnan',
+                            fontSize: 20,
+                            color: Palette.talkInk,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: '닫기',
+                        onPressed: () => Navigator.pop(dialogContext),
+                        icon: const Icon(Icons.close),
+                        color: Palette.talkInk,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Flexible(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: _contactsBlock(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _contactsBlock() {
     return StreamBuilder<Set<String>>(
       stream: TalkService.watchMyBlockIds(),
@@ -716,20 +735,11 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
           builder: (context, snap) {
             final contacts = snap.data ?? const <TalkContact>[];
             if (snap.hasError) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _sectionKicker('People I talked with', '내가 대화한 회원'),
-                  const SizedBox(height: 16),
-                  _emptyNote('대화한 회원 명단을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.'),
-                ],
-              );
+              return _emptyNote('대화한 회원 명단을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.');
             }
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _sectionKicker('People I talked with', '내가 대화한 회원'),
-                const SizedBox(height: 16),
                 if (snap.connectionState == ConnectionState.waiting &&
                     contacts.isEmpty)
                   const LinearProgressIndicator(color: Palette.talkCoral)
@@ -1274,7 +1284,7 @@ class _CreateTalkRoomDialogState extends State<_CreateTalkRoomDialog> {
       surfaceTintColor: Palette.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       title: Text(
-        group ? '그룹 채팅 열기' : '1:1 대화방 열기',
+        group ? '그룹 대화방 열기' : '일대일 대화방 열기',
         style: const TextStyle(fontFamily: 'Jalnan', color: Palette.talkInk),
       ),
       content: SizedBox(
