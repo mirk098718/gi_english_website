@@ -9,6 +9,8 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/TalkService.dart';
 import 'package:gi_english_website/widget/HomeDailyWordBlock.dart';
+import 'package:gi_english_website/widget/TalkHeroSpeech.dart';
+import 'package:gi_english_website/widget/TalkTopicBoard.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
@@ -313,6 +315,7 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
       child: Column(
         children: [
           _hero(compact: !wide),
+          TalkTopicBoard(compact: !wide),
           if (wide)
             const HomeDailyWordBlock(tone: DailyWordTone.talk),
           _body(compact: !wide),
@@ -394,86 +397,10 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
                       color: Palette.talkInk,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    TalkCopy.lead,
-                    style: TextStyle(
-                      fontFamily: 'NotoSansKR',
-                      fontSize: compact ? 15 : 17,
-                      height: 1.35,
-                      fontWeight: FontWeight.w700,
-                      color: Palette.talkInk,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final two = constraints.maxWidth >= 720;
-                      final noteW = two
-                          ? (constraints.maxWidth - 10) / 2
-                          : constraints.maxWidth;
-                      return Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: [
-                          SizedBox(
-                            width: noteW,
-                            child: _heroNote(
-                              TalkCopy.ruleTitle,
-                              TalkCopy.ruleBody,
-                              Palette.talkCoralDark,
-                              Palette.talkCoral,
-                            ),
-                          ),
-                          SizedBox(
-                            width: noteW,
-                            child: _heroNote(
-                              TalkCopy.safetyTitle,
-                              TalkCopy.safetyBody,
-                              Palette.danger,
-                              Palette.danger,
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+                  const SizedBox(height: 14),
+                  TalkHeroSpeech(compact: compact),
                 ],
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _heroNote(String title, String body, Color titleColor, Color border) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-      decoration: BoxDecoration(
-        color: Palette.white.withValues(alpha: 0.82),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: border.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontFamily: 'Jalnan',
-              fontSize: 13,
-              color: titleColor,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            body,
-            style: const TextStyle(
-              fontFamily: 'NotoSansKR',
-              fontSize: 12,
-              height: 1.4,
-              color: Palette.grey700,
             ),
           ),
         ],
