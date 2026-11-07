@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 final _viewTypes = <String, String>{};
 
-Widget topicPhoto(String url) {
+Widget topicPhoto(String url, {required double width, required double height}) {
   final viewType = _viewTypes.putIfAbsent(url, () {
     final type = 'talk-photo-${_viewTypes.length}';
     ui_web.platformViewRegistry.registerViewFactory(type, (int viewId) {
@@ -21,10 +21,10 @@ Widget topicPhoto(String url) {
     return type;
   });
   return ClipRRect(
-    borderRadius: BorderRadius.circular(16),
+    borderRadius: BorderRadius.circular(12),
     child: SizedBox(
-      height: 210,
-      width: double.infinity,
+      width: width,
+      height: height,
       child: HtmlElementView(viewType: viewType),
     ),
   );

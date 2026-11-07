@@ -132,6 +132,7 @@ class _TalkTopicBoardState extends State<TalkTopicBoard> {
                 const SizedBox(height: 10),
                 _ArticlePanel(
                   topic: topics[_selected.clamp(0, topics.length - 1).toInt()],
+                  compact: widget.compact,
                 ),
                 const SizedBox(height: 2),
                 Row(
@@ -230,75 +231,90 @@ class _CategoryTab extends StatelessWidget {
 
 class _ArticlePanel extends StatelessWidget {
   final TalkTopic topic;
+  final bool compact;
 
-  const _ArticlePanel({required this.topic});
+  const _ArticlePanel({required this.topic, required this.compact});
 
   @override
   Widget build(BuildContext context) {
     final kst = topic.published.toUtc().add(const Duration(hours: 9));
+    final photoWidth = compact ? 96.0 : 168.0;
+    final photoHeight = compact ? 72.0 : 96.0;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
       decoration: BoxDecoration(
         color: Palette.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Palette.talkCoral.withValues(alpha: 0.22)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           if (topic.imageUrl.isNotEmpty) ...[
-            topicPhoto(topic.imageUrl),
-            const SizedBox(height: 14),
+            topicPhoto(topic.imageUrl, width: photoWidth, height: photoHeight),
+            const SizedBox(width: 12),
           ],
-          Text(
-            '${topic.source}  ·  ${kst.month}월 ${kst.day}일',
-            style: const TextStyle(
-              fontFamily: 'NotoSansKR',
-              fontWeight: FontWeight.w700,
-              fontSize: 12,
-              color: Palette.talkCoralDark,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            topic.title,
-            style: const TextStyle(
-              fontFamily: 'NotoSansKR',
-              fontWeight: FontWeight.w800,
-              fontSize: 18,
-              height: 1.35,
-              color: Palette.talkInk,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            topic.summary,
-            style: const TextStyle(
-              fontFamily: 'NotoSansKR',
-              fontSize: 15,
-              height: 1.55,
-              color: Palette.talkInk,
-            ),
-          ),
-          const SizedBox(height: 14),
-          FilledButton.icon(
-            onPressed: () => UrlUtil.open(topic.url),
-            style: FilledButton.styleFrom(
-              backgroundColor: Palette.talkCoral,
-              foregroundColor: Palette.white,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            icon: const Icon(Icons.open_in_new, size: 16),
-            label: const Text(
-              '전체 기사 읽기',
-              style: TextStyle(
-                fontFamily: 'NotoSansKR',
-                fontWeight: FontWeight.w700,
-              ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${topic.source}  ·  ${kst.month}월 ${kst.day}일',
+                  style: const TextStyle(
+                    fontFamily: 'NotoSansKR',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                    color: Palette.talkCoralDark,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  topic.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontFamily: 'NotoSansKR',
+                    fontWeight: FontWeight.w800,
+                    fontSize: 15,
+                    height: 1.3,
+                    color: Palette.talkInk,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  topic.summary,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontFamily: 'NotoSansKR',
+                    fontSize: 13,
+                    height: 1.35,
+                    color: Palette.talkInk,
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    onPressed: () => UrlUtil.open(topic.url),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Palette.talkCoralDark,
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.symmetric(horizontal: 0),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    icon: const Icon(Icons.open_in_new, size: 14),
+                    label: const Text(
+                      '전체 기사 읽기',
+                      style: TextStyle(
+                        fontFamily: 'NotoSansKR',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

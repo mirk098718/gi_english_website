@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-Widget topicPhoto(String url) {
+Widget topicPhoto(String url, {required double width, required double height}) {
   return ClipRRect(
-    borderRadius: BorderRadius.circular(16),
+    borderRadius: BorderRadius.circular(12),
     child: Image.network(
       url,
-      height: 210,
-      width: double.infinity,
+      width: width,
+      height: height,
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
     ),

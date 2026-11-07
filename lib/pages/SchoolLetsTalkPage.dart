@@ -316,9 +316,9 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
         children: [
           _hero(compact: !wide),
           TalkTopicBoard(compact: !wide),
+          _body(compact: !wide),
           if (wide)
             const HomeDailyWordBlock(tone: DailyWordTone.talk),
-          _body(compact: !wide),
           if (wide) MyWidget.footer(),
         ],
       ),
