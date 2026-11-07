@@ -8,6 +8,7 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const https = require("https");
+const { collectTalkTopics } = require("./talkFeeds");
 const crypto = require("crypto");
 
 admin.initializeApp();
@@ -1409,4 +1410,11 @@ exports.sendRatingReminders = functions
     }
     console.log("수업 평가 재알림", { pending: snap.size, sent });
     return null;
+  });
+
+exports.talkConversationTopics = functions
+  .region("asia-northeast3")
+  .https.onCall(async () => {
+    const items = await collectTalkTopics();
+    return { items };
   });

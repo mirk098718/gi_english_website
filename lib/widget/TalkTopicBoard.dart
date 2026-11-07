@@ -3,6 +3,7 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/TalkTopicLookup.dart';
 import 'package:gi_english_website/util/TalkTopics.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
+import 'package:gi_english_website/widget/topic_photo.dart';
 
 class TalkTopicBoard extends StatefulWidget {
   final bool compact;
@@ -94,7 +95,7 @@ class _TalkTopicBoardState extends State<TalkTopicBoard> {
               ),
               const SizedBox(height: 4),
               const Text(
-                '정치·종교처럼 민감한 뉴스는 빼 두었어요. 분야를 누르면 영어 기사를 볼 수 있어요.',
+                '정치·종교처럼 민감한 뉴스는 빼 두었어요. 카드에는 신문의 영어 첫 문단과 사진을 보여 주고, 전문은 로그인 없이 열리는 기사로 연결해요.',
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontSize: 13,
@@ -246,6 +247,10 @@ class _ArticlePanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (topic.imageUrl.isNotEmpty) ...[
+            topicPhoto(topic.imageUrl),
+            const SizedBox(height: 14),
+          ],
           Text(
             '${topic.source}  ·  ${kst.month}월 ${kst.day}일',
             style: const TextStyle(

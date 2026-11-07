@@ -1,7 +1,7 @@
 class TalkCopy {
   static const eyebrow = 'Gleam  ·  English Cafe';
   static const headline = "Let's talk!";
-  static const lead = '글림 친구들과 영어로 이야기하는 카페예요.\n틀려도 괜찮으니, 편하게 들어와 보세요.';
+  static const lead = 'Gleamer들과 함께, 영어로 이야기하는 카페예요.\n틀려도 괜찮으니, 편하게 들어와 보세요.';
   static const ruleTitle = '영어로 이야기해요';
   static const ruleBody = '틀려도 괜찮아요. 카메라 켜고 편하게 말해 보세요.';
   static const usageTitle = '사용법';

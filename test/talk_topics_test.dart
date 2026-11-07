@@ -25,6 +25,16 @@ void main() {
     );
   }
 
+  test('names cooking, beauty, and science in Korean', () {
+    expect(TalkTopics.categoryKo['Cooking'], '요리');
+    expect(TalkTopics.categoryKo['Beauty'], '미용');
+    expect(TalkTopics.categoryKo['Science'], '과학');
+    expect(
+      TalkTopics.categories.indexOf('Cooking'),
+      lessThan(TalkTopics.categories.indexOf('Sports')),
+    );
+  });
+
   test('drops politics, religion, and death', () {
     expect(
       TalkTopics.isSensitive(
@@ -57,6 +67,46 @@ void main() {
         'Experts see how El Nino might change ski country',
       ),
       isFalse,
+    );
+  });
+
+  test('keeps only the opening paragraph and the feed photo', () {
+    const xml = '''
+      <item>
+        <title>A guesthouse carved into an Albanian tower</title>
+        <link>https://www.theguardian.com/travel/kulla</link>
+        <description><![CDATA[<p>In the mountains of northern Albania, a family opens a stone tower to guests who want a quiet week.</p><p>The rest of the article continues with prices, trains and a long itinerary that stays on the newspaper page.</p>]]></description>
+        <pubDate>Sat, 07 Nov 2026 08:00:00 GMT</pubDate>
+        <media:content width="140" url="https://i.guim.co.uk/img/media/example.jpg?width=140&amp;s=aaa"/>
+        <media:content width="700" url="https://i.guim.co.uk/img/media/example.jpg?width=700&amp;s=bbb"/>
+      </item>
+    ''';
+    final parsed = TalkTopics.parseRss(
+      xml,
+      category: 'Travel',
+      source: 'The Guardian',
+    );
+    expect(parsed, hasLength(1));
+    expect(parsed.single.summary, contains('northern Albania'));
+    expect(parsed.single.summary, isNot(contains('itinerary')));
+
+    final escaped = TalkTopics.lead(
+      '&lt;p&gt;A family opens a stone tower to weekend guests.&lt;/p&gt;&lt;p&gt;The later itinerary stays on the newspaper page.&lt;/p&gt;',
+    );
+    expect(escaped, 'A family opens a stone tower to weekend guests.');
+    expect(
+      TalkTopics.isEligible(
+        topic(
+          category: 'Sports',
+          title: 'Leeds United v Tottenham Hotspur: Premier League – live',
+        ),
+        DateTime.utc(2026, 11, 7, 12),
+      ),
+      isFalse,
+    );
+    expect(
+      parsed.single.imageUrl,
+      'https://i.guim.co.uk/img/media/example.jpg?width=700&s=bbb',
     );
   });
 

@@ -5,6 +5,7 @@ class TalkTopic {
   final String url;
   final String source;
   final DateTime published;
+  final String imageUrl;
 
   const TalkTopic({
     required this.category,
@@ -13,18 +14,32 @@ class TalkTopic {
     required this.url,
     required this.source,
     required this.published,
+    this.imageUrl = '',
   });
 }
 
 class TalkTopics {
-  static const categories = ['Travel', 'Society', 'Entertainment', 'Sports'];
+  static const categories = [
+    'Travel',
+    'Cooking',
+    'Beauty',
+    'Science',
+    'Society',
+    'Entertainment',
+    'Sports',
+    'Korea',
+  ];
   static const maxAge = Duration(hours: 72);
 
   static const categoryKo = {
     'Travel': '여행',
+    'Cooking': '요리',
+    'Beauty': '미용',
+    'Science': '과학',
     'Society': '사회',
     'Entertainment': '연예',
     'Sports': '스포츠',
+    'Korea': '한국',
   };
 
   /// 정치, 종교, 전쟁, 죽음, 범죄처럼 카페에서 다루기 민감한 단어를 거른다.
@@ -96,6 +111,7 @@ class TalkTopics {
       'sex',
       'porn',
       'nude',
+      'topless',
       'abuse',
       'abused',
       'rape',
@@ -115,6 +131,14 @@ class TalkTopics {
       'holocaust',
       'genocide',
       'massacre',
+      'allegations',
+      'stabbing',
+      'stabbed',
+      'arrest',
+      'arrested',
+      'warrant',
+      'assault',
+      'palestine',
     };
     if (words.any(blocked.contains)) return true;
     final lower = text.toLowerCase();
@@ -129,6 +153,9 @@ class TalkTopics {
     if (age.isNegative && age.abs() > const Duration(hours: 6)) return false;
     if (age > maxAge) return false;
     if (RegExp(r'^sources\s*:', caseSensitive: false).hasMatch(topic.title)) {
+      return false;
+    }
+    if (RegExp(r'\blive$', caseSensitive: false).hasMatch(topic.title.trim())) {
       return false;
     }
     return !isSensitive('${topic.title} ${topic.summary}');
@@ -163,7 +190,7 @@ class TalkTopics {
     for (final item in items) {
       final body = item.group(1) ?? '';
       final title = _clean(_tag(body, 'title'));
-      final summary = _clean(_tag(body, 'description'));
+      final summary = lead(_tag(body, 'description'));
       final url = _clean(_tag(body, 'link'));
       final published = parseRssDate(_tag(body, 'pubDate'));
       if (title.isEmpty || url.isEmpty || published == null) continue;
@@ -175,6 +202,7 @@ class TalkTopics {
           url: url,
           source: source,
           published: published,
+          imageUrl: _imageUrl(body),
         ),
       );
     }
@@ -239,6 +267,57 @@ class TalkTopics {
     return clock.subtract(offset);
   }
 
+  /// 피드에 공개된 첫 문단만 남긴다. 그 다음 본문은 신문 페이지에서 읽는다.
+  static String lead(String raw) {
+    final decoded = _decodeEntities(raw);
+    final firstParagraph = RegExp(
+      r'<p[^>]*>([\s\S]*?)</p>',
+      caseSensitive: false,
+    ).firstMatch(decoded);
+    final text = _clean(firstParagraph?.group(1) ?? decoded);
+    if (text.length <= 320) return text;
+    final sentences = RegExp(r'.+?[.!](?:\s|$)').allMatches(text).toList();
+    if (sentences.isEmpty) return text.substring(0, 320).trim();
+    final count = sentences.length >= 2 ? 2 : 1;
+    return sentences
+        .take(count)
+        .map((match) => match.group(0)!.trim())
+        .join(' ');
+  }
+
+  static String _imageUrl(String item) {
+    final tags = RegExp(
+      r'<(?:media:content|media:thumbnail)\b([^>]*)>',
+      caseSensitive: false,
+    ).allMatches(item);
+    var best = '';
+    var bestWidth = -1;
+    for (final tag in tags) {
+      final attrs = tag.group(1) ?? '';
+      final url = RegExp(r'''\burl="([^"]+)"''').firstMatch(attrs)?.group(1);
+      if (url == null || url.isEmpty) continue;
+      final width =
+          int.tryParse(
+            RegExp(r'''\bwidth="(\d+)"''').firstMatch(attrs)?.group(1) ?? '',
+          ) ??
+          0;
+      if (width < bestWidth) continue;
+      bestWidth = width;
+      best = url;
+    }
+    if (best.isEmpty) {
+      best =
+          RegExp(
+            r'<enclosure\b[^>]*\burl="([^"]+)"',
+            caseSensitive: false,
+          ).firstMatch(item)?.group(1) ??
+          '';
+    }
+    return _decodeEntities(
+      best,
+    ).replaceFirst('/ace/standard/240/', '/ace/standard/976/');
+  }
+
   static String _tag(String item, String name) {
     final cdata = RegExp(
       '<$name[^>]*>\\s*<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>\\s*</$name>',
@@ -254,28 +333,30 @@ class TalkTopics {
 
   static String _clean(String raw) {
     final withoutTags = raw.replaceAll(RegExp(r'<[^>]+>'), ' ');
-    final decoded = withoutTags.replaceAllMapped(
-      RegExp(r'&(#x?[0-9a-fA-F]+|[a-zA-Z]+);'),
-      (match) {
-        final token = match.group(1)!;
-        if (token.startsWith('#x') || token.startsWith('#X')) {
-          final code = int.tryParse(token.substring(2), radix: 16);
-          return code == null ? match.group(0)! : String.fromCharCode(code);
-        }
-        if (token.startsWith('#')) {
-          final code = int.tryParse(token.substring(1));
-          return code == null ? match.group(0)! : String.fromCharCode(code);
-        }
-        const named = {
-          'amp': '&',
-          'lt': '<',
-          'gt': '>',
-          'quot': '"',
-          'apos': "'",
-        };
-        return named[token] ?? match.group(0)!;
-      },
-    );
-    return decoded.replaceAll(RegExp(r'\s+'), ' ').trim();
+    return _decodeEntities(withoutTags).replaceAll(RegExp(r'\s+'), ' ').trim();
+  }
+
+  static String _decodeEntities(String raw) {
+    return raw.replaceAllMapped(RegExp(r'&(#x?[0-9a-fA-F]+|[a-zA-Z]+);'), (
+      match,
+    ) {
+      final token = match.group(1)!;
+      if (token.startsWith('#x') || token.startsWith('#X')) {
+        final code = int.tryParse(token.substring(2), radix: 16);
+        return code == null ? match.group(0)! : String.fromCharCode(code);
+      }
+      if (token.startsWith('#')) {
+        final code = int.tryParse(token.substring(1));
+        return code == null ? match.group(0)! : String.fromCharCode(code);
+      }
+      const named = {
+        'amp': '&',
+        'lt': '<',
+        'gt': '>',
+        'quot': '"',
+        'apos': "'",
+      };
+      return named[token] ?? match.group(0)!;
+    });
   }
 }
