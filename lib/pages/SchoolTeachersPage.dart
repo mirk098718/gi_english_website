@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
@@ -30,10 +31,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData mediaQueryData = MediaQuery.of(context);
-    Size size = mediaQueryData.size;
-    double width = size.width;
-    if (width > 768) {
+    if (!useMobileSchoolLayout(context)) {
       return desktopUi(context);
     } else {
       return mobileUi(context);

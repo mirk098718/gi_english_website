@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/TalkCopy.dart';
 import 'package:gi_english_website/class/TalkRoom.dart';
@@ -311,7 +312,7 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
 
   @override
   Widget build(BuildContext context) {
-    final wide = MediaQuery.sizeOf(context).width > 768;
+    final wide = !useMobileSchoolLayout(context);
     final body = SingleChildScrollView(
       child: Column(
         children: [

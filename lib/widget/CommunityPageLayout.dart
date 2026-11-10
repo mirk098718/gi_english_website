@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
@@ -28,11 +29,7 @@ class CommunityPageLayout extends StatefulWidget {
 class _CommunityPageLayoutState extends State<CommunityPageLayout> {
   @override
   Widget build(BuildContext context) {
-    MediaQueryData mediaQueryData = MediaQuery.of(context);
-    Size size = mediaQueryData.size;
-    double width = size.width;
-
-    if (width > 768) {
+    if (!useMobileSchoolLayout(context)) {
       return WebSchoolLayout(content: _buildScrollView());
     } else {
       return MobileSchoolLayout(content: _buildMobileScrollView());

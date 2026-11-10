@@ -202,7 +202,9 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
               child: GleamMark(height: 36),
             ),
           ),
-          SizedBox(width: 28),
+          SizedBox(width: 16),
+          const LanguageToggle(),
+          SizedBox(width: 16),
           Expanded(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -265,8 +267,6 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const LanguageToggle(),
-                SizedBox(width: 12),
                 NotificationBellButton(),
                 HeaderSocialLinks(),
                 SizedBox(width: 12),

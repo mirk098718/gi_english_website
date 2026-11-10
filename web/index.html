@@ -14,6 +14,7 @@
   <base href="/">
 
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
@@ -56,7 +57,7 @@
 <body>
 <script>
   (function () {
-    var key = "gleam-sw-reset-20261110c";
+    var key = "gleam-sw-reset-20261111a";
     if (!("serviceWorker" in navigator) || sessionStorage.getItem(key)) return;
     navigator.serviceWorker.getRegistrations().then(function (regs) {
       sessionStorage.setItem(key, "1");

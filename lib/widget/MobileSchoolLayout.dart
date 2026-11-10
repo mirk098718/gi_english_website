@@ -184,24 +184,24 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
       ),
       child: Row(
         children: [
-          Expanded(
-            child: InkWell(
-              onTap: () => SiteNav.goHome(context),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: SizedBox(
-                  height: 32,
-                  child: GleamMark(height: 32),
-                ),
-              ),
+          InkWell(
+            onTap: () => SiteNav.goHome(context),
+            child: SizedBox(
+              height: 32,
+              child: GleamMark(height: 32),
             ),
           ),
+          SizedBox(width: 8),
           const LanguageToggle(compact: true),
           SizedBox(width: 4),
-          NotificationBellButton(),
-          HeaderSocialLinks(compact: true),
-          SizedBox(width: 4),
-          if (_isStaff) ...[
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  NotificationBellButton(),
+                  HeaderSocialLinks(compact: true),
+                  if (_isStaff) ...[
             TextButton(
               onPressed: _logout,
               child: Text(
@@ -271,6 +271,10 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
               ),
             ),
           ],
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
