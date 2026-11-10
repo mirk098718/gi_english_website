@@ -146,6 +146,12 @@ textarea:focus{outline:2px solid var(--caramel); border-color:var(--caramel)}
 .type-table td:first-child{text-align:left; font-weight:700}
 .btn-reset{margin-top:18px; background:transparent; color:var(--no); border:2px solid var(--no); border-radius:999px; padding:10px 26px; font-weight:900; cursor:pointer; font-family:var(--sans); font-size:.88rem}
 .btn-reset:hover{background:var(--no-bg)}
+.quiz-actions{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center; margin:18px 0 8px}
+.quiz-actions-note{flex:1 1 100%; margin:0; text-align:center; color:var(--sub); font-size:.78rem; font-weight:700}
+.btn-grade-all,.btn-complete{border:none; border-radius:999px; padding:11px 22px; font-weight:900; cursor:pointer; font-family:var(--sans); font-size:.9rem}
+.btn-grade-all{background:var(--coffee); color:#fff}
+.btn-complete{background:var(--ok); color:#fff}
+.btn-grade-all:hover,.btn-complete:hover{transform:translateY(-1px)}
 footer{text-align:center; color:var(--sub); font-size:.78rem; font-weight:600; padding:26px 0 40px}
 .all-done{display:none; font-size:2.6rem; margin-top:4px}
 .all-done.show{display:block; animation:pop .4s ease}
@@ -219,7 +225,12 @@ button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid 
 
   <section class="block" id="mcq">
     <div class="sec-head"><h2>객관식 문제</h2><span class="count">25문제</span></div>
-    <p class="sec-desc">유형별로 구성되어 있어요: 개념 이해 · 빈칸 채우기 · 틀린 문장 찾기 · 모두 고르기 · 단어 배열 · 대화 문제 · 뜻 고르기 · 주어·be동사 찾기. 답을 고르고 <b>채점하기</b>를 누르면 바로 해설이 나옵니다.</p>
+    <p class="sec-desc">유형별로 구성되어 있어요: 개념 이해 · 빈칸 채우기 · 틀린 문장 찾기 · 모두 고르기 · 단어 배열 · 대화 문제 · 뜻 고르기 · 주어·be동사 찾기. 답을 고르고 <b>채점하기</b>를 누르면 바로 해설이 나옵니다. 한꺼번에 보려면 <b>한번에 채점하기</b>를, 결과를 남기려면 <b>완료</b>를 누르세요.</p>
+    <div class="quiz-actions">
+      <button type="button" class="btn-grade-all" data-quiz-grade-all>한번에 채점하기</button>
+      <button type="button" class="btn-complete" data-quiz-complete>완료</button>
+      <p class="quiz-actions-note">답을 고르지 않은 문제는 오답으로 채점됩니다. 완료를 누르면 점수와 주관식 답이 내 강의실에 바로 저장됩니다.</p>
+    </div>
     <div id="mcqList"></div>
   </section>
 
@@ -237,6 +248,11 @@ button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid 
       <thead><tr><th>유형</th><th>정답 / 채점</th></tr></thead>
       <tbody></tbody>
     </table>
+    <div class="quiz-actions">
+      <button type="button" class="btn-grade-all" data-quiz-grade-all>한번에 채점하기</button>
+      <button type="button" class="btn-complete" data-quiz-complete>완료</button>
+      <p class="quiz-actions-note">답을 고르지 않은 문제는 오답으로 채점됩니다. 완료를 누르면 점수와 주관식 답이 내 강의실에 바로 저장됩니다.</p>
+    </div>
     <button class="btn-reset" id="btnReset">모두 다시 풀기</button>
   </section>
 
@@ -354,6 +370,7 @@ const ESSAYS = [
 
 /* ─────────── 렌더링 ─────────── */
 const state = QUIZ.map(()=>({sel:new Set(), graded:false, correct:false}));
+const gradeOneFns = [];
 const marks = ["①","②","③","④"];
 const mcqList = document.getElementById("mcqList");
 
@@ -401,9 +418,10 @@ QUIZ.forEach((item, qi)=>{
     btn.disabled = state[qi].sel.size===0;
   }));
 
-  btn.addEventListener("click", ()=>{
+  function gradeOne(forceBlank){
     const st = state[qi];
-    if(st.graded || st.sel.size===0) return;
+    if(st.graded) return;
+    if(st.sel.size===0 && !forceBlank) return;
     const isRight = st.sel.size===item.a.length && item.a.every(x=>st.sel.has(x));
     st.graded = true; st.correct = isRight;
     opts.forEach((b,oi)=>{
@@ -414,14 +432,17 @@ QUIZ.forEach((item, qi)=>{
       else b.classList.add("dim");
     });
     tag.hidden = false;
-    tag.textContent = isRight ? "정답!" : "다시 확인해 보세요";
+    tag.textContent = isRight ? "정답!" : (st.sel.size ? "다시 확인해 보세요" : "답을 고르지 않았어요");
     tag.className = "graded-tag " + (isRight ? "good" : "bad");
     fb.classList.add("show");
     fbTitle.textContent = (isRight ? "⭕ 정답입니다! " : "❌ 아쉬워요. 정답은 " + item.a.map(i=>marks[i]).join(", ") + " ");
     fbTitle.className = "fb-title " + (isRight ? "good" : "bad");
     fbExp.innerHTML = "💡 " + item.e;
+    btn.disabled = true;
     updateScores();
-  });
+  }
+  gradeOneFns.push(gradeOne);
+  btn.addEventListener("click", ()=> gradeOne(false));
 });
 
 /* ── 주관식 ── */
@@ -488,30 +509,45 @@ function updateScores(){
   }
 }
 document.getElementById("btnReset").addEventListener("click", ()=>{ location.reload(); });
+var readQuizSnapshot = function () {
+  var graded = state.filter(function (item) { return item.graded; }).length;
+  var correct = state.filter(function (item) { return item.correct; }).length;
+  var areas = document.querySelectorAll("#essayList textarea");
+  var essays = ESSAYS.map(function (item, index) {
+    var area = areas[index];
+    var prompt = String(item.sit || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    return {
+      index: index + 1,
+      title: String(item.q || ""),
+      prompt: prompt,
+      answer: area ? String(area.value || "").trim() : ""
+    };
+  });
+  return {
+    graded: graded,
+    correct: correct,
+    total: QUIZ.length,
+    complete: QUIZ.length === 25 && graded === 25,
+    essays: essays
+  };
+};
+function gradeAllQuestions(){
+  gradeOneFns.forEach(function (gradeOne) { gradeOne(true); });
+}
+function completeQuiz(){
+  gradeAllQuestions();
+  if (window.GleamQuiz) GleamQuiz.finish(readQuizSnapshot());
+  var result = document.getElementById("result");
+  if (result) result.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+document.querySelectorAll("[data-quiz-grade-all]").forEach(function (button) {
+  button.addEventListener("click", gradeAllQuestions);
+});
+document.querySelectorAll("[data-quiz-complete]").forEach(function (button) {
+  button.addEventListener("click", completeQuiz);
+});
 if (window.GleamQuiz) {
   try {
-    var readQuizSnapshot = function () {
-      var graded = state.filter(function (item) { return item.graded; }).length;
-      var correct = state.filter(function (item) { return item.correct; }).length;
-      var areas = document.querySelectorAll("#essayList textarea");
-      var essays = ESSAYS.map(function (item, index) {
-        var area = areas[index];
-        var prompt = String(item.sit || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-        return {
-          index: index + 1,
-          title: String(item.q || ""),
-          prompt: prompt,
-          answer: area ? String(area.value || "").trim() : ""
-        };
-      });
-      return {
-        graded: graded,
-        correct: correct,
-        total: QUIZ.length,
-        complete: QUIZ.length === 25 && graded === 25,
-        essays: essays
-      };
-    };
     var originalUpdateScores = updateScores;
     updateScores = function () {
       originalUpdateScores();

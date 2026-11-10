@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>글림 중급 영어 제5강 · 문제 풀이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4ecdd; --bg-soft:#faf5ea; --card:#fffdf9;
+  --ink:#33241a; --sub:#82705d; --line:#e7d8c0;
+  --coffee:#7a4a26; --caramel:#d98a2b; --caramel-deep:#a9620f; --caramel-soft:#f8e7c8;
+  --ok:#3e7d54; --ok-bg:#e6f2e6; --no:#bc4741; --no-bg:#fae5e0;
+  --disp:'Black Han Sans', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --serif:Georgia, 'Times New Roman', serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans); color:var(--ink); background:var(--bg);
+  background-image:radial-gradient(#e2d3b8 1px, transparent 1px);
+  background-size:22px 22px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  word-break:keep-all; overflow-wrap:break-word; /* 한글은 단어 단위로만 줄바꿈 */
+}
+.en{font-family:var(--serif); letter-spacing:.01em}
+.wrap{max-width:880px; margin:0 auto; padding:0 18px}
+
+/* ── 상단바 ─────────────────────────── */
+.topbar{position:sticky; top:0; z-index:50; background:rgba(244,236,221,.92); backdrop-filter:blur(8px); border-bottom:1.5px solid var(--line)}
+.topbar .wrap{display:flex; align-items:center; gap:10px; justify-content:space-between; padding-top:10px; padding-bottom:10px; flex-wrap:wrap}
+.brand{font-family:var(--disp); font-size:1.02rem; color:var(--coffee); letter-spacing:.02em; display:flex; align-items:center; gap:6px}
+.brand small{white-space:nowrap; font-family:var(--sans); font-weight:700; color:var(--sub); font-size:.72rem; border:1.5px solid var(--line); border-radius:999px; padding:2px 8px; background:var(--card)}
+.scores{display:flex; gap:8px; align-items:center; font-weight:800; font-size:.8rem}
+.scores .chip{background:var(--card); border:1.5px solid var(--line); border-radius:999px; padding:4px 12px; color:var(--sub); white-space:nowrap}
+.scores .chip b{color:var(--coffee)}
+.scores .chip.ok b{color:var(--ok)}
+
+/* ── 히어로 ─────────────────────────── */
+.hero{padding:44px 0 10px; text-align:center}
+.lg-badge{display:inline-block; white-space:nowrap; background:var(--coffee); color:#f8ecdb; font-weight:800; font-size:.78rem; letter-spacing:.14em; border-radius:999px; padding:5px 16px}
+.hero h1{font-family:var(--disp); font-weight:400; font-size:clamp(1.7rem,5vw,2.6rem); line-height:1.28; margin:16px 0 6px; color:var(--ink)}
+.hero h1 .u{color:var(--caramel-deep); background:linear-gradient(transparent 68%, var(--caramel-soft) 68%)}
+.hero p.sub{color:var(--sub); font-weight:600; font-size:.95rem}
+
+/* 타임라인 공식 티켓 (시그니처) */
+.formula{display:flex; align-items:stretch; justify-content:center; gap:0; margin:30px auto 8px; flex-wrap:wrap; max-width:640px}
+.f-chip{flex:1 1 120px; min-width:100px; background:var(--card); border:2px solid var(--ink); border-radius:16px; padding:14px 12px 12px; position:relative; box-shadow:4px 4px 0 rgba(122,74,38,.22); text-align:center}
+.f-chip .role{position:absolute; top:-12px; left:50%; transform:translateX(-50%); font-size:.68rem; font-weight:900; letter-spacing:.08em; color:#fff; background:var(--coffee); border-radius:999px; padding:2px 11px; white-space:nowrap; max-width:none}
+.f-chip:nth-child(3) .role{background:var(--caramel-deep)}
+.f-chip:nth-child(5) .role{background:#3e7d54}
+.f-chip .en-big{font-family:var(--serif); font-size:1.55rem; font-weight:700; display:block; margin-top:6px}
+.f-chip .kr{font-size:.78rem; color:var(--sub); font-weight:700}
+.f-arrow{align-self:center; font-size:1.3rem; color:var(--caramel-deep); padding:0 10px; font-weight:900}
+.formula-note{color:var(--sub); font-size:.83rem; font-weight:700; margin-bottom:6px}
+.formula-note s{color:#b0473f}
+
+/* 요점 복습 */
+.recap{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:30px 0 8px}
+.r-card{background:var(--card); border:1.5px solid var(--line); border-radius:16px; padding:18px 16px; text-align:left}
+.r-card h3{font-size:.85rem; color:var(--caramel-deep); letter-spacing:.08em; font-weight:900; margin-bottom:8px}
+.r-card .ex{font-size:.95rem; margin-top:6px}
+.vs-box{background:var(--bg-soft); border:1px dashed var(--line); border-radius:10px; padding:8px 10px; margin-top:4px; font-size:.88rem}
+.vs-box .bad{color:#b0473f; font-weight:700}
+.vs-box .good{color:var(--ok); font-weight:800}
+.start-btn{display:inline-block; margin:26px 0 6px; background:var(--coffee); color:#fff7ec; font-weight:900; font-size:1rem; border:none; border-radius:999px; padding:14px 34px; cursor:pointer; box-shadow:0 6px 18px rgba(122,74,38,.32); transition:transform .15s, box-shadow .15s}
+.start-btn:hover{transform:translateY(-2px); box-shadow:0 10px 22px rgba(122,74,38,.38)}
+
+/* ── 섹션 공통 ──────────────────────── */
+section.block{padding:34px 0 6px}
+.sec-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:6px}
+.sec-head h2{font-family:var(--disp); font-weight:400; font-size:1.45rem; color:var(--coffee)}
+.sec-head .count{font-weight:900; color:var(--caramel-deep); font-size:.9rem; background:var(--caramel-soft); border-radius:999px; padding:3px 14px; white-space:nowrap}
+.sec-desc{color:var(--sub); font-size:.88rem; font-weight:600; margin-bottom:20px}
+
+/* ── 문제 카드 ──────────────────────── */
+.q-card{background:var(--card); border:1.5px solid var(--line); border-radius:18px; padding:20px 20px 18px; margin-bottom:18px; box-shadow:0 2px 10px rgba(122,74,38,.06)}
+.q-top{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px}
+.stamp{font-family:var(--disp); font-size:.95rem; color:var(--coffee); border:2px solid var(--coffee); border-radius:8px; padding:1px 9px; transform:rotate(-3deg); letter-spacing:.05em; flex:none; white-space:nowrap}
+.tchip{font-size:.72rem; font-weight:900; letter-spacing:.04em; border-radius:999px; padding:4px 12px; white-space:nowrap}
+.tc-concept{background:#f2e3c8; color:#8a5a1f}
+.tc-blank{background:#e3edf6; color:#2e5e83}
+.tc-wrong{background:#f9e0dc; color:#a3403a}
+.tc-multi{background:#e9e2f5; color:#5b4a8a}
+.tc-order{background:#ddefe4; color:#2f6e4f}
+.tc-dialog{background:#fce8ee; color:#96374f}
+.tc-trans{background:#e0eef0; color:#22626b}
+.tc-part{background:#f6ecd8; color:#7a641f}
+.tc-correct{background:#e2ecdf; color:#3c6b2f}
+.tc-vocab{background:#eceae7; color:#5f5346}
+.tc-write{background:#f8e7c8; color:#a9620f}
+.multi-note{font-size:.74rem; color:var(--caramel-deep); font-weight:800; background:var(--caramel-soft); border-radius:999px; padding:3px 10px; white-space:nowrap}
+.q-text{font-size:1.02rem; font-weight:700; margin-bottom:14px}
+.q-text .q-en{font-family:var(--serif); color:var(--coffee)}
+.opts{display:grid; gap:9px}
+.opt{display:flex; align-items:flex-start; gap:10px; width:100%; text-align:left; background:var(--bg-soft); border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; cursor:pointer; font-family:var(--sans); font-size:.95rem; color:var(--ink); transition:border-color .12s, background .12s, transform .12s}
+.opt:hover:not(:disabled){border-color:var(--caramel); transform:translateX(2px)}
+.opt:disabled{cursor:default}
+.opt .mark{font-weight:900; color:var(--caramel-deep); flex:none}
+.opt .box{flex:none; width:18px; height:18px; border:2px solid var(--sub); border-radius:5px; margin-top:2px; display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; color:transparent; font-weight:900}
+.opt.sel{border-color:var(--caramel-deep); background:var(--caramel-soft)}
+.opt.sel .box{background:var(--caramel-deep); border-color:var(--caramel-deep); color:#fff}
+.opt.right{border-color:var(--ok); background:var(--ok-bg)}
+.opt.right .box{background:var(--ok); border-color:var(--ok); color:#fff}
+.opt.right .mark{color:var(--ok)}
+.opt.right .mark::after{content:" ✓"; color:var(--ok); font-weight:900}
+.opt.miss{border-color:var(--no); background:var(--no-bg)}
+.opt.miss .box{background:var(--no); border-color:var(--no); color:#fff}
+.opt.miss .mark{color:var(--no)}
+.opt.miss .mark::after{content:" ✗"; color:var(--no); font-weight:900}
+.opt.dim{opacity:.55}
+.q-actions{display:flex; gap:10px; margin-top:14px; align-items:center}
+.btn-check{background:var(--caramel-deep); color:#fff; border:none; border-radius:999px; padding:10px 26px; font-weight:900; font-size:.88rem; cursor:pointer; font-family:var(--sans); transition:opacity .15s, transform .15s}
+.btn-check:hover:not(:disabled){transform:translateY(-1px)}
+.btn-check:disabled{opacity:.35; cursor:not-allowed}
+.graded-tag{font-weight:900; font-size:.85rem}
+.graded-tag.good{color:var(--ok)} .graded-tag.bad{color:var(--no)}
+.feedback{display:none; margin-top:14px; border-top:1.5px dashed var(--line); padding-top:13px}
+.feedback.show{display:block; animation:slidein .25s ease}
+@keyframes slidein{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+.fb-title{font-weight:900; font-size:.9rem; margin-bottom:5px}
+.fb-title.good{color:var(--ok)} .fb-title.bad{color:var(--no)}
+.fb-exp{font-size:.9rem; color:var(--ink); background:var(--bg-soft); border-radius:10px; padding:10px 13px}
+.fb-exp .en{color:var(--coffee)}
+
+/* ── 주관식 ─────────────────────────── */
+.situation{background:var(--bg-soft); border:1.5px dashed var(--line); border-radius:12px; padding:13px 15px; font-size:.95rem; margin-bottom:12px}
+.hints{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:12px}
+.hint{font-size:.74rem; font-weight:800; color:var(--coffee); background:var(--caramel-soft); border-radius:999px; padding:3px 11px; white-space:nowrap}
+.hint .en{font-style:normal}
+textarea{width:100%; min-height:86px; border:1.5px solid var(--line); border-radius:12px; background:var(--bg-soft); padding:12px 14px; font-family:var(--sans); font-size:.97rem; color:var(--ink); resize:vertical}
+textarea:focus{outline:2px solid var(--caramel); border-color:var(--caramel)}
+.model{display:none; margin-top:14px; background:#f2ede2; border-radius:12px; padding:12px 15px; font-size:.93rem}
+.model.show{display:block; animation:slidein .25s ease}
+.model b{color:var(--coffee)}
+
+/* ── 결과 ───────────────────────────── */
+.result{background:var(--card); border:2px solid var(--ink); border-radius:20px; box-shadow:6px 6px 0 rgba(122,74,38,.2); padding:26px 22px; margin:34px 0 10px; text-align:center}
+.result .big{font-family:var(--disp); font-size:2.5rem; color:var(--coffee); line-height:1.1}
+.result .msg{font-weight:800; margin-top:6px}
+.type-table{width:100%; border-collapse:collapse; margin-top:16px; font-size:.85rem}
+.type-table th,.type-table td{border-bottom:1px dashed var(--line); padding:7px 6px; text-align:center}
+.type-table th{color:var(--sub); font-size:.76rem; letter-spacing:.05em}
+.type-table td:first-child{text-align:left; font-weight:700}
+.btn-reset{margin-top:18px; background:transparent; color:var(--no); border:2px solid var(--no); border-radius:999px; padding:10px 26px; font-weight:900; cursor:pointer; font-family:var(--sans); font-size:.88rem}
+.btn-reset:hover{background:var(--no-bg)}
+.quiz-actions{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center; margin:18px 0 8px}
+.quiz-actions-note{flex:1 1 100%; margin:0; text-align:center; color:var(--sub); font-size:.78rem; font-weight:700}
+.btn-grade-all,.btn-complete{border:none; border-radius:999px; padding:11px 22px; font-weight:900; cursor:pointer; font-family:var(--sans); font-size:.9rem}
+.btn-grade-all{background:var(--coffee); color:#fff}
+.btn-complete{background:var(--ok); color:#fff}
+.btn-grade-all:hover,.btn-complete:hover{transform:translateY(-1px)}
+footer{text-align:center; color:var(--sub); font-size:.78rem; font-weight:600; padding:26px 0 40px}
+.all-done{display:none; font-size:2.6rem; margin-top:4px}
+.all-done.show{display:block; animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.4); opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1); opacity:1}}
+
+button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid var(--caramel-deep); outline-offset:2px}
+/* 칩이 4개(칩+화살표 = 자식 7개)면 좁은 화면에서 2+2 그리드:
+   화살표는 줄바꿈 시 방향이 어긋나므로 숨기고, 두 줄로 균등 배치 + 줄 간격 확보 */
+@media (max-width:680px){
+  .formula:has(.f-chip:nth-child(7)){gap:18px 14px}
+  .formula:has(.f-chip:nth-child(7)) .f-chip{flex:1 1 calc(50% - 7px); min-width:calc(50% - 7px); padding:14px 10px 11px}
+  .formula:has(.f-chip:nth-child(7)) .f-arrow{display:none}
+}
+@media (max-width:560px){
+  .f-arrow{padding:0 3px; font-size:1.05rem}
+  .f-chip{min-width:96px; flex:1 1 96px; padding:13px 8px 10px}
+  .f-chip .role{font-size:.6rem; letter-spacing:.01em; padding:2px 8px}
+  .f-chip .en-big{font-size:1.24rem}
+  .f-chip .kr{font-size:.72rem}
+  .q-card{padding:16px 14px 15px}
+  .lg-badge{font-size:.7rem; letter-spacing:.08em; padding:5px 13px}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} html{scroll-behavior:auto} }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">☕ 글림 중급 영어 <small>레벨 3 · 제5강 문제 풀이</small></div>
+    <div class="scores">
+      <span class="chip">채점 <b id="gradedN">0</b> / 25</span>
+      <span class="chip ok">정답 <b id="correctN">0</b> / 25</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <span class="lg-badge">제 05강 · I'll Have Finished by Friday (미래완료)</span>
+    <h1>미래의 데드라인까지 완료되어 있을<br/><span class="u">will have + p.p.</span> 확인 문제</h1>
+    <p class="sub">핵심 표현 · <span class="en">I'll have finished by Friday.</span> — 30문항으로 데드라인 확정 선언을 완전히 내 것으로 만들어 보세요.</p>
+
+    <div class="formula" aria-label="미래완료 타임라인 공식">
+      <div class="f-chip"><span class="role">현재</span><span class="en-big en">now</span><span class="kr">말하는 지금</span></div>
+      <div class="f-arrow">→</div>
+      <div class="f-chip"><span class="role">미래 데드라인</span><span class="en-big en">by Friday</span><span class="kr">그 시점까지는</span></div>
+      <div class="f-arrow">→</div>
+      <div class="f-chip"><span class="role">완료 상태</span><span class="en-big en">will have</span><span class="kr">+ p.p. · 끝내 놓았을</span></div>
+    </div>
+    <p class="formula-note">데드라인 시점엔 <b style="color:var(--caramel-deep)">이미 완료되어 있을 것</b>을 선언! — <span class="en">I <b>will have finished</b> by Friday.</span></p>
+
+    <div class="recap">
+      <div class="r-card">
+        <h3>1. 단순미래 vs 미래완료</h3>
+        <div class="vs-box"><span class="bad">단순미래</span> <span class="en">I will finish it.</span> → 그냥 할 예정</div>
+        <div class="vs-box"><span class="good">미래완료</span> <span class="en">I'll have finished by Friday.</span> <span class="good">(그때쯤엔 완료되어 있을!)</span></div>
+      </div>
+      <div class="r-card">
+        <h3>2. 절대 짝꿍 by &amp; by the time</h3>
+        <p style="font-size:.88rem; font-weight:700">by 5 PM · by Friday · by next month</p>
+        <p class="ex en">By the time you get home, I <b>will have cooked</b> dinner.</p>
+        <p class="ex en">By next year, I <b>will have worked</b> here for 10 years.</p>
+      </div>
+      <div class="r-card">
+        <h3>3. 오늘의 꿀팁 치트키</h3>
+        <p style="font-size:.88rem; font-weight:700"><b>until</b>은 '그때까지 계속 지속', <b>by</b>는 '그 시점 전에 완료'!</p>
+        <p class="ex en">stay <b>until</b> 5 PM / finish <b>by</b> 5 PM</p>
+      </div>
+    </div>
+
+    <a href="#mcq"><button class="start-btn">객관식 25문제 풀기 ↓</button></a>
+  </section>
+
+  <section class="block" id="mcq">
+    <div class="sec-head"><h2>객관식 문제</h2><span class="count">25문제</span></div>
+    <p class="sec-desc">유형별로 구성되어 있어요: 개념 이해 · 빈칸 채우기 · 틀린 문장 찾기 · 모두 고르기 · 단어 배열 · 대화 문제 · 뜻 고르기 · 동사·시제 찾기. 답을 고르고 <b>채점하기</b>를 누르면 바로 해설이 나옵니다. 한꺼번에 보려면 <b>한번에 채점하기</b>를, 점수와 주관식을 남기려면 <b>완료</b>를 누르세요.</p>
+        <div class="quiz-actions">
+      <button type="button" class="btn-grade-all" data-quiz-grade-all>한번에 채점하기</button>
+      <button type="button" class="btn-complete" data-quiz-complete>완료</button>
+      <p class="quiz-actions-note">답을 고르지 않은 문제는 오답으로 채점됩니다. 완료를 누르면 점수와 주관식 답이 내 강의실에 바로 저장됩니다.</p>
+    </div>
+    <div id="mcqList"></div>
+  </section>
+
+  <section class="block" id="essay">
+    <div class="sec-head"><h2>주관식 작문</h2><span class="count">5문제</span></div>
+    <p class="sec-desc">상황을 읽고 직접 영어 문장을 써 보세요. 그다음 <b>모범답안 보기</b>를 눌러 내 답과 비교해 보세요. 정답은 하나가 아닐 수도 있어요!</p>
+    <div id="essayList"></div>
+  </section>
+
+  <section class="result" id="result">
+    <div class="all-done" id="allDone">🎉</div>
+    <div class="big"><span id="finalScore">0</span><span style="font-size:1.2rem; color:var(--sub)"> / 25</span></div>
+    <div class="msg" id="resultMsg">문제를 풀면 결과가 여기에 표시돼요.</div>
+    <table class="type-table" id="typeTable" aria-label="유형별 정답률">
+      <thead><tr><th>유형</th><th>정답 / 채점</th></tr></thead>
+      <tbody></tbody>
+    </table>
+        <div class="quiz-actions">
+      <button type="button" class="btn-grade-all" data-quiz-grade-all>한번에 채점하기</button>
+      <button type="button" class="btn-complete" data-quiz-complete>완료</button>
+      <p class="quiz-actions-note">답을 고르지 않은 문제는 오답으로 채점됩니다. 완료를 누르면 점수와 주관식 답이 내 강의실에 바로 저장됩니다.</p>
+    </div>
+    <button class="btn-reset" id="btnReset">모두 다시 풀기</button>
+  </section>
+
+</main>
+<footer>글림 중급 영어 · 제 05강 「I'll Have Finished by Friday — 미래완료」 — 여러분의 미래 목표 달성 시점을 'I will have…'로 선언해 보세요. 다음 6강 수동태 기초 편에서 만나요!</footer>
+
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore-compat.js"></script>
+<script src="quiz-result.js"></script>
+<script>
+/* ─────────── 문제 데이터 ─────────── */
+const TYPE = {
+  concept:{label:"개념 이해", cls:"tc-concept"}, blank:{label:"빈칸 채우기", cls:"tc-blank"},
+  wrong:{label:"틀린 문장 찾기", cls:"tc-wrong"}, multi:{label:"모두 고르기", cls:"tc-multi"},
+  order:{label:"단어 배열", cls:"tc-order"}, dialog:{label:"대화 문제", cls:"tc-dialog"},
+  trans:{label:"뜻 고르기", cls:"tc-trans"}, part:{label:"동사·시제 찾기", cls:"tc-part"},
+  correct:{label:"바른 문장 찾기", cls:"tc-correct"}, vocab:{label:"어휘", cls:"tc-vocab"},
+  write:{label:"작문", cls:"tc-write"}
+};
+const QUIZ = [
+ {t:"concept", q:"미래완료의 공식으로 알맞은 것은?",
+  o:["will have + 과거분사(p.p.)","will be + 동사-ing","have + 과거분사(p.p.)","will + 동사원형"], a:[0],
+  e:"미래완료는 will have + p.p.! 미래의 특정 기준 시점 이전에 완료되어 있을 동작이나 달성될 경험·기간을 나타냅니다."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>I ___ ___ the entire report by Friday afternoon.</span>",
+  o:["will / finish","will / have finished","will / be finishing","had / finished"], a:[1],
+  e:"금요일 오후(미래 데드라인)까지 완료되어 있을 상태! will have finished가 정답이에요. will finish는 단순미래라 '완료'의 뉘앙스가 안 담겨요."},
+ {t:"wrong", q:"다음 중 형태가 틀린 문장은?",
+  o:["I will have finished the assignment by tomorrow morning.","By 2030, technology will have changed our lives drastically.","I will have finish the report by 5 PM.","By the end of this month, I will have saved 5 million won."], a:[2],
+  e:"will have 뒤에는 과거분사! finish가 아니라 finished. → I will have finished the report by 5 PM."},
+ {t:"multi", q:"다음 중 미래완료(will have p.p.)를 바르게 쓴 문장을 모두 고르시오.",
+  o:["She will have arrived by the time the meeting starts.","She will have arrive by the time the meeting starts.","They will have completed the audit by Monday.","They will have complete the audit by Monday."], a:[0,2],
+  e:"will have + 과거분사가 원칙! arrive나 complete 같은 원형이 아니라 arrived, completed처럼 과거분사가 와야 해요."},
+ {t:"concept", q:"미래완료가 나타내는 것으로 알맞은 것은?",
+  o:["미래의 한 시점에 한창 진행 중일 동작","미래 특정 시점 이전에 완료되어 있을 동작·경험·기간","과거에 이미 끝나 버린 동작","현재 계속되고 있는 동작"], a:[1],
+  e:"미래완료는 '미래의 특정 기준 시점 이전에 완료될 동작이나 달성될 경험·기간'! 데드라인 시점의 완료된 결과를 선언해요."},
+ {t:"trans", q:"<span class='q-en'>I'll have finished the entire report by Friday afternoon.</span> 의 뜻은?",
+  o:["금요일 오후에 보고서를 쓰기 시작할 거예요.","금요일 오후까지 보고서를 쓰고 있을 거예요.","금요일 오후에 전체 보고서를 받아 낼 거예요.","금요일 오후까지는 전체 보고서를 완료해 놓겠습니다."], a:[3],
+  e:"by Friday afternoon(금요일 오후까지는) + will have finished(완료해 놓았을)! 데드라인 확정의 약속 표현이에요."},
+ {t:"part", q:"<span class='q-en'>By the time you get home, I will have cooked dinner.</span> 에서 '미래완료' 동사 표현은?",
+  o:["will have cooked","By the time","you get home","dinner"], a:[0],
+  e:"will have cooked가 미래완료! By the time you get home(네가 집에 도착할 때쯤)은 미래의 기준 시점이에요."},
+ {t:"dialog", q:"대화의 빈칸에 알맞은 것은? — Manager: When do you think you can finalize this financial audit? / Brian: <span class='q-en'>___ the entire report by Friday afternoon.</span>",
+  o:["I have finished","I had finished","I'll have finished","I'll be finishing"], a:[2],
+  e:"금요일 오후까지 완료되어 있을 상태의 약속! I'll have finished. I'll be finishing은 '하고 있을 중'이라 완료 뉘앙스가 아니에요."},
+ {t:"vocab", q:"'~까지는 (그 시점 전에 이미 완료)'를 뜻하는 전치사는?",
+  o:["until","by","since","for"], a:[1],
+  e:"by는 '~까지는 (그 시점 전에 완료)'! by 5 PM, by Friday, by next month처럼 미래완료와 절대 짝꿍이에요."},
+ {t:"wrong", q:"다음 중 형태가 틀린 문장은?",
+  o:["By next year, I will have worked here for 10 years.","She will have arrived by the time the meeting starts.","They will have approved everything before the deadline.","I will have work here for 10 years by next year."], a:[3],
+  e:"will have 뒤에는 과거분사! work가 아니라 worked. → I will have worked here for 10 years by next year."},
+ {t:"trans", q:"<span class='q-en'>By 2030, technology will have changed our lives drastically.</span> 의 뜻은?",
+  o:["2030년이 되면 기술이 우리의 삶을 획기적으로 바꿔 놓았을 것이다.","2030년에 기술이 우리의 삶을 바꾸고 있다.","2030년까지 기술은 우리의 삶을 바꾸지 못할 것이다.","2030년에 기술이 우리의 삶을 바꾸기 시작했다."], a:[0],
+  e:"By 2030(2030년이 되면) + will have changed(바꿔 놓았을)! 미래 시점에서 완료된 결과를 보는 시제예요."},
+ {t:"concept", q:"전치사 'by'의 의미로 알맞은 것은?",
+  o:["~하는 동안 내내 (지속)","~까지는 (그 시점 전에 이미 완료)","~하기 전부터 줄곧","~한 지 오래되었다"], a:[1],
+  e:"by는 '~까지는' — 그 시점이 되기 전에 이미 완료되어 있음을 나타내요. 미래완료(will have p.p.)와 항상 함께 다녀요."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>By the time you get home, I ___ ___ dinner.</span>",
+  o:["will / cook","will / be cooking","had / cooked","will / have cooked"], a:[3],
+  e:"네가 도착할 때쯤엔 (이미) 저녁을 차려 놓았을 것! will have cooked. will be cooking은 '하고 있는 중'이라 완료가 아니에요."},
+ {t:"multi", q:"다음 중 전치사가 알맞게 쓰인 문장을 모두 고르시오.",
+  o:["I will have finished the work by Friday.","I will have finished the work until Friday.","By the end of this month, I will have saved 5 million won.","I'll stay by 10 PM tonight."], a:[0,2],
+  e:"미래완료에는 '완료'의 by! '그때까지 계속 지속'은 until이에요. → I'll stay until 10 PM tonight."},
+ {t:"part", q:"<span class='q-en'>Yes, they will have approved everything before the deadline.</span> 에서 '미래완료' 표현은?",
+  o:["Yes","they","will have approved","before the deadline"], a:[2],
+  e:"will have approved가 미래완료! '마감 전에 모두 승인을 완료해 둘 것' — 데드라인 이전의 완료를 선언해요."},
+ {t:"dialog", q:"대화의 빈칸에 알맞은 것은? — Manager: Excellent! <span class='q-en'>___ the figures by then?</span>",
+  o:["Will the team review","Will the team have reviewed","Will the team be reviewing","Has the team reviewed"], a:[1],
+  e:"'그때(by then)까지 검토를 마친 상태일까요?' — 미래 시점의 완료 확인! Will the team have reviewed가 정답이에요."},
+ {t:"correct", q:"다음 중 형태가 알맞게 쓰인 문장은?",
+  o:["I will have finished the assignment by tomorrow morning.","I will have finish the assignment by tomorrow morning.","I will have finishing the assignment by tomorrow morning.","I will been finished the assignment by tomorrow morning."], a:[0],
+  e:"will have + 과거분사(finished)! 원형이나 -ing가 오면 틀립니다."},
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( will / have / they / approved / everything by Monday )",
+  o:["They will approved have everything by Monday.","They have will approved everything by Monday.","They will approved everything have by Monday.","They will have approved everything by Monday."], a:[3],
+  e:"주어 + will have + 과거분사! → They will have approved everything by Monday."},
+ {t:"concept", q:"[꿀팁] '밤 5시까지 머무를게(stay)'와 '5시까지 끝내 놓을게(finish)'에 쓰일 전치사로 알맞은 것은?",
+  o:["stay by / finish until","stay until / finish by","둘 다 by","둘 다 until"], a:[1],
+  e:"until은 '그때까지 계속 지속되는 것'(stay until 5 PM), by는 '그 시점 전에 완료되는 것'(finish by 5 PM)! 미래완료에는 항상 by가 쓰여요."},
+ {t:"trans", q:"'이번 달 말이면 500만 원을 모았을 거야.'를 영어로 옮긴 것은?",
+  o:["I will save 5 million won at the end of this month.","I am saving 5 million won by the end of this month.","I will be saving 5 million won at the end of this month.","By the end of this month, I will have saved 5 million won."], a:[3],
+  e:"이번 달 말(deadline)까지 모아 둔 상태! By + 시점, will have saved. 단순미래·진행형은 '완료'의 뉘앙스가 없어요."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>By next year, I ___ ___ here for 10 years.</span>",
+  o:["will / work","will / be working","will / have worked","had / worked"], a:[2],
+  e:"내년이면 (그때까지 일한 기간이 쌓여) 10년째가 된다! will have worked. 기간·경험의 달성에도 미래완료를 써요."},
+ {t:"wrong", q:"다음 중 전치사가 어색한(틀린) 문장은?",
+  o:["By the time you arrive, I will have cooked dinner.","I'll have finished the report by Friday afternoon.","Technology will have changed our lives by 2030.","I will have submitted the report until Friday."], a:[3],
+  e:"미래완료(완료)에는 until이 아니라 by! → I will have submitted the report by Friday. until은 '계속 지속'에 써요."},
+ {t:"multi", q:"다음 중 '데드라인 시점까지의 완료'를 나타내는 문장을 모두 고르시오.",
+  o:["I'll have cleaned the house by the time you arrive.","I'll be cleaning the house when you arrive.","They will have approved everything before the deadline.","They will approve everything yesterday."], a:[0,2],
+  e:"will have p.p.가 들어간 두 문장만 '완료'! I'll be cleaning은 '하고 있을 중'(미래진행), yesterday는 시제가 어긋났어요."},
+ {t:"concept", q:"<span class='q-en'>I'll have finished the entire report by Friday afternoon.</span> — 이 문장이 비즈니스에서 주는 효과로 알맞은 것은?",
+  o:["상대에게 미움을 주는 표현이다","의사 결정을 미루는 표현이다","과거의 실적을 자랑하는 표현이다","확실한 마감 약속으로 신뢰를 준다"], a:[3],
+  e:"'그때쯤엔 이미 완료되어 있을 것'을 선언하는 데드라인 확정의 끝판왕! 상사와 고객에게 신뢰를 주는 표현이에요."},
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( approved / everything / they / will have / before the deadline )",
+  o:["They approved will have everything before the deadline.","They will have approved everything before the deadline.","They will approved everything have before the deadline.","They will have approved before the deadline everything."], a:[1],
+  e:"주어 + will have + approved(과거분사) + 목적어 + 시간 표현! → They will have approved everything before the deadline."}
+];
+const ESSAYS = [
+ {q:"기본 표현 쓰기", sit:"<b>『금요일까지는 (일을) 끝내 놓을 거예요.』</b>를 영어로 써 보세요.",
+  hints:["will have","by Friday"],
+  model:"I'll have finished by Friday.", modelKr:"금요일까지는 끝내 놓을 거예요."},
+ {q:"상황 작문 1", sit:"내일 아침이 마감인 과제가 있어요. <b>『내일 아침까지는 과제를 끝내 놓을 거예요.』</b>를 영어로 써 보세요.",
+  hints:["the assignment","by tomorrow morning"],
+  model:"I will have finished the assignment by tomorrow morning.", modelKr:"내일 아침까지는 과제를 끝내 놓을 거예요."},
+ {q:"상황 작문 2", sit:"집에 가는 길인 친구에게 말할 거예요. <b>『네가 집에 도착할 때쯤엔, 나는 저녁을 다 차려 놓았을 거야.』</b>를 영어로 써 보세요.",
+  hints:["By the time","dinner"],
+  model:"By the time you get home, I will have cooked dinner.", modelKr:"네가 집에 도착할 때쯤엔 내가 저녁을 다 차려 놓았을 거야."},
+ {q:"상황 작문 3", sit:"상사가 감사 보고서 마감을 물어봤어요. <b>『금요일 오후까지는 전체 보고서를 완료해 놓겠습니다.』</b>를 영어로 써 보세요.",
+  hints:["the entire report","by Friday afternoon"],
+  model:"I'll have finished the entire report by Friday afternoon.", modelKr:"금요일 오후까지는 전체 보고서를 완료해 놓겠습니다."},
+ {q:"자유 작문", sit:"올해 안에 또는 특정 시점까지 이루고 싶은 목표를 정하고, <b>『By + 시점, I will have + p.p.』</b> 선언 문장 1개로 써 보세요.",
+  hints:["By …, I will have …"],
+  model:"By the end of this year, I will have read 50 books.", modelKr:"예시 — 올해 말이면 책 50권을 읽었을 거예요. By next month, I will have saved 1 million won. 처럼 자유롭게!"}
+];
+
+/* ─────────── 렌더링 ─────────── */
+const state = QUIZ.map(()=>({sel:new Set(), graded:false, correct:false}));
+const gradeOneFns = [];
+const marks = ["①","②","③","④"];
+const mcqList = document.getElementById("mcqList");
+
+QUIZ.forEach((item, qi)=>{
+  const meta = TYPE[item.t];
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">Q.${String(qi+1).padStart(2,"0")}</span>
+      <span class="tchip ${meta.cls}">${meta.label}</span>
+      ${item.a.length>1 ? '<span class="multi-note">정답 '+item.a.length+'개를 모두 고르세요</span>' : ''}
+    </div>
+    <p class="q-text">${item.q}</p>
+    <div class="opts">${item.o.map((op,oi)=>`
+      <button type="button" class="opt" data-oi="${oi}" aria-pressed="false">
+        ${item.a.length>1 ? '<span class="box">✓</span>' : '<span class="mark">'+marks[oi]+'</span>'}
+        <span class="${/^[A-Za-z]/.test(op) ? 'en' : ''}">${op}</span>
+      </button>`).join("")}
+    </div>
+    <div class="q-actions">
+      <button type="button" class="btn-check" disabled>채점하기</button>
+      <span class="graded-tag" hidden></span>
+    </div>
+    <div class="feedback"><p class="fb-title"></p><p class="fb-exp"></p></div>`;
+  mcqList.appendChild(card);
+
+  const opts = [...card.querySelectorAll(".opt")];
+  const btn = card.querySelector(".btn-check");
+  const tag = card.querySelector(".graded-tag");
+  const fb = card.querySelector(".feedback");
+  const fbTitle = card.querySelector(".fb-title");
+  const fbExp = card.querySelector(".fb-exp");
+
+  opts.forEach((b,oi)=>b.addEventListener("click", ()=>{
+    if(state[qi].graded) return;
+    if(item.a.length>1){
+      state[qi].sel.has(oi) ? state[qi].sel.delete(oi) : state[qi].sel.add(oi);
+      b.classList.toggle("sel"); b.setAttribute("aria-pressed", b.classList.contains("sel"));
+    } else {
+      state[qi].sel.clear();
+      opts.forEach(o=>{o.classList.remove("sel"); o.setAttribute("aria-pressed","false");});
+      state[qi].sel.add(oi); b.classList.add("sel"); b.setAttribute("aria-pressed","true");
+    }
+    btn.disabled = state[qi].sel.size===0;
+  }));
+
+  function gradeOne(forceBlank){
+    const st = state[qi];
+    if(st.graded) return;
+    if(st.sel.size===0 && !forceBlank) return;
+    const isRight = st.sel.size===item.a.length && item.a.every(x=>st.sel.has(x));
+    st.graded = true; st.correct = isRight;
+    opts.forEach((b,oi)=>{
+      b.disabled = true;
+      const box = b.querySelector(".box");   // 다중선택 전용. 단일선택에는 없음(null)
+      if(item.a.includes(oi)){ b.classList.add("right"); if(box) box.textContent="✓"; }
+      else if(st.sel.has(oi)){ b.classList.add("miss"); if(box) box.textContent="✗"; }
+      else b.classList.add("dim");
+    });
+    tag.hidden = false;
+    tag.textContent = isRight ? "정답!" : (st.sel.size ? "다시 확인해 보세요" : "답을 고르지 않았어요");
+    tag.className = "graded-tag " + (isRight ? "good" : "bad");
+    fb.classList.add("show");
+    fbTitle.textContent = (isRight ? "⭕ 정답입니다! " : "❌ 아쉬워요. 정답은 " + item.a.map(i=>marks[i]).join(", ") + " ");
+    fbTitle.className = "fb-title " + (isRight ? "good" : "bad");
+    fbExp.innerHTML = "💡 " + item.e;
+    btn.disabled = true;
+    updateScores();
+  }
+  gradeOneFns.push(gradeOne);
+  btn.addEventListener("click", ()=> gradeOne(false));
+});
+
+/* ── 주관식 ── */
+const essayList = document.getElementById("essayList");
+ESSAYS.forEach((item, ei)=>{
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">W.${ei+1}</span>
+      <span class="tchip ${TYPE.write.cls}">${item.q}</span>
+    </div>
+    <div class="situation">${item.sit}</div>
+    <div class="hints">${item.hints.map(h=>'<span class="hint">힌트 · <span class="en">'+h+'</span></span>').join("")}</div>
+    <textarea placeholder="여기에 영어 문장을 직접 써 보세요." aria-label="${item.q} 답안 입력"></textarea>
+    <div class="q-actions">
+      <button type="button" class="btn-check">모범답안 보기</button>
+      <span style="font-size:.78rem; color:var(--sub); font-weight:700">정답은 하나가 아닐 수도 있어요</span>
+    </div>
+    <div class="model"><b>모범답안 · <span class="en" style="font-size:1.02rem">${item.model}</span></b><br/><span style="color:var(--sub); font-size:.85rem">${item.modelKr}</span></div>`;
+  essayList.appendChild(card);
+
+  const btn = card.querySelector(".btn-check");
+  const model = card.querySelector(".model");
+  btn.addEventListener("click", ()=>{
+    const open = model.classList.toggle("show");
+    btn.textContent = open ? "모범답안 숨기기" : "모범답안 보기";
+  });
+});
+
+/* ── 점수 집계 ── */
+function updateScores(){
+  const graded = state.filter(s=>s.graded).length;
+  const correct = state.filter(s=>s.correct).length;
+  document.getElementById("gradedN").textContent = graded;
+  document.getElementById("correctN").textContent = correct;
+  document.getElementById("finalScore").textContent = correct;
+
+  const tbody = document.querySelector("#typeTable tbody");
+  tbody.innerHTML = "";
+  Object.entries(TYPE).forEach(([key, meta])=>{
+    if(key==="write") return;
+    const rows = QUIZ.map((q,i)=>({q, s:state[i]})).filter(x=>x.q.t===key);
+    if(!rows.length) return;
+    const g = rows.filter(x=>x.s.graded).length;
+    const c = rows.filter(x=>x.s.correct).length;
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>"+meta.label+"</td><td>"+(g ? c+" / "+g : "–")+"</td>";
+    tbody.appendChild(tr);
+  });
+
+  const msg = document.getElementById("resultMsg");
+  const emoji = document.getElementById("allDone");
+  if(graded===QUIZ.length){
+    emoji.classList.add("show");
+    if(correct===25) msg.textContent = "만점! 미래완료 타임라인을 완벽하게 잡았어요. 바로 6강 수동태 기초로 갈 준비 끝!";
+    else if(correct>=20) msg.textContent = "훌륭해요! 틀린 문제의 해설만 다시 보면 완벽합니다.";
+    else if(correct>=14) msg.textContent = "절반 이상 성공! 'by + 시점 + will have p.p.' 구조를 다시 읽고 틀린 문제를 정리해 보세요.";
+    else if(correct>=7) msg.textContent = "조금 아쉬워요. 위의 핵심 정리를 다시 복습하고 같은 문제에 다시 도전!";
+    else msg.textContent = "괜찮아요, 시작이 반이에요! 핵심 정리를 읽고 천천히 다시 풀어 보세요.";
+  } else {
+    emoji.classList.remove("show");
+    msg.textContent = "채점한 문제: " + graded + " / 25 — 계속 풀어 보세요!";
+  }
+}
+document.getElementById("btnReset").addEventListener("click", ()=>{ location.reload(); });
+var readQuizSnapshot = function () {
+  var graded = state.filter(function (item) { return item.graded; }).length;
+  var correct = state.filter(function (item) { return item.correct; }).length;
+  var areas = document.querySelectorAll("#essayList textarea");
+  var essays = ESSAYS.map(function (item, index) {
+    var area = areas[index];
+    var prompt = String(item.sit || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    return {
+      index: index + 1,
+      title: String(item.q || ""),
+      prompt: prompt,
+      answer: area ? String(area.value || "").trim() : ""
+    };
+  });
+  return {
+    graded: graded,
+    correct: correct,
+    total: QUIZ.length,
+    complete: QUIZ.length === 25 && graded === 25,
+    essays: essays
+  };
+};
+function gradeAllQuestions(){
+  gradeOneFns.forEach(function (gradeOne) { gradeOne(true); });
+}
+function completeQuiz(){
+  gradeAllQuestions();
+  if (window.GleamQuiz) GleamQuiz.finish(readQuizSnapshot());
+  var result = document.getElementById("result");
+  if (result) result.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+document.querySelectorAll("[data-quiz-grade-all]").forEach(function (button) {
+  button.addEventListener("click", gradeAllQuestions);
+});
+document.querySelectorAll("[data-quiz-complete]").forEach(function (button) {
+  button.addEventListener("click", completeQuiz);
+});
+if (window.GleamQuiz) {
+  try {
+    var originalUpdateScores = updateScores;
+    updateScores = function () {
+      originalUpdateScores();
+      GleamQuiz.report(readQuizSnapshot());
+    };
+    GleamQuiz.start(readQuizSnapshot);
+  } catch (error) {}
+}
+updateScores();
+
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

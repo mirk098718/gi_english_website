@@ -43,35 +43,147 @@ class QuizResultSummary extends StatelessWidget {
                 color: Palette.grey500,
               ),
             ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton(
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: Size(0, 32),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              onPressed: () => showQuizEssayDialog(context, result),
-              child: Text(
-                '주관식 답안 보기',
-                style: TextStyle(
-                  fontFamily: "NotoSansKR",
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
+          if (result.essays.isNotEmpty)
+            _EssayAnswerList(result: result, dense: dense),
+        ],
+      ),
+    );
+  }
+}
+
+class _EssayAnswerList extends StatefulWidget {
+  final QuizResult result;
+  final bool dense;
+
+  const _EssayAnswerList({
+    required this.result,
+    required this.dense,
+  });
+
+  @override
+  State<_EssayAnswerList> createState() => _EssayAnswerListState();
+}
+
+class _EssayAnswerListState extends State<_EssayAnswerList> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          InkWell(
+            onTap: () => setState(() => _open = !_open),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '주관식 답 보기',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontFamily: "NotoSansKR",
+                        fontSize: widget.dense ? 12 : 13,
+                        fontWeight: FontWeight.w700,
+                        color: Palette.black,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    _open ? Icons.expand_less : Icons.expand_more,
+                    color: Palette.grey600,
+                    size: 22,
+                  ),
+                ],
               ),
             ),
           ),
-          if (!dense)
+          if (_open) ...[
+            ...widget.result.essays.map(
+              (essay) => _EssayAnswerBlock(essay: essay, dense: widget.dense),
+            ),
+            if (!widget.dense)
+              Text(
+                '다시 풀고 완료를 누르면 이 점수와 주관식 답이 최근 풀이로 바뀝니다.',
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 11,
+                  height: 1.4,
+                  color: Palette.grey500,
+                ),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _EssayAnswerBlock extends StatelessWidget {
+  final QuizEssayAnswer essay;
+  final bool dense;
+
+  const _EssayAnswerBlock({
+    required this.essay,
+    required this.dense,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final heading = essay.title.trim().isEmpty
+        ? '주관식 ${essay.index}'
+        : essay.title.trim();
+    final answerStyle = TextStyle(
+      fontFamily: "NotoSansKR",
+      fontSize: dense ? 12 : 14,
+      height: 1.45,
+      color: essay.hasAnswer ? Palette.black : Palette.grey500,
+    );
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.only(bottom: 8),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: dense ? 8 : 10),
+      alignment: Alignment.centerLeft,
+      decoration: BoxDecoration(
+        color: Palette.grey100,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Palette.grey300),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            heading,
+            textAlign: TextAlign.left,
+            style: TextStyle(
+              fontFamily: "NotoSansKR",
+              fontSize: dense ? 12 : 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          if (essay.prompt.trim().isNotEmpty) ...[
+            SizedBox(height: 4),
             Text(
-              '다시 풀고 25문제를 모두 채점하면 이 정답률과 주관식 답이 최근 풀이로 바뀝니다.',
+              essay.prompt.trim(),
+              textAlign: TextAlign.left,
               style: TextStyle(
                 fontFamily: "NotoSansKR",
-                fontSize: 11,
-                height: 1.4,
-                color: Palette.grey500,
+                fontSize: 12,
+                height: 1.45,
+                color: Palette.grey600,
               ),
             ),
+          ],
+          SizedBox(height: 4),
+          Text(
+            essay.hasAnswer ? essay.answer.trim() : '작성하지 않음',
+            textAlign: TextAlign.left,
+            style: answerStyle,
+          ),
         ],
       ),
     );
@@ -113,51 +225,9 @@ Future<void> showQuizEssayDialog(BuildContext context, QuizResult result) {
                     ),
                   )
                 else
-                  ...essays.map((essay) {
-                    final heading = essay.title.trim().isEmpty
-                        ? '주관식 ${essay.index}'
-                        : essay.title.trim();
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: 14),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            heading,
-                            style: TextStyle(
-                              fontFamily: "NotoSansKR",
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          if (essay.prompt.trim().isNotEmpty) ...[
-                            SizedBox(height: 4),
-                            Text(
-                              essay.prompt.trim(),
-                              style: TextStyle(
-                                fontFamily: "NotoSansKR",
-                                fontSize: 12,
-                                height: 1.45,
-                                color: Palette.grey600,
-                              ),
-                            ),
-                          ],
-                          SizedBox(height: 4),
-                          Text(
-                            essay.hasAnswer ? essay.answer.trim() : '작성하지 않음',
-                            style: TextStyle(
-                              fontFamily: "NotoSansKR",
-                              fontSize: 14,
-                              height: 1.45,
-                              color: essay.hasAnswer
-                                  ? Palette.black
-                                  : Palette.grey500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
+                  ...essays.map(
+                    (essay) => _EssayAnswerBlock(essay: essay, dense: false),
+                  ),
               ],
             ),
           ),

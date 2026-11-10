@@ -11,6 +11,7 @@ import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/TeacherScheduleService.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/util/QuizResultBridge.dart';
 import 'package:gi_english_website/util/QuizResultService.dart';
 import 'package:gi_english_website/util/JitsiJoin.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
@@ -32,7 +33,8 @@ class OnlineCourseDetailPage extends StatefulWidget {
   _OnlineCourseDetailPageState createState() => _OnlineCourseDetailPageState();
 }
 
-class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
+class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
+    with WidgetsBindingObserver {
   List<OnlineLesson> _lessons = [];
   List<OnlineSession> _sessions = [];
   List<OnlineWeek> _weeks = [];
@@ -52,10 +54,15 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
   bool _savingChecklist = false;
   bool _submittingBooking = false;
   Timer? _sessionTicker;
+  StreamSubscription<void>? _quizSavedSub;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _quizSavedSub = QuizResultEvents.saved.listen((_) {
+      _reloadQuizzes();
+    });
     _loadData();
     _sessionTicker = Timer.periodic(const Duration(seconds: 30), (_) {
       if (mounted) setState(() {});
@@ -64,8 +71,35 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _quizSavedSub?.cancel();
     _sessionTicker?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && !_isLoading) {
+      _reloadQuizzes();
+    }
+  }
+
+  Future<void> _reloadQuizzes() async {
+    final uid = AuthService.currentUser?.uid ?? '';
+    if (uid.isEmpty) return;
+    final quizIds = <String>{};
+    for (final week in _weeks) {
+      for (final link in week.problemLinks) {
+        final quizId = QuizResult.quizIdFromUrl(link.url);
+        if (quizId.isNotEmpty) quizIds.add(quizId);
+      }
+    }
+    final lookup = await QuizResultService.fetchForUser(
+      userId: uid,
+      quizIds: quizIds,
+    );
+    if (!mounted) return;
+    setState(() => _quizResults = lookup.results);
   }
 
   Future<void> _loadData() async {
@@ -940,6 +974,8 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
           initiallyExpanded: isCurrent,
           tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           childrenPadding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+          expandedAlignment: Alignment.centerLeft,
+          expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
           title: Row(
             children: [
               Text(
@@ -1191,7 +1227,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
       return Padding(
         padding: EdgeInsets.only(top: 8),
         child: Text(
-          '25문제를 모두 채점하면 맞은 개수와 정답률이 여기에 남습니다. 다시 풀면 최근 정답률로 바뀌고, 주관식도 최근 답으로 바뀝니다.',
+          '완료를 누르면 맞은 개수와 주관식 답이 여기에 바로 남습니다. 다시 풀고 완료하면 최근 결과로 바뀝니다.',
           style: TextStyle(
             fontFamily: "NotoSansKR",
             fontSize: 12,
