@@ -1596,6 +1596,48 @@ class AuthService {
     }
   }
 
+  /// 관리자 화면에 있는 강사 프로필을 수강생이 볼 수 있는 목록으로 공개한다.
+  static Future<void> publishTeacherProfiles() async {
+    try {
+      final snapshot = await _firestore.collection('admins').get();
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final isOwnerTeacher = data['role']?.toString() != 'teacher';
+        var existing = data['nativeProfileId']?.toString() ?? '';
+        if (existing.startsWith('native_temp_')) existing = '';
+        final profileId = OnlineNativeTeacher.profileIdFor(
+          uid: doc.id,
+          isOwner: isOwnerTeacher,
+          existing: existing,
+        );
+        await _upsertNativeProfile(
+          teacherUid: doc.id,
+          profileId: profileId,
+          name: data['name']?.toString() ?? '',
+          email: data['email']?.toString() ?? '',
+          nationality: data['nationality']?.toString() ?? '',
+          intro: data['intro']?.toString() ?? '',
+          photoUrl: data['photoUrl']?.toString() ?? '',
+          nickname: data['nickname']?.toString() ?? '',
+          isActive: data['isActive'] != false,
+          bookingOffer: TeacherBookingOffer.resolve(
+            data,
+            isOwner: isOwnerTeacher,
+          ),
+        );
+        await _firestore.collection('admins').doc(doc.id).set({
+          'nativeProfileId': profileId,
+          'bookingOffer': TeacherBookingOffer.resolve(
+            data,
+            isOwner: isOwnerTeacher,
+          ),
+        }, SetOptions(merge: true));
+      }
+    } catch (e) {
+      print('강사 프로필 공개 오류: $e');
+    }
+  }
+
   static Future<List<OnlineNativeTeacher>> selectableNativeTeachers({
     TeacherPickKind? kind,
   }) async {
