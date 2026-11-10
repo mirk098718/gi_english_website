@@ -12,7 +12,9 @@ import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
+import 'package:gi_english_website/util/LessonFeedbackService.dart';
 import 'package:gi_english_website/util/LessonRatingService.dart';
+import 'package:gi_english_website/util/SessionGate.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/pages/AdminTeacherScheduleTab.dart';
@@ -193,6 +195,9 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
   final sessionsController = TextEditingController(text: '8');
   OnlineCourse? _selectedCourse = OnlineCourse.all.first;
   List<EnrollmentRecord> _enrollments = [];
+  List<WeekBooking> _gateBookings = [];
+  List<LessonRating> _gateRatings = [];
+  List<LessonFeedback> _gateFeedbacks = [];
   Map<String, List<StudentWeekProgress>> _learning = {};
   List<Map<String, dynamic>> _members = [];
   bool _loading = true;
@@ -285,11 +290,22 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
     }
 
     final learning = await EnrollmentService.learningByEnrollment(enrollments);
+    var gateBookings = <WeekBooking>[];
+    var gateRatings = <LessonRating>[];
+    var gateFeedbacks = <LessonFeedback>[];
+    if (_isOwner) {
+      gateBookings = await EnrollmentService.staffWeekBookings();
+      gateRatings = await LessonRatingService.listAll();
+      gateFeedbacks = await LessonFeedbackService.listAll();
+    }
     if (!mounted) return;
     setState(() {
       _enrollments = enrollments;
       _learning = learning;
       _members = members;
+      _gateBookings = gateBookings;
+      _gateRatings = gateRatings;
+      _gateFeedbacks = gateFeedbacks;
       _loading = false;
     });
     _bannerKey.currentState?.reload();
@@ -692,6 +708,17 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
             spacing: 8,
             runSpacing: 8,
             children: [
+              if (_isOwner && _gateHold(record) != null)
+                ElevatedButton.icon(
+                  onPressed: () => _openNextSession(record),
+                  icon: Icon(Icons.lock_open, size: 17),
+                  label: Text('다음 회차 열기',
+                      style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.accent,
+                    foregroundColor: Palette.white,
+                  ),
+                ),
               ElevatedButton.icon(
                 onPressed: record.isActive &&
                         sessionsConfigured &&
@@ -923,6 +950,57 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
       _toast('배정 정보가 변경되었습니다.');
       await _refresh();
     }
+  }
+
+  SessionGateHold? _gateHold(EnrollmentRecord record) {
+    return SessionGate.holdFor(
+      enrollment: record,
+      bookings: _gateBookings,
+      ratings: _gateRatings,
+      feedbacks: _gateFeedbacks,
+    );
+  }
+
+  Future<void> _openNextSession(EnrollmentRecord record) async {
+    final hold = _gateHold(record);
+    if (hold == null) {
+      _toast('강사 피드백이나 학생 별점이 하루 이상 멈추지 않았습니다.', error: true);
+      return;
+    }
+    final reason = hold.waitingOnTeacher
+        ? '${hold.sessionNumber}회차 강사 피드백이 수업 후 하루 넘게 없습니다.'
+        : '${hold.sessionNumber}회차 학생 별점이 하루 넘게 없습니다.';
+    final next = hold.sessionNumber + 1;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('다음 회차 열기', style: TextStyle(fontFamily: "Jalnan")),
+        content: Text(
+          '$reason\n'
+          '다음 회차($next회차)만 엽니다. 수업 횟수는 빼지 않고, 별점이 끝나면 그때 차감됩니다.',
+          style: TextStyle(fontFamily: "NotoSansKR", height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text('닫기', style: TextStyle(fontFamily: "NotoSansKR")),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text('열기', style: TextStyle(fontFamily: "NotoSansKR")),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final error = await SessionGate.adminOpenNext(record.id);
+    if (!mounted) return;
+    if (error != null) {
+      _toast(error, error: true);
+      return;
+    }
+    _toast('$next회차를 열었습니다. 수업 횟수는 그대로입니다.');
+    await _refresh();
   }
 
   Future<void> _completeSession(EnrollmentRecord record) async {

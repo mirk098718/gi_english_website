@@ -493,10 +493,55 @@ class EnrollmentService {
     return '';
   }
 
-  static String _catalogWeekDescription(String courseId, String title) {
+  static String _catalogWeekDescription(
+    String courseId,
+    String title, {
+    required bool hasVideo,
+  }) {
     final level = catalogLevelLabel(courseId);
     final prefix = level.isEmpty ? '' : '$level ';
+    if (!hasVideo) {
+      return '$prefix$title 연습문제를 푼 뒤 체크리스트를 확인하세요.';
+    }
     return '$prefix$title 인강을 시청한 뒤 체크리스트를 확인하세요.';
+  }
+
+  static const List<WeekChecklistItem> videoAndProblemChecklist = [
+    WeekChecklistItem(id: 'watch_video', label: '인강 시청하기'),
+    WeekChecklistItem(id: 'solve_problems', label: '문제풀이 하기'),
+  ];
+
+  static const List<WeekChecklistItem> problemOnlyChecklist = [
+    WeekChecklistItem(id: 'solve_problems', label: '문제풀이 하기'),
+  ];
+
+  static List<WeekChecklistItem> checklistForVideo(String videoUrl) {
+    if (videoUrl.trim().isEmpty) return problemOnlyChecklist;
+    return videoAndProblemChecklist;
+  }
+
+  static bool weekHasVideo(OnlineWeek week) => week.videoUrl.trim().isNotEmpty;
+
+  /// 예약 전에 체크해야 하는 항목. 영상 주소가 없으면 인강 시청은 빼 둔다.
+  static List<WeekChecklistItem> requiredChecklistItems(OnlineWeek week) {
+    if (weekHasVideo(week)) return week.checklistItems;
+    return week.checklistItems.where((item) => !isVideoChecklistItem(item)).toList();
+  }
+
+  static String bookingChecklistHint(OnlineWeek week) {
+    final items = requiredChecklistItems(week);
+    final video = items.any(isVideoChecklistItem);
+    final problem = items.any(isProblemChecklistItem);
+    if (video && problem) {
+      return '인강 시청과 문제풀이를 모두 체크해야 아래 예약이 열립니다.';
+    }
+    if (problem) {
+      return '문제풀이를 체크하면 아래 예약이 열립니다. 이 회차에는 인강이 없습니다.';
+    }
+    if (video) {
+      return '인강 시청을 체크하면 아래 예약이 열립니다.';
+    }
+    return '이 회차는 별도 체크 없이 예약할 수 있습니다.';
   }
 
   static String defaultWeekId(String courseId, int weekNumber) =>
@@ -514,18 +559,12 @@ class EnrollmentService {
     return item.id == 'solve_problems' || item.label.contains('문제풀이');
   }
 
-  /// 인강·문제풀이 항목이 모두 체크됐는지. 둘 다 있어야 화상수업 예약이 열린다.
+  /// 예약에 필요한 체크가 끝났는지.
+  /// 영상 주소가 비어 있으면 인강 시청 체크는 요구하지 않는다.
   static bool isWeekReadyToBook(OnlineWeek week, List<String> checked) {
-    final items = week.checklistItems;
-    if (items.isEmpty) return false;
-    final videos = items.where(isVideoChecklistItem).toList();
-    final problems = items.where(isProblemChecklistItem).toList();
-    if (videos.isEmpty && problems.isEmpty) {
-      return items.every((item) => checked.contains(item.id));
-    }
-    if (videos.isEmpty || problems.isEmpty) return false;
-    return videos.every((item) => checked.contains(item.id)) &&
-        problems.every((item) => checked.contains(item.id));
+    final items = requiredChecklistItems(week);
+    if (items.isEmpty) return !weekHasVideo(week);
+    return items.every((item) => checked.contains(item.id));
   }
 
   /// 아직 관리자가 등록하지 않은 회차도 예약·학습 UI가 보이도록 하는 자리표시.
@@ -537,13 +576,14 @@ class EnrollmentService {
         courseId: courseId,
         weekNumber: weekNumber,
         title: catalog.title,
-        description: _catalogWeekDescription(courseId, catalog.title),
+        description: _catalogWeekDescription(
+          courseId,
+          catalog.title,
+          hasVideo: catalog.videoUrl.trim().isNotEmpty,
+        ),
         videoUrl: catalog.videoUrl,
         problemLinks: _catalogProblemLinks(catalog),
-        checklistItems: const [
-          WeekChecklistItem(id: 'watch_video', label: '인강 시청하기'),
-          WeekChecklistItem(id: 'solve_problems', label: '문제풀이 하기'),
-        ],
+        checklistItems: checklistForVideo(catalog.videoUrl),
       );
     }
     if (weekNumber <= 1) {
@@ -557,10 +597,7 @@ class EnrollmentService {
         problemLinks: const [
           WeekProblemLink(title: '리뷰 및 문제풀이', url: ''),
         ],
-        checklistItems: const [
-          WeekChecklistItem(id: 'watch_video', label: '인강 시청하기'),
-          WeekChecklistItem(id: 'solve_problems', label: '문제풀이 하기'),
-        ],
+        checklistItems: checklistForVideo(defaultWeek1VideoUrl),
       );
     }
     return OnlineWeek(
@@ -572,10 +609,7 @@ class EnrollmentService {
           '화상수업 예약은 아래에서 진행할 수 있습니다.',
       videoUrl: '',
       problemLinks: const [],
-      checklistItems: const [
-        WeekChecklistItem(id: 'watch_video', label: '인강 시청하기'),
-        WeekChecklistItem(id: 'solve_problems', label: '문제풀이 하기'),
-      ],
+      checklistItems: problemOnlyChecklist,
     );
   }
 
@@ -617,15 +651,16 @@ class EnrollmentService {
       weekNumber: week.weekNumber,
       title: placeholder && placeholderTitle ? catalog.title : week.title,
       description: week.description.trim().isEmpty
-          ? _catalogWeekDescription(week.courseId, catalog.title)
+          ? _catalogWeekDescription(
+              week.courseId,
+              catalog.title,
+              hasVideo: catalog.videoUrl.trim().isNotEmpty,
+            )
           : week.description,
       videoUrl: placeholder ? catalog.videoUrl : week.videoUrl,
       problemLinks: fillProblem ? _catalogProblemLinks(catalog) : week.problemLinks,
       checklistItems: week.checklistItems.isEmpty
-          ? const [
-              WeekChecklistItem(id: 'watch_video', label: '인강 시청하기'),
-              WeekChecklistItem(id: 'solve_problems', label: '문제풀이 하기'),
-            ]
+          ? checklistForVideo(placeholder ? catalog.videoUrl : week.videoUrl)
           : week.checklistItems,
     );
   }
@@ -641,18 +676,12 @@ class EnrollmentService {
           .where('userId', isEqualTo: user.uid)
           .get();
 
-      final now = DateTime.now();
       final List<OnlineCourse> courses = [];
 
       for (final doc in snapshot.docs) {
         final data = doc.data();
 
         if (data['isActive'] == false) continue;
-
-        final expiresAt = data['expiresAt'];
-        if (expiresAt is Timestamp && expiresAt.toDate().isBefore(now)) {
-          continue;
-        }
 
         final course =
             OnlineCourse.findById(data['courseId']?.toString() ?? '');
@@ -680,18 +709,12 @@ class EnrollmentService {
           .where('userId', isEqualTo: user.uid)
           .get();
 
-      final now = DateTime.now();
       final List<EnrollmentRecord> records = [];
       final member = await AuthService.currentMemberDoc();
 
       for (final doc in snapshot.docs) {
         final data = Map<String, dynamic>.from(doc.data());
         if (data['isActive'] == false) continue;
-
-        final expiresAt = data['expiresAt'];
-        if (expiresAt is Timestamp && expiresAt.toDate().isBefore(now)) {
-          continue;
-        }
 
         _applyAssignedTeacher(data, member);
         final uid = data['nativeTeacherUid']?.toString() ?? '';
@@ -706,6 +729,9 @@ class EnrollmentService {
       }
 
       records.sort((a, b) {
+        final aExpired = isEnrollmentExpired(a);
+        final bExpired = isEnrollmentExpired(b);
+        if (aExpired != bExpired) return aExpired ? 1 : -1;
         final ao = a.course?.order ?? 0;
         final bo = b.course?.order ?? 0;
         return ao.compareTo(bo);
@@ -1573,6 +1599,32 @@ class EnrollmentService {
     }
   }
 
+  /// 피드백·별점이 멈춘 회차의 다음 회차만 연다. 수업 횟수는 빼지 않는다.
+  static Future<String?> setAdminUnlockedThrough({
+    required String enrollmentId,
+    required int through,
+    required String adminName,
+    required int sessionNumber,
+  }) async {
+    try {
+      if (!await AuthService.isAdmin()) {
+        return '관리자만 다음 회차를 열 수 있습니다.';
+      }
+      if (through < 2) return '열 다음 회차가 없습니다.';
+      await _firestore.collection('enrollments').doc(enrollmentId).update({
+        'adminUnlockedThrough': through,
+        'adminUnlockedAt': FieldValue.serverTimestamp(),
+        'adminUnlockedBy': adminName,
+        'adminUnlockedFromSession': sessionNumber,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      return null;
+    } catch (e) {
+      print('다음 회차 개방 오류: $e');
+      return '다음 회차를 열지 못했습니다.';
+    }
+  }
+
   /// 특정 수강 배정의 화상수업 처리 이력(최신순).
   static Future<List<SessionLog>> sessionLogs(String enrollmentId) async {
     try {
@@ -1700,14 +1752,61 @@ class EnrollmentService {
   }
 
   /// 지금 열려 있는 회차. 이수한 다음 회차.
+  /// 관리자가 정체된 회차 다음을 연 경우에는 그 회차까지 연다.
   static int unlockedSessionNumber(EnrollmentRecord enrollment) {
     if (enrollment.totalSessions > 0 &&
         enrollment.completedSessions >= enrollment.totalSessions) {
       return enrollment.totalSessions;
     }
-    final next = enrollment.completedSessions + 1;
+    var next = enrollment.completedSessions + 1;
+    if (enrollment.adminUnlockedThrough > next) {
+      next = enrollment.adminUnlockedThrough;
+    }
     if (enrollment.totalSessions <= 0) return next;
     return next.clamp(1, enrollment.totalSessions);
+  }
+
+  /// 연장 결제가 더하는 기한. 남은 기한과 오늘 중 늦은 날부터 추가 회차만큼 잇는다.
+  static DateTime extendedExpiresAt({
+    required DateTime? currentExpires,
+    required int addedSessions,
+    DateTime? now,
+  }) {
+    final clock = dateOnly(now ?? DateTime.now());
+    final current = currentExpires == null ? null : dateOnly(currentExpires);
+    final base =
+        current != null && current.isAfter(clock) ? current : clock;
+    return base.add(Duration(days: deadlineWeeks(addedSessions) * 7));
+  }
+
+  /// 연장 결제가 기존 수강에 더하는 값. 진행 회차는 유지하고 횟수와 기한만 늘린다.
+  static Map<String, dynamic> extensionEnrollmentFields({
+    required Map<String, dynamic> previous,
+    required int addedSessions,
+    required int amount,
+    DateTime? now,
+  }) {
+    final completed = _intValue(previous['completedSessions']);
+    final prevTotal = _intValue(previous['totalSessions']);
+    final total = prevTotal + addedSessions;
+    final prevPaid = _intValue(previous['paidAmount']);
+    DateTime? currentExpires;
+    final raw = previous['expiresAt'];
+    if (raw is Timestamp) currentExpires = raw.toDate();
+    return {
+      'totalSessions': total,
+      'completedSessions': completed,
+      'remainingSessions': (total - completed).clamp(0, total),
+      'paidAmount': prevPaid + amount,
+      'isActive': true,
+      'isPaid': true,
+      'paymentNote': '수강 연장 결제',
+      'expiresAt': Timestamp.fromDate(extendedExpiresAt(
+        currentExpires: currentExpires,
+        addedSessions: addedSessions,
+        now: now,
+      )),
+    };
   }
 
   static bool isSessionUnlocked(
@@ -2054,6 +2153,9 @@ class EnrollmentService {
   static const int lessonMinutes = 20;
   static const int lessonPayWon = 10000;
 
+  /// 수업 시작 이 시간 전까지는 수강생이 예약을 취소하거나 옮길 수 있다.
+  static const Duration bookingChangeLead = Duration(hours: 3);
+
   static List<String> _buildBookingTimeSlots() {
     final slots = <String>[];
     for (var hour = 6; hour <= 23; hour++) {
@@ -2086,6 +2188,16 @@ class EnrollmentService {
     var hour12 = hour % 12;
     if (hour12 == 0) hour12 = 12;
     return '$hour12:$minute $period';
+  }
+
+  static bool canStudentChangeBooking(WeekBooking booking, {DateTime? now}) {
+    if (booking.status != 'pending' && booking.status != 'confirmed') {
+      return false;
+    }
+    final start = bookingDateTime(booking.date, booking.time);
+    if (start == null) return false;
+    final clock = now ?? DateTime.now();
+    return !clock.isAfter(start.subtract(bookingChangeLead));
   }
 
   static DateTime? bookingDateTime(DateTime date, String time) {
@@ -2298,7 +2410,7 @@ class EnrollmentService {
       expiresAt: enrollment.expiresAt,
     );
     if (isEnrollmentExpired(enrollment)) {
-      return '수강 기한이 끝났습니다. 연장이 필요하면 학원에 문의해 주세요.';
+      return '수강 기한이 끝났습니다. 내 강의실에서 연장 결제 후 다시 예약해 주세요.';
     }
     if (enrollment.remainingSessions <= 0) {
       return '남은 화상수업 횟수가 없습니다.';
@@ -2308,7 +2420,15 @@ class EnrollmentService {
     }
     final checked = (await weekProgress(enrollment.id))[week.id] ?? const [];
     if (!isWeekReadyToBook(week, checked)) {
-      return '인강 시청과 문제풀이를 모두 체크한 뒤에 예약할 수 있습니다.';
+      final items = requiredChecklistItems(week);
+      final needsVideo = items.any(isVideoChecklistItem);
+      final needsProblem = items.any(isProblemChecklistItem);
+      if (needsVideo && needsProblem) {
+        return '인강 시청과 문제풀이를 모두 체크한 뒤에 예약할 수 있습니다.';
+      }
+      if (needsProblem) return '문제풀이를 체크한 뒤에 예약할 수 있습니다.';
+      if (needsVideo) return '인강 시청을 체크한 뒤에 예약할 수 있습니다.';
+      return '이 회차 준비를 마친 뒤에 예약할 수 있습니다.';
     }
     if (!allowed.any((d) => d == day)) {
       return '선택할 수 없는 날짜입니다.';
@@ -2401,10 +2521,12 @@ class EnrollmentService {
               date: day,
               time: time,
               bookingId: bookingRef.id,
+              userId: user.uid,
             ),
           );
         }
 
+        final scheduled = bookingDateTime(day, time);
         transaction.set(bookingRef, {
           'userId': user.uid,
           'memberName': AuthService.profileDisplayName(
@@ -2419,6 +2541,7 @@ class EnrollmentService {
           'weekTitle': week.title,
           'date': Timestamp.fromDate(day),
           'time': time,
+          if (scheduled != null) 'scheduledAt': Timestamp.fromDate(scheduled),
           'status': 'pending',
           'teacherId': teacherUid,
           'nativeTeacherId': nativeTeacherId,
@@ -2499,6 +2622,217 @@ class EnrollmentService {
     } catch (e) {
       print('예약 확인 오류: $e');
       return '예약 확인에 실패했습니다.';
+    }
+  }
+
+  static Future<void> _cancelBookingInTransaction(
+    Transaction transaction, {
+    required DocumentSnapshot<Map<String, dynamic>> snap,
+    required DocumentReference<Map<String, dynamic>> ref,
+  }) async {
+    final data = snap.data() ?? {};
+    final status = data['status']?.toString() ?? '';
+    if (status != 'pending' && status != 'confirmed') {
+      throw StateError('이미 취소되었거나 변경할 수 없는 예약입니다.');
+    }
+    final booking = WeekBooking.fromMap(ref.id, data);
+    if (!canStudentChangeBooking(booking)) {
+      throw StateError('수업 3시간 전까지만 취소하거나 옮길 수 있습니다.');
+    }
+    final teacherUid = data['teacherId']?.toString() ??
+        data['nativeTeacherUid']?.toString() ??
+        '';
+    final time = data['time']?.toString() ?? '';
+    DateTime? day;
+    final dateRaw = data['date'];
+    if (dateRaw is Timestamp) day = dateOnly(dateRaw.toDate());
+    DocumentSnapshot<Map<String, dynamic>>? occ;
+    DocumentReference? occRef;
+    if (teacherUid.isNotEmpty && day != null && time.isNotEmpty) {
+      occRef = TeacherScheduleService.occupiedRef(teacherUid, day, time);
+      occ = await transaction.get(
+        occRef as DocumentReference<Map<String, dynamic>>,
+      );
+    }
+    transaction.update(ref, {
+      'status': 'cancelled',
+      'cancelledAt': FieldValue.serverTimestamp(),
+      'cancelledBy': 'student',
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+    if (occRef == null || occ == null || !occ.exists) return;
+    final occBooking = occ.data()?['bookingId']?.toString() ?? '';
+    if (occBooking.isEmpty || occBooking == ref.id) {
+      transaction.delete(occRef);
+    }
+  }
+
+  /// 수업 3시간 전까지 수강생이 예약을 취소하고 강사 시간을 바로 비운다.
+  static Future<String?> cancelWeekBooking(WeekBooking current) async {
+    final user = AuthService.currentUser;
+    if (user == null) return '로그인이 필요합니다.';
+    if (current.userId != user.uid) return '본인 예약만 취소할 수 있습니다.';
+    if (!canStudentChangeBooking(current)) {
+      return '수업 3시간 전까지만 취소하거나 옮길 수 있습니다.';
+    }
+    try {
+      final ref = _firestore.collection('week_bookings').doc(current.id);
+      await _firestore.runTransaction((transaction) async {
+        final snap = await transaction.get(ref);
+        if (!snap.exists) {
+          throw StateError('예약을 찾을 수 없습니다.');
+        }
+        if (snap.data()?['userId']?.toString() != user.uid) {
+          throw StateError('본인 예약만 취소할 수 있습니다.');
+        }
+        await _cancelBookingInTransaction(
+          transaction,
+          snap: snap,
+          ref: ref,
+        );
+      });
+      return null;
+    } on StateError catch (e) {
+      return e.message;
+    } catch (e) {
+      print('예약 취소 오류: $e');
+      return '예약 취소에 실패했습니다.';
+    }
+  }
+
+  /// 기존 예약을 취소하고 같은 회차를 다른 시간으로 다시 신청한다.
+  static Future<String?> moveWeekBooking({
+    required EnrollmentRecord enrollment,
+    required OnlineWeek week,
+    required WeekBooking current,
+    required DateTime date,
+    required String time,
+  }) async {
+    final user = AuthService.currentUser;
+    if (user == null) return '로그인이 필요합니다.';
+    if (current.userId != user.uid) return '본인 예약만 옮길 수 있습니다.';
+    if (!canStudentChangeBooking(current)) {
+      return '수업 3시간 전까지만 취소하거나 옮길 수 있습니다.';
+    }
+    if (isEnrollmentExpired(enrollment)) {
+      return '수강 기한이 끝났습니다. 내 강의실에서 연장 결제 후 다시 예약해 주세요.';
+    }
+    final day = dateOnly(date);
+    if (dateOnly(current.date) == day && current.time == time) {
+      return '같은 시간입니다. 다른 시간을 선택해 주세요.';
+    }
+    final allowed = remainingBookingDates(
+      enrollmentStart: enrollment.createdAt,
+      weekNumber: week.weekNumber,
+      expiresAt: enrollment.expiresAt,
+    );
+    if (!allowed.any((d) => d == day)) {
+      return '선택할 수 없는 날짜입니다.';
+    }
+    if (!remainingTimeSlots(day).contains(time)) {
+      return '선택할 수 없는 시간입니다.';
+    }
+    final teacherUid = current.teacherId.isNotEmpty
+        ? current.teacherId
+        : current.nativeTeacherUid;
+    try {
+      if (teacherUid.isNotEmpty) {
+        final availability = await TeacherScheduleService.load(teacherUid);
+        if (availability.isClosed(day, time)) {
+          return '선생님이 닫아 둔 시간입니다. 다른 시간을 선택해 주세요.';
+        }
+        if (availability.isOccupied(day, time) &&
+            !(dateOnly(current.date) == day && current.time == time)) {
+          return '이미 예약된 시간입니다. 다른 시간을 선택해 주세요.';
+        }
+      }
+      final bookingRef = _firestore.collection('week_bookings').doc();
+      final currentRef = _firestore.collection('week_bookings').doc(current.id);
+      await _firestore.runTransaction((transaction) async {
+        final snap = await transaction.get(currentRef);
+        if (!snap.exists) throw StateError('예약을 찾을 수 없습니다.');
+        final data = snap.data() ?? {};
+        if (data['userId']?.toString() != user.uid) {
+          throw StateError('본인 예약만 옮길 수 있습니다.');
+        }
+        final oldTeacher = data['teacherId']?.toString() ??
+            data['nativeTeacherUid']?.toString() ??
+            '';
+        final oldTime = data['time']?.toString() ?? '';
+        DateTime? oldDay;
+        final oldDateRaw = data['date'];
+        if (oldDateRaw is Timestamp) oldDay = dateOnly(oldDateRaw.toDate());
+        DocumentReference? newOcc;
+        if (teacherUid.isNotEmpty) {
+          newOcc = TeacherScheduleService.occupiedRef(teacherUid, day, time);
+          final occ = await transaction.get(
+            newOcc as DocumentReference<Map<String, dynamic>>,
+          );
+          final sameSlot = oldTeacher == teacherUid &&
+              oldDay == day &&
+              oldTime == time;
+          if (occ.exists && !sameSlot) {
+            throw StateError('이미 예약된 시간입니다. 다른 시간을 선택해 주세요.');
+          }
+          final closedRef = _firestore
+              .collection('teacher_closed_slots')
+              .doc(TeacherScheduleService.docId(teacherUid, day, time));
+          final closed = await transaction.get(closedRef);
+          if (closed.exists) {
+            throw StateError('선생님이 닫아 둔 시간입니다. 다른 시간을 선택해 주세요.');
+          }
+        }
+        await _cancelBookingInTransaction(
+          transaction,
+          snap: snap,
+          ref: currentRef,
+        );
+        if (newOcc != null) {
+          transaction.set(
+            newOcc,
+            TeacherScheduleService.occupiedPayload(
+              teacherUid: teacherUid,
+              date: day,
+              time: time,
+              bookingId: bookingRef.id,
+              userId: user.uid,
+            ),
+          );
+        }
+        final scheduled = bookingDateTime(day, time);
+        transaction.set(bookingRef, {
+          'userId': user.uid,
+          'memberName': data['memberName']?.toString() ?? current.memberName,
+          'email': data['email']?.toString() ?? current.email,
+          'phone': data['phone']?.toString() ?? current.phone,
+          'courseId': enrollment.courseId,
+          'weekId': week.id,
+          'weekNumber': week.weekNumber,
+          'weekTitle': week.title,
+          'date': Timestamp.fromDate(day),
+          'time': time,
+          if (scheduled != null) 'scheduledAt': Timestamp.fromDate(scheduled),
+          'status': 'pending',
+          'teacherId': teacherUid,
+          'nativeTeacherId': data['nativeTeacherId']?.toString() ??
+              current.nativeTeacherId,
+          'nativeTeacherName': data['nativeTeacherName']?.toString() ??
+              current.nativeTeacherName,
+          'nativeTeacherUid': teacherUid,
+          'assignedTeacherUid': data['assignedTeacherUid']?.toString() ??
+              current.assignedTeacherUid,
+          'assignedTeacherName': data['assignedTeacherName']?.toString() ??
+              current.assignedTeacherName,
+          'isSubstitute': data['isSubstitute'] == true,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      });
+      return null;
+    } on StateError catch (e) {
+      return e.message;
+    } catch (e) {
+      print('예약 이동 오류: $e');
+      return '예약 시간을 옮기지 못했습니다.';
     }
   }
 
@@ -2634,6 +2968,7 @@ class OnlineSession {
   final String teacherId;
   final String memberName;
   final int weekNumber;
+  final bool cancelled;
 
   OnlineSession({
     required this.id,
@@ -2651,6 +2986,7 @@ class OnlineSession {
     this.teacherId = '',
     this.memberName = '',
     this.weekNumber = 0,
+    this.cancelled = false,
   });
 
   /// 한 번이라도 진행되고 종료된 회차.
@@ -2673,7 +3009,7 @@ class OnlineSession {
 
   /// 컨펌으로 생긴 회차는 종료 전까지 입장 가능. 예전 수동 회차는 수업 시작 후에만 연다.
   bool get canStudentJoin {
-    if (isFinished || isStale) return false;
+    if (cancelled || isFinished || isStale) return false;
     if (meetingUrl.trim().isEmpty) return false;
     if (bookingId.isNotEmpty) return true;
     return isLiveNow;
@@ -2698,6 +3034,7 @@ class OnlineSession {
       teacherId: data['teacherId']?.toString() ?? '',
       memberName: data['memberName']?.toString() ?? '',
       weekNumber: EnrollmentService._intValue(data['weekNumber']),
+      cancelled: data['cancelled'] == true,
     );
   }
 }
@@ -2803,9 +3140,11 @@ class StudentWeekProgress {
       weekTitle: title,
       videoUrl: videoUrl,
       problemLinks: problems,
-      videoChecked: videoItems.isEmpty
-          ? checked.contains('watch_video')
-          : videoItems.every((item) => checked.contains(item.id)),
+      videoChecked: videoUrl.trim().isEmpty
+          ? true
+          : (videoItems.isEmpty
+              ? checked.contains('watch_video')
+              : videoItems.every((item) => checked.contains(item.id))),
       problemsChecked: problemItems.isEmpty
           ? checked.contains('solve_problems')
           : problemItems.every((item) => checked.contains(item.id)),
@@ -2881,6 +3220,7 @@ class WeekBooking {
 
   bool get isPending => status == 'pending';
   bool get isConfirmed => status == 'confirmed';
+  bool get isCancelled => status == 'cancelled';
 
   bool isGuestFor(String teacherUid) {
     if (teacherUid.isEmpty) return false;
@@ -2901,6 +3241,8 @@ class WeekBooking {
         return '강사 확인 완료';
       case 'rejected':
         return '거절됨';
+      case 'cancelled':
+        return '취소됨';
       default:
         return '강사 확인 대기';
     }
@@ -3011,7 +3353,7 @@ class TeacherMonthStats {
           booking.date.month != current.month) {
         continue;
       }
-      if (booking.status == 'rejected') {
+      if (booking.status == 'rejected' || booking.status == 'cancelled') {
         cancelled += 1;
       } else if (booking.isConfirmed && isCompleted(booking)) {
         completed += 1;
@@ -3168,6 +3510,7 @@ class EnrollmentRecord {
   final DateTime? expiresAt;
   final DateTime? createdAt;
   final DateTime? lastSessionAt;
+  final int adminUnlockedThrough;
 
   EnrollmentRecord({
     required this.id,
@@ -3189,6 +3532,7 @@ class EnrollmentRecord {
     this.expiresAt,
     this.createdAt,
     this.lastSessionAt,
+    this.adminUnlockedThrough = 0,
   });
 
   OnlineCourse? get course => OnlineCourse.findById(courseId);
@@ -3255,6 +3599,8 @@ class EnrollmentRecord {
       expiresAt: expiresAt,
       createdAt: createdAt,
       lastSessionAt: lastSessionAt,
+      adminUnlockedThrough:
+          EnrollmentService._intValue(data['adminUnlockedThrough']),
     );
   }
 }

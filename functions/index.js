@@ -41,6 +41,18 @@ function expiresAtFromStart(start, totalSessions) {
   return addDays(startOfKstDay(start), total * DEADLINE_WEEKS_PER_SESSION * 7);
 }
 
+function extendedExpiresAt(currentExpires, addedSessions, now) {
+  const clock = startOfKstDay(now || new Date());
+  const current = currentExpires ? startOfKstDay(currentExpires) : null;
+  const base = current && current.getTime() > clock.getTime() ? current : clock;
+  const added = Math.max(0, Number(addedSessions) || 0);
+  return addDays(base, added * DEADLINE_WEEKS_PER_SESSION * 7);
+}
+
+function isExtensionPayment(payment) {
+  return payment && payment.purpose === "extension";
+}
+
 function remainingDeadlineWeeks(expiresAt, now) {
   const leftDays = Math.floor(
     (startOfKstDay(expiresAt).getTime() - startOfKstDay(now).getTime()) /
@@ -239,16 +251,39 @@ exports.confirmTossPayment = functions
     if (enrollmentRef) {
       const prev = (await enrollmentRef.get()).data() || {};
       const completed = Number(prev.completedSessions || 0);
-      const payload = {
-        ...enrollmentPayload,
-        completedSessions: completed,
-        remainingSessions: Math.max(0, totalSessions - completed),
-      };
-      if (!prev.expiresAt) {
-        const start = toJsDate(prev.createdAt) || new Date();
-        payload.expiresAt = admin.firestore.Timestamp.fromDate(
-          expiresAtFromStart(start, totalSessions)
-        );
+      let payload;
+      if (isExtensionPayment(payment)) {
+        const added = Number(totalSessions || 0);
+        const prevTotal = Number(prev.totalSessions || 0);
+        const total = prevTotal + added;
+        payload = {
+          ...enrollmentPayload,
+          totalSessions: total,
+          completedSessions: completed,
+          remainingSessions: Math.max(0, total - completed),
+          paidAmount: Number(prev.paidAmount || 0) + amountNum,
+          paymentNote: "수강 연장 결제",
+          expiresAt: admin.firestore.Timestamp.fromDate(
+            extendedExpiresAt(toJsDate(prev.expiresAt), added, new Date())
+          ),
+        };
+        if (!payment.nativeTeacherUid && prev.nativeTeacherUid) {
+          payload.nativeTeacherId = prev.nativeTeacherId || "";
+          payload.nativeTeacherName = prev.nativeTeacherName || "";
+          payload.nativeTeacherUid = prev.nativeTeacherUid || "";
+        }
+      } else {
+        payload = {
+          ...enrollmentPayload,
+          completedSessions: completed,
+          remainingSessions: Math.max(0, totalSessions - completed),
+        };
+        if (!prev.expiresAt) {
+          const start = toJsDate(prev.createdAt) || new Date();
+          payload.expiresAt = admin.firestore.Timestamp.fromDate(
+            expiresAtFromStart(start, totalSessions)
+          );
+        }
       }
       await enrollmentRef.update(payload);
     } else {
@@ -289,7 +324,12 @@ exports.confirmTossPayment = functions
       );
     }
 
-    return { ok: true, message: "결제가 완료되었고 수강이 배정되었습니다." };
+    return {
+      ok: true,
+      message: isExtensionPayment(payment)
+        ? "연장이 완료되었습니다. 내 강의실에서 이어서 들을 수 있습니다."
+        : "결제가 완료되었고 수강이 배정되었습니다.",
+    };
   });
 
 async function assertOwner(context) {
@@ -746,6 +786,26 @@ function sessionIdForBooking(bookingId) {
   return "booking_" + bookingId;
 }
 
+async function releaseOccupiedSlot(bookingId, booking) {
+  const teacherUid = String(
+    (booking && (booking.teacherId || booking.nativeTeacherUid)) || ""
+  );
+  const time = String((booking && booking.time) || "");
+  const date = toJsDate(booking && booking.date);
+  if (!teacherUid || !time || !date) return;
+  const kst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+  const y = kst.getUTCFullYear();
+  const m = String(kst.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(kst.getUTCDate()).padStart(2, "0");
+  const id = `${teacherUid}_${y}-${m}-${d}_${time.replace(":", "")}`;
+  const ref = admin.firestore().collection("teacher_occupied_slots").doc(id);
+  const snap = await ref.get();
+  if (!snap.exists) return;
+  const stored = String((snap.data() || {}).bookingId || "");
+  if (stored && stored !== bookingId) return;
+  await ref.delete();
+}
+
 async function ensureSessionForBooking(bookingId, data) {
   const sessionId = sessionIdForBooking(bookingId);
   const ref = admin.firestore().collection("online_sessions").doc(sessionId);
@@ -817,6 +877,39 @@ exports.onWeekBookingUpdated = functions
 
     if (after.status === "confirmed" && !after.sessionId) {
       await ensureSessionForBooking(bookingId, after);
+    }
+
+    if (before.status !== "cancelled" && after.status === "cancelled") {
+      await releaseOccupiedSlot(bookingId, after);
+      const sessionId = String(after.sessionId || sessionIdForBooking(bookingId));
+      await admin.firestore().collection("online_sessions").doc(sessionId).set(
+        {
+          cancelled: true,
+          isLive: false,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+      const teacherUid = String(after.teacherId || after.nativeTeacherUid || "");
+      const when = formatLessonWhen(after);
+      const student = String(after.memberName || "수강생");
+      if (teacherUid) {
+        await writeNotification({
+          userId: teacherUid,
+          title: "수업 예약이 취소되었습니다",
+          body: `${student}님이 ${when} 예약을 취소했습니다. 그 시간은 다시 열렸습니다.`,
+          type: "booking_cancelled",
+          bookingId,
+        });
+        const phone = await teacherPhone(teacherUid);
+        if (phone) {
+          await sendSms({
+            to: phone,
+            text: `[글림교육] ${student}님이 ${when} 예약을 취소했습니다. 그 시간은 다시 열렸습니다.`,
+          });
+        }
+      }
+      return null;
     }
 
     if (before.status === after.status) return null;
@@ -1276,17 +1369,36 @@ exports.sendWeeklyEnrollmentReminders = functions
         updates.expiresAt = admin.firestore.Timestamp.fromDate(expires);
         backfilled += 1;
       }
-      if (expires.getTime() < startOfKstDay(now).getTime() && remaining > 0) {
-        expires = addDays(
-          startOfKstDay(now),
-          remaining * DEADLINE_WEEKS_PER_SESSION * 7
-        );
-        updates.expiresAt = admin.firestore.Timestamp.fromDate(expires);
-        backfilled += 1;
+
+      const already = String(data.lastWeeklyReminderWeek || "");
+      if (expires.getTime() < startOfKstDay(now).getTime()) {
+        if (already !== weekKey) {
+          const title = "수강 기한이 지났습니다";
+          const body = `수강 기한이 지나 내 강의실에 만료로 남아 있습니다. 남은 화상수업 ${remaining}회. 연장 결제 후 이어서 들을 수 있습니다.`;
+          await writeNotification({
+            userId,
+            title,
+            body,
+            type: "enrollment_expired",
+          });
+          const phone = await memberPhone(userId, data.phone);
+          if (phone) {
+            await sendSms({
+              to: phone,
+              text: `[글림교육] ${body}`,
+            });
+          }
+          updates.lastWeeklyReminderWeek = weekKey;
+          updates.lastWeeklyReminderAt = admin.firestore.FieldValue.serverTimestamp();
+        }
+        if (Object.keys(updates).length > 0) {
+          updates.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+          await doc.ref.update(updates);
+        }
+        continue;
       }
 
       const weeksLeft = remainingDeadlineWeeks(expires, now);
-      const already = String(data.lastWeeklyReminderWeek || "");
       const shouldAlways = weeksLeft <= 4;
       const hasBooking = bookedThisWeek.has(userId);
       const shouldSend = already !== weekKey && (shouldAlways || !hasBooking);

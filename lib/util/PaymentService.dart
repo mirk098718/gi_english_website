@@ -27,6 +27,7 @@ class PaymentService {
     required OnlineCourse course,
     OnlineNativeTeacher? nativeTeacher,
     int? totalSessions,
+    bool extendEnrollment = false,
   }) async {
     final user = AuthService.currentUser;
     if (user == null) return null;
@@ -56,6 +57,7 @@ class PaymentService {
       nativeTeacherId: nativeTeacher?.id ?? '',
       nativeTeacherName: nativeTeacher?.name ?? '',
       nativeTeacherUid: teacherUid,
+      purpose: extendEnrollment ? 'extension' : 'new',
     );
 
     await _firestore.collection('payments').doc(orderId).set({
@@ -71,6 +73,7 @@ class PaymentService {
       'nativeTeacherId': order.nativeTeacherId,
       'nativeTeacherName': order.nativeTeacherName,
       'nativeTeacherUid': order.nativeTeacherUid,
+      'purpose': order.purpose,
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
@@ -96,7 +99,9 @@ class PaymentService {
           'customerKey': customerKey,
           'amount': order.amount,
           'orderId': order.orderId,
-          'orderName': '${order.courseTitle} (${order.totalSessions}회)',
+          'orderName': order.purpose == 'extension'
+              ? '${order.courseTitle} 수강 연장 (${order.totalSessions}회)'
+              : '${order.courseTitle} (${order.totalSessions}회)',
           'customerEmail': order.email,
           'customerName': order.memberName.isEmpty ? '온라인회원' : order.memberName,
           'successUrl': '$origin/payment/success',
@@ -239,6 +244,24 @@ class PaymentService {
 
       if (enrollmentRef != null) {
         final prev = (await enrollmentRef.get()).data() as Map<String, dynamic>;
+        final purpose = payment['purpose']?.toString() ?? '';
+        if (purpose == 'extension') {
+          final extended = EnrollmentService.extensionEnrollmentFields(
+            previous: prev,
+            addedSessions: totalSessions,
+            amount: amount,
+          );
+          await enrollmentRef.update({
+            ...enrollmentPayload,
+            ...extended,
+            if ((payment['nativeTeacherUid']?.toString() ?? '').isEmpty &&
+                (prev['nativeTeacherUid']?.toString() ?? '').isNotEmpty) ...{
+              'nativeTeacherId': prev['nativeTeacherId']?.toString() ?? '',
+              'nativeTeacherName': prev['nativeTeacherName']?.toString() ?? '',
+              'nativeTeacherUid': prev['nativeTeacherUid']?.toString() ?? '',
+            },
+          });
+        } else {
         final completed = (prev['completedSessions'] is int)
             ? prev['completedSessions'] as int
             : 0;
@@ -258,6 +281,7 @@ class PaymentService {
           );
         }
         await enrollmentRef.update(payload);
+        }
       } else {
         await _firestore.collection('enrollments').add({
           ...enrollmentPayload,
@@ -386,6 +410,7 @@ class PaymentOrder {
   final String nativeTeacherId;
   final String nativeTeacherName;
   final String nativeTeacherUid;
+  final String purpose;
 
   PaymentOrder({
     required this.orderId,
@@ -404,6 +429,7 @@ class PaymentOrder {
     this.nativeTeacherId = '',
     this.nativeTeacherName = '',
     this.nativeTeacherUid = '',
+    this.purpose = 'new',
   });
 
   OnlineCourse? get course => OnlineCourse.findById(courseId);
@@ -456,6 +482,7 @@ class PaymentOrder {
       nativeTeacherId: data['nativeTeacherId']?.toString() ?? '',
       nativeTeacherName: data['nativeTeacherName']?.toString() ?? '',
       nativeTeacherUid: data['nativeTeacherUid']?.toString() ?? '',
+      purpose: data['purpose']?.toString() ?? 'new',
     );
   }
 }

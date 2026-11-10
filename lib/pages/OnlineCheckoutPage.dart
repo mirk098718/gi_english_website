@@ -4,6 +4,7 @@ import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
 import 'package:gi_english_website/pages/OnlineTeacherSelectPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
+import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -18,8 +19,13 @@ import '../util/WidgetUtil.dart';
 /// 과정 선택 후 원어민 강사 선택 화면으로 이동한다.
 class OnlineCheckoutPage extends StatefulWidget {
   final String? initialCourseId;
+  final bool extendEnrollment;
 
-  const OnlineCheckoutPage({Key? key, this.initialCourseId}) : super(key: key);
+  const OnlineCheckoutPage({
+    Key? key,
+    this.initialCourseId,
+    this.extendEnrollment = false,
+  }) : super(key: key);
 
   @override
   _OnlineCheckoutPageState createState() => _OnlineCheckoutPageState();
@@ -28,6 +34,7 @@ class OnlineCheckoutPage extends StatefulWidget {
 class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
   OnlineCourse? _selected;
   List<PaymentOrder> _myPayments = [];
+  bool _paying = false;
 
   @override
   void initState() {
@@ -61,7 +68,68 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
       );
       return;
     }
-    MenuUtil.push(context, OnlineTeacherSelectPage(course: _selected!));
+    MenuUtil.push(
+      context,
+      OnlineTeacherSelectPage(
+        course: _selected!,
+        extendEnrollment: widget.extendEnrollment,
+      ),
+    );
+  }
+
+  Future<void> _payExtension() async {
+    if (AuthService.currentUser == null) {
+      MenuUtil.push(context, MemberLoginPage());
+      return;
+    }
+    final course = _selected;
+    if (course == null || _paying) return;
+    final enrollments = await EnrollmentService.myEnrollments();
+    EnrollmentRecord? record;
+    for (final item in enrollments) {
+      if (item.courseId == course.id) {
+        record = item;
+        break;
+      }
+    }
+    final teacher = record?.nativeTeacher;
+    if (teacher == null) {
+      if (!mounted) return;
+      MenuUtil.push(
+        context,
+        OnlineTeacherSelectPage(course: course, extendEnrollment: true),
+      );
+      return;
+    }
+    setState(() => _paying = true);
+    final order = await PaymentService.createOrder(
+      course: course,
+      nativeTeacher: teacher,
+      extendEnrollment: true,
+    );
+    if (!mounted) return;
+    if (order == null) {
+      setState(() => _paying = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(tr(context, "주문을 생성하지 못했습니다. 로그인 상태를 확인해주세요."),
+              style: TextStyle(fontFamily: "NotoSansKR")),
+          backgroundColor: Palette.danger,
+        ),
+      );
+      return;
+    }
+    final error = await PaymentService.requestTossPayment(order);
+    if (!mounted) return;
+    setState(() => _paying = false);
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error, style: TextStyle(fontFamily: "NotoSansKR")),
+          backgroundColor: Palette.danger,
+        ),
+      );
+    }
   }
 
   @override
@@ -125,11 +193,19 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(tr(context, "프로그램 결제"), style: TextStyle(fontFamily: "Jalnan", fontSize: 20)),
+          Text(
+            tr(context, widget.extendEnrollment ? "수강 연장 결제" : "프로그램 결제"),
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
+          ),
           WidgetUtil.myDivider(),
           SizedBox(height: 12),
           Text(
-            tr(context, "수강할 과정을 선택한 뒤, 원어민 메인 강사를 고르고 결제합니다.\n결제 완료 시 내 강의실에 과정이 자동으로 배정됩니다. (테스트 결제: 실제 출금되지 않습니다)"),
+            tr(
+              context,
+              widget.extendEnrollment
+                  ? "기한이 지난 수강에 회차와 수강 기한을 더합니다. 이미 진행한 회차는 그대로 남습니다. (테스트 결제: 실제 출금되지 않습니다)"
+                  : "수강할 과정을 선택한 뒤, 원어민 메인 강사를 고르고 결제합니다.\n결제 완료 시 내 강의실에 과정이 자동으로 배정됩니다. (테스트 결제: 실제 출금되지 않습니다)",
+            ),
             style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 13,
@@ -187,10 +263,19 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8)),
                 ),
-                onPressed: _goTeacherSelect,
+                onPressed: _paying
+                    ? null
+                    : (widget.extendEnrollment ? _payExtension : _goTeacherSelect),
                 icon: Icon(Icons.arrow_forward, color: Palette.white),
                 label: Text(
-                  tr(context, "다음 · 원어민 강사 선택"),
+                  tr(
+                    context,
+                    _paying
+                        ? "결제창 여는 중..."
+                        : (widget.extendEnrollment
+                            ? "연장 결제하기"
+                            : "다음 · 원어민 강사 선택"),
+                  ),
                   style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
                 ),
               ),

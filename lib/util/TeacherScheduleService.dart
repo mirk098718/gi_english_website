@@ -278,6 +278,7 @@ class TeacherScheduleService {
     required DateTime date,
     required String time,
     required String bookingId,
+    String userId = '',
   }) {
     final day = dateOnly(date);
     return {
@@ -286,6 +287,7 @@ class TeacherScheduleService {
       'time': time,
       'slotKey': slotKey(day, time),
       'bookingId': bookingId,
+      if (userId.isNotEmpty) 'userId': userId,
       'createdAt': FieldValue.serverTimestamp(),
     };
   }
