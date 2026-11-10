@@ -195,6 +195,12 @@ void main() {
           prompt: '나는 커피를 좋아해요.',
           answer: 'I like coffee',
         ),
+        QuizEssayAnswer(
+          index: 2,
+          title: '상황 작문 1',
+          prompt: '오늘부터 영어 공부를 시작했어요. 나는 매일 영어를 공부해요. 라고 말하고 싶어요.',
+          answer: 'I study English everyday',
+        ),
       ],
       updatedAt: DateTime(2026, 11, 10, 13, 53),
     );
@@ -224,5 +230,13 @@ void main() {
     expect(find.text('I like coffee'), findsOneWidget);
     expect(find.text('나는 커피를 좋아해요.'), findsOneWidget);
     expect(find.text('기본 표현 쓰기'), findsOneWidget);
+    expect(find.text('상황 작문 1'), findsOneWidget);
+    final shortTitle = tester.getTopLeft(find.text('기본 표현 쓰기'));
+    final longTitle = tester.getTopLeft(find.text('상황 작문 1'));
+    final shortAnswer = tester.getTopLeft(find.text('I like coffee'));
+    final longAnswer = tester.getTopLeft(find.text('I study English everyday'));
+    expect(shortTitle.dx, longTitle.dx);
+    expect(shortAnswer.dx, longAnswer.dx);
+    expect(shortAnswer.dx, shortTitle.dx);
   });
 }
