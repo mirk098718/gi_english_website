@@ -17,9 +17,13 @@ import '../util/WidgetUtil.dart';
 /// 과정 확정 후 · 결제 전 원어민 메인 강사 선택.
 class OnlineTeacherSelectPage extends StatefulWidget {
   final OnlineCourse course;
+  final bool extendEnrollment;
 
-  const OnlineTeacherSelectPage({Key? key, required this.course})
-      : super(key: key);
+  const OnlineTeacherSelectPage({
+    Key? key,
+    required this.course,
+    this.extendEnrollment = false,
+  }) : super(key: key);
 
   @override
   State<OnlineTeacherSelectPage> createState() =>
@@ -72,6 +76,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
     final order = await PaymentService.createOrder(
       course: widget.course,
       nativeTeacher: _selected!,
+      extendEnrollment: widget.extendEnrollment,
     );
     if (order == null) {
       if (!mounted) return;
@@ -277,7 +282,14 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
               onPressed: (_paying || _selected == null) ? null : _startPayment,
               icon: Icon(Icons.payment, color: Palette.white),
               label: Text(
-                _paying ? tr(context, "결제창 여는 중...") : tr(context, "선택 완료 · 결제하기"),
+                _paying
+                    ? tr(context, "결제창 여는 중...")
+                    : tr(
+                        context,
+                        widget.extendEnrollment
+                            ? "선택 완료 · 연장 결제하기"
+                            : "선택 완료 · 결제하기",
+                      ),
                 style: TextStyle(fontFamily: 'Jalnan', fontSize: 15),
               ),
             ),

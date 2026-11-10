@@ -187,13 +187,14 @@ class _StudentLearningProgressPanelState
             ),
           ),
           SizedBox(height: 8),
-          _line(
-            label: '인강',
-            title: week.videoLabel,
-            url: week.videoUrl,
-            done: week.videoChecked,
-            asPlayer: true,
-          ),
+          if (week.videoUrl.trim().isNotEmpty)
+            _line(
+              label: '인강',
+              title: week.videoLabel,
+              url: week.videoUrl,
+              done: week.videoChecked,
+              asPlayer: true,
+            ),
           ...problems.map((link) => _line(
                 label: '문제',
                 title: link.title.trim().isEmpty ? '문제풀이' : link.title.trim(),

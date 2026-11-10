@@ -15,7 +15,9 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/QuizResultBridge.dart';
 import 'package:gi_english_website/util/QuizResultService.dart';
 import 'package:gi_english_website/util/JitsiJoin.dart';
+import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
+import 'package:gi_english_website/pages/OnlineCheckoutPage.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
@@ -54,6 +56,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
   bool _isLoading = true;
   bool _savingChecklist = false;
   bool _submittingBooking = false;
+  String? _movingWeekId;
   Timer? _sessionTicker;
   StreamSubscription<void>? _quizSavedSub;
   StreamSubscription<dynamic>? _authSub;
@@ -305,6 +308,98 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       ),
     );
     await _loadData();
+  }
+
+  Future<void> _cancelBooking(WeekBooking booking) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(tr(context, "예약 취소"),
+            style: TextStyle(fontFamily: "Jalnan")),
+        content: Text(
+          tr(context, "이 예약을 취소할까요?\n강사 시간이 바로 비워지고, 같은 회차를 다시 신청할 수 있습니다."),
+          style: TextStyle(fontFamily: "NotoSansKR", height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(tr(context, "닫기")),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(tr(context, "예약 취소")),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() => _submittingBooking = true);
+    final error = await EnrollmentService.cancelWeekBooking(booking);
+    if (!mounted) return;
+    setState(() {
+      _submittingBooking = false;
+      if (error == null) _movingWeekId = null;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          error ?? tr(context, "예약을 취소했습니다. 강사 시간이 비워졌습니다."),
+          style: TextStyle(fontFamily: "NotoSansKR"),
+        ),
+        backgroundColor: error == null ? Palette.success : Palette.danger,
+      ),
+    );
+    if (error == null) await _loadData();
+  }
+
+  Future<void> _moveBooking(OnlineWeek week, WeekBooking booking) async {
+    final enrollment = _enrollment;
+    if (enrollment == null || _submittingBooking) return;
+    final date = _selectedDates[week.id];
+    final time = _selectedTimes[week.id];
+    if (date == null || time == null || time.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(tr(context, "날짜와 시간을 선택해주세요."),
+              style: TextStyle(fontFamily: "NotoSansKR")),
+          backgroundColor: Palette.danger,
+        ),
+      );
+      return;
+    }
+    setState(() => _submittingBooking = true);
+    final error = await EnrollmentService.moveWeekBooking(
+      enrollment: enrollment,
+      week: week,
+      current: booking,
+      date: date,
+      time: time,
+    );
+    if (!mounted) return;
+    setState(() {
+      _submittingBooking = false;
+      if (error == null) _movingWeekId = null;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          error ?? tr(context, "예약 시간을 옮겼습니다. 강사 확인을 기다려 주세요."),
+          style: TextStyle(fontFamily: "NotoSansKR"),
+        ),
+        backgroundColor: error == null ? Palette.success : Palette.danger,
+      ),
+    );
+    if (error == null) await _loadData();
+  }
+
+  void _openExtension() {
+    MenuUtil.push(
+      context,
+      OnlineCheckoutPage(
+        initialCourseId: widget.course.id,
+        extendEnrollment: true,
+      ),
+    );
   }
 
   void _showProblemPlaceholder() {
@@ -972,6 +1067,22 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             height: 1.6,
           ),
         ),
+        if (_enrollment != null &&
+            EnrollmentService.isEnrollmentExpired(_enrollment!)) ...[
+          SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Palette.secondaryDark,
+                foregroundColor: Palette.white,
+              ),
+              onPressed: _openExtension,
+              child: Text(tr(context, "연장 결제"),
+                  style: TextStyle(fontFamily: "Jalnan")),
+            ),
+          ),
+        ],
         SizedBox(height: 16),
         if (_isLoading)
           Container(
@@ -1018,8 +1129,11 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     final deadline = enrollment.expiresAt == null
         ? "권장은 주 1회입니다."
         : "권장은 주 1회이며, 수강 기한은 ${enrollment.remainingDeadlineWeeks}주 남았습니다.";
-    return "지금 열린 수업은 $current회차입니다. 이 회차 화상수업을 마치면 다음 회차가 열립니다. "
-        "$deadline 인강과 문제풀이를 모두 체크하면 예약이 열립니다."
+    if (EnrollmentService.isEnrollmentExpired(enrollment)) {
+      return '수강 기한이 지났습니다. 목록에 만료로 남아 있으며, 연장 결제 후 이어서 예약할 수 있습니다.';
+    }
+    return "지금 열린 수업은 $current회차입니다. 강사 피드백과 별점 평가가 끝나야 다음 회차가 열립니다. "
+        "$deadline 영상이 있는 회차는 인강과 문제풀이를, 영상이 없는 회차는 문제풀이만 체크하면 예약이 열립니다."
         "${done > 0 ? ' 이수 $done/${enrollment.totalSessions}회.' : ''}";
   }
 
@@ -1053,12 +1167,12 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
         }
       }
       if (pending != null) {
-        return '${previous}회차 강사 평가(별점)를 마치면 이 회차가 열립니다. '
-            '평가를 하지 않으면 다음 단계와 강사 정산이 진행되지 않습니다.';
+        return '${previous}회차 별점 평가를 마치면 이 회차가 열립니다. '
+            '하루가 지나도 평가가 없으면 관리자가 다음 회차를 열 수 있습니다.';
       }
     }
-    return '이전 회차 화상수업과 강사 평가를 마치면 이 회차가 열립니다. '
-        '인강과 예약은 열린 회차에서만 진행할 수 있습니다.';
+    return '이전 회차의 강사 피드백과 별점 평가가 끝나야 이 회차가 열립니다. '
+        '한쪽이 하루 넘게 멈추면 관리자만 다음 회차를 열 수 있습니다.';
   }
 
   Widget weekTile(OnlineWeek week) {
@@ -1070,8 +1184,9 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     final completed = enrollment != null &&
         week.weekNumber <= enrollment.completedSessions;
     final checked = _checkedIds(week.id);
-    final done = week.checkedCount(checked);
-    final total = week.checklistItems.length;
+    final visibleItems = EnrollmentService.requiredChecklistItems(week);
+    final done = visibleItems.where((item) => checked.contains(item.id)).length;
+    final total = visibleItems.length;
 
     return Container(
       margin: EdgeInsets.only(bottom: 14),
@@ -1254,7 +1369,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                tr(context, "인강 시청과 문제풀이를 모두 체크해야 아래 예약이 열립니다."),
+                tr(context, EnrollmentService.bookingChecklistHint(week)),
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -1281,7 +1396,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
               )
             else
               Column(
-                children: week.checklistItems.map((item) {
+                children: EnrollmentService.requiredChecklistItems(week).map((item) {
                   final isChecked = checked.contains(item.id);
                   return CheckboxListTile(
                     contentPadding: EdgeInsets.zero,
@@ -1354,6 +1469,14 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
         ? ''
         : EnrollmentService.sessionDocIdForBooking(booking.id);
     return _sessions.where((session) {
+      if (session.cancelled) return false;
+      if (session.bookingId.isNotEmpty) {
+        for (final booking in _bookings) {
+          if (booking.id == session.bookingId && booking.isCancelled) {
+            return false;
+          }
+        }
+      }
       if (booking != null &&
           (session.bookingId == booking.id || session.id == expectedId)) {
         return true;
@@ -1400,7 +1523,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
           Text(
             _enrollment == null
                 ? tr(context, '수강이 배정되면 이 회차 화상수업을 예약할 수 있습니다.')
-                : tr(context, '인강 시청과 문제풀이를 모두 체크하면 화상수업 예약이 열립니다.'),
+                : tr(context, EnrollmentService.bookingChecklistHint(week)),
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 13,
@@ -1649,7 +1772,82 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
               SizedBox(height: 12),
               _joinButton(_joinUrlForBooking(existing)),
             ],
-          ] else ...[
+            SizedBox(height: 12),
+            if (EnrollmentService.canStudentChangeBooking(existing)) ...[
+              Text(
+                tr(context, "수업 3시간 전까지 취소하거나 시간을 옮길 수 있습니다. 취소하면 강사 시간이 바로 비워집니다."),
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 12,
+                  height: 1.45,
+                  color: Palette.grey600,
+                ),
+              ),
+              SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  OutlinedButton(
+                    onPressed: _submittingBooking
+                        ? null
+                        : () => _cancelBooking(existing),
+                    child: Text(tr(context, "예약 취소"),
+                        style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
+                  ),
+                  OutlinedButton(
+                    onPressed: _submittingBooking
+                        ? null
+                        : () {
+                            setState(() {
+                              _movingWeekId =
+                                  _movingWeekId == week.id ? null : week.id;
+                            });
+                          },
+                    child: Text(
+                      _movingWeekId == week.id
+                          ? tr(context, "옮기기 취소")
+                          : tr(context, "시간 옮기기"),
+                      style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ] else
+              Text(
+                tr(context, "취소 가능 시각이 지나 예약이 그대로 남습니다. 수업 3시간 전까지만 강사 시간을 비울 수 있습니다."),
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 12,
+                  height: 1.45,
+                  color: Palette.grey600,
+                ),
+              ),
+          ],
+          if (existing == null &&
+              _enrollment != null &&
+              EnrollmentService.isEnrollmentExpired(_enrollment!)) ...[
+            Text(
+              tr(context, "수강 기한이 지났습니다. 연장 결제하면 이어서 들을 수 있습니다."),
+              style: TextStyle(
+                fontFamily: "NotoSansKR",
+                fontSize: 13,
+                height: 1.5,
+                color: Palette.grey600,
+              ),
+            ),
+            SizedBox(height: 10),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Palette.secondaryDark,
+                foregroundColor: Palette.white,
+              ),
+              onPressed: _openExtension,
+              child: Text(tr(context, "연장 결제"),
+                  style: TextStyle(fontFamily: "Jalnan")),
+            ),
+          ] else if (existing == null || _movingWeekId == week.id) ...[
+            if (existing == null) ...[
             Text(
               otherTeacher
                   ? tr(context, "수업은 20분입니다. 선택한 원어민 선생님이 열어 둔 시간만 예약할 수 있습니다. 담당 선생님이 아니어도 강사가 확인하면 확정됩니다.")
@@ -1692,6 +1890,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                   ),
               ],
             ),
+            ],
             SizedBox(height: 10),
             Text(tr(context, "날짜 선택"),
                 style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
@@ -1756,9 +1955,15 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                   ),
                   onPressed: _submittingBooking
                       ? null
-                      : () => _submitBooking(week),
-                  child: Text(tr(context, "예약 신청"),
-                      style: TextStyle(fontFamily: "Jalnan")),
+                      : () => existing != null && _movingWeekId == week.id
+                          ? _moveBooking(week, existing)
+                          : _submitBooking(week),
+                  child: Text(
+                    existing != null && _movingWeekId == week.id
+                        ? tr(context, "이 시간으로 옮기기")
+                        : tr(context, "예약 신청"),
+                    style: TextStyle(fontFamily: "Jalnan"),
+                  ),
                 ),
               ),
             ],

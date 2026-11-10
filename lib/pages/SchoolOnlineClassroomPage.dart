@@ -641,14 +641,27 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
     );
   }
 
+  void _openExtension(EnrollmentRecord enrollment) {
+    MenuUtil.push(
+      context,
+      OnlineCheckoutPage(
+        initialCourseId: enrollment.courseId,
+        extendEnrollment: true,
+      ),
+    );
+  }
+
   Widget courseCard(EnrollmentRecord enrollment) {
     final course = enrollment.course;
     if (course == null) return SizedBox.shrink();
 
     final sessionsConfigured = enrollment.totalSessions > 0;
     final allDone = sessionsConfigured && enrollment.remainingSessions <= 0;
+    final expired = EnrollmentService.isEnrollmentExpired(enrollment);
 
-    return InkWell(
+    return Column(
+      children: [
+        InkWell(
       onTap: () {
         MenuUtil.push(context, OnlineCourseDetailPage(course: course));
       },
@@ -758,6 +771,24 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
           ],
         ),
       ),
+        ),
+        if (expired)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: EdgeInsets.only(bottom: 14),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.secondaryDark,
+                  foregroundColor: Palette.white,
+                ),
+                onPressed: () => _openExtension(enrollment),
+                child: Text(tr(context, "연장 결제"),
+                    style: TextStyle(fontFamily: "Jalnan")),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -789,7 +820,10 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
   }
 
   Widget sessionBadge(EnrollmentRecord enrollment, bool allDone) {
-    final Color color = allDone ? Palette.grey500 : Palette.secondaryDark;
+    final expired = EnrollmentService.isEnrollmentExpired(enrollment);
+    final Color color = expired
+        ? Palette.danger
+        : (allDone ? Palette.grey500 : Palette.secondaryDark);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
@@ -800,7 +834,11 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            allDone ? Icons.emoji_events_outlined : Icons.videocam_outlined,
+            expired
+                ? Icons.event_busy_outlined
+                : (allDone
+                    ? Icons.emoji_events_outlined
+                    : Icons.videocam_outlined),
             size: 15,
             color: color,
           ),
@@ -820,6 +858,9 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
   }
 
   String _classroomProgressCopy(EnrollmentRecord enrollment, bool allDone) {
+    if (EnrollmentService.isEnrollmentExpired(enrollment)) {
+      return '수강 기한이 지났습니다. 연장 결제하면 이어서 들을 수 있습니다.';
+    }
     if (allDone) {
       return '화상수업 ${enrollment.totalSessions}회를 모두 마쳤습니다 · 회차 학습 보기';
     }
@@ -831,6 +872,9 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
   }
 
   String _sessionBadgeCopy(EnrollmentRecord enrollment, bool allDone) {
+    if (EnrollmentService.isEnrollmentExpired(enrollment)) {
+      return '수강 기한 만료';
+    }
     if (allDone) {
       return '화상수업 ${enrollment.totalSessions}회 모두 완료';
     }

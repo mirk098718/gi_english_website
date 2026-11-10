@@ -54,6 +54,14 @@ void main() {
       final week = EnrollmentService.defaultWeek('beginner_phonics', lesson);
       expect(week.title, '$lesson강');
       expect(week.videoUrl, isEmpty);
+      expect(
+        week.checklistItems.map((item) => item.id).toList(),
+        ['solve_problems'],
+      );
+      expect(
+        EnrollmentService.isWeekReadyToBook(week, const ['solve_problems']),
+        isTrue,
+      );
       expect(week.problemLinks.single.title, '$lesson강 연습문제');
       expect(
         week.problemLinks.single.url,
@@ -175,6 +183,14 @@ void main() {
       );
       expect(week.title, '$lesson강');
       expect(week.videoUrl, isEmpty);
+      expect(
+        week.checklistItems.map((item) => item.id).toList(),
+        ['solve_problems'],
+      );
+      expect(
+        EnrollmentService.isWeekReadyToBook(week, const ['solve_problems']),
+        isTrue,
+      );
       expect(week.problemLinks.single.title, '$lesson강 연습문제');
       expect(
         week.problemLinks.single.url,
@@ -188,6 +204,14 @@ void main() {
       final week = EnrollmentService.defaultWeek('basic_grammar_speaking', lesson);
       expect(week.title, '$lesson강');
       expect(week.videoUrl, isEmpty);
+      expect(
+        week.checklistItems.map((item) => item.id).toList(),
+        ['solve_problems'],
+      );
+      expect(
+        EnrollmentService.isWeekReadyToBook(week, const ['solve_problems']),
+        isTrue,
+      );
       expect(week.problemLinks.single.title, '$lesson강 연습문제');
       expect(
         week.problemLinks.single.url,
@@ -202,6 +226,14 @@ void main() {
           EnrollmentService.defaultWeek('advanced_premium_speaking', lesson);
       expect(week.title, '$lesson강');
       expect(week.videoUrl, isEmpty);
+      expect(
+        week.checklistItems.map((item) => item.id).toList(),
+        ['solve_problems'],
+      );
+      expect(
+        EnrollmentService.isWeekReadyToBook(week, const ['solve_problems']),
+        isTrue,
+      );
       expect(week.problemLinks.single.title, '$lesson강 연습문제');
       expect(
         week.problemLinks.single.url,
@@ -215,6 +247,14 @@ void main() {
       final week = EnrollmentService.defaultWeek('business_english', lesson);
       expect(week.title, '$lesson강');
       expect(week.videoUrl, isEmpty);
+      expect(
+        week.checklistItems.map((item) => item.id).toList(),
+        ['solve_problems'],
+      );
+      expect(
+        EnrollmentService.isWeekReadyToBook(week, const ['solve_problems']),
+        isTrue,
+      );
       expect(week.problemLinks.single.title, '$lesson강 연습문제');
       expect(
         week.problemLinks.single.url,

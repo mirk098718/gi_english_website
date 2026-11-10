@@ -95,6 +95,20 @@ class LessonFeedbackService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static const String _collection = 'lesson_feedbacks';
 
+  static Future<List<LessonFeedback>> listAll() async {
+    try {
+      final snapshot = await _firestore.collection(_collection).get();
+      final list = snapshot.docs
+          .map((doc) => LessonFeedback.fromMap(doc.id, doc.data()))
+          .toList();
+      list.sort((a, b) => b.date.compareTo(a.date));
+      return list;
+    } catch (e) {
+      print('강사 피드백 전체 조회 오류: $e');
+      return [];
+    }
+  }
+
   static Future<List<LessonFeedback>> listForTeacher(String teacherId) async {
     if (teacherId.isEmpty) return [];
     try {
