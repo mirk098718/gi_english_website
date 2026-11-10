@@ -9,6 +9,8 @@ class AcademyLmsLinks extends StatelessWidget {
   final bool onDark;
   final bool compact;
   final bool centered;
+  final bool showElementary;
+  final bool showMiddle;
 
   const AcademyLmsLinks({
     Key? key,
@@ -16,7 +18,10 @@ class AcademyLmsLinks extends StatelessWidget {
     this.onDark = false,
     this.compact = false,
     this.centered = false,
-  }) : super(key: key);
+    this.showElementary = true,
+    this.showMiddle = true,
+  })  : assert(showElementary || showMiddle),
+        super(key: key);
 
   static const String _middleUrl = 'http://gienglish.theclip.net/';
   static const String _eleUrl =
@@ -40,25 +45,20 @@ class AcademyLmsLinks extends StatelessWidget {
       fill: fill,
     );
 
-    final Widget buttons;
-    if (centered) {
-      buttons = Row(
-        children: [
-          Expanded(child: ele),
-          SizedBox(width: compact ? 8 : 10),
-          Expanded(child: middle),
+    final items = <Widget>[
+      if (showElementary) ele,
+      if (showMiddle) middle,
+    ];
+    final gap = SizedBox(width: centered && compact ? 8 : 10);
+    final Widget buttons = Row(
+      mainAxisSize: centered ? MainAxisSize.max : MainAxisSize.min,
+      children: [
+        for (var i = 0; i < items.length; i++) ...[
+          if (i > 0) gap,
+          if (centered) Expanded(child: items[i]) else items[i],
         ],
-      );
-    } else {
-      buttons = Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ele,
-          SizedBox(width: 10),
-          middle,
-        ],
-      );
-    }
+      ],
+    );
 
     return Padding(
       padding: EdgeInsets.only(bottom: showHeading ? 24 : 0),
@@ -111,33 +111,51 @@ class AcademyLmsLinks extends StatelessWidget {
       border = null;
     }
 
+    Widget line(String text, TextStyle style, double lineHeight) {
+      final textWidget = Text(
+        text,
+        maxLines: 1,
+        softWrap: false,
+        overflow: fill ? TextOverflow.visible : TextOverflow.ellipsis,
+        style: style,
+      );
+      if (!fill) return textWidget;
+      return SizedBox(
+        width: double.infinity,
+        height: lineHeight,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: textWidget,
+        ),
+      );
+    }
+
     final label = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
+        line(
           title,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
+          TextStyle(
             fontFamily: 'NotoSansKR',
             fontWeight: FontWeight.w800,
             fontSize: compact ? 11 : 14,
             height: 1.2,
             color: foreground,
           ),
+          compact ? 14 : 17,
         ),
         SizedBox(height: 2),
-        Text(
+        line(
           subtitle,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
+          TextStyle(
             fontFamily: 'NotoSansKR',
             fontWeight: FontWeight.w500,
             fontSize: compact ? 10 : 12,
             color: foreground.withValues(alpha: 0.82),
           ),
+          compact ? 12 : 15,
         ),
       ],
     );
@@ -148,7 +166,7 @@ class AcademyLmsLinks extends StatelessWidget {
       excludeSemantics: true,
       child: Material(
         color: background,
-        elevation: onDark ? 2 : 0,
+        elevation: 2,
         shadowColor: Palette.black.withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(10),
         child: InkWell(

@@ -46,7 +46,6 @@ class SchoolAboutPage extends StatelessWidget {
       child: Column(
         children: [
           _hero(context, compact: true),
-          HomeDailyWordBlock(compact: true),
           AcademyHomeCards(compact: true),
           AcademyBulletinBoards(compact: true),
           _philosophy(context, compact: true),
@@ -57,9 +56,7 @@ class SchoolAboutPage extends StatelessWidget {
 
   Widget _hero(BuildContext context, {required bool compact}) {
     final screen = MediaQuery.sizeOf(context);
-    final height = compact
-        ? 520.0
-        : (screen.height - 72).clamp(560.0, 760.0);
+    final height = compact ? 520.0 : (screen.height - 72).clamp(560.0, 760.0);
 
     return SizedBox(
       width: double.infinity,

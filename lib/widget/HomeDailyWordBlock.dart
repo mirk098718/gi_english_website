@@ -8,9 +8,11 @@ import 'package:gi_english_website/util/UrlIUtil.dart';
 enum DailyWordTone { home, talk }
 
 /// 오늘의 단어. 홈은 남색 띠, 렛츠 토크는 코랄 띠, 내 강의실은 왼쪽 메뉴 아래 카드.
+/// 모바일에서는 [bar]로 화면 아래 작은 띠가 된다.
 class HomeDailyWordBlock extends StatefulWidget {
   final bool compact;
   final bool sidebar;
+  final bool bar;
   final DailyWordTone tone;
   final DateTime? date;
   final DailyWord? word;
@@ -19,6 +21,7 @@ class HomeDailyWordBlock extends StatefulWidget {
     Key? key,
     this.compact = false,
     this.sidebar = false,
+    this.bar = false,
     this.tone = DailyWordTone.home,
     this.date,
     this.word,
@@ -30,6 +33,7 @@ class HomeDailyWordBlock extends StatefulWidget {
 
 class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
   DailyWord? _word;
+  bool _open = false;
 
   @override
   void initState() {
@@ -56,6 +60,7 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
   Widget build(BuildContext context) {
     final today = widget.date ?? DateTime.now();
     final word = _word;
+    if (widget.bar) return _bar(word);
     final compact = widget.compact || widget.sidebar;
     final look = _look;
     return ClipRRect(
@@ -125,6 +130,144 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
         ],
       ),
     ),
+    );
+  }
+
+  Widget _bar(DailyWord? word) {
+    final look = _look;
+    final open = _open && word != null;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: word == null ? null : () => setState(() => _open = !_open),
+        child: Ink(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: look.gradient,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.22),
+                blurRadius: 16,
+                offset: const Offset(0, -6),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 8, 4, 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      '오늘의 단어',
+                      style: TextStyle(
+                        fontFamily: 'NotoSansKR',
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: look.accent,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(child: _barSummary(word)),
+                    Icon(
+                      open ? Icons.expand_more : Icons.expand_less,
+                      color: Palette.white,
+                      size: 22,
+                    ),
+                  ],
+                ),
+                if (word != null && _open) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    word.expression,
+                    style: const TextStyle(
+                      fontFamily: 'NotoSansKR',
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      height: 1.35,
+                      color: Palette.white,
+                    ),
+                  ),
+                  if (word.expressionMeaning.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      word.expressionMeaning,
+                      style: TextStyle(
+                        fontFamily: 'NotoSansKR',
+                        fontSize: 12,
+                        height: 1.35,
+                        color: Palette.white.withValues(alpha: 0.82),
+                      ),
+                    ),
+                  ],
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _barSummary(DailyWord? word) {
+    if (word == null) {
+      return Text(
+        '준비하고 있습니다',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontFamily: 'NotoSansKR',
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: Palette.white.withValues(alpha: 0.8),
+        ),
+      );
+    }
+    return Row(
+      children: [
+        Flexible(
+          child: Text(
+            word.word,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: Palette.white,
+              height: 1.1,
+            ),
+          ),
+        ),
+        Text(
+          '  ·  ',
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: 12,
+            color: Palette.white.withValues(alpha: 0.55),
+          ),
+        ),
+        Flexible(
+          child: Text(
+            word.meaning,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: Palette.white.withValues(alpha: 0.92),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

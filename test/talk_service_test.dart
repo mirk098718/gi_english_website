@@ -144,8 +144,9 @@ void main() {
   group('TalkCopy', () {
     test('keeps the cafe hero copy', () {
       expect(TalkCopy.headline, "Let's talk!");
-      expect(TalkCopy.lead, contains('GLEAMER'));
-      expect(TalkCopy.ruleTitle, contains('영어로 대화해보기'));
+      expect(TalkCopy.lead, contains('화상 대화방이에요'));
+      expect(TalkCopy.ruleTitle, '영어로 이야기해요');
+      expect(TalkCopy.safetyBody, contains('신고'));
       expect(TalkCopy.groupTitle, '그룹 채팅');
       expect(TalkCopy.oneToOneTitle, '1:1 대화방');
       expect(TalkCopy.contactsTitle, '내가 대화한 회원');

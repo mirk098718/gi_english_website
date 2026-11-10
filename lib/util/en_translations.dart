@@ -256,6 +256,8 @@ const Map<String, String> enTranslations = {
   "화상수업 예약하기": "Book a video class",
   "회의·이메일 실전": "Meetings and email, in practice",
   "1:1 대화방 열기": "Open a 1:1 room",
+  "그룹 대화방 열기": "Open a group room",
+  "일대일 대화방 열기": "Open a 1:1 room",
   "ⓒ 글림아일랜드교육": "ⓒ Gleam Island Education",
   "글림아일랜드 어학원": "Gleam Island Academy",
   "누구를 신고할까요?": "Who are you reporting?",

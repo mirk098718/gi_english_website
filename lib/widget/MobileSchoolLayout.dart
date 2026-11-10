@@ -9,6 +9,7 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/AcademyNavMenu.dart';
 import 'package:gi_english_website/widget/GleamMark.dart';
 import 'package:gi_english_website/widget/HeaderSocialLinks.dart';
+import 'package:gi_english_website/widget/HomeDailyWordBlock.dart';
 import 'package:gi_english_website/widget/LetsTalkNavChip.dart';
 import 'package:gi_english_website/widget/LessonRatingPromptHost.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
@@ -17,8 +18,13 @@ import 'package:gi_english_website/widget/SiteNav.dart';
 class MobileSchoolLayout extends StatefulWidget {
   final Widget content;
   final double height = 52;
+  final DailyWordTone dailyWordTone;
 
-  MobileSchoolLayout({Key? key, required this.content}) : super(key: key);
+  MobileSchoolLayout({
+    Key? key,
+    required this.content,
+    this.dailyWordTone = DailyWordTone.home,
+  }) : super(key: key);
 
   @override
   _MobileSchoolLayoutState createState() => _MobileSchoolLayoutState();
@@ -126,6 +132,10 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                     child: ClipRect(
                       child: widget.content,
                     ),
+                  ),
+                  HomeDailyWordBlock(
+                    bar: true,
+                    tone: widget.dailyWordTone,
                   ),
                   MyWidget.mobileSchoolFooter(),
                 ],
