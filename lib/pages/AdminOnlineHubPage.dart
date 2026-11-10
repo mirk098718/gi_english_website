@@ -313,6 +313,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
 
   Future<List<Map<String, dynamic>>> _membersForTeacher(String teacherUid) async {
     if (teacherUid.isEmpty) return [];
+    await AuthService.syncCardPaidStudents(teacherUid);
     final assigned =
         await AuthService.listMembers(teacherId: teacherUid, limit: 500);
     final byId = <String, Map<String, dynamic>>{};
@@ -2736,6 +2737,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
   Future<void> _refresh() async {
     setState(() => _loading = true);
     await AuthService.publishTeacherProfiles();
+    await AuthService.syncCardPaidStudents('');
     final teachers = await AuthService.listTeachers();
     final members = await AuthService.listMembers();
     final bookings = await EnrollmentService.staffWeekBookings(mineOnly: false);

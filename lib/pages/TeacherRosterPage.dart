@@ -145,6 +145,9 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       teacher = await AuthService.currentStaffProfile();
     }
     final teacherUid = teacher?['uid']?.toString() ?? '';
+    if (teacherUid.isNotEmpty) {
+      await AuthService.syncCardPaidStudents(teacherUid);
+    }
     final members = teacherUid.isEmpty
         ? <Map<String, dynamic>>[]
         : await AuthService.listMembers(teacherId: teacherUid);
