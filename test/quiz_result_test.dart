@@ -78,7 +78,7 @@ void main() {
           .map((lesson) => lesson.problemUrl),
     ];
 
-    expect(urls, hasLength(12));
+    expect(urls, hasLength(20));
     expect(
       urls.map(QuizResult.quizIdFromUrl).toSet(),
       {
@@ -94,6 +94,14 @@ void main() {
         'gleam-level1-lesson10',
         'gleam-level3-lesson1',
         'gleam-level3-lesson2',
+        'gleam-level3-lesson3',
+        'gleam-level3-lesson4',
+        'gleam-level3-lesson5',
+        'gleam-level3-lesson6',
+        'gleam-level3-lesson7',
+        'gleam-level3-lesson8',
+        'gleam-level3-lesson9',
+        'gleam-level3-lesson10',
       },
     );
   });

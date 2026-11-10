@@ -16,7 +16,15 @@ const connectedQuizzes = [
   "gleam-level1-lesson9-quiz.html",
   "gleam-level1-lesson10-quiz.html",
   "gleam-level3-lesson1-quiz.html",
-  "gleam-level3-lesson2-quiz.html"
+  "gleam-level3-lesson2-quiz.html",
+  "gleam-level3-lesson3-quiz.html",
+  "gleam-level3-lesson4-quiz.html",
+  "gleam-level3-lesson5-quiz.html",
+  "gleam-level3-lesson6-quiz.html",
+  "gleam-level3-lesson7-quiz.html",
+  "gleam-level3-lesson8-quiz.html",
+  "gleam-level3-lesson9-quiz.html",
+  "gleam-level3-lesson10-quiz.html"
 ];
 
 test("퀴즈 파일 이름에서 저장 키를 만든다", () => {

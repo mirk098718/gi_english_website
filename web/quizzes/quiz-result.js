@@ -65,6 +65,46 @@
       courseId: "intermediate_grammar_speaking",
       weekNumber: 2,
       title: "중급 2강 연습문제"
+    },
+    "gleam-level3-lesson3": {
+      courseId: "intermediate_grammar_speaking",
+      weekNumber: 3,
+      title: "중급 3강 연습문제"
+    },
+    "gleam-level3-lesson4": {
+      courseId: "intermediate_grammar_speaking",
+      weekNumber: 4,
+      title: "중급 4강 연습문제"
+    },
+    "gleam-level3-lesson5": {
+      courseId: "intermediate_grammar_speaking",
+      weekNumber: 5,
+      title: "중급 5강 연습문제"
+    },
+    "gleam-level3-lesson6": {
+      courseId: "intermediate_grammar_speaking",
+      weekNumber: 6,
+      title: "중급 6강 연습문제"
+    },
+    "gleam-level3-lesson7": {
+      courseId: "intermediate_grammar_speaking",
+      weekNumber: 7,
+      title: "중급 7강 연습문제"
+    },
+    "gleam-level3-lesson8": {
+      courseId: "intermediate_grammar_speaking",
+      weekNumber: 8,
+      title: "중급 8강 연습문제"
+    },
+    "gleam-level3-lesson9": {
+      courseId: "intermediate_grammar_speaking",
+      weekNumber: 9,
+      title: "중급 9강 연습문제"
+    },
+    "gleam-level3-lesson10": {
+      courseId: "intermediate_grammar_speaking",
+      weekNumber: 10,
+      title: "중급 10강 연습문제"
     }
   };
 

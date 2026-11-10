@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>글림 중급 영어 제6강 · 문제 풀이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4ecdd; --bg-soft:#faf5ea; --card:#fffdf9;
+  --ink:#33241a; --sub:#82705d; --line:#e7d8c0;
+  --coffee:#7a4a26; --caramel:#d98a2b; --caramel-deep:#a9620f; --caramel-soft:#f8e7c8;
+  --ok:#3e7d54; --ok-bg:#e6f2e6; --no:#bc4741; --no-bg:#fae5e0;
+  --disp:'Black Han Sans', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --serif:Georgia, 'Times New Roman', serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans); color:var(--ink); background:var(--bg);
+  background-image:radial-gradient(#e2d3b8 1px, transparent 1px);
+  background-size:22px 22px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  word-break:keep-all; overflow-wrap:break-word; /* 한글은 단어 단위로만 줄바꿈 */
+}
+.en{font-family:var(--serif); letter-spacing:.01em}
+.wrap{max-width:880px; margin:0 auto; padding:0 18px}
+
+/* ── 상단바 ─────────────────────────── */
+.topbar{position:sticky; top:0; z-index:50; background:rgba(244,236,221,.92); backdrop-filter:blur(8px); border-bottom:1.5px solid var(--line)}
+.topbar .wrap{display:flex; align-items:center; gap:10px; justify-content:space-between; padding-top:10px; padding-bottom:10px; flex-wrap:wrap}
+.brand{font-family:var(--disp); font-size:1.02rem; color:var(--coffee); letter-spacing:.02em; display:flex; align-items:center; gap:6px}
+.brand small{white-space:nowrap; font-family:var(--sans); font-weight:700; color:var(--sub); font-size:.72rem; border:1.5px solid var(--line); border-radius:999px; padding:2px 8px; background:var(--card)}
+.scores{display:flex; gap:8px; align-items:center; font-weight:800; font-size:.8rem}
+.scores .chip{background:var(--card); border:1.5px solid var(--line); border-radius:999px; padding:4px 12px; color:var(--sub); white-space:nowrap}
+.scores .chip b{color:var(--coffee)}
+.scores .chip.ok b{color:var(--ok)}
+
+/* ── 히어로 ─────────────────────────── */
+.hero{padding:44px 0 10px; text-align:center}
+.lg-badge{display:inline-block; white-space:nowrap; background:var(--coffee); color:#f8ecdb; font-weight:800; font-size:.78rem; letter-spacing:.14em; border-radius:999px; padding:5px 16px}
+.hero h1{font-family:var(--disp); font-weight:400; font-size:clamp(1.7rem,5vw,2.6rem); line-height:1.28; margin:16px 0 6px; color:var(--ink)}
+.hero h1 .u{color:var(--caramel-deep); background:linear-gradient(transparent 68%, var(--caramel-soft) 68%)}
+.hero p.sub{color:var(--sub); font-weight:600; font-size:.95rem}
+
+/* 변환 공식 티켓 (시그니처) */
+.formula{display:flex; align-items:stretch; justify-content:center; gap:0; margin:30px auto 8px; flex-wrap:wrap; max-width:640px}
+.f-chip{flex:1 1 120px; min-width:100px; background:var(--card); border:2px solid var(--ink); border-radius:16px; padding:14px 12px 12px; position:relative; box-shadow:4px 4px 0 rgba(122,74,38,.22); text-align:center}
+.f-chip .role{position:absolute; top:-12px; left:50%; transform:translateX(-50%); font-size:.68rem; font-weight:900; letter-spacing:.08em; color:#fff; background:var(--coffee); border-radius:999px; padding:2px 11px; white-space:nowrap; max-width:none}
+.f-chip:nth-child(3) .role{background:var(--caramel-deep)}
+.f-chip:nth-child(5) .role{background:#3e7d54}
+.f-chip .en-big{font-family:var(--serif); font-size:1.55rem; font-weight:700; display:block; margin-top:6px}
+.f-chip .kr{font-size:.78rem; color:var(--sub); font-weight:700}
+.f-arrow{align-self:center; font-size:1.3rem; color:var(--caramel-deep); padding:0 10px; font-weight:900}
+.formula-note{color:var(--sub); font-size:.83rem; font-weight:700; margin-bottom:6px}
+.formula-note s{color:#b0473f}
+
+/* 요점 복습 */
+.recap{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:30px 0 8px}
+.r-card{background:var(--card); border:1.5px solid var(--line); border-radius:16px; padding:18px 16px; text-align:left}
+.r-card h3{font-size:.85rem; color:var(--caramel-deep); letter-spacing:.08em; font-weight:900; margin-bottom:8px}
+.r-card .ex{font-size:.95rem; margin-top:6px}
+.vs-box{background:var(--bg-soft); border:1px dashed var(--line); border-radius:10px; padding:8px 10px; margin-top:4px; font-size:.88rem}
+.vs-box .bad{color:#b0473f; font-weight:700}
+.vs-box .good{color:var(--ok); font-weight:800}
+.start-btn{display:inline-block; margin:26px 0 6px; background:var(--coffee); color:#fff7ec; font-weight:900; font-size:1rem; border:none; border-radius:999px; padding:14px 34px; cursor:pointer; box-shadow:0 6px 18px rgba(122,74,38,.32); transition:transform .15s, box-shadow .15s}
+.start-btn:hover{transform:translateY(-2px); box-shadow:0 10px 22px rgba(122,74,38,.38)}
+
+/* ── 섹션 공통 ──────────────────────── */
+section.block{padding:34px 0 6px}
+.sec-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:6px}
+.sec-head h2{font-family:var(--disp); font-weight:400; font-size:1.45rem; color:var(--coffee)}
+.sec-head .count{font-weight:900; color:var(--caramel-deep); font-size:.9rem; background:var(--caramel-soft); border-radius:999px; padding:3px 14px; white-space:nowrap}
+.sec-desc{color:var(--sub); font-size:.88rem; font-weight:600; margin-bottom:20px}
+
+/* ── 문제 카드 ──────────────────────── */
+.q-card{background:var(--card); border:1.5px solid var(--line); border-radius:18px; padding:20px 20px 18px; margin-bottom:18px; box-shadow:0 2px 10px rgba(122,74,38,.06)}
+.q-top{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px}
+.stamp{font-family:var(--disp); font-size:.95rem; color:var(--coffee); border:2px solid var(--coffee); border-radius:8px; padding:1px 9px; transform:rotate(-3deg); letter-spacing:.05em; flex:none; white-space:nowrap}
+.tchip{font-size:.72rem; font-weight:900; letter-spacing:.04em; border-radius:999px; padding:4px 12px; white-space:nowrap}
+.tc-concept{background:#f2e3c8; color:#8a5a1f}
+.tc-blank{background:#e3edf6; color:#2e5e83}
+.tc-wrong{background:#f9e0dc; color:#a3403a}
+.tc-multi{background:#e9e2f5; color:#5b4a8a}
+.tc-order{background:#ddefe4; color:#2f6e4f}
+.tc-dialog{background:#fce8ee; color:#96374f}
+.tc-trans{background:#e0eef0; color:#22626b}
+.tc-part{background:#f6ecd8; color:#7a641f}
+.tc-correct{background:#e2ecdf; color:#3c6b2f}
+.tc-vocab{background:#eceae7; color:#5f5346}
+.tc-write{background:#f8e7c8; color:#a9620f}
+.multi-note{font-size:.74rem; color:var(--caramel-deep); font-weight:800; background:var(--caramel-soft); border-radius:999px; padding:3px 10px; white-space:nowrap}
+.q-text{font-size:1.02rem; font-weight:700; margin-bottom:14px}
+.q-text .q-en{font-family:var(--serif); color:var(--coffee)}
+.opts{display:grid; gap:9px}
+.opt{display:flex; align-items:flex-start; gap:10px; width:100%; text-align:left; background:var(--bg-soft); border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; cursor:pointer; font-family:var(--sans); font-size:.95rem; color:var(--ink); transition:border-color .12s, background .12s, transform .12s}
+.opt:hover:not(:disabled){border-color:var(--caramel); transform:translateX(2px)}
+.opt:disabled{cursor:default}
+.opt .mark{font-weight:900; color:var(--caramel-deep); flex:none}
+.opt .box{flex:none; width:18px; height:18px; border:2px solid var(--sub); border-radius:5px; margin-top:2px; display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; color:transparent; font-weight:900}
+.opt.sel{border-color:var(--caramel-deep); background:var(--caramel-soft)}
+.opt.sel .box{background:var(--caramel-deep); border-color:var(--caramel-deep); color:#fff}
+.opt.right{border-color:var(--ok); background:var(--ok-bg)}
+.opt.right .box{background:var(--ok); border-color:var(--ok); color:#fff}
+.opt.right .mark{color:var(--ok)}
+.opt.right .mark::after{content:" ✓"; color:var(--ok); font-weight:900}
+.opt.miss{border-color:var(--no); background:var(--no-bg)}
+.opt.miss .box{background:var(--no); border-color:var(--no); color:#fff}
+.opt.miss .mark{color:var(--no)}
+.opt.miss .mark::after{content:" ✗"; color:var(--no); font-weight:900}
+.opt.dim{opacity:.55}
+.q-actions{display:flex; gap:10px; margin-top:14px; align-items:center}
+.btn-check{background:var(--caramel-deep); color:#fff; border:none; border-radius:999px; padding:10px 26px; font-weight:900; font-size:.88rem; cursor:pointer; font-family:var(--sans); transition:opacity .15s, transform .15s}
+.btn-check:hover:not(:disabled){transform:translateY(-1px)}
+.btn-check:disabled{opacity:.35; cursor:not-allowed}
+.graded-tag{font-weight:900; font-size:.85rem}
+.graded-tag.good{color:var(--ok)} .graded-tag.bad{color:var(--no)}
+.feedback{display:none; margin-top:14px; border-top:1.5px dashed var(--line); padding-top:13px}
+.feedback.show{display:block; animation:slidein .25s ease}
+@keyframes slidein{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+.fb-title{font-weight:900; font-size:.9rem; margin-bottom:5px}
+.fb-title.good{color:var(--ok)} .fb-title.bad{color:var(--no)}
+.fb-exp{font-size:.9rem; color:var(--ink); background:var(--bg-soft); border-radius:10px; padding:10px 13px}
+.fb-exp .en{color:var(--coffee)}
+
+/* ── 주관식 ─────────────────────────── */
+.situation{background:var(--bg-soft); border:1.5px dashed var(--line); border-radius:12px; padding:13px 15px; font-size:.95rem; margin-bottom:12px}
+.hints{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:12px}
+.hint{font-size:.74rem; font-weight:800; color:var(--coffee); background:var(--caramel-soft); border-radius:999px; padding:3px 11px; white-space:nowrap}
+.hint .en{font-style:normal}
+textarea{width:100%; min-height:86px; border:1.5px solid var(--line); border-radius:12px; background:var(--bg-soft); padding:12px 14px; font-family:var(--sans); font-size:.97rem; color:var(--ink); resize:vertical}
+textarea:focus{outline:2px solid var(--caramel); border-color:var(--caramel)}
+.model{display:none; margin-top:14px; background:#f2ede2; border-radius:12px; padding:12px 15px; font-size:.93rem}
+.model.show{display:block; animation:slidein .25s ease}
+.model b{color:var(--coffee)}
+
+/* ── 결과 ───────────────────────────── */
+.result{background:var(--card); border:2px solid var(--ink); border-radius:20px; box-shadow:6px 6px 0 rgba(122,74,38,.2); padding:26px 22px; margin:34px 0 10px; text-align:center}
+.result .big{font-family:var(--disp); font-size:2.5rem; color:var(--coffee); line-height:1.1}
+.result .msg{font-weight:800; margin-top:6px}
+.type-table{width:100%; border-collapse:collapse; margin-top:16px; font-size:.85rem}
+.type-table th,.type-table td{border-bottom:1px dashed var(--line); padding:7px 6px; text-align:center}
+.type-table th{color:var(--sub); font-size:.76rem; letter-spacing:.05em}
+.type-table td:first-child{text-align:left; font-weight:700}
+.btn-reset{margin-top:18px; background:transparent; color:var(--no); border:2px solid var(--no); border-radius:999px; padding:10px 26px; font-weight:900; cursor:pointer; font-family:var(--sans); font-size:.88rem}
+.btn-reset:hover{background:var(--no-bg)}
+.quiz-actions{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center; margin:18px 0 8px}
+.quiz-actions-note{flex:1 1 100%; margin:0; text-align:center; color:var(--sub); font-size:.78rem; font-weight:700}
+.btn-grade-all,.btn-complete{border:none; border-radius:999px; padding:11px 22px; font-weight:900; cursor:pointer; font-family:var(--sans); font-size:.9rem}
+.btn-grade-all{background:var(--coffee); color:#fff}
+.btn-complete{background:var(--ok); color:#fff}
+.btn-grade-all:hover,.btn-complete:hover{transform:translateY(-1px)}
+footer{text-align:center; color:var(--sub); font-size:.78rem; font-weight:600; padding:26px 0 40px}
+.all-done{display:none; font-size:2.6rem; margin-top:4px}
+.all-done.show{display:block; animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.4); opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1); opacity:1}}
+
+button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid var(--caramel-deep); outline-offset:2px}
+/* 칩이 4개(칩+화살표 = 자식 7개)면 좁은 화면에서 2+2 그리드:
+   화살표는 줄바꿈 시 방향이 어긋나므로 숨기고, 두 줄로 균등 배치 + 줄 간격 확보 */
+@media (max-width:680px){
+  .formula:has(.f-chip:nth-child(7)){gap:18px 14px}
+  .formula:has(.f-chip:nth-child(7)) .f-chip{flex:1 1 calc(50% - 7px); min-width:calc(50% - 7px); padding:14px 10px 11px}
+  .formula:has(.f-chip:nth-child(7)) .f-arrow{display:none}
+}
+@media (max-width:560px){
+  .f-arrow{padding:0 3px; font-size:1.05rem}
+  .f-chip{min-width:96px; flex:1 1 96px; padding:13px 8px 10px}
+  .f-chip .role{font-size:.6rem; letter-spacing:.01em; padding:2px 8px}
+  .f-chip .en-big{font-size:1.24rem}
+  .f-chip .kr{font-size:.72rem}
+  .q-card{padding:16px 14px 15px}
+  .lg-badge{font-size:.7rem; letter-spacing:.08em; padding:5px 13px}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} html{scroll-behavior:auto} }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">☕ 글림 중급 영어 <small>레벨 3 · 제6강 문제 풀이</small></div>
+    <div class="scores">
+      <span class="chip">채점 <b id="gradedN">0</b> / 25</span>
+      <span class="chip ok">정답 <b id="correctN">0</b> / 25</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <span class="lg-badge">제 06강 · It Was Made in Korea (수동태 기초)</span>
+    <h1>대상이 행위자에 의해 '~되어진다'!<br/><span class="u">수동태 be + p.p.</span> 확인 문제</h1>
+    <p class="sub">핵심 표현 · <span class="en">It was made in Korea.</span> — 30문항으로 '대상이 ~되어지는' 수동태를 완전히 내 것으로 만들어 보세요.</p>
+
+    <div class="formula" aria-label="능동태 → 수동태 변환 공식">
+      <div class="f-chip"><span class="role">대상 · 주어로</span><span class="en-big en">English</span><span class="kr">행위를 당하는 대상</span></div>
+      <div class="f-arrow">→</div>
+      <div class="f-chip"><span class="role">be + p.p.</span><span class="en-big en">is spoken</span><span class="kr">'~되어진다' 형태</span></div>
+      <div class="f-arrow">→</div>
+      <div class="f-chip"><span class="role">by 행위자</span><span class="en-big en">by people</span><span class="kr">'~에 의해'</span></div>
+    </div>
+    <p class="formula-note"><b style="color:var(--caramel-deep)">대상이 행위자에 의해 '~되어진다'</b>! — <span class="en">People speak English. → <b>English is spoken.</b></span></p>
+
+    <div class="recap">
+      <div class="r-card">
+        <h3>1. 능동태 vs 수동태</h3>
+        <div class="vs-box"><span class="bad">능동태</span> <span class="en">People speak English.</span> → 사람들이 직접 '말한다'</div>
+        <div class="vs-box"><span class="good">수동태</span> <span class="en">English is spoken worldwide.</span> <span class="good">(영어가 '사용되어진다'!)</span></div>
+      </div>
+      <div class="r-card">
+        <h3>2. 시제별 수동태 공식</h3>
+        <p style="font-size:.88rem; font-weight:700">주어 + be동사 + p.p. (+ by 행위자)</p>
+        <p class="ex en">현재: The door <b>is locked</b>. / 과거: This building <b>was built</b> in 1990.</p>
+        <p class="ex en">미래: The policy <b>will be announced</b> tomorrow.</p>
+      </div>
+      <div class="r-card">
+        <h3>3. 오늘의 꿀팁 치트키</h3>
+        <p style="font-size:.88rem; font-weight:700">행위자가 명확하지 않거나 중요하지 않으면 by + 행위자는 과감히 생략!</p>
+        <p class="ex en">The door <b>is locked</b>. <span style="color:var(--sub)">(누가 잠갔는지 안 중요해요)</span></p>
+      </div>
+    </div>
+
+    <a href="#mcq"><button class="start-btn">객관식 25문제 풀기 ↓</button></a>
+  </section>
+
+  <section class="block" id="mcq">
+    <div class="sec-head"><h2>객관식 문제</h2><span class="count">25문제</span></div>
+    <p class="sec-desc">유형별로 구성되어 있어요: 개념 이해 · 빈칸 채우기 · 틀린 문장 찾기 · 모두 고르기 · 단어 배열 · 대화 문제 · 뜻 고르기 · 성분 찾기. 답을 고르고 <b>채점하기</b>를 누르면 바로 해설이 나옵니다. 한꺼번에 보려면 <b>한번에 채점하기</b>를, 점수와 주관식을 남기려면 <b>완료</b>를 누르세요.</p>
+        <div class="quiz-actions">
+      <button type="button" class="btn-grade-all" data-quiz-grade-all>한번에 채점하기</button>
+      <button type="button" class="btn-complete" data-quiz-complete>완료</button>
+      <p class="quiz-actions-note">답을 고르지 않은 문제는 오답으로 채점됩니다. 완료를 누르면 점수와 주관식 답이 내 강의실에 바로 저장됩니다.</p>
+    </div>
+    <div id="mcqList"></div>
+  </section>
+
+  <section class="block" id="essay">
+    <div class="sec-head"><h2>주관식 작문</h2><span class="count">5문제</span></div>
+    <p class="sec-desc">상황을 읽고 직접 영어 문장을 써 보세요. 그다음 <b>모범답안 보기</b>를 눌러 내 답과 비교해 보세요. 정답은 하나가 아닐 수도 있어요!</p>
+    <div id="essayList"></div>
+  </section>
+
+  <section class="result" id="result">
+    <div class="all-done" id="allDone">🎉</div>
+    <div class="big"><span id="finalScore">0</span><span style="font-size:1.2rem; color:var(--sub)"> / 25</span></div>
+    <div class="msg" id="resultMsg">문제를 풀면 결과가 여기에 표시돼요.</div>
+    <table class="type-table" id="typeTable" aria-label="유형별 정답률">
+      <thead><tr><th>유형</th><th>정답 / 채점</th></tr></thead>
+      <tbody></tbody>
+    </table>
+        <div class="quiz-actions">
+      <button type="button" class="btn-grade-all" data-quiz-grade-all>한번에 채점하기</button>
+      <button type="button" class="btn-complete" data-quiz-complete>완료</button>
+      <p class="quiz-actions-note">답을 고르지 않은 문제는 오답으로 채점됩니다. 완료를 누르면 점수와 주관식 답이 내 강의실에 바로 저장됩니다.</p>
+    </div>
+    <button class="btn-reset" id="btnReset">모두 다시 풀기</button>
+  </section>
+
+</main>
+<footer>글림 중급 영어 · 제 06강 「It Was Made in Korea — 수동태 기초」 — '대상이 행위자에 의해 ~되어지는' 객관적 화법, 수동태! 다음 7강 완료 수동태 편에서 더 고급스러운 표현으로 업그레이드해 보겠습니다.</footer>
+
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore-compat.js"></script>
+<script src="quiz-result.js"></script>
+<script>
+/* ─────────── 문제 데이터 ─────────── */
+const TYPE = {
+  concept:{label:"개념 이해", cls:"tc-concept"}, blank:{label:"빈칸 채우기", cls:"tc-blank"},
+  wrong:{label:"틀린 문장 찾기", cls:"tc-wrong"}, multi:{label:"모두 고르기", cls:"tc-multi"},
+  order:{label:"단어 배열", cls:"tc-order"}, dialog:{label:"대화 문제", cls:"tc-dialog"},
+  trans:{label:"뜻 고르기", cls:"tc-trans"}, part:{label:"성분 찾기", cls:"tc-part"},
+  correct:{label:"바른 문장 찾기", cls:"tc-correct"}, vocab:{label:"어휘", cls:"tc-vocab"},
+  write:{label:"작문", cls:"tc-write"}
+};
+const QUIZ = [
+ {t:"concept", q:"수동태의 기본 공식으로 알맞은 것은?",
+  o:["주어 + 동사 + 목적어","주어 + will + 동사원형","주어 + have + p.p.","주어 + be동사 + p.p. (+ by 행위자)"], a:[3],
+  e:"수동태는 주어 + be동사 + 과거분사(p.p.)! 행위자를 밝힐 때만 뒤에 by + 행위자를 붙여요."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>This building ___ ___ in 1990.</span>",
+  o:["is / built","was / built","was / build","is / building"], a:[1],
+  e:"1990년(과거)에 지어졌다 → 과거 수동태 was built! be동사를 과거형으로, 동사는 과거분사로 써야 해요."},
+ {t:"wrong", q:"다음 중 형태가 틀린 문장은?",
+  o:["The door is locked.","Coffee is grown in tropical regions.","This movie was directed by Bong Joon-ho.","The email was send to all employees this morning."], a:[3],
+  e:"be동사 뒤에는 과거분사! send가 아니라 sent. → The email was sent to all employees this morning."},
+ {t:"multi", q:"다음 중 수동태(be + p.p.)를 바르게 쓴 문장을 모두 고르시오.",
+  o:["English is spoken worldwide.","English is speak worldwide.","The policy will be announced tomorrow.","The policy will be announce tomorrow."], a:[0,2],
+  e:"be + 과거분사가 원칙! speak·announce 같은 원형이 아니라 spoken, announced처럼 과거분사가 와야 해요."},
+ {t:"concept", q:"수동태 문장을 한마디로 설명하면?",
+  o:["주어가 직접 행동을 '하는' 문장","상대에게 명령을 전하는 문장","미래의 일을 예측하는 문장","주어(대상)가 행위자에 의해 행위를 '당하는(되어지는)' 문장"], a:[3],
+  e:"수동태 = 대상이 행위자에 의해 행위를 '당하는(되어지는)' 문장! English is spoken worldwide = '영어가 (사람들에 의해) 사용되어진다'."},
+ {t:"trans", q:"<span class='q-en'>This movie was directed by Bong Joon-ho.</span> 의 뜻은?",
+  o:["이 영화는 봉준호 감독이 직접 출연했습니다.","이 영화는 봉준호 감독이 기획 중입니다.","이 영화는 봉준호 감독을 만났습니다.","이 영화는 봉준호 감독에 의해 연출되었습니다."], a:[3],
+  e:"was directed by ~ = '~에 의해 연출되었다'! by 뒤의 행위자가 누구인지 강조하는 수동태 문장이에요."},
+ {t:"part", q:"<span class='q-en'>The new policy will be announced tomorrow.</span> 에서 '수동태를 만드는 동사 부분'은?",
+  o:["The new policy","will be announced","tomorrow","new"], a:[1],
+  e:"will be + announced(과거분사)가 미래 수동태! '새 정책은 발표될 것이다' — 발표하는 사람은 중요하지 않아요."},
+ {t:"dialog", q:"대화의 빈칸에 알맞은 것은? — Tourist: This ceramic cup is gorgeous! Where was it produced? / Shopkeeper: <span class='q-en'>It ___ handcrafted in Korea by a famous master artisan.</span>",
+  o:["is","was","will be","has"], a:[1],
+  e:"생산은 이미 끝난 과거의 일! was handcrafted(수작업으로 제작되었다). 질문도 Where was it produced?로 과거 수동태를 썼어요."},
+ {t:"vocab", q:"'생산하다, 제작하다'를 뜻하는 영어 동사는?",
+  o:["production","product","produce","productive"], a:[2],
+  e:"produce가 동사 '생산하다'! product(제품), production(생산), productive(생산적인)은 모두 다른 품사예요."},
+ {t:"wrong", q:"다음 중 능동태와 수동태가 뒤섞여 틀린 문장은?",
+  o:["The door is locked every night.","They built this bridge in 2001.","This bridge was built in 2001.","The company was founded 20 years ago in 1990 by he."], a:[3],
+  e:"by 뒤에는 목격격! he가 아니라 him. → by him. by + 행위자는 '사람'이면 목적격형으로 씁니다."},
+ {t:"trans", q:"<span class='q-en'>Coffee is grown in tropical regions.</span> 의 뜻은?",
+  o:["커피는 열대 지방을 여행합니다.","커피는 열대 지방에서 자랍니다.","커피는 열대 지방에서 재배됩니다.","커피는 열대 지방에서 팔립니다."], a:[2],
+  e:"is grown = '재배된다'! 주어가 커피라서 커피가 하는 게 아니라 '커피가 (사람들에 의해) 재배되는' 수동태예요."},
+ {t:"concept", q:"<span class='q-en'>People speak English worldwide.</span> 를 수동태로 바꾼 것은?",
+  o:["English is spoken worldwide.","English speaks worldwide.","English is speaking worldwide.","English was spoken worldwide."], a:[0],
+  e:"목적어 English가 주어로, speak가 is spoken으로! 현재 시제를 유지하는 게 포인트예요."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>The new policy ___ ___ ___ tomorrow.</span>",
+  o:["will announce","will be announced","will being announced","is announced"], a:[1],
+  e:"미래 + 수동태 = will be + p.p.! '내일 발표될 것이다' — 발표자보다 정책 자체가 초점이에요."},
+ {t:"multi", q:"다음 중 수동태 문장에서 'by + 행위자'를 생략하는 것이 자연스러운 경우를 모두 고르시오.",
+  o:["The door is locked (by someone). — 누가 잠갔는지 모를 때","This novel was written (by somebody). — 작가가 누구인지 중요하지 않을 때","My essay was graded by Mr. Smith. — 누가 채점했는지 강조할 때","I was invited to the party (by a friend). — 누구 초대인지 중요하지 않을 때"], a:[0,3],
+  e:"행위자가 명확하지 않거나 중요하지 않으면 by + 행위자는 과감히 생략! 반대로 행위자를 강조할 때는 by를 남겨요."},
+ {t:"part", q:"<span class='q-en'>This bridge was built in 2001.</span> 에서 '주어(대상)'는?",
+  o:["built","was","This bridge","in 2001"], a:[2],
+  e:"수동태에서 주어는 '행위를 받는 대상'! 다리가 지어졌어요 — 이 문장엔 행위자(by …)가 아예 없죠."},
+ {t:"dialog", q:"대화의 빈칸에 알맞은 것은? — Shopkeeper: Yes, <span class='q-en'>all our ceramics ___ for high durability.</span>",
+  o:["are tested","are testing","test","is tested"], a:[0],
+  e:"도자기가 '테스트를 거친다' = 테스트를 받는다 → 수동태 are tested! 주어가 복수(ceramics)라 are를 씁니다."},
+ {t:"correct", q:"다음 중 수동태가 알맞게 쓰인 문장은?",
+  o:["The email was sent this morning.","The email was send this morning.","The email is sending this morning.","The email sent by this morning."], a:[0],
+  e:"was + sent(send의 과거분사)! be + p.p.가 수동태의 기본이에요."},
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( was / the car / made / in Korea )",
+  o:["The car made was in Korea.","The car in Korea was made.","The car was made in Korea.","In Korea the car made was."], a:[2],
+  e:"주어 + was + made(과거분사) + 장소! → The car was made in Korea."},
+ {t:"concept", q:"<span class='q-en'>The door is locked.</span> 같은 문장에서 by + 행위자를 생략해도 자연스러운 이유는?",
+  o:["행위자가 없었기 때문","행위자가 명확하지 않거나 중요하지 않기 때문","문이 스스로 잠겼기 때문","과거의 일이기 때문"], a:[1],
+  e:"누가 잠갔는지 모르거나(명확하지 않음), 말하고 싶은 게 '잠긴 상태'이기 때문(중요하지 않음)! 수동태는 '대상이 ~되어진다'는 게 핵심이에요."},
+ {t:"trans", q:"'이 제품은 한국에서 만들어졌어요.'를 영어로 옮긴 것은?",
+  o:["This product is made in Korea.","This product was made in Korea.","This product made in Korea.","This product was make in Korea."], a:[1],
+  e:"이미 만들어진 과거의 사실 → was made! ③처럼 be동사를 빼먹으면 문장이 성립하지 않아요."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>This bridge ___ ___ by a famous architect.</span>",
+  o:["was / design","were / designed","was / designed","is / design"], a:[2],
+  e:"주어가 단수(this bridge)라 was + designed! by a famous architect처럼 행위자를 강조할 때는 by를 남깁니다."},
+ {t:"wrong", q:"다음 중 시제가 어색한(틀린) 문장은?",
+  o:["English is spoken worldwide.","The policy will be announced tomorrow.","This building was built in 1990.","The parcels are delivered every day last week."], a:[3],
+  e:"every day(현재 반복)와 last week(과거)가 한 문장에 충돌! 과거라면 were delivered last week, 현재 습관이면 are delivered every day."},
+ {t:"multi", q:"다음 중 '대상이 ~되어진다' 느낌의 설명에 어울리는 수동태 문장을 모두 고르시오.",
+  o:["This smartphone was designed in California.","This smartphone was designed by Steve. 와 같은 문장이 두 개 있다.","Ceramic cups are made by hand.","I made a ceramic cup yesterday."], a:[0,2],
+  e:"'설계되었다', '손으로 만들어진다'처럼 대상이 '~되어진다'를 설명할 때 수동태가 자연스러워요. ④는 화자가 한 행동을 그냥 말한 능동태고요."},
+ {t:"concept", q:"<span class='q-en'>Is it microwave-safe?</span> — 이 질문에 대한 대답으로 알맞은 것은?",
+  o:["Yes, all our ceramics are tested for high durability.","Yes, all our ceramics test for high durability.","Yes, all our ceramics is tested for high durability.","Yes, all our ceramics are test for high durability."], a:[0],
+  e:"도자기가 '테스트된다' → are + tested(복수 주어 + 수동태)! 주어·동사 수 일치와 수동태 형태를 모두 확인해요."},
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( are / coffee / grown / in Brazil )",
+  o:["Coffee are grown in Brazil.","Coffee is grown in Brazil. (주어 단수! 주의)","Coffee is grown in Brazil과 형태가 다르다.","Coffee grown are in Brazil."], a:[1],
+  e:"coffee는 셀 수 없는 명사라 단수 취급! is + grown. → Coffee is grown in Brazil."}
+];
+const ESSAYS = [
+ {q:"기본 표현 쓰기", sit:"<b>『이것은 한국에서 만들어졌어요.』</b>를 영어로 써 보세요.",
+  hints:["was made","in Korea"],
+  model:"It was made in Korea.", modelKr:"이것은 한국에서 만들어졌어요."},
+ {q:"상황 작문 1", sit:"세계 각국의 언어를 소개하는 발표 중이에요. <b>『영어는 전 세계에서 사용됩니다.』</b>를 영어로 써 보세요.",
+  hints:["is spoken","worldwide"],
+  model:"English is spoken worldwide.", modelKr:"영어는 전 세계에서 사용됩니다."},
+ {q:"상황 작문 2", sit:"도시 안내 책자를 만들고 있어요. <b>『이 건물은 1990년에 지어졌습니다.』</b>를 영어로 써 보세요.",
+  hints:["this building","in 1990"],
+  model:"This building was built in 1990.", modelKr:"이 건물은 1990년에 지어졌습니다."},
+ {q:"상황 작문 3", sit:"회사 공지 메일을 보냈어요. <b>『그 이메일은 오늘 아침 전 직원에게 발송되었습니다.』</b>를 영어로 써 보세요.",
+  hints:["the email","this morning"],
+  model:"The email was sent to all employees this morning.", modelKr:"그 이메일은 오늘 아침 전 직원에게 발송되었습니다."},
+ {q:"자유 작문", sit:"우리 집이나 학교의 물건 하나를 정하고, <b>『대상 + be동사 + p.p. (+ by 행위자)』</b> 수동태 문장 1개로 소개해 보세요.",
+  hints:["is/are + p.p."],
+  model:"The window was broken yesterday.", modelKr:"예시 — 그 창문은 어제 깨졌어요. The songs are written by my brother. 처럼 자유롭게!"}
+];
+
+/* ─────────── 렌더링 ─────────── */
+const state = QUIZ.map(()=>({sel:new Set(), graded:false, correct:false}));
+const gradeOneFns = [];
+const marks = ["①","②","③","④"];
+const mcqList = document.getElementById("mcqList");
+
+QUIZ.forEach((item, qi)=>{
+  const meta = TYPE[item.t];
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">Q.${String(qi+1).padStart(2,"0")}</span>
+      <span class="tchip ${meta.cls}">${meta.label}</span>
+      ${item.a.length>1 ? '<span class="multi-note">정답 '+item.a.length+'개를 모두 고르세요</span>' : ''}
+    </div>
+    <p class="q-text">${item.q}</p>
+    <div class="opts">${item.o.map((op,oi)=>`
+      <button type="button" class="opt" data-oi="${oi}" aria-pressed="false">
+        ${item.a.length>1 ? '<span class="box">✓</span>' : '<span class="mark">'+marks[oi]+'</span>'}
+        <span class="${/^[A-Za-z]/.test(op) ? 'en' : ''}">${op}</span>
+      </button>`).join("")}
+    </div>
+    <div class="q-actions">
+      <button type="button" class="btn-check" disabled>채점하기</button>
+      <span class="graded-tag" hidden></span>
+    </div>
+    <div class="feedback"><p class="fb-title"></p><p class="fb-exp"></p></div>`;
+  mcqList.appendChild(card);
+
+  const opts = [...card.querySelectorAll(".opt")];
+  const btn = card.querySelector(".btn-check");
+  const tag = card.querySelector(".graded-tag");
+  const fb = card.querySelector(".feedback");
+  const fbTitle = card.querySelector(".fb-title");
+  const fbExp = card.querySelector(".fb-exp");
+
+  opts.forEach((b,oi)=>b.addEventListener("click", ()=>{
+    if(state[qi].graded) return;
+    if(item.a.length>1){
+      state[qi].sel.has(oi) ? state[qi].sel.delete(oi) : state[qi].sel.add(oi);
+      b.classList.toggle("sel"); b.setAttribute("aria-pressed", b.classList.contains("sel"));
+    } else {
+      state[qi].sel.clear();
+      opts.forEach(o=>{o.classList.remove("sel"); o.setAttribute("aria-pressed","false");});
+      state[qi].sel.add(oi); b.classList.add("sel"); b.setAttribute("aria-pressed","true");
+    }
+    btn.disabled = state[qi].sel.size===0;
+  }));
+
+  function gradeOne(forceBlank){
+    const st = state[qi];
+    if(st.graded) return;
+    if(st.sel.size===0 && !forceBlank) return;
+    const isRight = st.sel.size===item.a.length && item.a.every(x=>st.sel.has(x));
+    st.graded = true; st.correct = isRight;
+    opts.forEach((b,oi)=>{
+      b.disabled = true;
+      const box = b.querySelector(".box");   // 다중선택 전용. 단일선택에는 없음(null)
+      if(item.a.includes(oi)){ b.classList.add("right"); if(box) box.textContent="✓"; }
+      else if(st.sel.has(oi)){ b.classList.add("miss"); if(box) box.textContent="✗"; }
+      else b.classList.add("dim");
+    });
+    tag.hidden = false;
+    tag.textContent = isRight ? "정답!" : (st.sel.size ? "다시 확인해 보세요" : "답을 고르지 않았어요");
+    tag.className = "graded-tag " + (isRight ? "good" : "bad");
+    fb.classList.add("show");
+    fbTitle.textContent = (isRight ? "⭕ 정답입니다! " : "❌ 아쉬워요. 정답은 " + item.a.map(i=>marks[i]).join(", ") + " ");
+    fbTitle.className = "fb-title " + (isRight ? "good" : "bad");
+    fbExp.innerHTML = "💡 " + item.e;
+    btn.disabled = true;
+    updateScores();
+  }
+  gradeOneFns.push(gradeOne);
+  btn.addEventListener("click", ()=> gradeOne(false));
+});
+
+/* ── 주관식 ── */
+const essayList = document.getElementById("essayList");
+ESSAYS.forEach((item, ei)=>{
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">W.${ei+1}</span>
+      <span class="tchip ${TYPE.write.cls}">${item.q}</span>
+    </div>
+    <div class="situation">${item.sit}</div>
+    <div class="hints">${item.hints.map(h=>'<span class="hint">힌트 · <span class="en">'+h+'</span></span>').join("")}</div>
+    <textarea placeholder="여기에 영어 문장을 직접 써 보세요." aria-label="${item.q} 답안 입력"></textarea>
+    <div class="q-actions">
+      <button type="button" class="btn-check">모범답안 보기</button>
+      <span style="font-size:.78rem; color:var(--sub); font-weight:700">정답은 하나가 아닐 수도 있어요</span>
+    </div>
+    <div class="model"><b>모범답안 · <span class="en" style="font-size:1.02rem">${item.model}</span></b><br/><span style="color:var(--sub); font-size:.85rem">${item.modelKr}</span></div>`;
+  essayList.appendChild(card);
+
+  const btn = card.querySelector(".btn-check");
+  const model = card.querySelector(".model");
+  btn.addEventListener("click", ()=>{
+    const open = model.classList.toggle("show");
+    btn.textContent = open ? "모범답안 숨기기" : "모범답안 보기";
+  });
+});
+
+/* ── 점수 집계 ── */
+function updateScores(){
+  const graded = state.filter(s=>s.graded).length;
+  const correct = state.filter(s=>s.correct).length;
+  document.getElementById("gradedN").textContent = graded;
+  document.getElementById("correctN").textContent = correct;
+  document.getElementById("finalScore").textContent = correct;
+
+  const tbody = document.querySelector("#typeTable tbody");
+  tbody.innerHTML = "";
+  Object.entries(TYPE).forEach(([key, meta])=>{
+    if(key==="write") return;
+    const rows = QUIZ.map((q,i)=>({q, s:state[i]})).filter(x=>x.q.t===key);
+    if(!rows.length) return;
+    const g = rows.filter(x=>x.s.graded).length;
+    const c = rows.filter(x=>x.s.correct).length;
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>"+meta.label+"</td><td>"+(g ? c+" / "+g : "–")+"</td>";
+    tbody.appendChild(tr);
+  });
+
+  const msg = document.getElementById("resultMsg");
+  const emoji = document.getElementById("allDone");
+  if(graded===QUIZ.length){
+    emoji.classList.add("show");
+    if(correct===25) msg.textContent = "만점! 수동태 기초를 완벽하게 잡았어요. 바로 7강 완료 수동태로 갈 준비 끝!";
+    else if(correct>=20) msg.textContent = "훌륭해요! 틀린 문제의 해설만 다시 보면 완벽합니다.";
+    else if(correct>=14) msg.textContent = "절반 이상 성공! 'be동사 + p.p.' 형태와 시제 일치를 다시 읽고 틀린 문제를 정리해 보세요.";
+    else if(correct>=7) msg.textContent = "조금 아쉬워요. 위의 핵심 정리를 다시 복습하고 같은 문제에 다시 도전!";
+    else msg.textContent = "괜찮아요, 시작이 반이에요! 핵심 정리를 읽고 천천히 다시 풀어 보세요.";
+  } else {
+    emoji.classList.remove("show");
+    msg.textContent = "채점한 문제: " + graded + " / 25 — 계속 풀어 보세요!";
+  }
+}
+document.getElementById("btnReset").addEventListener("click", ()=>{ location.reload(); });
+var readQuizSnapshot = function () {
+  var graded = state.filter(function (item) { return item.graded; }).length;
+  var correct = state.filter(function (item) { return item.correct; }).length;
+  var areas = document.querySelectorAll("#essayList textarea");
+  var essays = ESSAYS.map(function (item, index) {
+    var area = areas[index];
+    var prompt = String(item.sit || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    return {
+      index: index + 1,
+      title: String(item.q || ""),
+      prompt: prompt,
+      answer: area ? String(area.value || "").trim() : ""
+    };
+  });
+  return {
+    graded: graded,
+    correct: correct,
+    total: QUIZ.length,
+    complete: QUIZ.length === 25 && graded === 25,
+    essays: essays
+  };
+};
+function gradeAllQuestions(){
+  gradeOneFns.forEach(function (gradeOne) { gradeOne(true); });
+}
+function completeQuiz(){
+  gradeAllQuestions();
+  if (window.GleamQuiz) GleamQuiz.finish(readQuizSnapshot());
+  var result = document.getElementById("result");
+  if (result) result.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+document.querySelectorAll("[data-quiz-grade-all]").forEach(function (button) {
+  button.addEventListener("click", gradeAllQuestions);
+});
+document.querySelectorAll("[data-quiz-complete]").forEach(function (button) {
+  button.addEventListener("click", completeQuiz);
+});
+if (window.GleamQuiz) {
+  try {
+    var originalUpdateScores = updateScores;
+    updateScores = function () {
+      originalUpdateScores();
+      GleamQuiz.report(readQuizSnapshot());
+    };
+    GleamQuiz.start(readQuizSnapshot);
+  } catch (error) {}
+}
+updateScores();
+
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
