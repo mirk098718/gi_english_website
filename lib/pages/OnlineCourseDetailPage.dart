@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/class/QuizResult.dart';
@@ -137,6 +138,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
   }
 
   Future<void> _loadData() async {
+    try {
     await AuthService.selectableNativeTeachers();
     final lessons = await EnrollmentService.lessons(widget.course.id);
     final sessions = await EnrollmentService.sessions(
@@ -202,6 +204,15 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       _isLoading = false;
     });
     _watchSessions();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        if (_weeks.isEmpty) {
+          _weeks = [EnrollmentService.defaultWeek1(widget.course.id)];
+        }
+      });
+    }
   }
 
   /// 강사가 시작을 누르면 새로고침 없이 입장 버튼이 초록으로 바뀐다.
@@ -437,10 +448,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData mediaQueryData = MediaQuery.of(context);
-    Size size = mediaQueryData.size;
-    double width = size.width;
-    if (width > 768) {
+    if (!useMobileSchoolLayout(context)) {
       return WebSchoolLayout(content: scrollView());
     } else {
       return MobileSchoolLayout(content: mobileScrollView());
@@ -525,7 +533,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
           ),
           SizedBox(height: 32),
           weekSection(),
-          if (_weeks.isEmpty) ...[
+          if (!_isLoading && _weeks.isEmpty) ...[
             SizedBox(height: 32),
             meetingSection(),
             SizedBox(height: 32),
@@ -1502,6 +1510,14 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       if (booking != null &&
           (session.bookingId == booking.id || session.id == expectedId)) {
         return true;
+      }
+      if (session.bookingId.isNotEmpty && week.weekNumber > 0) {
+        for (final item in _bookings) {
+          if (item.id == session.bookingId &&
+              item.weekNumber == week.weekNumber) {
+            return true;
+          }
+        }
       }
       if (week.weekNumber <= 0) return false;
       if (session.weekNumber == week.weekNumber) return true;

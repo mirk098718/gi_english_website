@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/class/Notice.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/NoticeService.dart';
@@ -210,11 +211,7 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData mediaQueryData = MediaQuery.of(context);
-    Size size = mediaQueryData.size;
-    double width = size.width;
-
-    if (width > 768) {
+    if (!useMobileSchoolLayout(context)) {
       return WebSchoolLayout(content: _buildScrollView(includeFooter: true));
     } else {
       return MobileSchoolLayout(content: _buildScrollView(includeFooter: false));

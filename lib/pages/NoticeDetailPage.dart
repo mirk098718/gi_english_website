@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/Notice.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -75,11 +76,7 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData mediaQueryData = MediaQuery.of(context);
-    Size size = mediaQueryData.size;
-    double width = size.width;
-
-    if (width > 768) {
+    if (!useMobileSchoolLayout(context)) {
       return WebSchoolLayout(content: _buildScrollView(includeFooter: true));
     } else {
       return MobileSchoolLayout(content: _buildScrollView(includeFooter: false));

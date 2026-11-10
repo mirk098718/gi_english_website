@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/ModernWidgets.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -16,8 +17,7 @@ class SchoolAboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    if (width > 768) {
+    if (!useMobileSchoolLayout(context)) {
       return WebSchoolLayout(content: _desktopScroll(context));
     }
     return MobileSchoolLayout(content: _mobileScroll(context));

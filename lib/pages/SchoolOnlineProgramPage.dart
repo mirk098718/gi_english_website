@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
 import 'package:gi_english_website/pages/OnlineCheckoutPage.dart';
@@ -24,10 +25,7 @@ class SchoolOnlineProgramPage extends StatefulWidget {
 class _SchoolOnlineProgramPageState extends State<SchoolOnlineProgramPage> {
   @override
   Widget build(BuildContext context) {
-    MediaQueryData mediaQueryData = MediaQuery.of(context);
-    Size size = mediaQueryData.size;
-    double width = size.width;
-    if (width > 768) {
+    if (!useMobileSchoolLayout(context)) {
       return desktopUi(context);
     } else {
       return mobileUi(context);

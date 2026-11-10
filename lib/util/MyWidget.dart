@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/widget/GleamMark.dart';
 import 'package:gi_english_website/widget/HomeDailyWordBlock.dart';
 
@@ -469,11 +470,11 @@ class MyWidget {
   }
 
   /// 왼쪽 메뉴 아래에 오늘의 단어 카드를 붙인다.
-  /// 모바일 너비에서는 카드를 빼 둔다. 화면 아래 작은 띠가 단어를 보여 준다.
+  /// 모바일에서는 카드를 빼 둔다. 화면 아래 작은 띠가 단어를 보여 준다.
   static Widget menuWithDailyWord(Widget menu) {
     return Builder(
       builder: (context) {
-        if (MediaQuery.sizeOf(context).width <= 768) return menu;
+        if (useMobileSchoolLayout(context)) return menu;
         return Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,

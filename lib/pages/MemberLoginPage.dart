@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/MemberRegisterPage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineClassroomPage.dart';
@@ -33,10 +34,7 @@ class _MemberLoginPageState extends State<MemberLoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData mediaQueryData = MediaQuery.of(context);
-    Size size = mediaQueryData.size;
-    double width = size.width;
-    if (width > 768) {
+    if (!useMobileSchoolLayout(context)) {
       return WebSchoolLayout(content: scrollView());
     } else {
       return MobileSchoolLayout(content: mobileScrollView());

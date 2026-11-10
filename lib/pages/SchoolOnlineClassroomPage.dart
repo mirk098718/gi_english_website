@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
@@ -377,10 +378,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData mediaQueryData = MediaQuery.of(context);
-    Size size = mediaQueryData.size;
-    double width = size.width;
-    if (width > 768) {
+    if (!useMobileSchoolLayout(context)) {
       return WebSchoolLayout(content: scrollView());
     } else {
       return MobileSchoolLayout(content: mobileScrollView());
