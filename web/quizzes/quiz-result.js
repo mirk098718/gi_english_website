@@ -205,6 +205,56 @@
       courseId: "advanced_premium_speaking",
       weekNumber: 10,
       title: "고급 10강 연습문제"
+    },
+    "gleam-level4-lesson1": {
+      courseId: "business_english",
+      weekNumber: 1,
+      title: "비즈니스 1강 연습문제"
+    },
+    "gleam-level4-lesson2": {
+      courseId: "business_english",
+      weekNumber: 2,
+      title: "비즈니스 2강 연습문제"
+    },
+    "gleam-level4-lesson3": {
+      courseId: "business_english",
+      weekNumber: 3,
+      title: "비즈니스 3강 연습문제"
+    },
+    "gleam-level4-lesson4": {
+      courseId: "business_english",
+      weekNumber: 4,
+      title: "비즈니스 4강 연습문제"
+    },
+    "gleam-level4-lesson5": {
+      courseId: "business_english",
+      weekNumber: 5,
+      title: "비즈니스 5강 연습문제"
+    },
+    "gleam-level4-lesson6": {
+      courseId: "business_english",
+      weekNumber: 6,
+      title: "비즈니스 6강 연습문제"
+    },
+    "gleam-level4-lesson7": {
+      courseId: "business_english",
+      weekNumber: 7,
+      title: "비즈니스 7강 연습문제"
+    },
+    "gleam-level4-lesson8": {
+      courseId: "business_english",
+      weekNumber: 8,
+      title: "비즈니스 8강 연습문제"
+    },
+    "gleam-level4-lesson9": {
+      courseId: "business_english",
+      weekNumber: 9,
+      title: "비즈니스 9강 연습문제"
+    },
+    "gleam-level4-lesson10": {
+      courseId: "business_english",
+      weekNumber: 10,
+      title: "비즈니스 10강 연습문제"
     }
   };
 

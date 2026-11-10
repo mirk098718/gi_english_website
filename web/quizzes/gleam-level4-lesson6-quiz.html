@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>글림 비즈니스 영어 제6강 · 문제 풀이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4ecdd; --bg-soft:#faf5ea; --card:#fffdf9;
+  --ink:#33241a; --sub:#82705d; --line:#e7d8c0;
+  --coffee:#7a4a26; --caramel:#d98a2b; --caramel-deep:#a9620f; --caramel-soft:#f8e7c8;
+  --ok:#3e7d54; --ok-bg:#e6f2e6; --no:#bc4741; --no-bg:#fae5e0;
+  --disp:'Black Han Sans', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --serif:Georgia, 'Times New Roman', serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans); color:var(--ink); background:var(--bg);
+  background-image:radial-gradient(#e2d3b8 1px, transparent 1px);
+  background-size:22px 22px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  word-break:keep-all; overflow-wrap:break-word; /* 한글은 단어 단위로만 줄바꿈 */
+}
+.en{font-family:var(--serif); letter-spacing:.01em}
+.wrap{max-width:880px; margin:0 auto; padding:0 18px}
+
+/* ── 상단바 ─────────────────────────── */
+.topbar{position:sticky; top:0; z-index:50; background:rgba(244,236,221,.92); backdrop-filter:blur(8px); border-bottom:1.5px solid var(--line)}
+.topbar .wrap{display:flex; align-items:center; gap:10px; justify-content:space-between; padding-top:10px; padding-bottom:10px; flex-wrap:wrap}
+.brand{font-family:var(--disp); font-size:1.02rem; color:var(--coffee); letter-spacing:.02em; display:flex; align-items:center; gap:6px}
+.brand small{white-space:nowrap; font-family:var(--sans); font-weight:700; color:var(--sub); font-size:.72rem; border:1.5px solid var(--line); border-radius:999px; padding:2px 8px; background:var(--card)}
+.scores{display:flex; gap:8px; align-items:center; font-weight:800; font-size:.8rem}
+.scores .chip{background:var(--card); border:1.5px solid var(--line); border-radius:999px; padding:4px 12px; color:var(--sub); white-space:nowrap}
+.scores .chip b{color:var(--coffee)}
+.scores .chip.ok b{color:var(--ok)}
+
+/* ── 히어로 ─────────────────────────── */
+.hero{padding:44px 0 10px; text-align:center}
+.lg-badge{display:inline-block; white-space:nowrap; background:var(--coffee); color:#f8ecdb; font-weight:800; font-size:.78rem; letter-spacing:.14em; border-radius:999px; padding:5px 16px}
+.hero h1{font-family:var(--disp); font-weight:400; font-size:clamp(1.7rem,5vw,2.6rem); line-height:1.28; margin:16px 0 6px; color:var(--ink)}
+.hero h1 .u{color:var(--caramel-deep); background:linear-gradient(transparent 68%, var(--caramel-soft) 68%)}
+.hero p.sub{color:var(--sub); font-weight:600; font-size:.95rem}
+
+/* 어순 공식 티켓 (시그니처) */
+.formula{display:flex; align-items:stretch; justify-content:center; gap:0; margin:30px auto 8px; flex-wrap:wrap; max-width:640px}
+.f-chip{flex:1 1 120px; min-width:100px; background:var(--card); border:2px solid var(--ink); border-radius:16px; padding:14px 12px 12px; position:relative; box-shadow:4px 4px 0 rgba(122,74,38,.22); text-align:center}
+.f-chip .role{position:absolute; top:-12px; left:50%; transform:translateX(-50%); font-size:.68rem; font-weight:900; letter-spacing:.08em; color:#fff; background:var(--coffee); border-radius:999px; padding:2px 11px; white-space:nowrap; max-width:none}
+.f-chip:nth-child(3) .role{background:var(--caramel-deep)}
+.f-chip:nth-child(5) .role{background:#3e7d54}
+.f-chip .en-big{font-family:var(--serif); font-size:1.55rem; font-weight:700; display:block; margin-top:6px}
+.f-chip .kr{font-size:.78rem; color:var(--sub); font-weight:700}
+.f-arrow{align-self:center; font-size:1.3rem; color:var(--caramel-deep); padding:0 10px; font-weight:900}
+.formula-note{color:var(--sub); font-size:.83rem; font-weight:700; margin-bottom:6px}
+.formula-note s{color:#b0473f}
+
+/* 요점 복습 */
+.recap{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:30px 0 8px}
+.r-card{background:var(--card); border:1.5px solid var(--line); border-radius:16px; padding:18px 16px; text-align:left}
+.r-card h3{font-size:.85rem; color:var(--caramel-deep); letter-spacing:.08em; font-weight:900; margin-bottom:8px}
+.r-card .ex{font-size:.95rem; margin-top:6px}
+.vs-box{background:var(--bg-soft); border:1px dashed var(--line); border-radius:10px; padding:8px 10px; margin-top:4px; font-size:.88rem}
+.vs-box .bad{color:#b0473f; font-weight:700}
+.vs-box .good{color:var(--ok); font-weight:800}
+/* 상단 정리 — 한 개념 한 줄: 항목당 2줄(영어+칩 / 한국어 뜻) */
+.freq-item{padding:4px 0}
+.freq-item + .freq-item{border-top:1px dashed var(--line); margin-top:4px; padding-top:9px}
+.fi-top{display:flex; align-items:baseline; justify-content:space-between; gap:8px; font-weight:800; font-size:.95rem}
+.fi-top .en{color:var(--ink)}
+.fi-pct{font-size:.76rem; color:var(--caramel-deep); font-weight:900; white-space:nowrap; background:var(--caramel-soft); border-radius:999px; padding:1px 8px}
+.fi-pct.pos2{background:#e3edf6; color:#2e5e83}
+.fi-kr{display:block; font-size:.84rem; color:var(--sub); font-weight:700; margin-top:2px}
+.start-btn{display:inline-block; margin:26px 0 6px; background:var(--coffee); color:#fff7ec; font-weight:900; font-size:1rem; border:none; border-radius:999px; padding:14px 34px; cursor:pointer; box-shadow:0 6px 18px rgba(122,74,38,.32); transition:transform .15s, box-shadow .15s}
+.start-btn:hover{transform:translateY(-2px); box-shadow:0 10px 22px rgba(122,74,38,.38)}
+
+/* ── 섹션 공통 ──────────────────────── */
+section.block{padding:34px 0 6px}
+.sec-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:6px}
+.sec-head h2{font-family:var(--disp); font-weight:400; font-size:1.45rem; color:var(--coffee)}
+.sec-head .count{font-weight:900; color:var(--caramel-deep); font-size:.9rem; background:var(--caramel-soft); border-radius:999px; padding:3px 14px; white-space:nowrap}
+.sec-desc{color:var(--sub); font-size:.88rem; font-weight:600; margin-bottom:20px}
+
+/* ── 문제 카드 ──────────────────────── */
+.q-card{background:var(--card); border:1.5px solid var(--line); border-radius:18px; padding:20px 20px 18px; margin-bottom:18px; box-shadow:0 2px 10px rgba(122,74,38,.06)}
+.q-top{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px}
+.stamp{font-family:var(--disp); font-size:.95rem; color:var(--coffee); border:2px solid var(--coffee); border-radius:8px; padding:1px 9px; transform:rotate(-3deg); letter-spacing:.05em; flex:none; white-space:nowrap}
+.tchip{font-size:.72rem; font-weight:900; letter-spacing:.04em; border-radius:999px; padding:4px 12px; white-space:nowrap}
+.tc-concept{background:#f2e3c8; color:#8a5a1f}
+.tc-blank{background:#e3edf6; color:#2e5e83}
+.tc-wrong{background:#f9e0dc; color:#a3403a}
+.tc-multi{background:#e9e2f5; color:#5b4a8a}
+.tc-order{background:#ddefe4; color:#2f6e4f}
+.tc-dialog{background:#fce8ee; color:#96374f}
+.tc-trans{background:#e0eef0; color:#22626b}
+.tc-part{background:#f6ecd8; color:#7a641f}
+.tc-correct{background:#e2ecdf; color:#3c6b2f}
+.tc-vocab{background:#eceae7; color:#5f5346}
+.tc-write{background:#f8e7c8; color:#a9620f}
+.multi-note{font-size:.74rem; color:var(--caramel-deep); font-weight:800; background:var(--caramel-soft); border-radius:999px; padding:3px 10px; white-space:nowrap}
+.q-text{font-size:1.02rem; font-weight:700; margin-bottom:14px}
+.q-text .q-en{font-family:var(--serif); color:var(--coffee)}
+.opts{display:grid; gap:9px}
+.opt{display:flex; align-items:flex-start; gap:10px; width:100%; text-align:left; background:var(--bg-soft); border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; cursor:pointer; font-family:var(--sans); font-size:.95rem; color:var(--ink); transition:border-color .12s, background .12s, transform .12s}
+.opt:hover:not(:disabled){border-color:var(--caramel); transform:translateX(2px)}
+.opt:disabled{cursor:default}
+.opt .mark{font-weight:900; color:var(--caramel-deep); flex:none}
+.opt .box{flex:none; width:18px; height:18px; border:2px solid var(--sub); border-radius:5px; margin-top:2px; display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; color:transparent; font-weight:900}
+.opt.sel{border-color:var(--caramel-deep); background:var(--caramel-soft)}
+.opt.sel .box{background:var(--caramel-deep); border-color:var(--caramel-deep); color:#fff}
+.opt.right{border-color:var(--ok); background:var(--ok-bg)}
+.opt.right .box{background:var(--ok); border-color:var(--ok); color:#fff}
+.opt.right .mark{color:var(--ok)}
+.opt.right .mark::after{content:" ✓"; color:var(--ok); font-weight:900}
+.opt.miss{border-color:var(--no); background:var(--no-bg)}
+.opt.miss .box{background:var(--no); border-color:var(--no); color:#fff}
+.opt.miss .mark{color:var(--no)}
+.opt.miss .mark::after{content:" ✗"; color:var(--no); font-weight:900}
+.opt.dim{opacity:.55}
+.q-actions{display:flex; gap:10px; margin-top:14px; align-items:center}
+.btn-check{background:var(--caramel-deep); color:#fff; border:none; border-radius:999px; padding:10px 26px; font-weight:900; font-size:.88rem; cursor:pointer; font-family:var(--sans); transition:opacity .15s, transform .15s}
+.btn-check:hover:not(:disabled){transform:translateY(-1px)}
+.btn-check:disabled{opacity:.35; cursor:not-allowed}
+.graded-tag{font-weight:900; font-size:.85rem}
+.graded-tag.good{color:var(--ok)} .graded-tag.bad{color:var(--no)}
+.feedback{display:none; margin-top:14px; border-top:1.5px dashed var(--line); padding-top:13px}
+.feedback.show{display:block; animation:slidein .25s ease}
+@keyframes slidein{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+.fb-title{font-weight:900; font-size:.9rem; margin-bottom:5px}
+.fb-title.good{color:var(--ok)} .fb-title.bad{color:var(--no)}
+.fb-exp{font-size:.9rem; color:var(--ink); background:var(--bg-soft); border-radius:10px; padding:10px 13px}
+.fb-exp .en{color:var(--coffee)}
+
+/* ── 주관식 ─────────────────────────── */
+.situation{background:var(--bg-soft); border:1.5px dashed var(--line); border-radius:12px; padding:13px 15px; font-size:.95rem; margin-bottom:12px}
+.hints{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:12px}
+.hint{font-size:.74rem; font-weight:800; color:var(--coffee); background:var(--caramel-soft); border-radius:999px; padding:3px 11px; white-space:nowrap}
+.hint .en{font-style:normal}
+textarea{width:100%; min-height:86px; border:1.5px solid var(--line); border-radius:12px; background:var(--bg-soft); padding:12px 14px; font-family:var(--sans); font-size:.97rem; color:var(--ink); resize:vertical}
+textarea:focus{outline:2px solid var(--caramel); border-color:var(--caramel)}
+.model{display:none; margin-top:14px; background:#f2ede2; border-radius:12px; padding:12px 15px; font-size:.93rem}
+.model.show{display:block; animation:slidein .25s ease}
+.model b{color:var(--coffee)}
+
+/* ── 결과 ───────────────────────────── */
+.result{background:var(--card); border:2px solid var(--ink); border-radius:20px; box-shadow:6px 6px 0 rgba(122,74,38,.2); padding:26px 22px; margin:34px 0 10px; text-align:center}
+.result .big{font-family:var(--disp); font-size:2.5rem; color:var(--coffee); line-height:1.1}
+.result .msg{font-weight:800; margin-top:6px}
+.type-table{width:100%; border-collapse:collapse; margin-top:16px; font-size:.85rem}
+.type-table th,.type-table td{border-bottom:1px dashed var(--line); padding:7px 6px; text-align:center}
+.type-table th{color:var(--sub); font-size:.76rem; letter-spacing:.05em}
+.type-table td:first-child{text-align:left; font-weight:700}
+.btn-reset{margin-top:18px; background:transparent; color:var(--no); border:2px solid var(--no); border-radius:999px; padding:10px 26px; font-weight:900; cursor:pointer; font-family:var(--sans); font-size:.88rem}
+.btn-reset:hover{background:var(--no-bg)}
+.quiz-actions{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center; margin:18px 0 8px}
+.quiz-actions-note{flex:1 1 100%; margin:0; text-align:center; color:var(--sub); font-size:.78rem; font-weight:700}
+.btn-grade-all,.btn-complete{border:none; border-radius:999px; padding:11px 22px; font-weight:900; cursor:pointer; font-family:var(--sans); font-size:.9rem}
+.btn-grade-all{background:var(--coffee); color:#fff}
+.btn-complete{background:var(--ok); color:#fff}
+.btn-grade-all:hover,.btn-complete:hover{transform:translateY(-1px)}
+footer{text-align:center; color:var(--sub); font-size:.78rem; font-weight:600; padding:26px 0 40px}
+.all-done{display:none; font-size:2.6rem; margin-top:4px}
+.all-done.show{display:block; animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.4); opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1); opacity:1}}
+
+button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid var(--caramel-deep); outline-offset:2px}
+/* 칩이 4개(칩+화살표 = 자식 7개)면 좁은 화면에서 2+2 그리드:
+   화살표는 줄바꿈 시 방향이 어긋나므로 숨기고, 두 줄로 균등 배치 + 줄 간격 확보 */
+@media (max-width:680px){
+  .formula:has(.f-chip:nth-child(7)){gap:18px 14px}
+  .formula:has(.f-chip:nth-child(7)) .f-chip{flex:1 1 calc(50% - 7px); min-width:calc(50% - 7px); padding:14px 10px 11px}
+  .formula:has(.f-chip:nth-child(7)) .f-arrow{display:none}
+}
+@media (max-width:560px){
+  .f-arrow{padding:0 2px; font-size:.92rem}
+  .f-chip{min-width:78px; flex:1 1 78px; padding:12px 5px 9px}
+  .f-chip .role{font-size:.58rem; letter-spacing:.01em; padding:2px 7px}
+  .f-chip .en-big{font-size:1.12rem}
+  .f-chip .kr{font-size:.66rem}
+  .hero h1{font-size:clamp(1.2rem,5.2vw,2rem)}
+  .q-card{padding:16px 14px 15px}
+  .lg-badge{font-size:.7rem; letter-spacing:.08em; padding:5px 13px}
+}
+/* ── 일반화 문장 틀(2행) + 예문 박스 ── */
+.formula.tpl2{flex-direction:column; align-items:stretch; gap:0; max-width:720px}
+.tpl-row{display:flex; align-items:stretch; justify-content:center; margin-top:16px}
+.tpl-row .f-chip{flex:1 1 0; min-width:0; padding:14px 8px 12px}
+.tpl-row .f-chip .en-big{font-size:1.14rem; line-height:1.25; margin-top:4px}
+.tpl-row .f-chip .kr{font-size:.76rem}
+.f-chip.cond .role{background:var(--coffee)}
+.f-chip.res .role{background:#3e7d54}
+.f-plus{align-self:center; flex:none; font-weight:900; font-size:1.25rem; color:var(--caramel-deep); padding:0 8px}
+.tpl-down{text-align:center; font-weight:900; font-size:1.15rem; color:var(--caramel-deep); line-height:1; margin:4px 0 0}
+.tpl-ex{max-width:720px; margin:14px auto 0; background:var(--card); border:1.5px dashed var(--line); border-radius:14px; padding:12px 15px; text-align:left}
+.tpl-ex-h{font-size:.74rem; font-weight:900; letter-spacing:.12em; color:var(--caramel-deep); margin-bottom:6px}
+.tpl-ex .ex-line{padding-top:8px; margin-top:8px; border-top:1px dashed var(--line)}
+.tpl-ex .ex-line:first-of-type{border-top:none; margin-top:0; padding-top:0}
+.tpl-ex .ex-line .en{display:block; font-weight:700; font-size:.95rem; color:var(--coffee)}
+.tpl-ex .ex-line .kr{display:block; font-size:.84rem; color:var(--sub); font-weight:700; margin-top:2px}
+@media (max-width:560px){
+  .tpl-row .f-chip .en-big{font-size:1rem}
+  .tpl-row .f-chip .kr{font-size:.7rem}
+  .f-plus{padding:0 5px; font-size:1.05rem}
+  .tpl-ex{padding:11px 12px}
+  .tpl-ex .ex-line .en{font-size:.9rem}
+}
+/* 초협폭(320px 미만) — 반드시 560px 블록 뒤에 둔다(CSS는 나중 규칙이 이긴다) */
+@media (max-width:319px){
+  .f-arrow{padding:0 1px; font-size:.85rem}
+  .f-chip{min-width:64px; flex:1 1 64px; padding:11px 4px 8px}
+  .f-chip .role{font-size:.5rem; letter-spacing:0; padding:2px 5px}
+  .f-chip .en-big{font-size:1rem}
+  .f-chip .kr{font-size:.6rem}
+  .hero h1{font-size:.98rem}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} html{scroll-behavior:auto} }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">☕ 글림 비즈니스 영어 <small>LEVEL 4 · 제6강 문제 풀이</small></div>
+    <div class="scores">
+      <span class="chip">채점 <b id="gradedN">0</b> / 25</span>
+      <span class="chip ok">정답 <b id="correctN">0</b> / 25</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <span class="lg-badge">LEVEL 4 · 제 06강 · 감정 배제 업무 지시</span>
+    <h1>It Needs to Be Done<br/><span class="u">감정 배제 업무 지시</span> 확인 문제</h1>
+    <p class="sub">핵심 표현 · <span class="en">It needs to be finished by Friday. / It must be resolved.</span> — 30문항으로 오늘 배운 수동태 지시 화법을 완전히 내 것으로 만들어 보세요.</p>
+
+    <div class="formula" aria-label="수동태 지시 공식">
+      <div class="f-chip"><span class="role">업무 · 주어</span><span class="en-big en">It / This error</span><span class="kr">업무 그 자체</span></div>
+      <div class="f-arrow">+</div>
+      <div class="f-chip"><span class="role">강도 · 조동사</span><span class="en-big en">needs to be / must be</span><span class="kr">~되어야 합니다</span></div>
+      <div class="f-arrow">+</div>
+      <div class="f-chip"><span class="role">동작 · 수동</span><span class="en-big en">p.p.(과거분사)</span><span class="kr">fixed, finished…</span></div>
+    </div>
+    <p class="formula-note">공격적인 <s>You must finish this!(너 꼭 끝내!)</s> ✗ &nbsp;→&nbsp; 업무 중심 <b style="color:var(--caramel-deep)">It needs to be + p.p. = 감정 제로!</b></p>
+
+    <div class="tpl-ex">
+      <p class="tpl-ex-h">오피스 예문</p>
+      <p class="ex-line"><span class="en">It needs to be submitted by end of day.</span><span class="kr">오늘 일과 종료 전까지 제출되어야 합니다.</span></p>
+      <p class="ex-line"><span class="en">All customer inquiries should be answered within 2 hours.</span><span class="kr">모든 고객 문의는 2시간 안에 답변되어야 합니다.</span></p>
+    </div>
+
+    <div class="recap">
+      <div class="r-card">
+        <h3>1. 능동 vs 수동의 뉘앙스</h3>
+        <div class="freq-item">
+          <div class="fi-top"><span class="en">You have to fix this error.</span><span class="fi-pct">능동 ✗</span></div>
+          <span class="fi-kr">'너 이 에러 고쳐야 해' — 개인에게 직접적 부담!</span>
+        </div>
+        <div class="freq-item">
+          <div class="fi-top"><span class="en">This error needs to be fixed.</span><span class="fi-pct pos2">수동 ✓</span></div>
+          <span class="fi-kr">'이 에러는 수정되어야 합니다' — 업무 중심의 객관적 전달!</span>
+        </div>
+      </div>
+      <div class="r-card">
+        <h3>2. 실무 다빈출 패턴</h3>
+        <div class="freq-item">
+          <div class="fi-top"><span class="en">주어 + needs to be + p.p.</span><span class="fi-pct">패턴 A</span></div>
+          <span class="fi-kr">필요성 — ~되어야 합니다(해야 해요 느낌)</span>
+        </div>
+        <div class="freq-item">
+          <div class="fi-top"><span class="en">주어 + should be + p.p.</span><span class="fi-pct pos2">패턴 B</span></div>
+          <span class="fi-kr">당위·권고 — ~되어야 합니다(그러는 게 좋아요 느낌)</span>
+        </div>
+      </div>
+      <div class="r-card">
+        <h3>3. 오늘의 비즈니스 꿀팁</h3>
+        <div class="freq-item">
+          <div class="fi-top"><span class="en">It needs to be done by ~</span><span class="fi-pct">1등 표현</span></div>
+          <span class="fi-kr">자존심을 건드리지 않고 데드라인을 명확하게 각인!</span>
+        </div>
+        <div class="vs-box"><span class="good">사람 탓 없이 업무 자체를 지시</span> <span class="good">글로벌 리더의 매너!</span></div>
+      </div>
+    </div>
+
+    <a href="#mcq"><button class="start-btn">객관식 25문제 풀기 ↓</button></a>
+  </section>
+
+  <section class="block" id="mcq">
+    <div class="sec-head"><h2>객관식 문제</h2><span class="count">25문제</span></div>
+    <p class="sec-desc">유형별로 구성되어 있어요: 개념 이해 · 빈칸 채우기 · 틀린 문장 찾기 · 모두 고르기 · 단어 배열 · 대화 문제 · 뜻 고르기 · 주어·동사 찾기. 답을 고르고 <b>채점하기</b>를 누르면 바로 해설이 나옵니다. 한꺼번에 보려면 <b>한번에 채점하기</b>를, 점수와 주관식을 남기려면 <b>완료</b>를 누르세요.</p>
+        <div class="quiz-actions">
+      <button type="button" class="btn-grade-all" data-quiz-grade-all>한번에 채점하기</button>
+      <button type="button" class="btn-complete" data-quiz-complete>완료</button>
+      <p class="quiz-actions-note">답을 고르지 않은 문제는 오답으로 채점됩니다. 완료를 누르면 점수와 주관식 답이 내 강의실에 바로 저장됩니다.</p>
+    </div>
+    <div id="mcqList"></div>
+  </section>
+
+  <section class="block" id="essay">
+    <div class="sec-head"><h2>주관식 작문</h2><span class="count">5문제</span></div>
+    <p class="sec-desc">상황을 읽고 직접 영어 문장을 써 보세요. 그다음 <b>모범답안 보기</b>를 눌러 내 답과 비교해 보세요. 정답은 하나가 아닐 수도 있어요!</p>
+    <div id="essayList"></div>
+  </section>
+
+  <section class="result" id="result">
+    <div class="all-done" id="allDone">🎉</div>
+    <div class="big"><span id="finalScore">0</span><span style="font-size:1.2rem; color:var(--sub)"> / 25</span></div>
+    <div class="msg" id="resultMsg">문제를 풀면 결과가 여기에 표시돼요.</div>
+    <table class="type-table" id="typeTable" aria-label="유형별 정답률">
+      <thead><tr><th>유형</th><th>정답 / 채점</th></tr></thead>
+      <tbody></tbody>
+    </table>
+        <div class="quiz-actions">
+      <button type="button" class="btn-grade-all" data-quiz-grade-all>한번에 채점하기</button>
+      <button type="button" class="btn-complete" data-quiz-complete>완료</button>
+      <p class="quiz-actions-note">답을 고르지 않은 문제는 오답으로 채점됩니다. 완료를 누르면 점수와 주관식 답이 내 강의실에 바로 저장됩니다.</p>
+    </div>
+    <button class="btn-reset" id="btnReset">모두 다시 풀기</button>
+  </section>
+
+</main>
+<footer>글림 비즈니스 영어 · 제 06강 「It Needs to Be Done」 — 오늘 업무 지시에 It needs to be + p.p.로 감정을 빼고 전문성을 더해 보세요. 다음 7강 결정 사항 공지 완료 수동태 편에서 만나요!</footer>
+
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore-compat.js"></script>
+<script src="quiz-result.js"></script>
+<script>
+/* ─────────── 문제 데이터 ─────────── */
+const TYPE = {
+  concept:{label:"개념 이해", cls:"tc-concept"}, blank:{label:"빈칸 채우기", cls:"tc-blank"},
+  wrong:{label:"틀린 문장 찾기", cls:"tc-wrong"}, multi:{label:"모두 고르기", cls:"tc-multi"},
+  order:{label:"단어 배열", cls:"tc-order"}, dialog:{label:"대화 문제", cls:"tc-dialog"},
+  trans:{label:"뜻 고르기", cls:"tc-trans"}, part:{label:"주어·동사 찾기", cls:"tc-part"},
+  correct:{label:"바른 문장 찾기", cls:"tc-correct"}, vocab:{label:"어휘", cls:"tc-vocab"},
+  write:{label:"작문", cls:"tc-write"}
+};
+const QUIZ = [
+ {t:"concept", q:"동료에게 업무를 지시할 때 감정을 배제한 프로페셔널한 표현은?",
+  o:["You must finish this!","You should have done it better!","Why aren't you done yet?","It needs to be finished by Friday."], a:[3],
+  e:"'You must…'는 개인 압박 느낌! It needs to be + p.p.로 업무 자체의 완료 필요성을 전달하는 게 글로벌 리더의 1등 표현이에요."},
+ {t:"concept", q:"능동태 지시 'You have to fix this error.'를 수동태로 바꾼 것은?",
+  o:["This error fixes it.","This error needs to be fixed.","You are fixed this error.","This error is fixing."], a:[1],
+  e:"'너 고쳐야 해(개인 부담)' → '이 에러는 수정되어야 합니다(업무 중심 객관 전달)'! 주어가 업무로 바뀌고 needs to be + p.p.가 돼요."},
+ {t:"concept", q:"수동태 지시의 장점으로 알맞은 것은?",
+  o:["상대를 더 강하게 압박한다","내가 실수했음을 숨길 수 있다","감정을 싹 빼고 업무 자체의 필요성을 객관적으로 전달한다","문장이 짧아져서 편하다"], a:[2],
+  e:"수동태는 '사람'이 아니라 '업무'가 주어라 감정 없이 객관적으로! 상대의 자존심을 건드리지 않아요."},
+ {t:"concept", q:"'It needs to be done by ~' 패턴이 글로벌 리더들의 1등 표현인 이유는?",
+  o:["상대방의 자존심을 건드리지 않으면서 업무 중요도와 데드라인을 명확하게 각인시키니까","문법이 가장 쉬워서","짧게 말할 수 있어서","상대가 거절하기 쉬워서"], a:[0],
+  e:"사람을 탓하지 않으면서도 데드라인을 명확히! 자존심과 실무성을 동시에 잡는 표현이에요."},
+ {t:"concept", q:"'needs to be'와 'should be'의 뉘앙스 차이로 알맞은 것은?",
+  o:["의미가 완전히 같다","needs to be는 필요성(~해야 함), should be는 당위·권고(~하는 게 좋음)","should be가 더 강한 명령이다","needs to be는 과거를 말한다"], a:[1],
+  e:"needs to be는 '해야 해요(필요)', should be는 '그러는 게 좋아요(권고)'! should가 약간 더 부드러워요."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>It needs to be ___ by end of day.</span>",
+  o:["submitted","submit","submitting","submits"], a:[0],
+  e:"needs to be + 과거분사(수동태)! submitted = 제출되어야 합니다."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>All confidential files must be ___ before transmission.</span>",
+  o:["encrypt","encrypting","encrypts","encrypted"], a:[3],
+  e:"must be + 과거분사! encrypted = 암호화되어야 합니다. 파일은 암호화를 '당하는' 대상이에요."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>The customer database needs to be ___ on a weekly basis.</span>",
+  o:["update","updated","updating","updates"], a:[1],
+  e:"needs to be + 과거분사! updated = 업데이트되어야 합니다."},
+ {t:"wrong", q:"다음 중 틀린 문장은?",
+  o:["It needs to be finished by Friday.","This error needs to be fixed.","The report needs to be reviewed.","It needs to be finishing by Monday."], a:[3],
+  e:"needs to be 뒤에는 과거분사! finishing(진행형)이 아니라 → finished."},
+ {t:"wrong", q:"다음 중 틀린 문장은?",
+  o:["It needs to be resolve today.","All inquiries should be answered within 2 hours.","The files must be encrypted.","The data needs to be updated weekly."], a:[0],
+  e:"be 뒤에는 과거분사! resolve(원형)가 아니라 → resolved."},
+ {t:"wrong", q:"다음 중 어순이 틀린 문장은?",
+  o:["It needs to be submitted by 5 PM.","The issue must be resolved quickly.","Needs to be it finished by Friday.","All files should be backed up daily."], a:[2],
+  e:"어순은 주어 + needs to be + p.p.! Needs to be it finished.는 주어(it)가 잘못된 자리에 있어요."},
+ {t:"multi", q:"다음 중 '감정 배제형 업무 지시' 표현을 모두 고르세요.",
+  o:["You must finish this!","It needs to be finished by Friday.","Why are you so slow?","It must be resolved before Monday."], a:[1,3],
+  e:"It/업무가 주어인 수동태 지시가 정답! You must…, Why are you so slow?는 개인을 압박하는 표현이에요."},
+ {t:"multi", q:"다음 중 'needs to be / should be' 뒤에 바르게 이어지는 것을 모두 고르세요.",
+  o:["needs to be review the report","should be encrypted","needs to be reviewed","should be to encrypt the files"], a:[1,2],
+  e:"be 뒤에는 항상 과거분사(p.p.)! encrypted, reviewed가 정답이고 review(원형), to encrypt는 모양이 틀려요."},
+ {t:"multi", q:"다음 중 'by Friday(금요일까지)' 같은 데드라인을 정중하게 각인시키는 문장을 모두 고르세요.",
+  o:["Finish it by Friday or else!","It needs to be finished by Friday.","Do it by Friday, now.","The report needs to be submitted by end of day."], a:[1,3],
+  e:"or else!, now 같은 압박 없이 It needs to be + p.p. + by ~ 구조가 정답! 중요도와 마감을 정중하게 각인시켜요."},
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( to / needs / be / it / finished )",
+  o:["It needs be to finished.","It to needs be finished.","It needs to be finished.","Finished it needs to be."], a:[2],
+  e:"It(주어) + needs + to be + finished(과거분사)! 어순은 needs to be가 한 덩어리."},
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( be / must / files / the / encrypted )",
+  o:["The files must encrypted be.","The files must be encrypted.","Must the files be encrypted.","The files be must encrypted."], a:[1],
+  e:"The files(주어) + must + be + encrypted(과거분사)! 조동사 must 뒤에 be가 바로 옵니다."},
+ {t:"dialog", q:"대화의 빈칸에 알맞은 것은? — Director: Understood. However, ___ before the system goes live on Monday. / Engineer: We will work overtime tonight to ensure everything is resolved.",
+  o:["you need to hurry up","I am completing it","it needs to be completed","finish it now"], a:[2],
+  e:"감정 배제형 지시는 it needs to be + p.p.! '월요일 오픈 전 반드시 완료되어야 합니다'"},
+ {t:"dialog", q:"Director: How are we doing with the software security patch? / Engineer: We found a minor bug during testing, but we are working on it. — Engineer가 발견한 것은?",
+  o:["새로운 고객","보안 패치 취소","사소한 버그","오래된 서버"], a:[2],
+  e:"We found a minor bug during testing = 테스트 중 사소한 버그를 발견했어요! minor(사소한) + bug(버그)."},
+ {t:"trans", q:"<span class='q-en'>This financial report needs to be reviewed by legal counsel.</span> 의 뜻은?",
+  o:["법무팀이 재무 보고서를 작성해야 합니다.","이 재무 보고서는 법무팀의 검토를 거쳐야 합니다.","재무 보고서를 법무팀에 보내지 마세요.","재무 보고서가 법무팀을 검토했습니다."], a:[1],
+  e:"be reviewed(검토되어야) + by legal counsel(법무팀에 의해)! 보고서가 주어인 수동태예요."},
+ {t:"trans", q:"<span class='q-en'>All confidential files must be encrypted before transmission.</span> 의 뜻은?",
+  o:["모든 기밀 파일은 전송 후 암호화를 풀어야 합니다.","기밀 파일을 직원에게 전송하세요.","암호화된 파일을 삭제하세요.","모든 기밀 파일은 전송 전 반드시 암호화되어야 합니다."], a:[3],
+  e:"must be encrypted(반드시 암호화되어야) + before transmission(전송 전)!"},
+ {t:"trans", q:"<span class='q-en'>It must be resolved.</span> 의 뜻은?",
+  o:["그것을 무시해도 됩니다.","그것을 반드시 해결해야 합니다(해결되어야 합니다).","그것을 나중에 하세요.","그것은 이미 해결됐습니다."], a:[1],
+  e:"must be resolved = 반드시 해결되어야 합니다! must가 더 강한 필요성을 나타내요."},
+ {t:"part", q:"<span class='q-en'>It needs to be finished by Friday.</span> 에서 '과거분사(p.p.)'는?",
+  o:["It","needs","to be","finished"], a:[3],
+  e:"needs to be 뒤의 과거분사가 finished! Friday는 '금요일까지'라는 데드라인이에요."},
+ {t:"part", q:"<span class='q-en'>All customer inquiries should be answered within 2 hours.</span> 에서 '주어'는?",
+  o:["All customer inquiries","should","answered","2 hours"], a:[0],
+  e:"수동태에서도 주어는 맨 앞! 문의들이 '답변되어야' 하는 대상이에요."},
+ {t:"correct", q:"다음 중 바르게 쓰인 문장은?",
+  o:["It needs to be submit today.","It needs to be submitting today.","It needs to be submitted today.","It needs to be submits today."], a:[2],
+  e:"needs to be + 과거분사(submitted)! submit, submitting, submits는 모두 틀린 모양이에요."},
+ {t:"vocab", q:"'암호화하다'를 뜻하는 영어 동사는?",
+  o:["transmit","review","encrypt","resolve"], a:[2],
+  e:"encrypt 암호화하다 / transmit 전송하다 / review 검토하다 / resolve 해결하다!"}
+];
+const ESSAYS = [
+ {q:"기본 표현 쓰기", sit:"업무 지시를 내려요. <b>『이건 금요일까지 끝나야 합니다.』</b>라고 감정 배제형으로 써 보세요.",
+  hints:["It","needs","finished"],
+  model:"It needs to be finished by Friday.", modelKr:"이건 금요일까지 끝나야 합니다."},
+ {q:"상황 작문 1", sit:"시스템 오류가 발견됐어요. <b>『이 에러는 수정되어야 합니다.』</b>라고 사람을 탓하지 않고 써 보세요.",
+  hints:["This error","fixed"],
+  model:"This error needs to be fixed.", modelKr:"이 에러는 수정되어야 합니다."},
+ {q:"상황 작문 2", sit:"고객 응대 규정을 정하려고 해요. <b>『모든 고객 문의는 2시간 안에 답변되어야 합니다.』</b>라고 써 보세요.",
+  hints:["should","answered","within 2 hours"],
+  model:"All customer inquiries should be answered within 2 hours.", modelKr:"모든 고객 문의는 2시간 안에 답변되어야 합니다."},
+ {q:"상황 작문 3", sit:"보안팀에게 강하게 요청해요. <b>『이 문제는 반드시 해결되어야 합니다.』</b>라고 써 보세요.",
+  hints:["It","must","resolved"],
+  model:"It must be resolved.", modelKr:"이건 반드시 해결되어야 합니다."},
+ {q:"자유 작문", sit:"오늘 실제로 쓸 지시 문장을 만들어 보세요! <b>주어 + needs to be / must be + p.p. (+ by ~)</b> 형식으로 써 보세요.",
+  hints:["needs to be","과거분사"],
+  model:"The invoice needs to be sent by 3 PM.", modelKr:"예시 — 송장은 3시까지 보내져야 합니다. (reviewed, updated, completed 등 어떤 과거분사든 OK!)"}
+];
+
+/* ─────────── 렌더링 ─────────── */
+const state = QUIZ.map(()=>({sel:new Set(), graded:false, correct:false}));
+const gradeOneFns = [];
+const marks = ["①","②","③","④"];
+const mcqList = document.getElementById("mcqList");
+
+QUIZ.forEach((item, qi)=>{
+  const meta = TYPE[item.t];
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">Q.${String(qi+1).padStart(2,"0")}</span>
+      <span class="tchip ${meta.cls}">${meta.label}</span>
+      ${item.a.length>1 ? '<span class="multi-note">정답 '+item.a.length+'개를 모두 고르세요</span>' : ''}
+    </div>
+    <p class="q-text">${item.q}</p>
+    <div class="opts">${item.o.map((op,oi)=>`
+      <button type="button" class="opt" data-oi="${oi}" aria-pressed="false">
+        ${item.a.length>1 ? '<span class="box">✓</span>' : '<span class="mark">'+marks[oi]+'</span>'}
+        <span class="${/^[A-Za-z]/.test(op) ? 'en' : ''}">${op}</span>
+      </button>`).join("")}
+    </div>
+    <div class="q-actions">
+      <button type="button" class="btn-check" disabled>채점하기</button>
+      <span class="graded-tag" hidden></span>
+    </div>
+    <div class="feedback"><p class="fb-title"></p><p class="fb-exp"></p></div>`;
+  mcqList.appendChild(card);
+
+  const opts = [...card.querySelectorAll(".opt")];
+  const btn = card.querySelector(".btn-check");
+  const tag = card.querySelector(".graded-tag");
+  const fb = card.querySelector(".feedback");
+  const fbTitle = card.querySelector(".fb-title");
+  const fbExp = card.querySelector(".fb-exp");
+
+  opts.forEach((b,oi)=>b.addEventListener("click", ()=>{
+    if(state[qi].graded) return;
+    if(item.a.length>1){
+      state[qi].sel.has(oi) ? state[qi].sel.delete(oi) : state[qi].sel.add(oi);
+      b.classList.toggle("sel"); b.setAttribute("aria-pressed", b.classList.contains("sel"));
+    } else {
+      state[qi].sel.clear();
+      opts.forEach(o=>{o.classList.remove("sel"); o.setAttribute("aria-pressed","false");});
+      state[qi].sel.add(oi); b.classList.add("sel"); b.setAttribute("aria-pressed","true");
+    }
+    btn.disabled = state[qi].sel.size===0;
+  }));
+
+  function gradeOne(forceBlank){
+    const st = state[qi];
+    if(st.graded) return;
+    if(st.sel.size===0 && !forceBlank) return;
+    const isRight = st.sel.size===item.a.length && item.a.every(x=>st.sel.has(x));
+    st.graded = true; st.correct = isRight;
+    opts.forEach((b,oi)=>{
+      b.disabled = true;
+      const box = b.querySelector(".box");   // 다중선택 전용. 단일선택에는 없음(null)
+      if(item.a.includes(oi)){ b.classList.add("right"); if(box) box.textContent="✓"; }
+      else if(st.sel.has(oi)){ b.classList.add("miss"); if(box) box.textContent="✗"; }
+      else b.classList.add("dim");
+    });
+    tag.hidden = false;
+    tag.textContent = isRight ? "정답!" : (st.sel.size ? "다시 확인해 보세요" : "답을 고르지 않았어요");
+    tag.className = "graded-tag " + (isRight ? "good" : "bad");
+    fb.classList.add("show");
+    fbTitle.textContent = (isRight ? "⭕ 정답입니다! " : "❌ 아쉬워요. 정답은 " + item.a.map(i=>marks[i]).join(", ") + " ");
+    fbTitle.className = "fb-title " + (isRight ? "good" : "bad");
+    fbExp.innerHTML = "💡 " + item.e;
+    btn.disabled = true;
+    updateScores();
+  }
+  gradeOneFns.push(gradeOne);
+  btn.addEventListener("click", ()=> gradeOne(false));
+});
+
+/* ── 주관식 ── */
+const essayList = document.getElementById("essayList");
+ESSAYS.forEach((item, ei)=>{
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">W.${ei+1}</span>
+      <span class="tchip ${TYPE.write.cls}">${item.q}</span>
+    </div>
+    <div class="situation">${item.sit}</div>
+    <div class="hints">${item.hints.map(h=>'<span class="hint">힌트 · <span class="en">'+h+'</span></span>').join("")}</div>
+    <textarea placeholder="여기에 영어 문장을 직접 써 보세요." aria-label="${item.q} 답안 입력"></textarea>
+    <div class="q-actions">
+      <button type="button" class="btn-check">모범답안 보기</button>
+      <span style="font-size:.78rem; color:var(--sub); font-weight:700">정답은 하나가 아닐 수도 있어요</span>
+    </div>
+    <div class="model"><b>모범답안 · <span class="en" style="font-size:1.02rem">${item.model}</span></b><br/><span style="color:var(--sub); font-size:.85rem">${item.modelKr}</span></div>`;
+  essayList.appendChild(card);
+
+  const btn = card.querySelector(".btn-check");
+  const model = card.querySelector(".model");
+  btn.addEventListener("click", ()=>{
+    const open = model.classList.toggle("show");
+    btn.textContent = open ? "모범답안 숨기기" : "모범답안 보기";
+  });
+});
+
+/* ── 점수 집계 ── */
+function updateScores(){
+  const graded = state.filter(s=>s.graded).length;
+  const correct = state.filter(s=>s.correct).length;
+  document.getElementById("gradedN").textContent = graded;
+  document.getElementById("correctN").textContent = correct;
+  document.getElementById("finalScore").textContent = correct;
+
+  const tbody = document.querySelector("#typeTable tbody");
+  tbody.innerHTML = "";
+  Object.entries(TYPE).forEach(([key, meta])=>{
+    if(key==="write") return;
+    const rows = QUIZ.map((q,i)=>({q, s:state[i]})).filter(x=>x.q.t===key);
+    if(!rows.length) return;
+    const g = rows.filter(x=>x.s.graded).length;
+    const c = rows.filter(x=>x.s.correct).length;
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>"+meta.label+"</td><td>"+(g ? c+" / "+g : "–")+"</td>";
+    tbody.appendChild(tr);
+  });
+
+  const msg = document.getElementById("resultMsg");
+  const emoji = document.getElementById("allDone");
+  if(graded===QUIZ.length){
+    emoji.classList.add("show");
+    if(correct===25) msg.textContent = "만점! 수동태 업무 지시 화법을 완벽하게 장착했어요. 바로 7강으로 갈 준비 끝!";
+    else if(correct>=20) msg.textContent = "훌륭해요! 틀린 문제의 해설만 다시 보면 완벽합니다.";
+    else if(correct>=14) msg.textContent = "절반 이상 성공! 주어 + needs to be + p.p. 공식을 다시 읽고 틀린 문제를 정리해 보세요.";
+    else if(correct>=7) msg.textContent = "조금 아쉬워요. 위의 핵심 정리를 다시 복습하고 같은 문제에 다시 도전!";
+    else msg.textContent = "괜찮아요, 시작이 반이에요! 핵심 정리를 읽고 천천히 다시 풀어 보세요.";
+  } else {
+    emoji.classList.remove("show");
+    msg.textContent = "채점한 문제: " + graded + " / 25 — 계속 풀어 보세요!";
+  }
+}
+document.getElementById("btnReset").addEventListener("click", ()=>{ location.reload(); });
+var readQuizSnapshot = function () {
+  var graded = state.filter(function (item) { return item.graded; }).length;
+  var correct = state.filter(function (item) { return item.correct; }).length;
+  var areas = document.querySelectorAll("#essayList textarea");
+  var essays = ESSAYS.map(function (item, index) {
+    var area = areas[index];
+    var prompt = String(item.sit || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    return {
+      index: index + 1,
+      title: String(item.q || ""),
+      prompt: prompt,
+      answer: area ? String(area.value || "").trim() : ""
+    };
+  });
+  return {
+    graded: graded,
+    correct: correct,
+    total: QUIZ.length,
+    complete: QUIZ.length === 25 && graded === 25,
+    essays: essays
+  };
+};
+function gradeAllQuestions(){
+  gradeOneFns.forEach(function (gradeOne) { gradeOne(true); });
+}
+function completeQuiz(){
+  gradeAllQuestions();
+  if (window.GleamQuiz) GleamQuiz.finish(readQuizSnapshot());
+  var result = document.getElementById("result");
+  if (result) result.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+document.querySelectorAll("[data-quiz-grade-all]").forEach(function (button) {
+  button.addEventListener("click", gradeAllQuestions);
+});
+document.querySelectorAll("[data-quiz-complete]").forEach(function (button) {
+  button.addEventListener("click", completeQuiz);
+});
+if (window.GleamQuiz) {
+  try {
+    var originalUpdateScores = updateScores;
+    updateScores = function () {
+      originalUpdateScores();
+      GleamQuiz.report(readQuizSnapshot());
+    };
+    GleamQuiz.start(readQuizSnapshot);
+  } catch (error) {}
+}
+updateScores();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

@@ -209,4 +209,17 @@ void main() {
       );
     }
   });
+
+  test('비즈니스 1강부터 10강은 인강 없이 연습문제만 연결한다', () {
+    for (var lesson = 1; lesson <= 10; lesson++) {
+      final week = EnrollmentService.defaultWeek('business_english', lesson);
+      expect(week.title, '$lesson강');
+      expect(week.videoUrl, isEmpty);
+      expect(week.problemLinks.single.title, '$lesson강 연습문제');
+      expect(
+        week.problemLinks.single.url,
+        '/quizzes/gleam-level4-lesson$lesson-quiz.html',
+      );
+    }
+  });
 }
