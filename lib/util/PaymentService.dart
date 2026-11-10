@@ -308,14 +308,20 @@ class PaymentService {
       final nativeTeacherId = payment['nativeTeacherId']?.toString() ?? '';
       final nativeTeacherName = payment['nativeTeacherName']?.toString() ?? '';
       final nativeTeacherUid = payment['nativeTeacherUid']?.toString() ?? '';
-      if (nativeTeacherId.isNotEmpty) {
-        await _firestore.collection('members').doc(userId).set({
-          'teacherId': nativeTeacherUid,
+      if (nativeTeacherId.isNotEmpty || nativeTeacherUid.isNotEmpty) {
+        final memberPatch = <String, dynamic>{
           'nativeTeacherId': nativeTeacherId,
           'nativeTeacherName': nativeTeacherName,
           'nativeTeacherUid': nativeTeacherUid,
           'updatedAt': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
+        };
+        if (nativeTeacherUid.isNotEmpty) {
+          memberPatch['teacherId'] = nativeTeacherUid;
+        }
+        await _firestore.collection('members').doc(userId).set(
+              memberPatch,
+              SetOptions(merge: true),
+            );
       }
       return null;
     } catch (e) {

@@ -450,6 +450,22 @@ class AuthService {
       return '연락처 저장에 실패했습니다.';
     }
   }
+
+  /// 카드 결제로 고른 강사 uid가 수강 문서에만 있으면 회원 teacherId를 채운다.
+  /// 강사 화면은 이 값으로 담당 수강생과 연락처를 읽는다.
+  /// [teacherUid]가 비어 있으면 메인 관리자 호출에서 전체 수강을 맞춘다.
+  static Future<void> syncCardPaidStudents(String teacherUid) async {
+    try {
+      final callable = FirebaseFunctions.instanceFor(region: 'asia-northeast3')
+          .httpsCallable('syncCardPaidStudents');
+      await callable.call(<String, dynamic>{
+        if (teacherUid.isNotEmpty) 'teacherUid': teacherUid,
+      });
+    } catch (e) {
+      print('카드 결제 수강생 배정 동기화 오류: $e');
+    }
+  }
+
   /// 회원을 강사에게 배정하거나 배정을 해제한다. teacherId가 빈 문자열이면 해제.
   /// 수강생 내 강의실이 보는 nativeTeacher* 필드와 수강 배정 문서도 함께 맞춘다.
   static Future<String?> assignMemberToTeacher({

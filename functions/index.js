@@ -9,6 +9,10 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const https = require("https");
 const { collectTalkTopics } = require("./talkFeeds");
+const {
+  memberTeacherPatch,
+  shouldFillMemberTeacher,
+} = require("./memberTeacher");
 const crypto = require("crypto");
 
 admin.initializeApp();
@@ -312,12 +316,11 @@ exports.confirmTossPayment = functions
       awaitingServerConfirm: false,
     });
 
-    if (payment.nativeTeacherId) {
+    const teacherPatch = memberTeacherPatch(payment);
+    if (teacherPatch) {
       await db.collection("members").doc(userId).set(
         {
-          nativeTeacherId: payment.nativeTeacherId || "",
-          nativeTeacherName: payment.nativeTeacherName || "",
-          nativeTeacherUid: payment.nativeTeacherUid || "",
+          ...teacherPatch,
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         },
         { merge: true }
@@ -330,6 +333,105 @@ exports.confirmTossPayment = functions
         ? "연장이 완료되었습니다. 내 강의실에서 이어서 들을 수 있습니다."
         : "결제가 완료되었고 수강이 배정되었습니다.",
     };
+  });
+
+const OWNER_EMAIL = "gienglish.paju@gmail.com";
+
+async function staffRole(context) {
+  if (!context.auth) return "";
+  const email = String(
+    (context.auth.token && context.auth.token.email) || ""
+  )
+    .trim()
+    .toLowerCase();
+  if (email === OWNER_EMAIL) return "owner";
+  const snap = await admin
+    .firestore()
+    .collection("admins")
+    .doc(context.auth.uid)
+    .get();
+  if (!snap.exists) return "";
+  const data = snap.data() || {};
+  if (data.isActive === false) return "";
+  if (!data.role || data.role === "owner") return "owner";
+  if (data.role === "teacher") return "teacher";
+  return "";
+}
+
+/// 수강 문서에만 강사 uid가 있고 회원 teacherId가 비어 있으면 채운다.
+/// 이미 수동 배정된 teacherId는 유지한다.
+async function syncMemberTeacherIfUnassigned(db, source) {
+  const userId = String((source && source.userId) || "").trim();
+  if (!userId) return false;
+  const ref = db.collection("members").doc(userId);
+  const snap = await ref.get();
+  if (!snap.exists) return false;
+  if (!shouldFillMemberTeacher(snap.data() || {}, source)) return false;
+  const patch = memberTeacherPatch(source);
+  await ref.set(
+    {
+      ...patch,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    },
+    { merge: true }
+  );
+  return true;
+}
+
+exports.syncCardPaidStudentOnEnrollment = functions
+  .region("asia-northeast3")
+  .firestore.document("enrollments/{enrollmentId}")
+  .onWrite(async (change) => {
+    if (!change.after.exists) return null;
+    try {
+      await syncMemberTeacherIfUnassigned(
+        admin.firestore(),
+        change.after.data() || {}
+      );
+    } catch (err) {
+      console.error("수강 강사 배정 동기화 실패", change.after.id, err);
+    }
+    return null;
+  });
+
+/// 이미 카드 결제한 수강생을 강사 화면 목록에 붙인다.
+/// 강사는 본인, 메인 관리자는 지정 강사 또는 전체.
+exports.syncCardPaidStudents = functions
+  .region("asia-northeast3")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError(
+        "unauthenticated",
+        "로그인이 필요합니다."
+      );
+    }
+    const role = await staffRole(context);
+    if (!role) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "강사 또는 메인 관리자만 수강생 배정을 맞출 수 있습니다."
+      );
+    }
+    const requested = String((data && data.teacherUid) || "").trim();
+    if (role === "teacher" && requested && requested !== context.auth.uid) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "본인 수강생만 맞출 수 있습니다."
+      );
+    }
+    const db = admin.firestore();
+    let query = db.collection("enrollments");
+    const teacherUid = role === "teacher" ? context.auth.uid : requested;
+    if (teacherUid) {
+      query = query.where("nativeTeacherUid", "==", teacherUid);
+    }
+    const snap = await query.get();
+    let updated = 0;
+    for (const doc of snap.docs) {
+      const filled = await syncMemberTeacherIfUnassigned(db, doc.data() || {});
+      if (filled) updated += 1;
+    }
+    return { ok: true, updated };
   });
 
 async function assertOwner(context) {
@@ -1353,6 +1455,11 @@ exports.sendWeeklyEnrollmentReminders = functions
       if (data.isActive === false) continue;
       const userId = String(data.userId || "");
       if (!userId) continue;
+      try {
+        await syncMemberTeacherIfUnassigned(db, data);
+      } catch (err) {
+        console.error("카드 결제 수강생 강사 배정 동기화 실패", doc.id, err);
+      }
       const total = Number(data.totalSessions || 0);
       const completed = Number(data.completedSessions || 0);
       const remaining =
