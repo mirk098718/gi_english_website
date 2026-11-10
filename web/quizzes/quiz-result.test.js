@@ -1,6 +1,17 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const quiz = require("./quiz-result.js");
+
+const connectedQuizzes = [
+  "gleam-level1-lesson1-quiz.html",
+  "gleam-level2-lesson02-quiz.html",
+  "gleam-level1-lesson3-quiz.html",
+  "gleam-level1-lesson4-quiz.html",
+  "gleam-level3-lesson1-quiz.html",
+  "gleam-level3-lesson2-quiz.html"
+];
 
 test("퀴즈 파일 이름에서 저장 키를 만든다", () => {
   assert.equal(
@@ -41,4 +52,15 @@ test("다시 저장할 문서는 최근 점수와 최근 주관식으로 덮어�
   assert.equal(quiz.percentFor(14, 25), 56);
   assert.equal(second.completed, true);
   assert.equal(second.totalCount, 25);
+});
+
+test("연결된 문제풀이 페이지마다 한번에 채점하기와 완료 버튼이 있다", () => {
+  for (const name of connectedQuizzes) {
+    const html = fs.readFileSync(path.join(__dirname, name), "utf8");
+    assert.equal(html.split('class="btn-grade-all"').length - 1, 2, name);
+    assert.equal(html.split('class="btn-complete"').length - 1, 2, name);
+    assert.match(html, /gradeOne\(true\)/);
+    assert.match(html, /GleamQuiz\.finish\(readQuizSnapshot\(\)\)/);
+    assert.equal(typeof quiz.finish, "function");
+  }
 });

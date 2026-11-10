@@ -134,7 +134,7 @@
       var section = document.createElement("section");
       section.id = "gleamSaved";
       section.hidden = true;
-      section.innerHTML = '<h2>최근 결과</h2><p class="score"></p><p class="status"></p><div class="essays"></div><p class="note">다시 풀고 25문제를 모두 채점하면 이 정답률과 주관식 답이 방금 풀이로 바뀝니다.</p>';
+      section.innerHTML = '<h2>최근 결과</h2><p class="score"></p><p class="status"></p><div class="essays"></div><p class="note">완료를 누르면 이 정답률과 주관식 답이 저장됩니다. 다시 풀고 완료하면 방금 풀이로 바뀝니다.</p>';
       main.insertBefore(section, main.firstChild);
       return section;
     }
@@ -164,6 +164,8 @@
       statusEl.textContent = status || "";
     }
 
+    var pendingFinish = false;
+
     function schedule(snapshot) {
       if (!shouldSave(snapshot) || !meta) return;
       var key = snapshotKey(snapshot);
@@ -174,10 +176,12 @@
       }, 400);
     }
 
-    function save(snapshot, key) {
+    function save(snapshot, key, doneMessage) {
       if (!user || !meta || !shouldSave(snapshot)) {
         if (authReady && !user) {
-          renderSaved(null, "웹사이트에 로그인한 뒤 풀면 점수와 주관식 답이 강의실과 예약 강사에게 남습니다.");
+          renderSaved(null, doneMessage
+            ? "웹사이트에 로그인한 뒤 완료를 눌러야 점수와 주관식 답이 강의실과 예약 강사에게 남습니다."
+            : "웹사이트에 로그인한 뒤 풀면 점수와 주관식 답이 강의실과 예약 강사에게 남습니다.");
         }
         return;
       }
@@ -185,10 +189,29 @@
       payload.updatedAt = window.firebase.firestore.FieldValue.serverTimestamp();
       window.firebase.firestore().collection("quiz_results").doc(user.uid + "_" + meta.quizId).set(payload).then(function () {
         lastSavedKey = key;
-        renderSaved(payload, "최근 점수로 저장했습니다. 주관식도 방금 답으로 바뀌었습니다.");
+        renderSaved(payload, doneMessage || "최근 점수로 저장했습니다. 주관식도 방금 답으로 바뀌었습니다.");
       }).catch(function () {
         renderSaved(payload, "점수 저장에 실패했습니다. 로그인 상태를 확인해 주세요.");
       });
+    }
+
+    function commitFinish(snapshot) {
+      if (!shouldSave(snapshot) || !meta) return;
+      clearTimeout(timer);
+      var key = snapshotKey(snapshot);
+      if (!user) {
+        renderSaved(null, "웹사이트에 로그인한 뒤 완료를 눌러야 점수와 주관식 답이 강의실과 예약 강사에게 남습니다.");
+        return;
+      }
+      if (key === lastSavedKey) {
+        renderSaved({
+          title: meta.title,
+          correctCount: snapshot.correct,
+          essays: snapshot.essays || []
+        }, "문제풀이를 완료했습니다. 이 점수와 주관식 답이 저장되어 있습니다.");
+        return;
+      }
+      save(snapshot, key, "문제풀이를 완료하고 결과를 저장했습니다.");
     }
 
     function loadSaved() {
@@ -202,8 +225,16 @@
     return {
       report: function (snapshot) {
         queued = snapshot;
+        pendingFinish = false;
         if (!authReady) return;
         schedule(snapshot);
+      },
+      finish: function (snapshot) {
+        queued = snapshot;
+        pendingFinish = true;
+        if (!authReady) return;
+        pendingFinish = false;
+        commitFinish(snapshot);
       },
       start: function (readSnapshot) {
         read = readSnapshot;
@@ -233,7 +264,13 @@
           authReady = true;
           if (user) loadSaved();
           else renderSaved(null, "웹사이트에 로그인한 뒤 풀면 점수와 주관식 답이 강의실과 예약 강사에게 남습니다.");
-          if (queued) schedule(queued);
+          if (!queued) return;
+          if (pendingFinish) {
+            pendingFinish = false;
+            commitFinish(queued);
+          } else {
+            schedule(queued);
+          }
         });
       }
     };
@@ -248,6 +285,9 @@
     buildPayload: buildPayload,
     report: function (snapshot) {
       if (browser) browser.report(snapshot);
+    },
+    finish: function (snapshot) {
+      if (browser) browser.finish(snapshot);
     },
     start: function (readSnapshot) {
       if (browser) browser.start(readSnapshot);
