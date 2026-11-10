@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gi_english_website/class/QuizResult.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
+import 'package:gi_english_website/widget/QuizResultSummary.dart';
 
 void main() {
   test('퀴즈 주소에서 저장 키를 만든다', () {
@@ -174,5 +176,53 @@ void main() {
       }),
       isNull,
     );
+  });
+
+  testWidgets('주관식 답은 접혀 있다가 열면 보인다', (tester) async {
+    final result = QuizResult(
+      id: 'student1_gleam-level1-lesson1',
+      userId: 'student1',
+      quizId: 'gleam-level1-lesson1',
+      title: '왕초보 1강 연습문제',
+      courseId: 'beginner_phonics',
+      weekNumber: 1,
+      correctCount: 11,
+      totalCount: 25,
+      essays: const [
+        QuizEssayAnswer(
+          index: 1,
+          title: '기본 표현 쓰기',
+          prompt: '나는 커피를 좋아해요.',
+          answer: 'I like coffee',
+        ),
+      ],
+      updatedAt: DateTime(2026, 11, 10, 13, 53),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 420,
+              child: QuizResultSummary(result: result),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('왕초보 1강 연습문제 · 11 / 25문제 · 44%'), findsOneWidget);
+    expect(find.text('주관식 답 보기'), findsOneWidget);
+    expect(find.text('I like coffee'), findsNothing);
+    expect(find.text('나는 커피를 좋아해요.'), findsNothing);
+
+    await tester.tap(find.text('주관식 답 보기'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('I like coffee'), findsOneWidget);
+    expect(find.text('나는 커피를 좋아해요.'), findsOneWidget);
+    expect(find.text('기본 표현 쓰기'), findsOneWidget);
   });
 }

@@ -43,15 +43,43 @@ class QuizResultSummary extends StatelessWidget {
                 color: Palette.grey500,
               ),
             ),
+          if (result.essays.isNotEmpty) _essayDropdown(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _essayDropdown(BuildContext context) {
+    return Theme(
+      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      child: ExpansionTile(
+        tilePadding: EdgeInsets.zero,
+        childrenPadding: EdgeInsets.only(left: 2, bottom: 4),
+        expandedAlignment: Alignment.centerLeft,
+        iconColor: Palette.grey600,
+        collapsedIconColor: Palette.grey600,
+        title: Text(
+          '주관식 답 보기',
+          style: TextStyle(
+            fontFamily: "NotoSansKR",
+            fontSize: dense ? 12 : 13,
+            fontWeight: FontWeight.w700,
+            color: Palette.black,
+          ),
+        ),
+        children: [
           ...result.essays.map((essay) => _essayBlock(essay)),
           if (!dense)
-            Text(
-              '다시 풀고 완료를 누르면 이 점수와 주관식 답이 최근 풀이로 바뀝니다.',
-              style: TextStyle(
-                fontFamily: "NotoSansKR",
-                fontSize: 11,
-                height: 1.4,
-                color: Palette.grey500,
+            Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: Text(
+                '다시 풀고 완료를 누르면 이 점수와 주관식 답이 최근 풀이로 바뀝니다.',
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 11,
+                  height: 1.4,
+                  color: Palette.grey500,
+                ),
               ),
             ),
         ],

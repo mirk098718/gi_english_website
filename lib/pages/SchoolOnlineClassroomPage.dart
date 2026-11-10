@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
-import 'package:gi_english_website/class/QuizResult.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
 import 'package:gi_english_website/pages/OnlineCheckoutPage.dart';
 import 'package:gi_english_website/pages/OnlineCourseDetailPage.dart';
@@ -14,13 +13,10 @@ import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/NotificationService.dart';
 import 'package:gi_english_website/util/Palette.dart';
-import 'package:gi_english_website/util/QuizResultBridge.dart';
-import 'package:gi_english_website/util/QuizResultService.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
-import 'package:gi_english_website/widget/QuizResultSummary.dart';
 import 'package:gi_english_website/widget/ProfileEditDialog.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
@@ -34,32 +30,24 @@ class SchoolOnlineClassroomPage extends StatefulWidget {
       _SchoolOnlineClassroomPageState();
 }
 
-class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage>
-    with WidgetsBindingObserver {
+class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
   List<EnrollmentRecord> _myEnrollments = [];
-  Map<String, List<QuizResult>> _quizByCourse = {};
   List<AppNotification> _notifications = [];
   Map<String, dynamic>? _member;
   String _memberPhone = '';
   bool _isLoading = true;
   bool _savingPhone = false;
   StreamSubscription<User?>? _authSub;
-  StreamSubscription<void>? _quizSavedSub;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    _quizSavedSub = QuizResultEvents.saved.listen((_) {
-      _reloadQuizzes();
-    });
     _loadMyCourses();
     _authSub = AuthService.authStateChanges.listen((user) {
       if (!mounted) return;
       if (user == null) {
         setState(() {
           _myEnrollments = [];
-          _quizByCourse = {};
           _notifications = [];
           _member = null;
           _memberPhone = '';
@@ -71,30 +59,8 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage>
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _quizSavedSub?.cancel();
     _authSub?.cancel();
     super.dispose();
-  }
-
-  @override
-  void activate() {
-    super.activate();
-    if (!_isLoading) _reloadQuizzes();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed && !_isLoading) {
-      _reloadQuizzes();
-    }
-  }
-
-  Future<void> _reloadQuizzes() async {
-    if (_myEnrollments.isEmpty) return;
-    final quizByCourse = await _quizResultsFor(_myEnrollments);
-    if (!mounted) return;
-    setState(() => _quizByCourse = quizByCourse);
   }
 
   Future<void> _logout() async {
@@ -102,7 +68,6 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage>
     if (!mounted) return;
     setState(() {
       _myEnrollments = [];
-      _quizByCourse = {};
       _notifications = [];
       _member = null;
       _memberPhone = '';
@@ -119,13 +84,11 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage>
   Future<void> _loadMyCourses() async {
     await AuthService.selectableNativeTeachers();
     final enrollments = await EnrollmentService.myEnrollments();
-    final quizByCourse = await _quizResultsFor(enrollments);
     final member = await AuthService.currentMemberDoc();
     final notifications = await NotificationService.listMine();
     if (!mounted) return;
     setState(() {
       _myEnrollments = enrollments;
-      _quizByCourse = quizByCourse;
       _notifications = notifications;
       _member = member;
       _memberPhone = member?['phone']?.toString() ?? '';
@@ -784,7 +747,6 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage>
                       color: Palette.grey600,
                     ),
                   ),
-                  ..._quizLines(course.id),
                   if (sessionsConfigured) ...[
                     SizedBox(height: 8),
                     sessionBadge(enrollment, allDone),
@@ -855,47 +817,6 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage>
         ],
       ),
     );
-  }
-
-  Future<Map<String, List<QuizResult>>> _quizResultsFor(
-    List<EnrollmentRecord> enrollments,
-  ) async {
-    final uid = AuthService.currentUser?.uid ?? '';
-    if (uid.isEmpty || enrollments.isEmpty) return {};
-    final idsByCourse = <String, Set<String>>{};
-    for (final enrollment in enrollments) {
-      final ids = idsByCourse.putIfAbsent(enrollment.courseId, () => <String>{});
-      for (final lesson in EnrollmentService.catalogLessons(enrollment.courseId)) {
-        final quizId = QuizResult.quizIdFromUrl(lesson.problemUrl);
-        if (quizId.isNotEmpty) ids.add(quizId);
-      }
-    }
-    final allIds = idsByCourse.values.expand((ids) => ids).toSet();
-    final lookup = await QuizResultService.fetchForUser(
-      userId: uid,
-      quizIds: allIds,
-    );
-    final grouped = <String, List<QuizResult>>{};
-    idsByCourse.forEach((courseId, ids) {
-      final results = ids
-          .map((id) => lookup.results[id])
-          .whereType<QuizResult>()
-          .toList()
-        ..sort((a, b) => a.weekNumber.compareTo(b.weekNumber));
-      if (results.isNotEmpty) grouped[courseId] = results;
-    });
-    return grouped;
-  }
-
-  List<Widget> _quizLines(String courseId) {
-    final results = _quizByCourse[courseId] ?? const <QuizResult>[];
-    if (results.isEmpty) return const [];
-    return [
-      SizedBox(height: 8),
-      ...results.map(
-        (result) => QuizResultSummary(result: result, dense: true),
-      ),
-    ];
   }
 
   String _classroomProgressCopy(EnrollmentRecord enrollment, bool allDone) {
