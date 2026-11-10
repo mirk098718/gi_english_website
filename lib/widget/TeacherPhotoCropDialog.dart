@@ -9,6 +9,7 @@ import 'package:gi_english_website/util/html_stub.dart'
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
 class TeacherPhotoCropDialog extends StatefulWidget {
@@ -195,14 +196,14 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
     return AlertDialog(
       backgroundColor: Palette.white,
       surfaceTintColor: Palette.white,
-      title: Text('사진 위치 조정', style: TextStyle(fontFamily: "Jalnan")),
+      title: Text(tr(context, "사진 위치 조정"), style: TextStyle(fontFamily: "Jalnan")),
       content: SizedBox(
         width: 360,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '처음에는 사진 전체가 보입니다. 얼굴을 원 안으로 끌어오고, 슬라이더로 확대하세요.',
+              tr(context, "처음에는 사진 전체가 보입니다. 얼굴을 원 안으로 끌어오고, 슬라이더로 확대하세요."),
               style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 13,
@@ -311,7 +312,7 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
               ),
             TextButton(
               onPressed: !_ready ? null : () => setState(_resetContain),
-              child: Text('사진 전체 보기',
+              child: Text(tr(context, "사진 전체 보기"),
                   style: TextStyle(
                       fontFamily: "NotoSansKR", color: Palette.darkTeal)),
             ),
@@ -321,7 +322,7 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
       actions: [
         TextButton(
           onPressed: _saving ? null : () => Navigator.pop(context),
-          child: Text('취소', style: TextStyle(fontFamily: "NotoSansKR")),
+          child: Text(tr(context, "취소"), style: TextStyle(fontFamily: "NotoSansKR")),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -336,7 +337,7 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
                   child: CircularProgressIndicator(
                       strokeWidth: 2, color: Palette.white),
                 )
-              : Text('이 구도로 사용', style: TextStyle(fontFamily: "Jalnan")),
+              : Text(tr(context, "이 구도로 사용"), style: TextStyle(fontFamily: "Jalnan")),
         ),
       ],
     );

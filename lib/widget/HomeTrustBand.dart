@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/GleamMark.dart';
 
@@ -38,7 +39,7 @@ class HomeTrustBand extends StatelessWidget {
             children: [
               _wordmark(),
               SizedBox(height: compact ? 28 : 40),
-              compact ? _stackedFacts() : _rowFacts(),
+              compact ? _stackedFacts(context) : _rowFacts(context),
             ],
           ),
         ),
@@ -46,32 +47,32 @@ class HomeTrustBand extends StatelessWidget {
     );
   }
 
-  Widget _rowFacts() {
+  Widget _rowFacts(BuildContext context) {
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           for (var i = 0; i < _facts.length; i++) ...[
             if (i > 0) SizedBox(width: 24),
-            Expanded(child: _fact(_facts[i])),
+            Expanded(child: _fact(context, _facts[i])),
           ],
         ],
       ),
     );
   }
 
-  Widget _stackedFacts() {
+  Widget _stackedFacts(BuildContext context) {
     return Column(
       children: [
         for (var i = 0; i < _facts.length; i++) ...[
           if (i > 0) SizedBox(height: 16),
-          _fact(_facts[i]),
+          _fact(context, _facts[i]),
         ],
       ],
     );
   }
 
-  Widget _fact(_TrustFact fact) {
+  Widget _fact(BuildContext context, _TrustFact fact) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(
@@ -95,7 +96,7 @@ class HomeTrustBand extends StatelessWidget {
               SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  fact.title,
+                  tr(context, fact.title),
                   style: TextStyle(
                     fontFamily: 'NotoSansKR',
                     fontSize: compact ? 17 : 19,
@@ -108,7 +109,7 @@ class HomeTrustBand extends StatelessWidget {
           ),
           SizedBox(height: 8),
           Text(
-            fact.body,
+            tr(context, fact.body),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: compact ? 13 : 14,

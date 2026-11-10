@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
 class BoardTable extends StatelessWidget {
@@ -93,7 +94,7 @@ class BoardTable extends StatelessWidget {
       cells.add(
         SizedBox(
           width: 80,
-          child: Text("관리", style: _headerTextStyle()),
+          child: Text(tr(context, "관리"), style: _headerTextStyle()),
         ),
       );
     }

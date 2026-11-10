@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/FAQ.dart';
 import 'package:gi_english_website/class/Notice.dart';
 import 'package:gi_english_website/pages/NoticeDetailPage.dart';
@@ -135,7 +136,7 @@ class AcademyBulletinBoards extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  child: const Text('더보기'),
+                  child: Text(tr(context, "더보기")),
                 ),
               ],
             ),
@@ -264,7 +265,7 @@ class AcademyBulletinBoards extends StatelessWidget {
                   borderRadius: BorderRadius.circular(3),
                 ),
                 child: Text(
-                  '중요',
+                  tr(context, "중요"),
                   style: TextStyle(
                     color: Palette.white,
                     fontSize: compact ? 9 : 10,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 
 import 'MenuUtil.dart';
 import 'Palette.dart';
@@ -41,7 +42,7 @@ class DialogUtil {
                   ),
                   onPressed: () => backPage(context),
                   child: Text(
-                    "확인",
+                    tr(context, "확인"),
                     style: TextStyle(fontFamily: "Jalnan"),
                   ),
                 ),

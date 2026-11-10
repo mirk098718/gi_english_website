@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/firebase_options.dart';
 import 'package:gi_english_website/pages/PaymentResultPage.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/NoticeService.dart';
 import 'package:gi_english_website/util/SiteAlertCenter.dart';
 
@@ -21,11 +22,13 @@ Future<void> main() async {
   // Firestore 설정 초기화
   NoticeService.initializeFirestore();
 
-  // 달력 등 한글 로케일(요일/월 이름) 사용을 위한 초기화
+  // 달력 등 로케일(요일/월 이름) 사용을 위한 초기화
   await initializeDateFormatting('ko_KR', null);
+  await initializeDateFormatting('en_US', null);
+  await AppLanguage.instance.load();
   SiteAlertCenter.instance.start();
 
-  runApp(MyApp());
+  runApp(LangScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

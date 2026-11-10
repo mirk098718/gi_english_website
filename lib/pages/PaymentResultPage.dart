@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/OnlineCheckoutPage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineClassroomPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
@@ -110,7 +111,7 @@ class _PaymentResultPageState extends State<PaymentResultPage> {
                     children: [
                       CircularProgressIndicator(),
                       SizedBox(height: 20),
-                      Text('결제를 확인하고 수강을 배정하는 중입니다...',
+                      Text(tr(context, "결제를 확인하고 수강을 배정하는 중입니다..."),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontFamily: "NotoSansKR", fontSize: 14)),
@@ -128,7 +129,7 @@ class _PaymentResultPageState extends State<PaymentResultPage> {
                       Text(
                         _confirmed
                             ? (_error == null ? '결제가 완료되었습니다' : '결제 인증 완료')
-                            : '결제 처리 실패',
+                            : tr(context, "결제 처리 실패"),
                         style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
                       ),
                       SizedBox(height: 12),
@@ -167,7 +168,7 @@ class _PaymentResultPageState extends State<PaymentResultPage> {
                               (route) => false,
                             );
                           },
-                          child: Text('내 강의실로 이동',
+                          child: Text(tr(context, "내 강의실로 이동"),
                               style: TextStyle(fontFamily: "Jalnan")),
                         )
                       else
@@ -180,7 +181,7 @@ class _PaymentResultPageState extends State<PaymentResultPage> {
                           onPressed: () {
                             MenuUtil.push(context, OnlineCheckoutPage());
                           },
-                          child: Text('다시 결제하기',
+                          child: Text(tr(context, "다시 결제하기"),
                               style: TextStyle(fontFamily: "Jalnan")),
                         ),
                     ],

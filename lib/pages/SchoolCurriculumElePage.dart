@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumHighSchoolPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumMiddleSchoolPage.dart';
@@ -120,7 +121,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "정규 초등부 Curriculum",
+            tr(context, "정규 초등부 Curriculum"),
             style: TextStyle(
               fontFamily: "Jalnan",
               fontSize: 20,
@@ -131,7 +132,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
           WidgetUtil.pageImage("assets/eleProgramPeriod.png"),
           SizedBox(height: 20),
           Text(
-            "월수금반",
+            tr(context, "월수금반"),
             style: TextStyle(
               fontFamily: "Jalnan",
               fontSize: 15,
@@ -141,7 +142,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
           WidgetUtil.pageImage("assets/eleTimetableMWF.png"),
           SizedBox(height: 20),
           Text(
-            "화목반",
+            tr(context, "화목반"),
             style: TextStyle(
               fontFamily: "Jalnan",
               fontSize: 15,
@@ -151,7 +152,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
           WidgetUtil.pageImage("assets/eleTimetableTuesThurs.png"),
           SizedBox(height: 40),
           Text(
-            "NIE 영자신문 수업",
+            tr(context, "NIE 영자신문 수업"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
@@ -210,7 +211,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
-                    child: Text("상담신청",
+                    child: Text(tr(context, "상담신청"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "Jalnan",
@@ -342,7 +343,7 @@ class _SchoolCurriculumElePageState extends State<SchoolCurriculumElePage> {
                       foregroundColor: Palette.black,
                     ),
                     onPressed: () {},
-                    child: Text("상담신청",
+                    child: Text(tr(context, "상담신청"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontFamily: "Oneprettynight",

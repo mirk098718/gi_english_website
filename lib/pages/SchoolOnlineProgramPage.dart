@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
 import 'package:gi_english_website/pages/OnlineCheckoutPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -132,7 +133,7 @@ class _SchoolOnlineProgramPageState extends State<SchoolOnlineProgramPage> {
           }
         },
         child: Text(
-          "프로그램 결제하기",
+          tr(context, "프로그램 결제하기"),
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: "Jalnan",
@@ -159,13 +160,13 @@ class _SchoolOnlineProgramPageState extends State<SchoolOnlineProgramPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "온라인 프로그램 (인강)",
+            tr(context, "온라인 프로그램 (인강)"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
           SizedBox(height: 20),
           Text(
-            "언제 어디서나, 글림아일랜드의 수업을 이어가세요",
+            tr(context, "언제 어디서나, 글림아일랜드의 수업을 이어가세요"),
             style: TextStyle(
               fontFamily: "Jalnan",
               fontSize: 15,
@@ -181,14 +182,13 @@ class _SchoolOnlineProgramPageState extends State<SchoolOnlineProgramPage> {
               fontSize: 14,
               height: 1.6,
             ),
-            "글림아일랜드 온라인 프로그램은 바쁜 일정 속에서도 체계적인 영어 학습을 이어갈 수 있도록 마련된 인강 과정입니다.\n"
-            "검증된 커리큘럼과 현장 수업의 노하우를 온라인으로 옮겼으며, 신청하신 분들께 안내된 강의실에서 배정된 강의를 수강하실 수 있습니다.",
+            tr(context, "글림아일랜드 온라인 프로그램은 바쁜 일정 속에서도 체계적인 영어 학습을 이어갈 수 있도록 마련된 인강 과정입니다.\n검증된 커리큘럼과 현장 수업의 노하우를 온라인으로 옮겼으며, 신청하신 분들께 안내된 강의실에서 배정된 강의를 수강하실 수 있습니다."),
           ),
           SizedBox(height: 28),
           classGuideImage(),
           SizedBox(height: 28),
           Text(
-            "이런 분들께 추천합니다",
+            tr(context, "이런 분들께 추천합니다"),
             style: TextStyle(
               fontFamily: "Jalnan",
               fontSize: 15,
@@ -204,13 +204,11 @@ class _SchoolOnlineProgramPageState extends State<SchoolOnlineProgramPage> {
               fontSize: 14,
               height: 1.6,
             ),
-            "• 시간·장소 제약 없이 꾸준히 영어를 공부하고 싶은 성인 학습자\n"
-            "• 오프라인 수업과 병행해 복습·예습을 강화하고 싶은 분\n"
-            "• 체계적인 인강으로 목표(회화·시험·유학 준비 등)에 집중하고 싶은 분",
+            tr(context, "• 시간·장소 제약 없이 꾸준히 영어를 공부하고 싶은 성인 학습자\n• 오프라인 수업과 병행해 복습·예습을 강화하고 싶은 분\n• 체계적인 인강으로 목표(회화·시험·유학 준비 등)에 집중하고 싶은 분"),
           ),
           SizedBox(height: 28),
           Text(
-            "이용 안내",
+            tr(context, "이용 안내"),
             style: TextStyle(
               fontFamily: "Jalnan",
               fontSize: 15,
@@ -226,9 +224,7 @@ class _SchoolOnlineProgramPageState extends State<SchoolOnlineProgramPage> {
               fontSize: 14,
               height: 1.6,
             ),
-            "1. 아래 버튼으로 온라인 프로그램을 신청해 주세요.\n"
-            "2. 상담·안내 후 수강이 확정되면 배정된 강의를 안내드립니다.\n"
-            "3. 회원으로 로그인하시면 나의 강의실에서 할당된 인강을 시청할 수 있습니다.",
+            tr(context, "1. 아래 버튼으로 온라인 프로그램을 신청해 주세요.\n2. 상담·안내 후 수강이 확정되면 배정된 강의를 안내드립니다.\n3. 회원으로 로그인하시면 나의 강의실에서 할당된 인강을 시청할 수 있습니다."),
           ),
           SizedBox(height: 36),
           applyButton(width: 260),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolTeachersPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
@@ -127,26 +128,18 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "상담/오시는 길",
+            tr(context, "상담/오시는 길"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
           SizedBox(height: 24),
           Text(
-            "상담 예약하기",
+            tr(context, "상담 예약하기"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 18),
           ),
           SizedBox(height: 12),
           Text(
-            "입학 상담 및 입학 테스트를 원하시는 학부모님께서는 대표번호로 연락 주세요.\n"
-            "\n"
-            "• 상담 요일 : 월요일~금요일 / 토요일 오전\n"
-            "• 상담 시간 : 오후 1시~8시40분 / 토요일 9시~12시\n"
-            "• 상담 절차 : 031 942 0908\n"
-            "  대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n"
-            "\n"
-            "• 전화 상담 : 031 942 0908\n"
-            "• 이메일 : gienglish.paju@gmail.com",
+            tr(context, "입학 상담 및 입학 테스트를 원하시는 학부모님께서는 대표번호로 연락 주세요.\n\n• 상담 요일 : 월요일~금요일 / 토요일 오전\n• 상담 시간 : 오후 1시~8시40분 / 토요일 9시~12시\n• 상담 절차 : 031 942 0908\n  대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n\n• 전화 상담 : 031 942 0908\n• 이메일 : gienglish.paju@gmail.com"),
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 14,
@@ -156,7 +149,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
           ),
           SizedBox(height: 28),
           Text(
-            "오시는 길",
+            tr(context, "오시는 길"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 18),
           ),
           SizedBox(height: 12),
@@ -217,7 +210,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
-                    child: Text("상담신청",
+                    child: Text(tr(context, "상담신청"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "Jalnan",
@@ -335,7 +328,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
                   height: 40,
                   child: ElevatedButton(
                     child: Text(
-                      "상담신청",
+                      tr(context, "상담신청"),
                       style:
                           TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),

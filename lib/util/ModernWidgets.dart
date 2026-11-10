@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/widget/GleamMark.dart';
 import 'Palette.dart';
 
@@ -326,6 +327,7 @@ class ModernWidgets {
 
   // 현대적인 푸터
   static Widget modernFooter() {
+    return Builder(builder: (context) {
     return Container(
       width: double.infinity,
       color: Palette.grey900,
@@ -342,7 +344,7 @@ class ModernWidgets {
           GleamMark(height: 36, lightPlate: true),
           SizedBox(height: 16),
           Text(
-            "글림교육",
+            tr(context, "글림교육"),
             style: TextStyle(
               color: Palette.white,
               fontFamily: "NotoSansKR",
@@ -362,10 +364,7 @@ class ModernWidgets {
           ),
           SizedBox(height: 12),
           Text(
-            "경기도 파주시 해올2길 2 태산 W 타워 7층 701~703호 (다율동 1044)\n"
-            "문의 : 031 942 0908\n"
-            "email : gienglish.paju@gmail.com\n"
-            "사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희",
+            tr(context, "경기도 파주시 해올2길 2 태산 W 타워 7층 701~703호 (다율동 1044)\n문의 : 031 942 0908\nemail : gienglish.paju@gmail.com\n사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희"),
             style: TextStyle(
               color: Palette.grey400,
               fontFamily: "NotoSansKR",
@@ -375,7 +374,7 @@ class ModernWidgets {
           ),
           SizedBox(height: 24),
           Text(
-            "Copyright ⓒ 글림교육",
+            tr(context, "Copyright ⓒ 글림교육"),
             style: TextStyle(
               color: Palette.grey500,
               fontFamily: "NotoSansKR",
@@ -385,10 +384,12 @@ class ModernWidgets {
         ],
       ),
     );
+    });
   }
 
   // 모바일용 현대적인 푸터
   static Widget modernMobileFooter() {
+    return Builder(builder: (context) {
     return Container(
       width: double.infinity,
       color: Palette.grey900,
@@ -399,7 +400,7 @@ class ModernWidgets {
           GleamMark(height: 32, lightPlate: true),
           SizedBox(height: 16),
           Text(
-            "글림교육",
+            tr(context, "글림교육"),
             style: TextStyle(
               color: Palette.white,
               fontFamily: "NotoSansKR",
@@ -421,7 +422,7 @@ class ModernWidgets {
           ),
           SizedBox(height: 8),
           Text(
-            "경기도 파주시 해올2길 2 태산 W 타워 7층",
+            tr(context, "경기도 파주시 해올2길 2 태산 W 타워 7층"),
             style: TextStyle(
               color: Palette.grey300,
               fontFamily: "NotoSansKR",
@@ -431,7 +432,7 @@ class ModernWidgets {
           ),
           SizedBox(height: 8),
           Text(
-            "ⓒ 글림교육",
+            tr(context, "ⓒ 글림교육"),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Palette.grey400,
@@ -443,5 +444,6 @@ class ModernWidgets {
         ],
       ),
     );
+    });
   }
 }

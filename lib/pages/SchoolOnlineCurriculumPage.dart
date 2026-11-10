@@ -3,6 +3,7 @@ import 'package:gi_english_website/class/ClassPlacementQuiz.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
 import 'package:gi_english_website/pages/OnlineTeacherSelectPage.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
@@ -80,7 +81,7 @@ class _SchoolOnlineCurriculumPageState
     if (course == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('과정을 선택해주세요.',
+          content: Text(tr(context, "과정을 선택해주세요."),
               style: TextStyle(fontFamily: 'NotoSansKR')),
           backgroundColor: Palette.danger,
         ),
@@ -177,7 +178,7 @@ class _SchoolOnlineCurriculumPageState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "수강과정 전체보기",
+            tr(context, "수강과정 전체보기"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
@@ -231,7 +232,7 @@ class _SchoolOnlineCurriculumPageState
               onPressed: _goTeacherSelect,
               icon: Icon(Icons.arrow_forward, color: Palette.white),
               label: Text(
-                '다음 · 원어민 강사 선택',
+                tr(context, "다음 · 원어민 강사 선택"),
                 style: TextStyle(fontFamily: 'Jalnan', fontSize: 15),
               ),
             ),
@@ -266,7 +267,7 @@ class _SchoolOnlineCurriculumPageState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '${course.order}. ${course.title}',
+          '${course.order}. ${tr(context, course.title)}',
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontWeight: FontWeight.w800,
@@ -276,7 +277,13 @@ class _SchoolOnlineCurriculumPageState
         ),
         SizedBox(height: 4),
         Text(
-          '${course.subtitle} · 화상 ${course.defaultSessions}회',
+          () {
+            final subtitle = tr(context, course.subtitle);
+            if (AppLanguage.instance.isEnglish) {
+              return '$subtitle · ${course.defaultSessions} live classes';
+            }
+            return '$subtitle · 화상 ${course.defaultSessions}회';
+          }(),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontWeight: FontWeight.w600,
@@ -286,7 +293,7 @@ class _SchoolOnlineCurriculumPageState
         ),
         SizedBox(height: 10),
         Text(
-          course.description,
+          tr(context, course.description),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: 14,
@@ -384,7 +391,7 @@ class _SchoolOnlineCurriculumPageState
         _courseRadio(course),
         SizedBox(width: 4),
         Text(
-          selected ? '선택됨' : '이 과정 선택',
+          selected ? tr(context, "선택됨") : tr(context, "이 과정 선택"),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontWeight: FontWeight.w600,
@@ -421,7 +428,7 @@ class _SchoolOnlineCurriculumPageState
         ),
         SizedBox(height: 10),
         Text(
-          '인강 · 디지털 교재 · 실시간 화상수업 · 피드백 체크리스트가 한 화면에서 이어집니다.',
+          tr(context, "인강 · 디지털 교재 · 실시간 화상수업 · 피드백 체크리스트가 한 화면에서 이어집니다."),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: compact ? 12 : 13,
@@ -446,7 +453,7 @@ class _SchoolOnlineCurriculumPageState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '「나에게 맞는 클래스 선택하기」',
+            tr(context, "「나에게 맞는 클래스 선택하기」"),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontWeight: FontWeight.w700,

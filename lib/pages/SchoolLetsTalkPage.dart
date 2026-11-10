@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/TalkCopy.dart';
 import 'package:gi_english_website/class/TalkRoom.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
@@ -44,7 +45,7 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
           ScaffoldMessenger.of(this.context).showSnackBar(
             SnackBar(
               content: Text(
-                'Jitsi 대화방이 열렸어요. Speak English here!',
+                tr(context, "Jitsi 대화방이 열렸어요. Speak English here!"),
                 style: TextStyle(fontFamily: 'NotoSansKR'),
               ),
               backgroundColor: Palette.talkCoralDark,
@@ -159,7 +160,7 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Palette.white,
-        title: const Text('이 회원을 차단할까요?',
+        title: Text(tr(context, "이 회원을 차단할까요?"),
             style: TextStyle(fontFamily: 'Jalnan')),
         content: Text(
           '${contact.name}님과 같은 방에 들어가거나 메시지를 보낼 수 없게 됩니다.',
@@ -168,12 +169,12 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('닫기'),
+            child: Text(tr(context, "닫기")),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(backgroundColor: Palette.danger),
-            child: const Text('차단'),
+            child: Text(tr(context, "차단")),
           ),
         ],
       ),
@@ -215,9 +216,9 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
     final others = room.memberIds.where((id) => id != uid).toList();
     if (others.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            '아직 함께 있는 상대가 없어요.',
+            tr(context, "아직 함께 있는 상대가 없어요."),
             style: TextStyle(fontFamily: 'NotoSansKR'),
           ),
         ),
@@ -229,7 +230,7 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
       targetId = await showDialog<String>(
         context: context,
         builder: (context) => SimpleDialog(
-          title: const Text('누구를 신고할까요?',
+          title: Text(tr(context, "누구를 신고할까요?"),
               style: TextStyle(fontFamily: 'Jalnan')),
           children: [
             for (final id in others)
@@ -267,9 +268,9 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
     );
     if (!mounted || sent != true) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text(
-          '신고를 접수했어요. 운영자가 확인합니다.',
+          tr(context, "신고를 접수했어요. 운영자가 확인합니다."),
           style: TextStyle(fontFamily: 'NotoSansKR'),
         ),
         backgroundColor: Palette.talkCoralDark,
@@ -283,21 +284,21 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Palette.white,
-        title: const Text('대화는 괜찮았나요?',
+        title: Text(tr(context, "대화는 괜찮았나요?"),
             style: TextStyle(fontFamily: 'Jalnan')),
-        content: const Text(
-          '욕설이나 불편한 이야기가 있었다면 지금 신고해 주세요. 운영자가 확인합니다.',
+        content: Text(
+          tr(context, "욕설이나 불편한 이야기가 있었다면 지금 신고해 주세요. 운영자가 확인합니다."),
           style: TextStyle(fontFamily: 'NotoSansKR', height: 1.45),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, 'ok'),
-            child: const Text('괜찮았어요'),
+            child: Text(tr(context, "괜찮았어요")),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, 'report'),
             style: FilledButton.styleFrom(backgroundColor: Palette.danger),
-            child: const Text('신고하기'),
+            child: Text(tr(context, "신고하기")),
           ),
         ],
       ),
@@ -573,8 +574,8 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '로그인하면 바로 Cafe에 들어갈 수 있어요',
+          Text(
+            tr(context, "로그인하면 바로 Cafe에 들어갈 수 있어요"),
             style: TextStyle(
               fontFamily: 'Jalnan',
               fontSize: 16,
@@ -582,8 +583,8 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            '방을 열거나, 이미 열린 대화에 참여하려면 수강생 로그인이 필요해요.',
+          Text(
+            tr(context, "방을 열거나, 이미 열린 대화에 참여하려면 수강생 로그인이 필요해요."),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: 13,
@@ -598,7 +599,7 @@ class _SchoolLetsTalkPageState extends State<SchoolLetsTalkPage> {
               backgroundColor: Palette.talkCoral,
               foregroundColor: Palette.white,
             ),
-            child: const Text('수강생 로그인', style: TextStyle(fontFamily: 'NotoSansKR')),
+            child: Text(tr(context, "수강생 로그인"), style: TextStyle(fontFamily: 'NotoSansKR')),
           ),
         ],
       ),
@@ -983,8 +984,8 @@ class _RoomCard extends StatelessWidget {
           ),
           if (!room.isGroup && room.memberIds.length == 1) ...[
             const SizedBox(height: 6),
-            const Text(
-              '짝을 기다리는 중',
+            Text(
+              tr(context, "짝을 기다리는 중"),
               style: TextStyle(
                 fontFamily: 'NotoSansKR',
                 fontSize: 12,
@@ -1034,10 +1035,10 @@ class _RoomCard extends StatelessWidget {
                         )
                       : Text(
                           mine
-                              ? '다시 입장'
+                              ? tr(context, "다시 입장")
                               : room.isFull
-                                  ? '가득 참'
-                                  : '들어가기',
+                                  ? tr(context, "가득 참")
+                                  : tr(context, "들어가기"),
                           style: const TextStyle(fontFamily: 'NotoSansKR'),
                         ),
                 ),
@@ -1046,8 +1047,8 @@ class _RoomCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: busy ? null : onLeave,
-                  child: const Text(
-                    '나가기',
+                  child: Text(
+                    tr(context, "나가기"),
                     style: TextStyle(fontFamily: 'NotoSansKR', color: Palette.grey600),
                   ),
                 ),
@@ -1169,7 +1170,7 @@ class _ContactChip extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   blocked
-                      ? '차단한 회원'
+                      ? tr(context, "차단한 회원")
                       : '${contact.lastRoomType.koLabel} · ${contact.lastLevel.label}',
                   style: TextStyle(
                     fontFamily: 'NotoSansKR',
@@ -1191,19 +1192,19 @@ class _ContactChip extends StatelessWidget {
               PopupMenuItem(
                 value: 'message',
                 enabled: !blocked,
-                child: const Text('메시지 보내기',
+                child: Text(tr(context, "메시지 보내기"),
                     style: TextStyle(fontFamily: 'NotoSansKR')),
               ),
               PopupMenuItem(
                 value: 'block',
                 child: Text(
-                  blocked ? '차단 해제' : '차단',
+                  blocked ? tr(context, "차단 해제") : tr(context, "차단"),
                   style: const TextStyle(fontFamily: 'NotoSansKR'),
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'report',
-                child: Text('신고', style: TextStyle(fontFamily: 'NotoSansKR')),
+                child: Text(tr(context, "신고"), style: TextStyle(fontFamily: 'NotoSansKR')),
               ),
             ],
           ),
@@ -1271,7 +1272,7 @@ class _CreateTalkRoomDialogState extends State<_CreateTalkRoomDialog> {
       surfaceTintColor: Palette.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       title: Text(
-        group ? '그룹 채팅 열기' : '1:1 대화방 열기',
+        group ? tr(context, "그룹 채팅 열기") : tr(context, "1:1 대화방 열기"),
         style: const TextStyle(fontFamily: 'Jalnan', color: Palette.talkInk),
       ),
       content: SizedBox(
@@ -1302,8 +1303,8 @@ class _CreateTalkRoomDialogState extends State<_CreateTalkRoomDialog> {
                 ],
               ),
               const SizedBox(height: 18),
-              const Text(
-                '레벨',
+              Text(
+                tr(context, "레벨"),
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontWeight: FontWeight.w700,
@@ -1324,8 +1325,8 @@ class _CreateTalkRoomDialogState extends State<_CreateTalkRoomDialog> {
               ),
               if (group) ...[
                 const SizedBox(height: 18),
-                const Text(
-                  '인원 (최대 6명)',
+                Text(
+                  tr(context, "인원 (최대 6명)"),
                   style: TextStyle(
                     fontFamily: 'NotoSansKR',
                     fontWeight: FontWeight.w700,
@@ -1363,7 +1364,7 @@ class _CreateTalkRoomDialogState extends State<_CreateTalkRoomDialog> {
       actions: [
         TextButton(
           onPressed: _saving ? null : () => Navigator.pop(context),
-          child: const Text('닫기'),
+          child: Text(tr(context, "닫기")),
         ),
         FilledButton(
           onPressed: _saving ? null : _submit,
@@ -1380,7 +1381,7 @@ class _CreateTalkRoomDialogState extends State<_CreateTalkRoomDialog> {
                     color: Palette.white,
                   ),
                 )
-              : const Text('방 만들고 입장'),
+              : Text(tr(context, "방 만들고 입장")),
         ),
       ],
     );
@@ -1444,8 +1445,8 @@ class _TalkMessageDialogState extends State<_TalkMessageDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              '상대 화면 오른쪽 위 알림 종에도 바로 뜹니다.',
+            Text(
+              tr(context, "상대 화면 오른쪽 위 알림 종에도 바로 뜹니다."),
               style: TextStyle(
                 fontFamily: 'NotoSansKR',
                 fontSize: 13,
@@ -1477,7 +1478,7 @@ class _TalkMessageDialogState extends State<_TalkMessageDialog> {
       actions: [
         TextButton(
           onPressed: _saving ? null : () => Navigator.pop(context, false),
-          child: const Text('닫기'),
+          child: Text(tr(context, "닫기")),
         ),
         FilledButton(
           onPressed: _saving ? null : _submit,
@@ -1494,7 +1495,7 @@ class _TalkMessageDialogState extends State<_TalkMessageDialog> {
                     color: Palette.white,
                   ),
                 )
-              : const Text('보내기'),
+              : Text(tr(context, "보내기")),
         ),
       ],
     );
@@ -1568,8 +1569,8 @@ class _TalkReportDialogState extends State<_TalkReportDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              '사유',
+            Text(
+              tr(context, "사유"),
               style: TextStyle(
                 fontFamily: 'NotoSansKR',
                 fontWeight: FontWeight.w700,
@@ -1614,7 +1615,7 @@ class _TalkReportDialogState extends State<_TalkReportDialog> {
       actions: [
         TextButton(
           onPressed: _saving ? null : () => Navigator.pop(context, false),
-          child: const Text('닫기'),
+          child: Text(tr(context, "닫기")),
         ),
         FilledButton(
           onPressed: _saving ? null : _submit,
@@ -1631,7 +1632,7 @@ class _TalkReportDialogState extends State<_TalkReportDialog> {
                     color: Palette.white,
                   ),
                 )
-              : const Text('신고하기'),
+              : Text(tr(context, "신고하기")),
         ),
       ],
     );

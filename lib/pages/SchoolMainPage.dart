@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/ModernWidgets.dart';
@@ -140,7 +141,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '온라인 영어 · 원어민 1:1',
+          tr(context, "온라인 영어 · 원어민 1:1"),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: compact ? 12 : 13,
@@ -151,7 +152,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         ),
         SizedBox(height: compact ? 10 : 14),
         Text(
-          '인강으로 배운 영어,\n원어민 화상 수업에서\n완벽히 내 것으로 만듭니다',
+          tr(context, "인강으로 배운 영어,\n원어민 화상 수업에서\n완벽히 내 것으로 만듭니다"),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: compact ? 24 : 36,
@@ -162,7 +163,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
         ),
         SizedBox(height: compact ? 12 : 16),
         Text(
-          '매주 강의를 보고, 연습문제를 푼 후,\n내 시간에 맞춰 원어민과 1:1 수업을 예약합니다.',
+          tr(context, "매주 강의를 보고, 연습문제를 푼 후,\n내 시간에 맞춰 원어민과 1:1 수업을 예약합니다."),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: compact ? 14 : 16,
@@ -189,7 +190,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                 ),
                 onPressed: () => SiteNav.openPlacement(context),
                 child: Text(
-                  '무료 체험하기',
+                  tr(context, "무료 체험하기"),
                   style: TextStyle(
                     fontFamily: 'NotoSansKR',
                     fontWeight: FontWeight.w700,
@@ -211,7 +212,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                 ),
                 onPressed: () => SiteNav.goCourses(context),
                 child: Text(
-                  '과정 보기',
+                  tr(context, "과정 보기"),
                   style: TextStyle(
                     fontFamily: 'NotoSansKR',
                     fontWeight: FontWeight.w600,

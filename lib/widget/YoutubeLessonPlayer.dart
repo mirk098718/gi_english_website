@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
 // ignore: deprecated_member_use
@@ -83,7 +84,7 @@ class _YoutubeLessonPlayerState extends State<YoutubeLessonPlayer> {
         ),
         SizedBox(height: 6),
         Text(
-          '유튜브 페이지로 나가지 않고 이 자리에서 재생됩니다.',
+          tr(context, "유튜브 페이지로 나가지 않고 이 자리에서 재생됩니다."),
           style: TextStyle(
             fontFamily: "NotoSansKR",
             fontSize: 12,

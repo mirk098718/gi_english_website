@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
 /// 홈: 매주 인강 → 학습지 → 원어민 화상 → 피드백.
@@ -49,7 +50,7 @@ class HomeWeeklyLoopBand extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '주간 학습 루프',
+            tr(context, "주간 학습 루프"),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: compact ? 12 : 13,
@@ -60,7 +61,7 @@ class HomeWeeklyLoopBand extends StatelessWidget {
           ),
           SizedBox(height: 8),
           Text(
-            '배우고, 말하고, 고칩니다',
+            tr(context, "배우고, 말하고, 고칩니다"),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: compact ? 22 : 28,
@@ -72,7 +73,7 @@ class HomeWeeklyLoopBand extends StatelessWidget {
           ConstrainedBox(
             constraints: BoxConstraints(maxWidth: 720),
             child: Text(
-              '매주 인강과 학습지로 준비하고, 원어민과 바로 써본 뒤 피드백을 받습니다. 배운 내용을 실제로 쓰고 고치는 것이 핵심입니다.',
+              tr(context, "매주 인강과 학습지로 준비하고, 원어민과 바로 써본 뒤 피드백을 받습니다. 배운 내용을 실제로 쓰고 고치는 것이 핵심입니다."),
               style: TextStyle(
                 fontFamily: 'NotoSansKR',
                 fontSize: compact ? 14 : 16,
@@ -85,9 +86,9 @@ class HomeWeeklyLoopBand extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) {
               if (compact || constraints.maxWidth < 980) {
-                return _columnSteps();
+                return _columnSteps(context);
               }
-              return _rowSteps();
+              return _rowSteps(context);
             },
           ),
         ],
@@ -95,10 +96,10 @@ class HomeWeeklyLoopBand extends StatelessWidget {
     );
   }
 
-  Widget _rowSteps() {
+  Widget _rowSteps(BuildContext context) {
     final children = <Widget>[];
     for (var i = 0; i < _steps.length; i++) {
-      children.add(Expanded(child: _stepCard(_steps[i])));
+      children.add(Expanded(child: _stepCard(context, _steps[i])));
       if (i < _steps.length - 1) {
         children.add(_horizontalArrow());
       }
@@ -109,11 +110,11 @@ class HomeWeeklyLoopBand extends StatelessWidget {
     );
   }
 
-  Widget _columnSteps() {
+  Widget _columnSteps(BuildContext context) {
     return Column(
       children: [
         for (var i = 0; i < _steps.length; i++) ...[
-          _stepCard(_steps[i]),
+          _stepCard(context, _steps[i]),
           if (i < _steps.length - 1) _verticalArrow(),
         ],
       ],
@@ -157,7 +158,7 @@ class HomeWeeklyLoopBand extends StatelessWidget {
     );
   }
 
-  Widget _stepCard(_LoopStep step) {
+  Widget _stepCard(BuildContext context, _LoopStep step) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(
@@ -213,7 +214,7 @@ class HomeWeeklyLoopBand extends StatelessWidget {
           ),
           SizedBox(height: 14),
           Text(
-            step.title,
+            tr(context, step.title),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontWeight: FontWeight.w800,
@@ -223,7 +224,7 @@ class HomeWeeklyLoopBand extends StatelessWidget {
           ),
           SizedBox(height: 6),
           Text(
-            step.body,
+            tr(context, step.body),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: compact ? 13 : 14,

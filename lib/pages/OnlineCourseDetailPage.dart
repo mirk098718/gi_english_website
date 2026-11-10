@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/class/QuizResult.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonFeedbackService.dart';
@@ -206,7 +207,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
     if (date == null || time == null || time.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('날짜와 시간을 선택해주세요.',
+          content: Text(tr(context, "날짜와 시간을 선택해주세요."),
               style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Palette.danger,
         ),
@@ -238,7 +239,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
     }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('예약이 신청되었습니다. 강사 확인을 기다려 주세요.',
+        content: Text(tr(context, "예약이 신청되었습니다. 강사 확인을 기다려 주세요."),
             style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: Palette.success,
       ),
@@ -250,7 +251,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'HTML 문제 페이지가 연결되면 이 버튼으로 열립니다.',
+          tr(context, "HTML 문제 페이지가 연결되면 이 버튼으로 열립니다."),
           style: TextStyle(fontFamily: "NotoSansKR"),
         ),
         backgroundColor: Palette.secondaryDark,
@@ -323,13 +324,13 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            course.title,
+            tr(context, course.title),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
           SizedBox(height: 20),
           Text(
-            course.subtitle,
+            tr(context, course.subtitle),
             style: TextStyle(
               fontFamily: "Jalnan",
               fontSize: 15,
@@ -338,7 +339,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
           ),
           SizedBox(height: 16),
           Text(
-            course.highlights.map((line) => "• $line").join("\n"),
+            course.highlights.map((line) => "• ${tr(context, line)}").join("\n"),
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 14,
@@ -347,10 +348,10 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
             ),
           ),
           SizedBox(height: 32),
-          meetingSection(),
-          SizedBox(height: 32),
           weekSection(),
           if (_weeks.isEmpty) ...[
+            SizedBox(height: 32),
+            meetingSection(),
             SizedBox(height: 32),
             lessonSection(),
           ],
@@ -444,7 +445,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
       onPressed: () => _openStudentMeeting(url),
       icon: Icon(Icons.login, size: 16, color: Palette.white),
       label: Text(
-        '화상수업 입장',
+        tr(context, "화상수업 입장"),
         style: TextStyle(fontFamily: "Jalnan", color: Palette.white, fontSize: 13),
       ),
     );
@@ -514,7 +515,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
             Text(
               intro.isNotEmpty
                   ? intro
-                  : '선택한 원어민 강사와 화상수업을 진행합니다.',
+                  : tr(context, "선택한 원어민 강사와 화상수업을 진행합니다."),
               style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 14,
@@ -527,7 +528,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text('닫기', style: TextStyle(fontFamily: "NotoSansKR")),
+            child: Text(tr(context, "닫기"), style: TextStyle(fontFamily: "NotoSansKR")),
           ),
         ],
       ),
@@ -552,7 +553,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
     if (others.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('지금은 예약할 수 있는 다른 원어민 강사가 없습니다.',
+          content: Text(tr(context, "지금은 예약할 수 있는 다른 원어민 강사가 없습니다."),
               style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Palette.grey700,
         ),
@@ -562,7 +563,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
     final selected = await showDialog<OnlineNativeTeacher>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text('다른 원어민 강사 선택',
+        title: Text(tr(context, "다른 원어민 강사 선택"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
         content: SizedBox(
           width: 420,
@@ -583,7 +584,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                         fontWeight: FontWeight.w700)),
                 subtitle: Text(
                   teacher.nationality.isEmpty
-                      ? '담당 선생님 시간이 안 맞을 때 이 선생님 스케줄로 예약합니다.'
+                      ? tr(context, "담당 선생님 시간이 안 맞을 때 이 선생님 스케줄로 예약합니다.")
                       : teacher.nationality,
                   style: TextStyle(
                       fontFamily: "NotoSansKR",
@@ -598,7 +599,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text('취소', style: TextStyle(fontFamily: "NotoSansKR")),
+            child: Text(tr(context, "취소"), style: TextStyle(fontFamily: "NotoSansKR")),
           ),
         ],
       ),
@@ -629,7 +630,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
           Row(
             children: [
               Text(
-                "화상수업 회차",
+                tr(context, "화상수업 회차"),
                 style: TextStyle(
                   fontFamily: "Jalnan",
                   fontSize: 15,
@@ -646,8 +647,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
           ),
           SizedBox(height: 4),
           Text(
-            "강사가 예약을 컨펌하면 회차가 생기고, 수업 시작 5분 전에 휴대폰으로 알림이 갑니다.\n"
-            "강사가 호스트로 입장하면 수강생도 바로 들어올 수 있습니다. 수업 시간이 되면 입장하기를 누르세요.",
+            tr(context, "강사가 예약을 컨펌하면 회차가 생기고, 수업 시작 5분 전에 휴대폰으로 알림이 갑니다.\n강사가 호스트로 입장하면 수강생도 바로 들어올 수 있습니다. 수업 시간이 되면 입장하기를 누르세요."),
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 14,
@@ -677,7 +677,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                       size: 34, color: Palette.grey400),
                   SizedBox(height: 10),
                   Text(
-                    "아직 등록된 화상수업 회차가 없습니다.",
+                    tr(context, "아직 등록된 화상수업 회차가 없습니다."),
                     style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 14,
@@ -686,7 +686,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                   ),
                   SizedBox(height: 6),
                   Text(
-                    "수업 일정이 확정되면 회차가 표시됩니다.",
+                    tr(context, "수업 일정이 확정되면 회차가 표시됩니다."),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: "NotoSansKR",
@@ -774,7 +774,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
               onPressed: () => _openStudentMeeting(session.meetingUrl),
               icon: Icon(Icons.login, size: 16, color: Palette.white),
               label: Text(
-                "입장하기",
+                tr(context, "입장하기"),
                 style: TextStyle(
                   fontFamily: "Jalnan",
                   color: Palette.white,
@@ -806,18 +806,28 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "회차 학습",
-          style: TextStyle(
-            fontFamily: "Jalnan",
-            fontSize: 15,
-            color: Palette.secondaryDark,
-          ),
+        Row(
+          children: [
+            Text(
+              tr(context, "회차 학습"),
+              style: TextStyle(
+                fontFamily: "Jalnan",
+                fontSize: 15,
+                color: Palette.secondaryDark,
+              ),
+            ),
+            SizedBox(width: 4),
+            IconButton(
+              tooltip: '새로고침',
+              onPressed: _loadData,
+              icon: Icon(Icons.refresh, size: 18, color: Palette.grey600),
+            ),
+          ],
         ),
         SizedBox(height: 8),
         Text(
           _enrollment == null
-              ? "수강이 배정되면 회차별로 인강, 문제풀이, 체크리스트를 진행할 수 있습니다."
+              ? tr(context, "수강이 배정되면 회차별로 인강, 문제풀이, 체크리스트를 진행할 수 있습니다.")
               : _enrollmentDeadlineCopy(),
           style: TextStyle(
             fontFamily: "NotoSansKR",
@@ -843,7 +853,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
               border: Border.all(color: Palette.grey200),
             ),
             child: Text(
-              "아직 등록된 회차 학습이 없습니다. 곧 1회차부터 올라올 예정입니다.",
+              tr(context, "아직 등록된 회차 학습이 없습니다. 곧 1회차부터 올라올 예정입니다."),
               style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 14,
@@ -853,7 +863,10 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
           )
         else
           Column(
-            children: _weeks.map(weekTile).toList(),
+            children: [
+              ..._weeks.map(weekTile),
+              ..._unmatchedSessions().map(sessionTile),
+            ],
           ),
       ],
     );
@@ -961,7 +974,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    '진행 중',
+                    tr(context, "진행 중"),
                     style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 11,
@@ -978,7 +991,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    '이수',
+                    tr(context, "이수"),
                     style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 11,
@@ -1017,6 +1030,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                   color: Palette.grey600,
                 ),
               ),
+              ..._sessionsForWeek(week).map(sessionTile),
             ] else ...[
             if (week.description.isNotEmpty) ...[
               Align(
@@ -1035,13 +1049,13 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
             ],
             Align(
               alignment: Alignment.centerLeft,
-              child: Text('1. 인강 보기',
+              child: Text(tr(context, "1. 인강 보기"),
                   style: TextStyle(fontFamily: "Jalnan", fontSize: 13)),
             ),
             SizedBox(height: 8),
             if (week.videoUrl.isEmpty)
               Text(
-                '아직 인강이 등록되지 않았습니다.',
+                tr(context, "아직 인강이 등록되지 않았습니다."),
                 style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 13,
@@ -1055,7 +1069,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
             SizedBox(height: 16),
             Align(
               alignment: Alignment.centerLeft,
-              child: Text('2. 문제풀이',
+              child: Text(tr(context, "2. 문제풀이"),
                   style: TextStyle(fontFamily: "Jalnan", fontSize: 13)),
             ),
             SizedBox(height: 8),
@@ -1077,7 +1091,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                           },
                           icon: Icon(Icons.quiz_outlined, size: 18),
                           label: Text(
-                            link.title.isEmpty ? '리뷰 및 문제풀이' : link.title,
+                            link.title.isEmpty ? tr(context, "리뷰 및 문제풀이") : link.title,
                             style: TextStyle(fontFamily: "NotoSansKR"),
                           ),
                         ))
@@ -1085,7 +1099,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                     OutlinedButton.icon(
                       onPressed: _showProblemPlaceholder,
                       icon: Icon(Icons.quiz_outlined, size: 18),
-                      label: Text('리뷰 및 문제풀이',
+                      label: Text(tr(context, "리뷰 및 문제풀이"),
                           style: TextStyle(fontFamily: "NotoSansKR")),
                     ),
                 ],
@@ -1095,14 +1109,14 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
             SizedBox(height: 16),
             Align(
               alignment: Alignment.centerLeft,
-              child: Text('3. 학습 체크리스트',
+              child: Text(tr(context, "3. 학습 체크리스트"),
                   style: TextStyle(fontFamily: "Jalnan", fontSize: 13)),
             ),
             SizedBox(height: 4),
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                '인강 시청과 문제풀이를 모두 체크해야 아래 예약이 열립니다.',
+                tr(context, "인강 시청과 문제풀이를 모두 체크해야 아래 예약이 열립니다."),
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -1113,7 +1127,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
             SizedBox(height: 8),
             if (_enrollment == null)
               Text(
-                '체크하려면 이 과정에 수강이 배정되어 있어야 합니다.',
+                tr(context, "체크하려면 이 과정에 수강이 배정되어 있어야 합니다."),
                 style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 13,
@@ -1121,7 +1135,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
               )
             else if (week.checklistItems.isEmpty)
               Text(
-                '이번 회차 체크 항목이 아직 없습니다.',
+                tr(context, "이번 회차 체크 항목이 아직 없습니다."),
                 style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 13,
@@ -1153,22 +1167,9 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                 }).toList(),
               ),
             SizedBox(height: 16),
+            weekLiveClassSection(week, checked),
+            SizedBox(height: 16),
             weekFeedbackSection(week),
-            if (_enrollment != null) ...[
-              SizedBox(height: 16),
-              if (_readyToBook(week, checked))
-                weekBookingSection(week)
-              else
-                Text(
-                  '인강 시청과 문제풀이를 모두 체크하면 화상수업 예약이 열립니다.',
-                  style: TextStyle(
-                    fontFamily: "NotoSansKR",
-                    fontSize: 13,
-                    color: Palette.grey600,
-                    height: 1.5,
-                  ),
-                ),
-            ],
             ],
           ],
         ),
@@ -1191,7 +1192,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
       return Padding(
         padding: EdgeInsets.only(top: 8),
         child: Text(
-          '25문제를 모두 채점하면 맞은 개수와 정답률이 여기에 남습니다. 다시 풀면 최근 정답률로 바뀌고, 주관식도 최근 답으로 바뀝니다.',
+          tr(context, "25문제를 모두 채점하면 맞은 개수와 정답률이 여기에 남습니다. 다시 풀면 최근 정답률로 바뀌고, 주관식도 최근 답으로 바뀝니다."),
           style: TextStyle(
             fontFamily: "NotoSansKR",
             fontSize: 12,
@@ -1209,6 +1210,70 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
     );
   }
 
+  List<OnlineSession> _sessionsForWeek(OnlineWeek week) {
+    final booking = _bookingFor(week.id);
+    final expectedId = booking == null
+        ? ''
+        : EnrollmentService.sessionDocIdForBooking(booking.id);
+    return _sessions.where((session) {
+      if (booking != null &&
+          (session.bookingId == booking.id || session.id == expectedId)) {
+        return true;
+      }
+      if (week.weekNumber <= 0) return false;
+      if (session.weekNumber == week.weekNumber) return true;
+      return session.weekNumber == 0 &&
+          session.bookingId.isEmpty &&
+          session.order == week.weekNumber;
+    }).toList();
+  }
+
+  List<OnlineSession> _unmatchedSessions() {
+    final matched = <String>{};
+    for (final week in _weeks) {
+      for (final session in _sessionsForWeek(week)) {
+        matched.add(session.id);
+      }
+    }
+    return _sessions.where((session) => !matched.contains(session.id)).toList();
+  }
+
+  /// 인강 · 문제 · 체크 다음, 강사 피드백 앞에 두는 이 회차의 화상수업.
+  Widget weekLiveClassSection(OnlineWeek week, List<String> checked) {
+    final sessions = _sessionsForWeek(week);
+    final booking = _bookingFor(week.id);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            tr(context, "4. 화상수업"),
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 13),
+          ),
+        ),
+        SizedBox(height: 8),
+        if (sessions.isNotEmpty)
+          Column(children: sessions.map(sessionTile).toList())
+        else if (_enrollment != null &&
+            (booking != null || _readyToBook(week, checked)))
+          weekBookingSection(week)
+        else
+          Text(
+            _enrollment == null
+                ? tr(context, '수강이 배정되면 이 회차 화상수업을 예약할 수 있습니다.')
+                : tr(context, '인강 시청과 문제풀이를 모두 체크하면 화상수업 예약이 열립니다.'),
+            style: TextStyle(
+              fontFamily: "NotoSansKR",
+              fontSize: 13,
+              color: Palette.grey600,
+              height: 1.5,
+            ),
+          ),
+      ],
+    );
+  }
+
   Widget weekFeedbackSection(OnlineWeek week) {
     final feedback =
         LessonFeedbackService.forWeek(_feedbacks, week.id, week.weekNumber);
@@ -1218,7 +1283,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
       children: [
         Align(
           alignment: Alignment.centerLeft,
-          child: Text('4. 강사 피드백',
+          child: Text(tr(context, "5. 강사 피드백"),
               style: TextStyle(fontFamily: "Jalnan", fontSize: 13)),
         ),
         SizedBox(height: 8),
@@ -1232,7 +1297,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
           ),
           child: feedback == null
               ? Text(
-                  '아직 강사 피드백이 없습니다.',
+                  tr(context, "아직 강사 피드백이 없습니다."),
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 13,
@@ -1266,7 +1331,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                       ),
                     ),
                     SizedBox(height: 12),
-                    Text('수업 평가',
+                    Text(tr(context, "수업 평가"),
                         style: TextStyle(
                             fontFamily: "NotoSansKR",
                             fontWeight: FontWeight.w700,
@@ -1297,13 +1362,13 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                             );
                             if (saved) await _loadData();
                           },
-                          child: Text('별점 평가하기',
+                          child: Text(tr(context, "별점 평가하기"),
                               style: TextStyle(fontFamily: "NotoSansKR")),
                         ),
                       )
                     else
                       Text(
-                        '강사 피드백을 확인한 뒤 별점 평가를 마치면 다음 회차가 열립니다.',
+                        tr(context, "강사 피드백을 확인한 뒤 별점 평가를 마치면 다음 회차가 열립니다."),
                         style: TextStyle(
                           fontFamily: "NotoSansKR",
                           fontSize: 13,
@@ -1386,7 +1451,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '화상수업 예약하기',
+                      tr(context, "화상수업 예약하기"),
                       style: TextStyle(fontFamily: "Jalnan", fontSize: 13),
                     ),
                     SizedBox(height: 2),
@@ -1402,7 +1467,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                     if (otherTeacher) ...[
                       SizedBox(height: 2),
                       Text(
-                        '담당 선생님 대신 다른 원어민 수업입니다.',
+                        tr(context, "담당 선생님 대신 다른 원어민 수업입니다."),
                         style: TextStyle(
                           fontFamily: "NotoSansKR",
                           fontSize: 11,
@@ -1451,8 +1516,8 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
           ] else ...[
             Text(
               otherTeacher
-                  ? '수업은 20분입니다. 선택한 원어민 선생님이 열어 둔 시간만 예약할 수 있습니다. 담당 선생님이 아니어도 강사가 확인하면 확정됩니다.'
-                  : '수업은 20분입니다. 담당 원어민 선생님이 열어 둔 시간만 6:00 AM부터 11:00 PM까지 30분 단위로 선택할 수 있습니다. 강사가 확인하면 예약이 확정됩니다.',
+                  ? tr(context, "수업은 20분입니다. 선택한 원어민 선생님이 열어 둔 시간만 예약할 수 있습니다. 담당 선생님이 아니어도 강사가 확인하면 확정됩니다.")
+                  : tr(context, "수업은 20분입니다. 담당 원어민 선생님이 열어 둔 시간만 6:00 AM부터 11:00 PM까지 30분 단위로 선택할 수 있습니다. 강사가 확인하면 예약이 확정됩니다."),
               style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 13,
@@ -1470,7 +1535,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                       ? null
                       : () => _pickOtherTeacher(week),
                   child: Text(
-                    '다른 원어민 강사 수업 예약',
+                    tr(context, "다른 원어민 강사 수업 예약"),
                     style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12),
                   ),
                 ),
@@ -1484,7 +1549,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                       });
                     },
                     child: Text(
-                      '담당 선생님으로 다시 예약',
+                      tr(context, "담당 선생님으로 다시 예약"),
                       style: TextStyle(
                           fontFamily: "NotoSansKR", fontSize: 12),
                     ),
@@ -1492,7 +1557,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
               ],
             ),
             SizedBox(height: 10),
-            Text('날짜 선택',
+            Text(tr(context, "날짜 선택"),
                 style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
             SizedBox(height: 8),
             Wrap(
@@ -1517,12 +1582,12 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
             ),
             if (selectedDate != null) ...[
               SizedBox(height: 12),
-              Text('시간 선택',
+              Text(tr(context, "시간 선택"),
                   style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
               SizedBox(height: 8),
               if (timeSlots.isEmpty)
                 Text(
-                  '선택할 수 있는 열린 시간이 없습니다. 다른 날짜를 골라 주세요.',
+                  tr(context, "선택할 수 있는 열린 시간이 없습니다. 다른 날짜를 골라 주세요."),
                   style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 13,
@@ -1556,7 +1621,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                   onPressed: _submittingBooking
                       ? null
                       : () => _submitBooking(week),
-                  child: Text('예약 신청',
+                  child: Text(tr(context, "예약 신청"),
                       style: TextStyle(fontFamily: "Jalnan")),
                 ),
               ),
@@ -1572,7 +1637,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "강의 영상 자료",
+          tr(context, "강의 영상 자료"),
           style: TextStyle(
             fontFamily: "Jalnan",
             fontSize: 15,
@@ -1610,7 +1675,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
           Icon(Icons.video_library_outlined, size: 40, color: Palette.grey400),
           SizedBox(height: 12),
           Text(
-            "등록된 강의 영상이 아직 없습니다.",
+            tr(context, "등록된 강의 영상이 아직 없습니다."),
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 14,
@@ -1619,7 +1684,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
           ),
           SizedBox(height: 6),
           Text(
-            "기본 영상 자료는 순차적으로 업로드될 예정입니다.",
+            tr(context, "기본 영상 자료는 순차적으로 업로드될 예정입니다."),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: "NotoSansKR",

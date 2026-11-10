@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
 /// 홈: 주간 루프 아래, 수업 화면과 예약 알림 안내.
@@ -22,7 +23,7 @@ class HomeClassAlertBand extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '예약 · 알림',
+            tr(context, "예약 · 알림"),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: compact ? 12 : 13,
@@ -33,7 +34,7 @@ class HomeClassAlertBand extends StatelessWidget {
           ),
           SizedBox(height: 8),
           Text(
-            '내 시간에 맞춰 고르면,\n수업 전에 알려 드립니다',
+            tr(context, "내 시간에 맞춰 고르면,\n수업 전에 알려 드립니다"),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: compact ? 22 : 28,
@@ -46,7 +47,7 @@ class HomeClassAlertBand extends StatelessWidget {
           ConstrainedBox(
             constraints: BoxConstraints(maxWidth: 720),
             child: Text(
-              '30분 단위로 화상수업을 예약하면, 수업 전에 카카오톡과 이메일로 일정을 보내 드립니다.',
+              tr(context, "30분 단위로 화상수업을 예약하면, 수업 전에 카카오톡과 이메일로 일정을 보내 드립니다."),
               style: TextStyle(
                 fontFamily: 'NotoSansKR',
                 fontSize: compact ? 14 : 16,
@@ -62,7 +63,7 @@ class HomeClassAlertBand extends StatelessWidget {
           ),
           SizedBox(height: compact ? 28 : 40),
           Text(
-            '예약하면 수업 전에 이렇게 알려 드립니다.',
+            tr(context, "예약하면 수업 전에 이렇게 알려 드립니다."),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: compact ? 16 : 18,

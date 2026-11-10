@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityBoardPage.dart';
@@ -219,7 +220,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                '갤러리',
+                tr(context, "갤러리"),
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontWeight: FontWeight.w800,
@@ -232,7 +233,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
               TextButton.icon(
                 onPressed: _showUploadDialog,
                 icon: Icon(Icons.add, size: compact ? 16 : 18),
-                label: Text(compact ? '업로드' : '사진 올리기'),
+                label: Text(compact ? tr(context, "업로드") : tr(context, "사진 올리기")),
                 style: TextButton.styleFrom(
                   foregroundColor: Palette.navy,
                   textStyle: TextStyle(
@@ -267,11 +268,11 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
         }
 
         if (snapshot.hasError) {
-          return const Padding(
+          return Padding(
             padding: EdgeInsets.symmetric(vertical: 32),
             child: Center(
               child: Text(
-                '갤러리를 불러오는 중 오류가 발생했습니다.',
+                tr(context, "갤러리를 불러오는 중 오류가 발생했습니다."),
                 style: TextStyle(fontFamily: 'NotoSansKR'),
               ),
             ),
@@ -289,7 +290,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                       size: 40, color: Palette.grey400),
                   const SizedBox(height: 10),
                   Text(
-                    '아직 올라온 사진이 없습니다.',
+                    tr(context, "아직 올라온 사진이 없습니다."),
                     style: TextStyle(
                       fontFamily: 'NotoSansKR',
                       fontSize: 14,
@@ -401,7 +402,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
-                    child: Text("상담신청",
+                    child: Text(tr(context, "상담신청"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "Jalnan",
@@ -522,7 +523,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                   height: 40,
                   child: ElevatedButton(
                     child: Text(
-                      "상담신청",
+                      tr(context, "상담신청"),
                       style:
                           TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),

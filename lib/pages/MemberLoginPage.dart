@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/MemberRegisterPage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineClassroomPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -116,7 +117,7 @@ class _MemberLoginPageState extends State<MemberLoginPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "회원 로그인",
+            tr(context, "회원 로그인"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
@@ -134,7 +135,7 @@ class _MemberLoginPageState extends State<MemberLoginPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    "온라인 프로그램 회원 로그인",
+                    tr(context, "온라인 프로그램 회원 로그인"),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: "Jalnan",
@@ -144,7 +145,7 @@ class _MemberLoginPageState extends State<MemberLoginPage> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    "로그인하시면 나의 강의실에서 배정된 인강을 수강하실 수 있습니다.",
+                    tr(context, "로그인하시면 나의 강의실에서 배정된 인강을 수강하실 수 있습니다."),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: "NotoSansKR",
@@ -168,7 +169,7 @@ class _MemberLoginPageState extends State<MemberLoginPage> {
                                 prefillEmail: emailController.text,
                               ),
                       child: Text(
-                        '아이디 · 비밀번호 찾기',
+                        tr(context, "아이디 · 비밀번호 찾기"),
                         style: TextStyle(
                           fontFamily: 'NotoSansKR',
                           fontSize: 13,
@@ -199,7 +200,7 @@ class _MemberLoginPageState extends State<MemberLoginPage> {
                               ),
                             )
                           : Text(
-                              "로그인",
+                              tr(context, "로그인"),
                               style: TextStyle(
                                 fontFamily: "Jalnan",
                                 color: Palette.white,
@@ -214,7 +215,7 @@ class _MemberLoginPageState extends State<MemberLoginPage> {
                       MenuUtil.push(context, MemberRegisterPage());
                     },
                     child: Text(
-                      "아직 회원이 아니신가요? 회원가입",
+                      tr(context, "아직 회원이 아니신가요? 회원가입"),
                       style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 13,
@@ -224,7 +225,7 @@ class _MemberLoginPageState extends State<MemberLoginPage> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    "가입 후 관리자 수강 배정이 완료되면 내 강의실에서 프로그램을 이용할 수 있습니다.",
+                    tr(context, "가입 후 관리자 수강 배정이 완료되면 내 강의실에서 프로그램을 이용할 수 있습니다."),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: "NotoSansKR",

@@ -7,6 +7,7 @@ import 'package:gi_english_website/pages/SchoolCurriculumMiddleSchoolPage.dart';
 import 'package:gi_english_website/pages/SchoolMapPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
 import 'package:gi_english_website/pages/SchoolTeachersPage.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
@@ -32,7 +33,7 @@ class AcademyHomeCards extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '프로그램',
+            tr(context, "프로그램"),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: compact ? 12 : 13,
@@ -43,7 +44,7 @@ class AcademyHomeCards extends StatelessWidget {
           ),
           SizedBox(height: 8),
           Text(
-            '파주 캠퍼스에서 고를 수 있는 수업',
+            tr(context, "파주 캠퍼스에서 고를 수 있는 수업"),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: compact ? 22 : 28,
@@ -60,7 +61,7 @@ class AcademyHomeCards extends StatelessWidget {
           ),
           SizedBox(height: compact ? 28 : 36),
           Text(
-            '학원 안내',
+            tr(context, "학원 안내"),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: compact ? 12 : 13,
@@ -172,7 +173,7 @@ class AcademyHomeCards extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        item.title,
+                        tr(context, item.title),
                         style: TextStyle(
                           fontFamily: 'NotoSansKR',
                           fontWeight: FontWeight.w800,
@@ -182,7 +183,7 @@ class AcademyHomeCards extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        item.subtitle,
+                        tr(context, item.subtitle),
                         style: TextStyle(
                           fontFamily: 'NotoSansKR',
                           fontSize: compact ? 12 : 13,

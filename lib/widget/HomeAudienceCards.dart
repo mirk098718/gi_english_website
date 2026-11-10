@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/SiteNav.dart';
 
@@ -24,7 +25,7 @@ class HomeAudienceCards extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '대상별 과정',
+            tr(context, "대상별 과정"),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: compact ? 12 : 13,
@@ -35,7 +36,7 @@ class HomeAudienceCards extends StatelessWidget {
           ),
           SizedBox(height: 8),
           Text(
-            '지금 필요한 영어부터 고르세요',
+            tr(context, "지금 필요한 영어부터 고르세요"),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: compact ? 22 : 28,
@@ -102,7 +103,7 @@ class HomeAudienceCards extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '학원',
+          tr(context, "학원"),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: compact ? 12 : 13,
@@ -155,7 +156,7 @@ class HomeAudienceCards extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '초중등 파주캠퍼스 바로가기',
+                            tr(context, "초중등 파주캠퍼스 바로가기"),
                             style: TextStyle(
                               fontFamily: 'NotoSansKR',
                               fontWeight: FontWeight.w800,
@@ -165,7 +166,7 @@ class HomeAudienceCards extends StatelessWidget {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            '오프라인 초중등 회화 · 파주 운정',
+                            tr(context, "오프라인 초중등 회화 · 파주 운정"),
                             style: TextStyle(
                               fontFamily: 'NotoSansKR',
                               fontSize: compact ? 12 : 13,
@@ -232,7 +233,7 @@ class HomeAudienceCards extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        item.title,
+                        tr(context, item.title),
                         style: TextStyle(
                           fontFamily: 'NotoSansKR',
                           fontWeight: FontWeight.w800,
@@ -241,8 +242,8 @@ class HomeAudienceCards extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 4),
-                      Text(
-                        item.subtitle,
+                          Text(
+                            tr(context, item.subtitle),
                         style: TextStyle(
                           fontFamily: 'NotoSansKR',
                           fontSize: compact ? 12 : 13,

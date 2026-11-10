@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
@@ -137,7 +138,7 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
           Container(
             width: 600,
             height: 600,
-            child: Text("게시판 필요"),
+            child: Text(tr(context, "게시판 필요")),
           )
         ],
       ),
@@ -189,7 +190,7 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
-                    child: Text("상담신청",
+                    child: Text(tr(context, "상담신청"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "Jalnan",
@@ -316,7 +317,7 @@ class _SchoolCommunityFAQPageState extends State<SchoolCommunityFAQPage> {
                   height: 40,
                   child: ElevatedButton(
                     child: Text(
-                      "상담신청",
+                      tr(context, "상담신청"),
                       style:
                           TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolMapPage.dart';
@@ -127,7 +128,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "GLEAM ISLAND 교원/운영시스템 소개",
+            tr(context, "GLEAM ISLAND 교원/운영시스템 소개"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
@@ -135,7 +136,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
             height: 30,
           ),
           Text(
-            "원장 Mia 선생님",
+            tr(context, "원장 Mia 선생님"),
             style: TextStyle(
                 fontFamily: "Jalnan", fontSize: 15, color: Palette.primary),
           ),
@@ -154,28 +155,14 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
                 ),
               );
               final bio = Text(
-                "Mia Kim \n\n"
-                "현 Gi 글림아일랜드 어학원 파주 원장\n"
-                "전 서대문구 소재 청담 에이프릴 어학원 교수부장\n"
-                "서대문구 소재 위즈빌 어학원 영어 유초등부 강사\n"
-                "하이잉글리쉬 대기업 출강강사 (현대케피코, 두산중공업 등)\n"
-                "강남 유명 OPIC (영어 구술 시험) 전문 어학원 강사\n"
-                "비욘드 어학원 초, 중등 강사\n"
-                "JTBC 다큐멘터리 “스포츠관광을 디렉팅하라” 영문번역",
+                tr(context, "Mia Kim \n\n현 Gi 글림아일랜드 어학원 파주 원장\n전 서대문구 소재 청담 에이프릴 어학원 교수부장\n서대문구 소재 위즈빌 어학원 영어 유초등부 강사\n하이잉글리쉬 대기업 출강강사 (현대케피코, 두산중공업 등)\n강남 유명 OPIC (영어 구술 시험) 전문 어학원 강사\n비욘드 어학원 초, 중등 강사\nJTBC 다큐멘터리 “스포츠관광을 디렉팅하라” 영문번역"),
                 style: TextStyle(
                     color: Palette.black,
                     fontFamily: "NotoSansKR",
                     fontSize: 14),
               );
               final creds = Text(
-                "학력 및 자격\n"
-                "\n"
-                "뉴질랜드 오클랜드 공과 대학교\n"
-                "(Auckland University of Technology) 석사졸\n"
-                "뉴질랜드 오클랜드 소재 Glenfield College 고등학교 졸\n"
-                "TESOL 영어 강사 자격 보유\n"
-                "(Certificate in Teaching English as a Second Language)\n"
-                "(Queens Academic Group)",
+                tr(context, "학력 및 자격\n\n뉴질랜드 오클랜드 공과 대학교\n(Auckland University of Technology) 석사졸\n뉴질랜드 오클랜드 소재 Glenfield College 고등학교 졸\nTESOL 영어 강사 자격 보유\n(Certificate in Teaching English as a Second Language)\n(Queens Academic Group)"),
                 style: TextStyle(
                     color: Palette.black,
                     fontFamily: "NotoSansKR",
@@ -208,7 +195,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
           WidgetUtil.pageImage("assets/teachers.png", maxWidth: 900),
           SizedBox(height: 40),
           Text(
-            "운영시스템",
+            tr(context, "운영시스템"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
@@ -219,12 +206,11 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
                 fontFamily: "NotoSansKR",
                 fontWeight: FontWeight.normal,
                 fontSize: 14),
-            "글림아일랜드 어학원은 원장의 총괄 관리 하에 중등부와 초등부 한 해 전체 커리큘럼이 사전에 완벽하게 짜여진 상태로 진행되는 시스템으로, 담임 선생님들이 아이들을 밀착 관리하되, 수업 내용은 원장 및 교수부가 부단한 노력으로 연구 개발한 커리큘럼의 틀을 크게 벗어나지 않도록 철저히 관리합니다.\n"
-            "글림아일랜드의 시간표는 버리는 시간이 없도록 알찬 내용으로 구성되어 있으며, 아이들이 재미와 학습을 모두 잡을 수 있도록 합니다.",
+            tr(context, "글림아일랜드 어학원은 원장의 총괄 관리 하에 중등부와 초등부 한 해 전체 커리큘럼이 사전에 완벽하게 짜여진 상태로 진행되는 시스템으로, 담임 선생님들이 아이들을 밀착 관리하되, 수업 내용은 원장 및 교수부가 부단한 노력으로 연구 개발한 커리큘럼의 틀을 크게 벗어나지 않도록 철저히 관리합니다.\n글림아일랜드의 시간표는 버리는 시간이 없도록 알찬 내용으로 구성되어 있으며, 아이들이 재미와 학습을 모두 잡을 수 있도록 합니다."),
           ),
           SizedBox(height: 20),
           Text(
-            "정기상담",
+            tr(context, "정기상담"),
             style: TextStyle(
                 fontFamily: "Jalnan",
                 fontSize: 15,
@@ -237,13 +223,11 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
                 fontFamily: "NotoSansKR",
                 fontWeight: FontWeight.normal,
                 fontSize: 14),
-            "본원에서는 아이들의 학업 성취와 원 생활에 대한 정보을 학부모님과 보다 가깝게 소통하기 위하여 "
-            "월 정기 담임 상담 1회, 레벨업 상담 1회를 진행합니다. 또한 상담실은 언제든 열려 있으며, "
-            "원장 상담 역시 언제든 예약해주십시오.",
+            tr(context, "본원에서는 아이들의 학업 성취와 원 생활에 대한 정보을 학부모님과 보다 가깝게 소통하기 위하여 월 정기 담임 상담 1회, 레벨업 상담 1회를 진행합니다. 또한 상담실은 언제든 열려 있으며, 원장 상담 역시 언제든 예약해주십시오."),
           ),
           SizedBox(height: 20),
           Text(
-            "정기테스트",
+            tr(context, "정기테스트"),
             style: TextStyle(
                 fontFamily: "Jalnan",
                 fontSize: 15,
@@ -256,9 +240,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
                 fontFamily: "NotoSansKR",
                 fontWeight: FontWeight.normal,
                 fontSize: 14),
-            "• 본원에서는 아이들의 원활한 Vocabulary 습득을 위하여 정기적인 단어시험을 진행합니다.\n"
-            "• 중등, 초등부 모두 매주 해당 주에 배운 단어들에 대한 쪽지 시험을 보며,\n"
-            "• 매월 정기 Monthly Test, 6개월에 1회 Level Up Test 를 진행합니다\n",
+            tr(context, "• 본원에서는 아이들의 원활한 Vocabulary 습득을 위하여 정기적인 단어시험을 진행합니다.\n• 중등, 초등부 모두 매주 해당 주에 배운 단어들에 대한 쪽지 시험을 보며,\n• 매월 정기 Monthly Test, 6개월에 1회 Level Up Test 를 진행합니다\n"),
           ),
           SizedBox(height: 20),
           Container(
@@ -316,7 +298,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
-                    child: Text("상담신청",
+                    child: Text(tr(context, "상담신청"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "Jalnan",
@@ -443,7 +425,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
                   height: 40,
                   child: ElevatedButton(
                     child: Text(
-                      "상담신청",
+                      tr(context, "상담신청"),
                       style:
                           TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),

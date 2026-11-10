@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -47,7 +48,7 @@ class TeacherMonthLessonSummary extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title ?? '이번달 수업수',
+                      title ?? tr(context, "이번달 수업수"),
                       style: TextStyle(
                         fontFamily: "Jalnan",
                         fontSize: 12,
@@ -83,7 +84,7 @@ class TeacherMonthLessonSummary extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title ?? '이번달 수업수',
+                  title ?? tr(context, "이번달 수업수"),
                   style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
                 ),
                 SizedBox(height: 4),
@@ -264,7 +265,7 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
         const SizedBox(height: 16),
         Text(
           widget.teacherName.isEmpty
-              ? '이 달의 예약 · 진행 · 평가가 시간순으로 보입니다. 별점은 인사 평가에 쓰입니다.'
+              ? tr(context, "이 달의 예약 · 진행 · 평가가 시간순으로 보입니다. 별점은 인사 평가에 쓰입니다.")
               : '${widget.teacherName} 선생님의 이 달 예약 · 진행 · 학생 평가입니다.',
           style: TextStyle(
               fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
@@ -273,7 +274,7 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
         if (_loading)
           const Center(child: CircularProgressIndicator())
         else if (items.isEmpty)
-          Text('이 달 수업 이력이 없습니다.',
+          Text(tr(context, "이 달 수업 이력이 없습니다."),
               style:
                   TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500))
         else
@@ -316,7 +317,7 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
             [
               student,
               if (booking.weekNumber > 0) '${booking.weekNumber}회차',
-              if (guest) '코티칭',
+              if (guest) tr(context, "코티칭"),
             ].join(' · '),
             style: TextStyle(
               fontFamily: "NotoSansKR",
