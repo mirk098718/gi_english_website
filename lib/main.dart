@@ -5,6 +5,7 @@ import 'package:gi_english_website/firebase_options.dart';
 import 'package:gi_english_website/pages/PaymentResultPage.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:gi_english_website/util/NoticeService.dart';
+import 'package:gi_english_website/util/QuizResultBridge.dart';
 import 'package:gi_english_website/util/SiteAlertCenter.dart';
 
 import 'pages/AdminTeacherScheduleTab.dart';
@@ -24,6 +25,7 @@ Future<void> main() async {
   // 달력 등 한글 로케일(요일/월 이름) 사용을 위한 초기화
   await initializeDateFormatting('ko_KR', null);
   SiteAlertCenter.instance.start();
+  startQuizResultBridge();
 
   runApp(MyApp());
 }

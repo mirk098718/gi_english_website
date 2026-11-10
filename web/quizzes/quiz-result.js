@@ -26,6 +26,36 @@
       weekNumber: 4,
       title: "왕초보 4강 연습문제"
     },
+    "gleam-level1-lesson5": {
+      courseId: "beginner_phonics",
+      weekNumber: 5,
+      title: "왕초보 5강 연습문제"
+    },
+    "gleam-level1-lesson6": {
+      courseId: "beginner_phonics",
+      weekNumber: 6,
+      title: "왕초보 6강 연습문제"
+    },
+    "gleam-level1-lesson7": {
+      courseId: "beginner_phonics",
+      weekNumber: 7,
+      title: "왕초보 7강 연습문제"
+    },
+    "gleam-level1-lesson8": {
+      courseId: "beginner_phonics",
+      weekNumber: 8,
+      title: "왕초보 8강 연습문제"
+    },
+    "gleam-level1-lesson9": {
+      courseId: "beginner_phonics",
+      weekNumber: 9,
+      title: "왕초보 9강 연습문제"
+    },
+    "gleam-level1-lesson10": {
+      courseId: "beginner_phonics",
+      weekNumber: 10,
+      title: "왕초보 10강 연습문제"
+    },
     "gleam-level3-lesson1": {
       courseId: "intermediate_grammar_speaking",
       weekNumber: 1,
@@ -134,7 +164,7 @@
       var section = document.createElement("section");
       section.id = "gleamSaved";
       section.hidden = true;
-      section.innerHTML = '<h2>최근 결과</h2><p class="score"></p><p class="status"></p><div class="essays"></div><p class="note">완료를 누르면 이 정답률과 주관식 답이 저장됩니다. 다시 풀고 완료하면 방금 풀이로 바뀝니다.</p>';
+      section.innerHTML = '<h2>최근 결과</h2><p class="score"></p><p class="status"></p><div class="essays"></div><p class="note">완료를 누르면 이 점수와 주관식 답이 내 강의실에 바로 저장됩니다. 다시 풀고 완료하면 방금 풀이로 바뀝니다.</p>';
       main.insertBefore(section, main.firstChild);
       return section;
     }
@@ -165,6 +195,41 @@
     }
 
     var pendingFinish = false;
+    var siteSavePending = false;
+    var savedMessage = "문제풀이를 완료하고 결과를 저장했습니다. 내 강의실에서 점수와 주관식 답을 볼 수 있습니다.";
+
+    function previewFrom(snapshot) {
+      return {
+        title: meta ? meta.title : "",
+        correctCount: snapshot.correct,
+        essays: snapshot.essays || []
+      };
+    }
+
+    function notifySite(snapshot) {
+      if (!window.opener || window.opener === window || !meta || !snapshot) return false;
+      try {
+        window.opener.postMessage({
+          type: "gleam-quiz-result",
+          payload: buildPayload(meta, snapshot, user ? user.uid : "")
+        }, window.location.origin);
+        siteSavePending = true;
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    window.addEventListener("message", function (event) {
+      if (!event.data || event.origin !== window.location.origin) return;
+      if (event.data.type === "gleam-quiz-saved") {
+        siteSavePending = false;
+        renderSaved(queued ? previewFrom(queued) : {}, savedMessage);
+      } else if (event.data.type === "gleam-quiz-save-failed" && siteSavePending && !user) {
+        siteSavePending = false;
+        renderSaved(null, "점수 저장에 실패했습니다. 웹사이트에 로그인한 뒤 완료를 다시 눌러 주세요.");
+      }
+    });
 
     function schedule(snapshot) {
       if (!shouldSave(snapshot) || !meta) return;
@@ -199,19 +264,25 @@
       if (!shouldSave(snapshot) || !meta) return;
       clearTimeout(timer);
       var key = snapshotKey(snapshot);
+      var handed = notifySite(snapshot);
       if (!user) {
-        renderSaved(null, "웹사이트에 로그인한 뒤 완료를 눌러야 점수와 주관식 답이 강의실과 예약 강사에게 남습니다.");
+        if (handed) {
+          renderSaved(previewFrom(snapshot), "문제풀이를 완료하고 강의실에 저장하는 중입니다.");
+          setTimeout(function () {
+            if (!siteSavePending || user) return;
+            siteSavePending = false;
+            renderSaved(null, "웹사이트에 로그인한 뒤 완료를 눌러야 점수와 주관식 답이 내 강의실에 남습니다.");
+          }, 2500);
+        } else {
+          renderSaved(null, "웹사이트에 로그인한 뒤 완료를 눌러야 점수와 주관식 답이 내 강의실에 남습니다.");
+        }
         return;
       }
       if (key === lastSavedKey) {
-        renderSaved({
-          title: meta.title,
-          correctCount: snapshot.correct,
-          essays: snapshot.essays || []
-        }, "문제풀이를 완료했습니다. 이 점수와 주관식 답이 저장되어 있습니다.");
+        renderSaved(previewFrom(snapshot), savedMessage);
         return;
       }
-      save(snapshot, key, "문제풀이를 완료하고 결과를 저장했습니다.");
+      save(snapshot, key, savedMessage);
     }
 
     function loadSaved() {
@@ -232,13 +303,25 @@
       finish: function (snapshot) {
         queued = snapshot;
         pendingFinish = true;
-        if (!authReady) return;
+        if (!meta) return;
+        if (!authReady) {
+          if (!notifySite(snapshot)) {
+            renderSaved(null, "웹사이트에 로그인한 뒤 완료를 눌러야 점수와 주관식 답이 내 강의실에 남습니다.");
+            return;
+          }
+          renderSaved(previewFrom(snapshot), "문제풀이를 완료하고 강의실에 저장하는 중입니다.");
+          setTimeout(function () {
+            if (!siteSavePending || user) return;
+            siteSavePending = false;
+            renderSaved(null, "웹사이트에 로그인한 뒤 완료를 눌러야 점수와 주관식 답이 내 강의실에 남습니다.");
+          }, 2500);
+          return;
+        }
         pendingFinish = false;
         commitFinish(snapshot);
       },
       start: function (readSnapshot) {
         read = readSnapshot;
-        if (typeof window === "undefined" || !window.firebase) return;
         meta = META[quizIdFromPath(window.location.pathname)];
         if (!meta) return;
         meta = {
@@ -247,6 +330,7 @@
           weekNumber: meta.weekNumber,
           title: meta.title
         };
+        if (typeof window === "undefined" || !window.firebase) return;
         try {
           if (!window.firebase.apps.length) window.firebase.initializeApp(firebaseConfig);
         } catch (error) {

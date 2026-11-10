@@ -78,7 +78,7 @@ void main() {
           .map((lesson) => lesson.problemUrl),
     ];
 
-    expect(urls, hasLength(6));
+    expect(urls, hasLength(12));
     expect(
       urls.map(QuizResult.quizIdFromUrl).toSet(),
       {
@@ -86,9 +86,52 @@ void main() {
         'gleam-level2-lesson02',
         'gleam-level1-lesson3',
         'gleam-level1-lesson4',
+        'gleam-level1-lesson5',
+        'gleam-level1-lesson6',
+        'gleam-level1-lesson7',
+        'gleam-level1-lesson8',
+        'gleam-level1-lesson9',
+        'gleam-level1-lesson10',
         'gleam-level3-lesson1',
         'gleam-level3-lesson2',
       },
+    );
+  });
+
+  test('완료로 넘긴 점수와 주관식만 강의실 저장 요청이 된다', () {
+    final saved = QuizSaveRequest.tryParse({
+      'quizId': 'gleam-level1-lesson5',
+      'title': '왕초보 5강 연습문제',
+      'courseId': 'beginner_phonics',
+      'weekNumber': 5,
+      'correctCount': 18,
+      'totalCount': 25,
+      'completed': true,
+      'essays': [
+        {
+          'index': 1,
+          'title': '상황 작문 1',
+          'prompt': '문을 닫아 달라고 해 보세요.',
+          'answer': 'Could you close the door?',
+        },
+      ],
+    });
+
+    expect(saved, isNotNull);
+    expect(saved!.correctCount, 18);
+    expect(saved.weekNumber, 5);
+    expect(saved.essays.single.answer, 'Could you close the door?');
+    expect(
+      QuizSaveRequest.tryParse({
+        'quizId': 'gleam-level1-lesson5',
+        'courseId': 'beginner_phonics',
+        'weekNumber': 5,
+        'correctCount': 18,
+        'totalCount': 24,
+        'completed': true,
+        'essays': [],
+      }),
+      isNull,
     );
   });
 }

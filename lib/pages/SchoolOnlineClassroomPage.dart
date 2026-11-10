@@ -14,6 +14,7 @@ import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/NotificationService.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/util/QuizResultBridge.dart';
 import 'package:gi_english_website/util/QuizResultService.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
@@ -33,7 +34,8 @@ class SchoolOnlineClassroomPage extends StatefulWidget {
       _SchoolOnlineClassroomPageState();
 }
 
-class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
+class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage>
+    with WidgetsBindingObserver {
   List<EnrollmentRecord> _myEnrollments = [];
   Map<String, List<QuizResult>> _quizByCourse = {};
   List<AppNotification> _notifications = [];
@@ -42,10 +44,15 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
   bool _isLoading = true;
   bool _savingPhone = false;
   StreamSubscription<User?>? _authSub;
+  StreamSubscription<void>? _quizSavedSub;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _quizSavedSub = QuizResultEvents.saved.listen((_) {
+      _reloadQuizzes();
+    });
     _loadMyCourses();
     _authSub = AuthService.authStateChanges.listen((user) {
       if (!mounted) return;
@@ -64,8 +71,30 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _quizSavedSub?.cancel();
     _authSub?.cancel();
     super.dispose();
+  }
+
+  @override
+  void activate() {
+    super.activate();
+    if (!_isLoading) _reloadQuizzes();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && !_isLoading) {
+      _reloadQuizzes();
+    }
+  }
+
+  Future<void> _reloadQuizzes() async {
+    if (_myEnrollments.isEmpty) return;
+    final quizByCourse = await _quizResultsFor(_myEnrollments);
+    if (!mounted) return;
+    setState(() => _quizByCourse = quizByCourse);
   }
 
   Future<void> _logout() async {
@@ -864,10 +893,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
     return [
       SizedBox(height: 8),
       ...results.map(
-        (result) => GestureDetector(
-          onTap: () {},
-          child: QuizResultSummary(result: result, dense: true),
-        ),
+        (result) => QuizResultSummary(result: result, dense: true),
       ),
     ];
   }

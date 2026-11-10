@@ -49,6 +49,19 @@ void main() {
     );
   });
 
+  test('왕초보 5강부터 10강 연습문제를 회차에 연결한다', () {
+    for (var lesson = 5; lesson <= 10; lesson++) {
+      final week = EnrollmentService.defaultWeek('beginner_phonics', lesson);
+      expect(week.title, '$lesson강');
+      expect(week.videoUrl, isEmpty);
+      expect(week.problemLinks.single.title, '$lesson강 연습문제');
+      expect(
+        week.problemLinks.single.url,
+        '/quizzes/gleam-level1-lesson$lesson-quiz.html',
+      );
+    }
+  });
+
   test('저장된 왕초보 회차에 임시 영상만 있으면 실제 인강으로 바꾼다', () {
     final stored = OnlineWeek(
       id: 'beginner_phonics_week_2',

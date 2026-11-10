@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gi_english_website/class/QuizResult.dart';
 
 /// 연습문제 최근 결과를 `quiz_results/{userId}_{quizId}`에서 읽는다.
@@ -34,5 +35,28 @@ class QuizResultService {
       results: QuizResult.keepLatest(loaded),
       unavailable: unavailable && loaded.isEmpty,
     );
+  }
+
+  /// 로그인한 학생의 최근 점수와 주관식 답을 한 문서에 덮어쓴다.
+  static Future<void> saveLatest(QuizSaveRequest request) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    if (uid.isEmpty) {
+      throw StateError('로그인이 필요합니다.');
+    }
+    await _firestore
+        .collection('quiz_results')
+        .doc(QuizResult.documentId(uid, request.quizId))
+        .set({
+      'userId': uid,
+      'quizId': request.quizId,
+      'title': request.title,
+      'courseId': request.courseId,
+      'weekNumber': request.weekNumber,
+      'correctCount': request.correctCount,
+      'totalCount': 25,
+      'completed': true,
+      'essays': request.essays.map((essay) => essay.toMap()).toList(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
   }
 }

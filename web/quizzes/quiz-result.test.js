@@ -9,6 +9,12 @@ const connectedQuizzes = [
   "gleam-level2-lesson02-quiz.html",
   "gleam-level1-lesson3-quiz.html",
   "gleam-level1-lesson4-quiz.html",
+  "gleam-level1-lesson5-quiz.html",
+  "gleam-level1-lesson6-quiz.html",
+  "gleam-level1-lesson7-quiz.html",
+  "gleam-level1-lesson8-quiz.html",
+  "gleam-level1-lesson9-quiz.html",
+  "gleam-level1-lesson10-quiz.html",
   "gleam-level3-lesson1-quiz.html",
   "gleam-level3-lesson2-quiz.html"
 ];

@@ -125,6 +125,48 @@ class EnrollmentService {
       problemTitle: '4강 연습문제',
       problemUrl: '/quizzes/gleam-level1-lesson4-quiz.html',
     ),
+    CatalogLesson(
+      order: 5,
+      title: '5강',
+      videoUrl: '',
+      problemTitle: '5강 연습문제',
+      problemUrl: '/quizzes/gleam-level1-lesson5-quiz.html',
+    ),
+    CatalogLesson(
+      order: 6,
+      title: '6강',
+      videoUrl: '',
+      problemTitle: '6강 연습문제',
+      problemUrl: '/quizzes/gleam-level1-lesson6-quiz.html',
+    ),
+    CatalogLesson(
+      order: 7,
+      title: '7강',
+      videoUrl: '',
+      problemTitle: '7강 연습문제',
+      problemUrl: '/quizzes/gleam-level1-lesson7-quiz.html',
+    ),
+    CatalogLesson(
+      order: 8,
+      title: '8강',
+      videoUrl: '',
+      problemTitle: '8강 연습문제',
+      problemUrl: '/quizzes/gleam-level1-lesson8-quiz.html',
+    ),
+    CatalogLesson(
+      order: 9,
+      title: '9강',
+      videoUrl: '',
+      problemTitle: '9강 연습문제',
+      problemUrl: '/quizzes/gleam-level1-lesson9-quiz.html',
+    ),
+    CatalogLesson(
+      order: 10,
+      title: '10강',
+      videoUrl: '',
+      problemTitle: '10강 연습문제',
+      problemUrl: '/quizzes/gleam-level1-lesson10-quiz.html',
+    ),
   ];
 
   /// 글림 중급영어 과정에 연결된 인강.

@@ -139,12 +139,84 @@ class QuizEssayAnswer {
 
   bool get hasAnswer => answer.trim().isNotEmpty;
 
+  Map<String, dynamic> toMap() {
+    return {
+      'index': index,
+      'title': title,
+      'prompt': prompt,
+      'answer': answer,
+    };
+  }
+
   factory QuizEssayAnswer.fromMap(Map<String, dynamic> data) {
     return QuizEssayAnswer(
       index: QuizResult._intValue(data['index']),
       title: data['title']?.toString() ?? '',
       prompt: data['prompt']?.toString() ?? '',
       answer: data['answer']?.toString() ?? '',
+    );
+  }
+}
+
+/// 완료 버튼이 강의실로 넘기는 저장 요청.
+class QuizSaveRequest {
+  final String quizId;
+  final String title;
+  final String courseId;
+  final int weekNumber;
+  final int correctCount;
+  final List<QuizEssayAnswer> essays;
+
+  const QuizSaveRequest({
+    required this.quizId,
+    required this.title,
+    required this.courseId,
+    required this.weekNumber,
+    required this.correctCount,
+    required this.essays,
+  });
+
+  static final RegExp _quizIdPattern = RegExp(r'^[a-z0-9-]{3,64}$');
+
+  static QuizSaveRequest? tryParse(Map<String, dynamic> data) {
+    final quizId = data['quizId']?.toString() ?? '';
+    if (!_quizIdPattern.hasMatch(quizId)) return null;
+    final courseId = (data['courseId']?.toString() ?? '').trim();
+    if (courseId.isEmpty || courseId.length > 80) return null;
+    final weekNumber = QuizResult._intValue(data['weekNumber']);
+    if (weekNumber < 1 || weekNumber > 52) return null;
+    final correctCount = QuizResult._intValue(data['correctCount']);
+    if (correctCount < 0 || correctCount > 25) return null;
+    if (QuizResult._intValue(data['totalCount']) != 25) return null;
+    if (data['completed'] != true) return null;
+    var title = data['title']?.toString() ?? '';
+    if (title.length > 120) title = title.substring(0, 120);
+    final rawEssays = data['essays'];
+    if (rawEssays is! List || rawEssays.length > 8) return null;
+    final essays = <QuizEssayAnswer>[];
+    for (final item in rawEssays) {
+      if (item is! Map) return null;
+      final map = item.map((key, value) => MapEntry(key.toString(), value));
+      var essayTitle = map['title']?.toString() ?? '';
+      var prompt = map['prompt']?.toString() ?? '';
+      var answer = map['answer']?.toString() ?? '';
+      if (essayTitle.length > 80) essayTitle = essayTitle.substring(0, 80);
+      if (prompt.length > 500) prompt = prompt.substring(0, 500);
+      if (answer.length > 2000) answer = answer.substring(0, 2000);
+      essays.add(QuizEssayAnswer(
+        index: QuizResult._intValue(map['index']),
+        title: essayTitle,
+        prompt: prompt,
+        answer: answer,
+      ));
+    }
+    return QuizSaveRequest(
+      quizId: quizId,
+      title: title,
+      courseId: courseId,
+      weekNumber: weekNumber,
+      correctCount: correctCount,
+      essays: essays,
     );
   }
 }
