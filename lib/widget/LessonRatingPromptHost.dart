@@ -116,10 +116,10 @@ class LessonRatingStatusChip extends StatelessWidget {
         ],
       );
     }
-    if (rating!.isPendingStudent) {
+    if (rating!.canStudentRate) {
       return _chip('학생 평가 대기', Palette.warning.withValues(alpha: 0.16), Palette.warning);
     }
-    return _chip('강사 피드백 대기', Palette.grey200, Palette.grey600);
+    return _chip('평가 대기', Palette.grey200, Palette.grey600);
   }
 
   Widget _chip(String label, Color background, Color color) {

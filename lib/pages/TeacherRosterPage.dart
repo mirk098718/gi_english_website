@@ -259,11 +259,11 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     );
     if (saved) {
       _toast(afterClass
-          ? '피드백을 저장했습니다. 수강생에게 수업 평가 요청이 전달되었습니다.'
-          : '피드백을 저장했습니다. 수강생 평가가 끝나야 이 수업이 정산에 포함됩니다.');
+          ? tr(context, "피드백을 저장했습니다. 수강생은 종료된 수업에 별점을 남길 수 있습니다.")
+          : tr(context, "피드백을 저장했습니다. 수업을 종료하면 수강생 별점 평가가 열립니다."));
       await _load();
     } else if (afterClass && mounted) {
-      _toast('피드백을 작성해야 수강생 평가와 정산이 진행됩니다.', error: true);
+      _toast(tr(context, "수업은 종료되었습니다. 별점 평가는 이미 요청되었고, 피드백은 나중에 작성할 수 있습니다."));
       await _load();
     }
   }
@@ -311,7 +311,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       builder: (dialogContext) => AlertDialog(
         title: Text(tr(context, "수업 종료"), style: TextStyle(fontFamily: "Jalnan")),
         content: Text(
-          tr(context, "이 회차 화상수업을 종료할까요?\n종료 후 피드백을 작성해야 수강생 평가가 시작되고, 평가가 끝나야 정산에 포함됩니다."),
+          tr(context, "이 회차 화상수업을 종료할까요?\n종료하면 수강생에게 바로 별점 평가가 요청됩니다. 피드백도 이어서 작성해 주세요. 별점 평가가 끝나야 정산에 포함됩니다."),
           style: TextStyle(fontFamily: "NotoSansKR", height: 1.5),
         ),
         actions: [
@@ -363,7 +363,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
           Text(tr(context, "내 수강생"), style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           SizedBox(height: 8),
           Text(
-            tr(context, "담당 회원의 화상수업 입장·종료와 회차별 피드백을 여기서 진행합니다. 수업 종료 직후 피드백 창이 열리고, 저장하면 수강생에게 별점 평가가 요청됩니다."),
+            tr(context, "담당 회원의 화상수업 입장·종료와 회차별 피드백을 여기서 진행합니다. 수업을 종료하면 수강생에게 바로 별점 평가가 요청되고, 이어서 피드백을 작성합니다."),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),

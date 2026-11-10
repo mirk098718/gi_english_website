@@ -953,6 +953,7 @@ async function ensureLessonRating({ bookingId, sessionId, session, status, extra
   const existing = await ref.get();
   const current = existing.exists ? existing.data() || {} : {};
   if (current.status === "rated") return ref;
+  if (status === "pending" && current.status === "pending") return ref;
   if (status === "awaiting_feedback" && current.status === "pending") return ref;
 
   const booking = await loadBookingData(bookingId);
@@ -999,7 +1000,7 @@ async function ensureLessonRating({ bookingId, sessionId, session, status, extra
   if (!existing.exists) {
     payload.createdAt = admin.firestore.FieldValue.serverTimestamp();
   }
-  if (status === "pending") {
+  if (status === "pending" && extra && extra.markFeedback) {
     payload.feedbackSubmittedAt = admin.firestore.FieldValue.serverTimestamp();
   }
   await ref.set(payload, { merge: true });
@@ -1164,8 +1165,40 @@ async function sendRatingReminder(rating, ratingId, { reason }) {
   return true;
 }
 
+async function notifyRatingOpened(bookingId) {
+  if (!bookingId) return;
+  const ref = admin.firestore().collection("lesson_ratings").doc(bookingId);
+  const snap = await ref.get();
+  if (!snap.exists) return;
+  const rating = snap.data() || {};
+  if (rating.openedNotifiedAt) return;
+  if (rating.status !== "pending" && rating.status !== "awaiting_feedback") return;
+  const userId = String(rating.userId || "");
+  if (!userId) return;
+  const weekNumber = Number(rating.weekNumber || 0);
+  const week = weekNumber > 0 ? `${weekNumber}회차` : "화상수업";
+  const teacher = String(rating.teacherName || "").trim() || "강사";
+  await writeNotification({
+    userId,
+    title: "수업 평가 요청",
+    body: `${week} 수업이 끝났습니다. ${teacher} 선생님 수업에 별점을 남겨 주세요. 평가를 마치면 다음 회차가 열립니다.`,
+    type: "lesson_rating",
+    bookingId,
+  });
+  await ref.set(
+    {
+      openedNotifiedAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    },
+    { merge: true }
+  );
+}
+
 function isRatingReminderDue(rating, now) {
-  if (!rating || rating.status !== "pending") return false;
+  if (!rating) return false;
+  if (rating.status !== "pending" && rating.status !== "awaiting_feedback") {
+    return false;
+  }
   const last = toJsDate(rating.lastReminderAt);
   const created = toJsDate(rating.createdAt) || toJsDate(rating.feedbackSubmittedAt) || now;
   const anchor = last || created;
@@ -1189,8 +1222,9 @@ exports.onOnlineSessionUpdated = functions
       bookingId,
       sessionId,
       session: after,
-      status: "awaiting_feedback",
+      status: "pending",
     });
+    await notifyRatingOpened(bookingId);
     return null;
   });
 
@@ -1325,11 +1359,20 @@ exports.onLessonFeedbackWritten = functions
     const week = weekNumber > 0 ? `${weekNumber}회차` : "화상수업";
     const isNew = !change.before.exists;
     const bookingId = String(after.bookingId || change.after.id);
+    const ratingSnap = await admin
+      .firestore()
+      .collection("lesson_ratings")
+      .doc(bookingId)
+      .get();
+    const alreadyRated =
+      ratingSnap.exists && String((ratingSnap.data() || {}).status || "") === "rated";
     await writeNotification({
       userId,
       title: "강사 피드백",
       body: isNew
-        ? `${teacher} 선생님이 ${week} 피드백을 남겼습니다. 바로 수업 평가(별점)를 완료해 주세요.`
+        ? alreadyRated
+          ? `${teacher} 선생님이 ${week} 피드백을 남겼습니다. 내 강의실에서 확인해 주세요.`
+          : `${teacher} 선생님이 ${week} 피드백을 남겼습니다. 아직 별점 평가를 하지 않았다면 마쳐 주세요.`
         : `${teacher} 선생님이 ${week} 피드백을 수정했습니다. 내 강의실에서 확인해 주세요.`,
       type: "lesson_feedback",
       bookingId,
@@ -1338,13 +1381,27 @@ exports.onLessonFeedbackWritten = functions
       { alertSentAt: admin.firestore.FieldValue.serverTimestamp() },
       { merge: true }
     );
-    await ensureLessonRating({
-      bookingId,
-      sessionId: String(after.sessionId || sessionIdForBooking(bookingId)),
-      session: after,
-      status: "pending",
-      extra: { teacherName: teacher, courseTitle: String(after.courseTitle || "") },
-    });
+    const sessionId = String(after.sessionId || sessionIdForBooking(bookingId));
+    const sessionSnap = await admin
+      .firestore()
+      .collection("online_sessions")
+      .doc(sessionId)
+      .get();
+    const session = sessionSnap.exists ? sessionSnap.data() || {} : {};
+    const classEnded = session.isLive === false && !!session.endedAt;
+    if (classEnded) {
+      await ensureLessonRating({
+        bookingId,
+        sessionId,
+        session: after,
+        status: "pending",
+        extra: {
+          teacherName: teacher,
+          courseTitle: String(after.courseTitle || ""),
+          markFeedback: true,
+        },
+      });
+    }
     return null;
   });
 
@@ -1380,8 +1437,10 @@ exports.onLessonRatingWritten = functions
       return null;
     }
 
+    const waitingForRating =
+      after.status === "pending" || after.status === "awaiting_feedback";
     const justDismissed =
-      after.status === "pending" &&
+      waitingForRating &&
       after.dismissedAt &&
       !before.dismissedAt;
     if (justDismissed) {
@@ -1399,7 +1458,7 @@ exports.sendRatingReminders = functions
     const snap = await admin
       .firestore()
       .collection("lesson_ratings")
-      .where("status", "==", "pending")
+      .where("status", "in", ["pending", "awaiting_feedback"])
       .get();
     let sent = 0;
     for (const doc of snap.docs) {

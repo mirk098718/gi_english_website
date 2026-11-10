@@ -12,7 +12,7 @@ int _intValue(dynamic value) {
   return int.tryParse(value?.toString() ?? '') ?? 0;
 }
 
-/// 수강생 → 강사 수업 평가. 강사 피드백 이후에만 별점을 받는다.
+/// 수강생 → 강사 수업 평가. 화상수업이 끝나면 바로 별점을 받는다.
 class LessonRating {
   static const String statusAwaitingFeedback = 'awaiting_feedback';
   static const String statusPending = 'pending';
@@ -80,6 +80,10 @@ class LessonRating {
   bool get isPendingStudent => status == statusPending && !isRated;
 
   bool get awaitingTeacherFeedback => status == statusAwaitingFeedback;
+
+  /// 수업이 끝나 평가 문서가 열린 상태. 피드백 전에도 별점을 받는다.
+  bool get canStudentRate =>
+      !isRated && (isPendingStudent || awaitingTeacherFeedback);
 
   String get lessonLabel {
     final week = weekNumber > 0 ? '$weekNumber회차' : '화상수업';
@@ -211,7 +215,10 @@ class LessonRatingService {
     DateTime? lastReminderAt,
     required String status,
   }) {
-    if (status != LessonRating.statusPending) return false;
+    if (status != LessonRating.statusPending &&
+        status != LessonRating.statusAwaitingFeedback) {
+      return false;
+    }
     final anchor = lastReminderAt ?? createdAt;
     return !now.isBefore(anchor.add(LessonRating.reminderInterval));
   }
@@ -281,7 +288,7 @@ class LessonRatingService {
     }
   }
 
-  static Stream<List<LessonRating>> watchMinePending({String? userId}) {
+  static Stream<List<LessonRating>> watchMine({String? userId}) {
     final uid = userId ?? AuthService.currentUser?.uid ?? '';
     if (uid.isEmpty) return Stream.value(const []);
     return _firestore
@@ -291,8 +298,15 @@ class LessonRatingService {
         .map((snapshot) {
       final list = snapshot.docs
           .map((doc) => LessonRating.fromMap(doc.id, doc.data()))
-          .where((item) => item.isPendingStudent)
           .toList();
+      list.sort((a, b) => a.weekNumber.compareTo(b.weekNumber));
+      return list;
+    });
+  }
+
+  static Stream<List<LessonRating>> watchMinePending({String? userId}) {
+    return watchMine(userId: userId).map((items) {
+      final list = items.where((item) => item.canStudentRate).toList();
       list.sort((a, b) => a.createdAt.compareTo(b.createdAt));
       return list;
     });
@@ -376,7 +390,7 @@ class LessonRatingService {
   }
 
   static Future<void> markDismissed(LessonRating rating) async {
-    if (rating.id.isEmpty || !rating.isPendingStudent) return;
+    if (rating.id.isEmpty || !rating.canStudentRate) return;
     if (rating.dismissedAt != null) return;
     try {
       await _firestore.collection(collection).doc(rating.id).set({
@@ -508,13 +522,23 @@ class _LessonRatingDialogState extends State<LessonRatingDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '$teacher 선생님의 ${rating.lessonLabel} 수업을 평가해 주세요. '
-                  '별점은 필수이며, 평가를 마치면 다음 회차가 열립니다.',
+                  tr(context,
+                      "끝난 화상수업에 별점을 남겨 주세요. 별점은 필수이고, 평가를 마치면 다음 회차가 열립니다."),
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 13,
                     height: 1.5,
                     color: Palette.grey700,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  '$teacher 선생님 · ${rating.lessonLabel}',
+                  style: TextStyle(
+                    fontFamily: "NotoSansKR",
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: Palette.black,
                   ),
                 ),
                 SizedBox(height: 18),

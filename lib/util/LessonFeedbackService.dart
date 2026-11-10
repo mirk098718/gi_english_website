@@ -243,11 +243,13 @@ class LessonFeedbackService {
       if (sent) {
         await ref.set({'alertSentAt': now}, SetOptions(merge: true));
       }
-      await LessonRatingService.openAfterFeedback(
-        booking: booking,
-        teacherId: teacherId.isNotEmpty ? teacherId : writerUid,
-        teacherName: teacherName,
-      );
+      if (await _sessionHasEnded(booking)) {
+        await LessonRatingService.openAfterFeedback(
+          booking: booking,
+          teacherId: teacherId.isNotEmpty ? teacherId : writerUid,
+          teacherName: teacherName,
+        );
+      }
       return null;
     } on FirebaseException catch (e) {
       print('피드백 저장 오류: ${e.code} ${e.message}');
@@ -258,6 +260,24 @@ class LessonFeedbackService {
     } catch (e) {
       print('피드백 저장 오류: $e');
       return '피드백 저장에 실패했습니다.';
+    }
+  }
+
+  /// 강사가 종료 버튼을 눌러 회차가 끝난 뒤에만 별점 요청을 연다.
+  static Future<bool> _sessionHasEnded(WeekBooking booking) async {
+    final sessionId = booking.sessionId.trim().isNotEmpty
+        ? booking.sessionId.trim()
+        : EnrollmentService.sessionDocIdForBooking(booking.id);
+    if (sessionId.isEmpty) return false;
+    try {
+      final snap =
+          await _firestore.collection('online_sessions').doc(sessionId).get();
+      final data = snap.data();
+      if (data == null) return false;
+      return data['isLive'] == false && data['endedAt'] != null;
+    } catch (e) {
+      print('수업 종료 여부 확인 오류: $e');
+      return false;
     }
   }
 

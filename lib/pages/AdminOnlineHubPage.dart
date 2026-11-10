@@ -25,7 +25,7 @@ import 'package:gi_english_website/util/JitsiJoin.dart';
 import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
 import 'package:gi_english_website/widget/AdminContentWidth.dart';
 import 'package:gi_english_website/widget/AdminTalkReportsTab.dart';
-import 'package:gi_english_website/widget/LessonRatingPromptHost.dart';
+import 'package:gi_english_website/widget/TeacherRatingBoard.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/util/ProfilePhotoPicker.dart';
@@ -2704,66 +2704,28 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
   Future<void> _openTeacherRatings(Map<String, dynamic> teacher) async {
     final uid = teacher['uid']?.toString() ?? '';
     final name = AuthService.profileDisplayName(teacher, fallback: '강사');
-    final now = DateTime.now();
-    final items = _ratings.where((rating) {
-      if (rating.teacherId != uid) return false;
-      return rating.date.year == now.year && rating.date.month == now.month;
-    }).toList()
-      ..sort((a, b) => b.date.compareTo(a.date));
+    final items = _ratings
+        .where((rating) => rating.teacherId == uid)
+        .toList();
     if (!mounted) return;
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: Palette.white,
         surfaceTintColor: Palette.white,
-        title: Text('$name · 이번달 수업 평가',
+        title: Text('$name · 수업 별점',
             style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
         content: SizedBox(
           width: 480,
-          child: items.isEmpty
-              ? Text('이번 달 학생 평가가 아직 없습니다.',
-                  style: TextStyle(fontFamily: "NotoSansKR"))
-              : ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: 420),
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    itemCount: items.length,
-                    separatorBuilder: (_, __) => Divider(height: 16),
-                    itemBuilder: (_, index) {
-                      final rating = items[index];
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            [
-                              if (rating.memberName.isNotEmpty)
-                                rating.memberName,
-                              rating.lessonLabel,
-                            ].join(' · '),
-                            style: TextStyle(
-                              fontFamily: "NotoSansKR",
-                              fontWeight: FontWeight.w700,
-                              fontSize: 13,
-                            ),
-                          ),
-                          SizedBox(height: 6),
-                          LessonRatingStatusChip(rating: rating),
-                          if (rating.review.trim().isNotEmpty) ...[
-                            SizedBox(height: 6),
-                            Text(
-                              rating.review.trim(),
-                              style: TextStyle(
-                                fontFamily: "NotoSansKR",
-                                fontSize: 13,
-                                height: 1.45,
-                              ),
-                            ),
-                          ],
-                        ],
-                      );
-                    },
-                  ),
-                ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: 480),
+            child: SingleChildScrollView(
+              child: TeacherRatingBoard(
+                stats: _statsFor(uid),
+                ratings: items,
+              ),
+            ),
+          ),
         ),
         actions: [
           TextButton(
@@ -3051,7 +3013,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
           ),
           SizedBox(height: 8),
           Text(
-            '강사를 누르면 프로필·회원, 그 강사의 스케줄·예약, 한달 수업 이력을 볼 수 있습니다. 카드에는 이번 달 진행·취소·수입·평균 별점이 함께 보입니다. 별점은 매달 인사 평가에 쓰입니다.',
+            '강사를 누르면 프로필·회원, 그 강사의 스케줄·예약, 한달 수업 이력을 볼 수 있습니다. 카드에는 이번 달 평균과 최근 학생 별점이 바로 보이고, 평가는 전체 이력을 엽니다. 별점은 매달 인사 평가에 쓰입니다.',
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
@@ -3114,8 +3076,6 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                             '이번달 진행 ${stats.completedCount}회 · 취소 ${stats.cancelledCount}회 · 대기 ${pending}건',
                             if (stats.awaitingCount > 0)
                               '평가대기 ${stats.awaitingCount}건',
-                            '평균별점 ${stats.averageStarsLabel}'
-                                '${stats.ratedCount > 0 ? ' (${stats.ratedCount}건)' : ''}',
                             stats.incomeLabel,
                             if (bank.isNotEmpty) bank,
                             PhoneUtil.isValid(t['phone']?.toString() ?? '')
@@ -3181,6 +3141,16 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                                             : Palette.secondaryDark)),
                               ),
                           ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 4, right: 4, bottom: 8),
+                        child: TeacherRatingBoard(
+                          stats: stats,
+                          ratings: _ratings
+                              .where((rating) => rating.teacherId == uid)
+                              .toList(),
+                          previewLimit: 3,
                         ),
                       ),
                       if (intro.isNotEmpty)

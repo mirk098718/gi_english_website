@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonRatingService.dart';
@@ -153,6 +154,51 @@ void main() {
           createdAt: created,
           status: LessonRating.statusRated,
         ),
+        isFalse,
+      );
+    });
+
+    test('reminds when the class ended before feedback was saved', () {
+      expect(
+        LessonRatingService.isReminderDue(
+          now: created.add(Duration(hours: 3)),
+          createdAt: created,
+          status: LessonRating.statusAwaitingFeedback,
+        ),
+        isTrue,
+      );
+    });
+  });
+
+  testWidgets('별점 대화는 별을 고르기 전에는 제출할 수 없다', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: LessonRatingDialog(rating: _rating()),
+    ));
+
+    expect(find.text('수업 평가'), findsOneWidget);
+    expect(find.text('별점'), findsOneWidget);
+    final submit = find.widgetWithText(ElevatedButton, '평가 제출');
+    expect(tester.widget<ElevatedButton>(submit).onPressed, isNull);
+
+    await tester.tap(find.byIcon(Icons.star_border_rounded).first);
+    await tester.pump();
+
+    expect(find.text('1점'), findsOneWidget);
+    expect(tester.widget<ElevatedButton>(submit).onPressed, isNotNull);
+  });
+
+  group('LessonRating.canStudentRate', () {
+    test('opens as soon as the class ends, before or after feedback', () {
+      expect(
+        _rating(status: LessonRating.statusAwaitingFeedback).canStudentRate,
+        isTrue,
+      );
+      expect(
+        _rating(status: LessonRating.statusPending).canStudentRate,
+        isTrue,
+      );
+      expect(
+        _rating(status: LessonRating.statusRated, stars: 4).canStudentRate,
         isFalse,
       );
     });

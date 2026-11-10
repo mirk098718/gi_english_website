@@ -597,7 +597,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
           ),
           const SizedBox(height: 8),
           Text(
-            '강사 피드백과 수강생 별점 평가가 모두 끝난 수업만 진행으로 셉니다. '
+            '수강생 별점 평가가 끝난 수업만 진행으로 셉니다. '
             '예전 수업(평가 기록 없음)은 수업 시간이 지나면 포함됩니다. '
             '수업 ${EnrollmentService.lessonMinutes}분 · 건당 ${_formatWon(EnrollmentService.lessonPayWon)}.',
             style: TextStyle(
