@@ -1163,7 +1163,7 @@ class EnrollmentService {
     }
   }
 
-  /// 화상수업 종료 후 정산 게이트를 연다. 별점 제출 전에는 다음 회차를 열지 않는다.
+  /// 화상수업 종료 직후 수강생 별점 요청을 연다. 별점 제출 전에는 다음 회차를 열지 않는다.
   static Future<void> _openPayGateAfterSessionEnd({
     required String sessionId,
     required Map<String, dynamic> data,
@@ -1212,9 +1212,9 @@ class EnrollmentService {
         'date': booking['date'] ?? FieldValue.serverTimestamp(),
         'time': (data['time'] ?? booking['time'] ?? '').toString(),
         'sessionId': sessionId,
-        'status': 'awaiting_feedback',
-        'stars': 0,
-        'review': '',
+        'status': 'pending',
+        if (!existing.exists) 'stars': 0,
+        if (!existing.exists) 'review': '',
         'updatedAt': FieldValue.serverTimestamp(),
         if (!existing.exists) 'createdAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));

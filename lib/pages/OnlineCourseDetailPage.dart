@@ -56,6 +56,9 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
   bool _submittingBooking = false;
   Timer? _sessionTicker;
   StreamSubscription<void>? _quizSavedSub;
+  StreamSubscription<dynamic>? _authSub;
+  StreamSubscription<List<LessonRating>>? _ratingSub;
+  int _ratingBind = 0;
 
   @override
   void initState() {
@@ -65,6 +68,9 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       _reloadQuizzes();
     });
     _loadData();
+    _authSub = AuthService.authStateChanges.listen((_) {
+      _bindRatings();
+    });
     _sessionTicker = Timer.periodic(const Duration(seconds: 30), (_) {
       if (mounted) setState(() {});
     });
@@ -74,8 +80,28 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _quizSavedSub?.cancel();
+    _authSub?.cancel();
+    _ratingSub?.cancel();
     _sessionTicker?.cancel();
     super.dispose();
+  }
+
+  Future<void> _bindRatings() async {
+    final token = ++_ratingBind;
+    await _ratingSub?.cancel();
+    if (!mounted || token != _ratingBind) return;
+    _ratingSub = null;
+    final uid = AuthService.currentUser?.uid ?? '';
+    if (uid.isEmpty) return;
+    _ratingSub = LessonRatingService.watchMine(userId: uid).listen((ratings) {
+      if (!mounted) return;
+      setState(() {
+        _ratings = ratings
+            .where((rating) =>
+                rating.courseId.isEmpty || rating.courseId == widget.course.id)
+            .toList();
+      });
+    }, onError: (_) {});
   }
 
   @override
@@ -762,7 +788,10 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             color: live ? Palette.success : Palette.grey200,
             width: live ? 1.5 : 1),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
         children: [
           Icon(
             live ? Icons.videocam : Icons.schedule,
@@ -825,7 +854,80 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                 color: Palette.grey500,
               ),
             ),
+            ],
+          ),
+          if (ended) ...[
+            SizedBox(height: 10),
+            _sessionRatingRow(session),
+          ],
         ],
+      ),
+    );
+  }
+
+  LessonRating? _ratingForSession(OnlineSession session) {
+    if (session.bookingId.isNotEmpty) {
+      final byBooking =
+          LessonRatingService.forBooking(_ratings, session.bookingId);
+      if (byBooking != null) return byBooking;
+    }
+    if (session.id.startsWith('booking_')) {
+      final bookingId = session.id.substring('booking_'.length);
+      final byId = LessonRatingService.forBooking(_ratings, bookingId);
+      if (byId != null) return byId;
+    }
+    if (session.weekNumber <= 0) return null;
+    LessonRating? best;
+    for (final rating in _ratings) {
+      if (rating.weekNumber != session.weekNumber) continue;
+      if (best == null || rating.date.isAfter(best.date)) best = rating;
+    }
+    return best;
+  }
+
+  Future<void> _rateLesson(LessonRating rating) async {
+    final saved = await LessonRatingService.showPrompt(
+      context: context,
+      rating: rating,
+    );
+    if (saved) await _loadData();
+  }
+
+  Widget _sessionRatingRow(OnlineSession session) {
+    final rating = _ratingForSession(session);
+    if (rating != null && rating.isRated) {
+      return Row(
+        children: [
+          LessonStarView(stars: rating.stars, size: 18),
+          SizedBox(width: 6),
+          Text(
+            rating.starsLabel,
+            style: TextStyle(
+              fontFamily: "NotoSansKR",
+              fontSize: 12,
+              color: Palette.grey700,
+            ),
+          ),
+        ],
+      );
+    }
+    if (rating != null && rating.canStudentRate) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: ElevatedButton.icon(
+          onPressed: () => _rateLesson(rating),
+          icon: Icon(Icons.star_rounded, size: 18),
+          label: Text(tr(context, "별점 평가하기"),
+              style: TextStyle(fontFamily: "NotoSansKR")),
+        ),
+      );
+    }
+    return Text(
+      tr(context, "강사가 수업을 종료하면 이 자리에서 별점을 남길 수 있습니다."),
+      style: TextStyle(
+        fontFamily: "NotoSansKR",
+        fontSize: 12,
+        color: Palette.grey600,
       ),
     );
   }
@@ -945,7 +1047,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     if (previous > 0) {
       LessonRating? pending;
       for (final rating in _ratings) {
-        if (rating.weekNumber == previous && rating.isPendingStudent) {
+        if (rating.weekNumber == previous && rating.canStudentRate) {
           pending = rating;
           break;
         }
@@ -1331,8 +1433,11 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Palette.grey200),
           ),
-          child: feedback == null
-              ? Text(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (feedback == null)
+                Text(
                   tr(context, "아직 강사 피드백이 없습니다."),
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
@@ -1341,78 +1446,73 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                     height: 1.5,
                   ),
                 )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      [
-                        if (feedback.teacherName.isNotEmpty)
-                          '${feedback.teacherName} 선생님',
-                        feedback.lessonLabel,
-                      ].join(' · '),
-                      style: TextStyle(
-                        fontFamily: "NotoSansKR",
-                        fontSize: 12,
-                        color: Palette.grey600,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      feedback.content,
-                      style: TextStyle(
-                        fontFamily: "NotoSansKR",
-                        fontSize: 14,
-                        height: 1.55,
-                        color: Palette.black,
-                      ),
-                    ),
-                    SizedBox(height: 12),
-                    Text(tr(context, "수업 평가"),
-                        style: TextStyle(
-                            fontFamily: "NotoSansKR",
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12)),
-                    SizedBox(height: 6),
-                    if (rating != null && rating.isRated) ...[
-                      LessonStarView(stars: rating.stars),
-                      if (rating.review.trim().isNotEmpty) ...[
-                        SizedBox(height: 6),
-                        Text(
-                          rating.review.trim(),
-                          style: TextStyle(
-                            fontFamily: "NotoSansKR",
-                            fontSize: 13,
-                            height: 1.45,
-                            color: Palette.grey700,
-                          ),
-                        ),
-                      ],
-                    ] else if (rating != null && rating.isPendingStudent)
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            final saved = await LessonRatingService.showPrompt(
-                              context: context,
-                              rating: rating,
-                            );
-                            if (saved) await _loadData();
-                          },
-                          child: Text(tr(context, "별점 평가하기"),
-                              style: TextStyle(fontFamily: "NotoSansKR")),
-                        ),
-                      )
-                    else
-                      Text(
-                        tr(context, "강사 피드백을 확인한 뒤 별점 평가를 마치면 다음 회차가 열립니다."),
-                        style: TextStyle(
-                          fontFamily: "NotoSansKR",
-                          fontSize: 13,
-                          color: Palette.grey600,
-                        ),
-                      ),
-                  ],
+              else ...[
+                Text(
+                  [
+                    if (feedback.teacherName.isNotEmpty)
+                      '${feedback.teacherName} 선생님',
+                    feedback.lessonLabel,
+                  ].join(' · '),
+                  style: TextStyle(
+                    fontFamily: "NotoSansKR",
+                    fontSize: 12,
+                    color: Palette.grey600,
+                  ),
                 ),
+                SizedBox(height: 8),
+                Text(
+                  feedback.content,
+                  style: TextStyle(
+                    fontFamily: "NotoSansKR",
+                    fontSize: 14,
+                    height: 1.55,
+                    color: Palette.black,
+                  ),
+                ),
+              ],
+              SizedBox(height: 12),
+              Text(tr(context, "수업 평가"),
+                  style: TextStyle(
+                      fontFamily: "NotoSansKR",
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12)),
+              SizedBox(height: 6),
+              if (rating != null && rating.isRated) ...[
+                LessonStarView(stars: rating.stars),
+                if (rating.review.trim().isNotEmpty) ...[
+                  SizedBox(height: 6),
+                  Text(
+                    rating.review.trim(),
+                    style: TextStyle(
+                      fontFamily: "NotoSansKR",
+                      fontSize: 13,
+                      height: 1.45,
+                      color: Palette.grey700,
+                    ),
+                  ),
+                ],
+              ] else if (rating != null && rating.canStudentRate)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: ElevatedButton(
+                    onPressed: () => _rateLesson(rating),
+                    child: Text(tr(context, "별점 평가하기"),
+                        style: TextStyle(fontFamily: "NotoSansKR")),
+                  ),
+                )
+              else
+                Text(
+                  tr(context,
+                      "화상수업을 마치면 이 자리에서 강사 별점을 남길 수 있습니다. 평가를 마치면 다음 회차가 열립니다."),
+                  style: TextStyle(
+                    fontFamily: "NotoSansKR",
+                    fontSize: 13,
+                    height: 1.5,
+                    color: Palette.grey600,
+                  ),
+                ),
+            ],
+          ),
         ),
       ],
     );
