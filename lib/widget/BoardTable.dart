@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
 class BoardTable extends StatelessWidget {
@@ -71,18 +72,18 @@ class BoardTable extends StatelessWidget {
           width: isMobile
               ? (headers[0] == "번호" ? 40 : 50) // 모바일에서는 더 작게
               : (headers[0] == "번호" ? 60 : 80),
-          child: Text(headers[i], style: _headerTextStyle()),
+          child: Text(tr(context, headers[i]), style: _headerTextStyle()),
         );
       } else if (i == headers.length - 1) {
         // 마지막 컬럼 (작성일)
         cell = SizedBox(
           width: isMobile ? 70 : 120, // 모바일에서는 더 작게
-          child: Text(headers[i], style: _headerTextStyle()),
+          child: Text(tr(context, headers[i]), style: _headerTextStyle()),
         );
       } else {
         // 제목 컬럼 (Notice Board의 제목 또는 FAQ의 질문)
         cell = Expanded(
-          child: Text(headers[i], style: _headerTextStyle()),
+          child: Text(tr(context, headers[i]), style: _headerTextStyle()),
         );
       }
       cells.add(cell);
@@ -93,7 +94,7 @@ class BoardTable extends StatelessWidget {
       cells.add(
         SizedBox(
           width: 80,
-          child: Text("관리", style: _headerTextStyle()),
+          child: Text(tr(context, "관리"), style: _headerTextStyle()),
         ),
       );
     }
@@ -108,7 +109,7 @@ class BoardTable extends StatelessWidget {
           padding: EdgeInsets.all(40),
           child: Center(
             child: Text(
-              emptyMessage,
+              tr(context, emptyMessage),
               style: TextStyle(
                 fontSize: 14,
                 color: Palette.grey600,
@@ -192,7 +193,7 @@ class BoardTable extends StatelessWidget {
                 ],
                 Expanded(
                   child: Text(
-                    item['title'] ?? '',
+                    tr(context, item['title'] ?? ''),
                     style: TextStyle(
                       fontSize: isMobile ? 12 : 14, // 모바일에서는 폰트 크기 작게
                       fontFamily: "NotoSansKR",
@@ -242,7 +243,7 @@ class BoardTable extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
-              item['category'] ?? 'FAQ',
+              tr(context, item['category'] ?? 'FAQ'),
               style: TextStyle(
                 fontSize: isMobile ? 10 : 12, // 모바일에서는 폰트 크기 작게
                 fontFamily: "NotoSansKR",
@@ -271,7 +272,7 @@ class BoardTable extends StatelessWidget {
                 ],
                 Expanded(
                   child: Text(
-                    item['title'] ?? '',
+                    tr(context, item['title'] ?? ''),
                     style: TextStyle(
                       fontSize: isMobile ? 12 : 14, // 모바일에서는 폰트 크기 작게
                       fontFamily: "NotoSansKR",

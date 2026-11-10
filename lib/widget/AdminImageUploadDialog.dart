@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:gi_english_website/util/GalleryService.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -238,8 +239,8 @@ class _AdminImageUploadDialogState extends State<AdminImageUploadDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    '갤러리 이미지 업로드',
+                  Text(
+                    tr(context, "갤러리 이미지 업로드"),
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -275,7 +276,7 @@ class _AdminImageUploadDialogState extends State<AdminImageUploadDialog> {
                       )
                     : InkWell(
                         onTap: _pickImage,
-                        child: const Column(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
@@ -285,7 +286,7 @@ class _AdminImageUploadDialogState extends State<AdminImageUploadDialog> {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              '클릭하여 이미지 선택',
+                              tr(context, "클릭하여 이미지 선택"),
                               style: TextStyle(
                                 color: Palette.grey600,
                                 fontSize: 16,
@@ -293,7 +294,7 @@ class _AdminImageUploadDialogState extends State<AdminImageUploadDialog> {
                               ),
                             ),
                             Text(
-                              'JPG, PNG 파일만 지원',
+                              tr(context, "JPG, PNG 파일만 지원"),
                               style: TextStyle(
                                 color: Palette.grey400,
                                 fontSize: 12,
@@ -327,8 +328,8 @@ class _AdminImageUploadDialogState extends State<AdminImageUploadDialog> {
                         _resetState();
                         _pickImage();
                       },
-                      child: const Text(
-                        '다시 선택',
+                      child: Text(
+                        tr(context, "다시 선택"),
                         style: TextStyle(
                           fontSize: 12,
                           fontFamily: "NotoSansKR",
@@ -343,8 +344,8 @@ class _AdminImageUploadDialogState extends State<AdminImageUploadDialog> {
 
               // 이미지가 선택된 경우에만 설명 입력 필드 표시
               if (_selectedImageData != null) ...[
-                const Text(
-                  '이미지 설명 (선택사항)',
+                Text(
+                  tr(context, "이미지 설명 (선택사항)"),
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -428,7 +429,7 @@ class _AdminImageUploadDialogState extends State<AdminImageUploadDialog> {
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: Text(
-                      '취소',
+                      tr(context, "취소"),
                       style: TextStyle(
                         fontFamily: "NotoSansKR",
                         color: _isUploading ? Palette.grey400 : Palette.grey600,
@@ -457,8 +458,8 @@ class _AdminImageUploadDialogState extends State<AdminImageUploadDialog> {
                                 strokeWidth: 2,
                               ),
                             )
-                          : const Text(
-                              '업로드',
+                          : Text(
+                              tr(context, "업로드"),
                               style: TextStyle(
                                 fontFamily: "NotoSansKR",
                                 fontWeight: FontWeight.bold,

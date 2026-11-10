@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolAllDayPage.dart';
 import 'package:gi_english_website/pages/SchoolCampPage.dart';
@@ -91,14 +92,14 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content:
-              Text('로그아웃되었습니다.', style: TextStyle(fontFamily: "NotoSansKR")),
+              Text(tr(context, "로그아웃되었습니다."), style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Colors.green,
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('로그아웃 중 오류가 발생했습니다.',
+          content: Text(tr(context, "로그아웃 중 오류가 발생했습니다."),
               style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Colors.red,
         ),
@@ -128,7 +129,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
       color: selectedColor,
       width: 140,
       height: 35,
-      child: Text(label, style: TextStyle(color: Palette.white)),
+      child: Text(tr(context, label), style: TextStyle(color: Palette.white)),
     );
   }
 
@@ -398,7 +399,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                         ),
                         SizedBox(width: 4),
                         Text(
-                          "로그아웃",
+                          tr(context, "로그아웃"),
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 12,
@@ -426,7 +427,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                       ),
                       SizedBox(width: 4),
                       Text(
-                        "관리자",
+                        tr(context, "관리자"),
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -448,12 +449,18 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
           child: InkWell(
             child: Container(
                 height: 49, child: Image.asset("assets/giEmblem.png")),
-            onTap: () {
-              MenuUtil.push(context, SchoolMainPage());
-            },
-          ),
+          onTap: () {
+            MenuUtil.push(context, SchoolMainPage());
+          },
         ),
-        // Positioned(
+      ),
+      Positioned(
+        left: 78,
+        top: 0,
+        bottom: 0,
+        child: Center(child: const LanguageToggle()),
+      ),
+      // Positioned(
         //   right:5, top: 5,
         //   child: Container(
         //     alignment: Alignment.topRight,

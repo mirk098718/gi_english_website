@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolMapPage.dart';
 import 'package:gi_english_website/pages/SchoolSystemPage.dart';
 import 'package:gi_english_website/pages/SchoolTeachersPage.dart';
@@ -125,7 +126,7 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "GLEAM ISLAND 의 철학과 목표",
+            tr(context, "GLEAM ISLAND 의 철학과 목표"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
@@ -228,7 +229,7 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
-                    child: Text("상담신청",
+                    child: Text(tr(context, "상담신청"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "Jalnan",
@@ -271,7 +272,7 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "GLEAM ISLAND 의 철학과 목표",
+            tr(context, "GLEAM ISLAND 의 철학과 목표"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
@@ -381,7 +382,7 @@ class _SchoolAboutPageState extends State<SchoolAboutPage> {
                   height: 40,
                   child: ElevatedButton(
                     child: Text(
-                      "상담신청",
+                      tr(context, "상담신청"),
                       style:
                           TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),

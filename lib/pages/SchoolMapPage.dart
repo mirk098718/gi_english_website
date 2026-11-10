@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolSystemPage.dart';
 import 'package:gi_english_website/pages/SchoolTeachersPage.dart';
@@ -125,14 +126,14 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "오시는 길",
+            tr(context, "오시는 길"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
           SizedBox(
             height: 20,
           ),
-          Text("주소: 경기도 파주시 해올2길2 태산W타워 7층, 701~703호 (다율동 1044)"),
+          Text(tr(context, "주소: 경기도 파주시 해올2길2 태산W타워 7층, 701~703호 (다율동 1044)")),
           SizedBox(
             height: 20,
           ),
@@ -190,7 +191,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
-                    child: Text("상담신청",
+                    child: Text(tr(context, "상담신청"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "Jalnan",
@@ -308,7 +309,7 @@ class _SchoolMapPageState extends State<SchoolMapPage> {
                   height: 40,
                   child: ElevatedButton(
                     child: Text(
-                      "상담신청",
+                      tr(context, "상담신청"),
                       style:
                           TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),

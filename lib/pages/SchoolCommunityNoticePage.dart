@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/Notice.dart';
 import 'package:gi_english_website/pages/AdminNoticeWritePage.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
@@ -80,7 +81,7 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
                 ElevatedButton.icon(
                   onPressed: () => _navigateToWritePage(),
                   icon: Icon(Icons.edit, size: 16),
-                  label: Text("글쓰기"),
+                  label: Text(tr(context, "글쓰기")),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.primary,
                     foregroundColor: Palette.white,
@@ -92,7 +93,7 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
           WidgetUtil.myDivider(),
           SizedBox(height: 20),
           Text(
-            "글림아일랜드의 최신 소식과 공지사항을 확인하세요.",
+            tr(context, "글림아일랜드의 최신 소식과 공지사항을 확인하세요."),
             style: TextStyle(
               fontSize: 14,
               color: Palette.grey600,
@@ -143,7 +144,7 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '공지사항을 불러오는데 오류가 발생했습니다.',
+              tr(context, "공지사항을 불러오는데 오류가 발생했습니다."),
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.red,
@@ -152,7 +153,7 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
             ),
             SizedBox(height: 8),
             Text(
-              '오류: $error',
+              '${tr(context, "오류")}: $error',
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.red[300],
@@ -164,7 +165,7 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
               onPressed: () {
                 setState(() {});
               },
-              child: Text('다시 시도'),
+              child: Text(tr(context, "다시 시도")),
             ),
           ],
         ),
@@ -184,7 +185,7 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
             ),
             SizedBox(height: 16),
             Text(
-              message,
+              tr(context, message),
               style: TextStyle(
                 fontSize: 14,
                 color: Palette.grey600,
@@ -261,7 +262,7 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
       if (notice == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('공지사항을 찾을 수 없습니다.'),
+            content: Text(tr(context, "공지사항을 찾을 수 없습니다.")),
             backgroundColor: Colors.red,
           ),
         );
@@ -283,7 +284,8 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('공지사항 수정 중 오류가 발생했습니다: $e'),
+          content: Text(
+              '${AppLanguage.instance.translate("공지사항 수정 중 오류가 발생했습니다")}: $e'),
           backgroundColor: Colors.red,
         ),
       );
@@ -297,18 +299,20 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          "공지사항 삭제",
+          tr(context, "공지사항 삭제"),
           style: TextStyle(fontFamily: "NotoSansKR"),
         ),
         content: Text(
-          "공지사항 '$noticeTitle'을(를) 삭제하시겠습니까?\n삭제된 공지사항은 복구할 수 없습니다.",
+          AppLanguage.instance.isEnglish
+              ? "Delete the announcement \"${noticeTitle ?? ''}\"?\nThis cannot be undone."
+              : "공지사항 '$noticeTitle'을(를) 삭제하시겠습니까?\n삭제된 공지사항은 복구할 수 없습니다.",
           style: TextStyle(fontFamily: "NotoSansKR"),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
-              "취소",
+              tr(context, "취소"),
               style: TextStyle(fontFamily: "NotoSansKR"),
             ),
           ),
@@ -316,7 +320,7 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: Text(
-              "삭제",
+              tr(context, "삭제"),
               style: TextStyle(fontFamily: "NotoSansKR"),
             ),
           ),
@@ -331,7 +335,7 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                '공지사항이 삭제되었습니다.',
+                tr(context, "공지사항이 삭제되었습니다."),
                 style: TextStyle(fontFamily: "NotoSansKR"),
               ),
               backgroundColor: Colors.green,
@@ -343,7 +347,7 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                '공지사항 삭제에 실패했습니다.',
+                tr(context, "공지사항 삭제에 실패했습니다."),
                 style: TextStyle(fontFamily: "NotoSansKR"),
               ),
               backgroundColor: Colors.red,
@@ -354,7 +358,7 @@ class _SchoolCommunityNoticePageState extends State<SchoolCommunityNoticePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '공지사항 삭제 중 오류가 발생했습니다: $e',
+              '${AppLanguage.instance.translate("공지사항 삭제 중 오류가 발생했습니다")}: $e',
               style: TextStyle(fontFamily: "NotoSansKR"),
             ),
             backgroundColor: Colors.red,

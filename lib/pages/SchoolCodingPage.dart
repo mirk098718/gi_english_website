@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
@@ -122,7 +123,7 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "선택 프로그램",
+            tr(context, "선택 프로그램"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
@@ -130,7 +131,7 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
             height: 20,
           ),
           Text(
-            "대상",
+            tr(context, "대상"),
             style: TextStyle(
                 fontFamily: "Jalnan", fontSize: 15, color: const Color.fromRGBO(4, 120, 87, 1)),
           ),
@@ -143,8 +144,7 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "1) 선택/특강 프로그램 : 이공계 / 예체능 적성의 본원 정규 초등영어 과정 수강생\n"
-              "2) 방학특강 프로그램 : 이공계 적성의 본원 정규 중등영어 과정 수강생 또는 유학준비생"),
+              tr(context, "1) 선택/특강 프로그램 : 이공계 / 예체능 적성의 본원 정규 초등영어 과정 수강생\n2) 방학특강 프로그램 : 이공계 적성의 본원 정규 중등영어 과정 수강생 또는 유학준비생")),
           SizedBox(
             height: 20,
           ),
@@ -215,7 +215,7 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
-                    child: Text("상담신청",
+                    child: Text(tr(context, "상담신청"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "Jalnan",
@@ -342,7 +342,7 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
                   height: 40,
                   child: ElevatedButton(
                     child: Text(
-                      "상담신청",
+                      tr(context, "상담신청"),
                       style:
                           TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),

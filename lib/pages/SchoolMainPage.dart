@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityBoardPage.dart';
@@ -104,11 +105,11 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "상담",
+                  tr(context, "상담"),
                   style: TextStyle(fontFamily: "Jalnan", color: Palette.white),
                 ),
                 Text(
-                  "신청",
+                  tr(context, "신청"),
                   style: TextStyle(fontFamily: "Jalnan", color: Palette.white),
                 ),
               ],
@@ -355,7 +356,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             padding: EdgeInsets.all(20),
             child: Center(
               child: Text(
-                '공지사항을 불러오는데 오류가 발생했습니다.',
+                tr(context, "공지사항을 불러오는데 오류가 발생했습니다."),
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.red,
@@ -388,7 +389,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             padding: EdgeInsets.all(20),
             child: Center(
               child: Text(
-                '등록된 공지사항이 없습니다.',
+                tr(context, "등록된 공지사항이 없습니다."),
                 style: TextStyle(
                   fontSize: 14,
                   color: Palette.grey600,
@@ -420,9 +421,10 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
 
   Widget _buildNoticeItem(Notice notice) {
     // 미리보기 텍스트 생성 (60자 제한)
-    String preview = notice.content.length > 60
-        ? '${notice.content.substring(0, 60)}...'
-        : notice.content;
+    final translatedNotice = tr(context, notice.content);
+    String preview = translatedNotice.length > 60
+        ? '${translatedNotice.substring(0, 60)}...'
+        : translatedNotice;
 
     return InkWell(
       onTap: () {
@@ -445,7 +447,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                       borderRadius: BorderRadius.circular(3),
                     ),
                     child: Text(
-                      "중요",
+                      tr(context, "중요"),
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 10,
@@ -458,7 +460,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                 ],
                 Expanded(
                   child: Text(
-                    notice.title,
+                    tr(context, notice.title),
                     style: TextStyle(
                       color: Palette.black,
                       fontFamily: "NotoSansKR",
@@ -507,7 +509,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             padding: EdgeInsets.all(20),
             child: Center(
               child: Text(
-                'FAQ를 불러오는데 오류가 발생했습니다.',
+                tr(context, "FAQ를 불러오는데 오류가 발생했습니다."),
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.red,
@@ -540,7 +542,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             padding: EdgeInsets.all(20),
             child: Center(
               child: Text(
-                '등록된 FAQ가 없습니다.',
+                tr(context, "등록된 FAQ가 없습니다."),
                 style: TextStyle(
                   fontSize: 14,
                   color: Palette.grey600,
@@ -572,9 +574,10 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
 
   Widget _buildFAQItem(FAQ faq) {
     // 미리보기 텍스트 생성 (50자 제한)
-    String preview = faq.answer.length > 50
-        ? '${faq.answer.substring(0, 50)}...'
-        : faq.answer;
+    final translatedAnswer = tr(context, faq.answer);
+    String preview = translatedAnswer.length > 50
+        ? '${translatedAnswer.substring(0, 50)}...'
+        : translatedAnswer;
 
     return InkWell(
       onTap: () {
@@ -594,7 +597,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                     borderRadius: BorderRadius.circular(3),
                   ),
                   child: Text(
-                    faq.category,
+                    tr(context, faq.category),
                     style: TextStyle(
                       color: faq.isImportant ? Colors.white : Palette.grey700,
                       fontSize: 10,
@@ -612,7 +615,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             ),
             SizedBox(height: 8),
             Text(
-              "Q: ${faq.question}",
+              "Q: ${tr(context, faq.question)}",
               style: TextStyle(
                 color: Palette.black,
                 fontFamily: "NotoSansKR",
@@ -791,14 +794,14 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "상담",
+                        tr(context, "상담"),
                         style: TextStyle(
                             fontFamily: "Jalnan",
                             fontSize: 10,
                             color: Palette.white),
                       ),
                       Text(
-                        "신청",
+                        tr(context, "신청"),
                         style: TextStyle(
                             fontFamily: "Jalnan",
                             fontSize: 10,
@@ -956,7 +959,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             padding: EdgeInsets.all(20),
             child: Center(
               child: Text(
-                '공지사항을 불러오는데 오류가 발생했습니다.',
+                tr(context, "공지사항을 불러오는데 오류가 발생했습니다."),
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.red,
@@ -990,7 +993,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             padding: EdgeInsets.all(20),
             child: Center(
               child: Text(
-                '등록된 공지사항이 없습니다.',
+                tr(context, "등록된 공지사항이 없습니다."),
                 style: TextStyle(
                   fontSize: 12,
                   color: Palette.grey600,
@@ -1022,9 +1025,10 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
 
   Widget _buildMobileNoticeItem(Notice notice) {
     // 미리보기 텍스트 생성 (40자 제한 - 모바일에서는 더 짧게)
-    String preview = notice.content.length > 40
-        ? '${notice.content.substring(0, 40)}...'
-        : notice.content;
+    final translatedNotice = tr(context, notice.content);
+    String preview = translatedNotice.length > 40
+        ? '${translatedNotice.substring(0, 40)}...'
+        : translatedNotice;
 
     return InkWell(
       onTap: () {
@@ -1047,7 +1051,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                       borderRadius: BorderRadius.circular(3),
                     ),
                     child: Text(
-                      "중요",
+                      tr(context, "중요"),
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 8,
@@ -1060,7 +1064,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                 ],
                 Expanded(
                   child: Text(
-                    notice.title,
+                    tr(context, notice.title),
                     style: TextStyle(
                       color: Palette.black,
                       fontFamily: "NotoSansKR",
@@ -1109,7 +1113,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             padding: EdgeInsets.all(20),
             child: Center(
               child: Text(
-                'FAQ를 불러오는데 오류가 발생했습니다.',
+                tr(context, "FAQ를 불러오는데 오류가 발생했습니다."),
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.red,
@@ -1143,7 +1147,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             padding: EdgeInsets.all(20),
             child: Center(
               child: Text(
-                '등록된 FAQ가 없습니다.',
+                tr(context, "등록된 FAQ가 없습니다."),
                 style: TextStyle(
                   fontSize: 12,
                   color: Palette.grey600,
@@ -1175,9 +1179,10 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
 
   Widget _buildMobileFAQItem(FAQ faq) {
     // 미리보기 텍스트 생성 (30자 제한 - 모바일에서는 더 짧게)
-    String preview = faq.answer.length > 30
-        ? '${faq.answer.substring(0, 30)}...'
-        : faq.answer;
+    final translatedAnswer = tr(context, faq.answer);
+    String preview = translatedAnswer.length > 30
+        ? '${translatedAnswer.substring(0, 30)}...'
+        : translatedAnswer;
 
     return InkWell(
       onTap: () {
@@ -1197,7 +1202,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
                     borderRadius: BorderRadius.circular(3),
                   ),
                   child: Text(
-                    faq.category,
+                    tr(context, faq.category),
                     style: TextStyle(
                       color: faq.isImportant ? Colors.white : Palette.grey700,
                       fontSize: 8,
@@ -1215,7 +1220,7 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             ),
             SizedBox(height: 6),
             Text(
-              "Q: ${faq.question}",
+              "Q: ${tr(context, faq.question)}",
               style: TextStyle(
                 color: Palette.black,
                 fontFamily: "NotoSansKR",

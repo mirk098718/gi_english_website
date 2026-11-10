@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
 class EasyRadio extends StatelessWidget {
@@ -12,7 +13,7 @@ class EasyRadio extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(label,
+        Text(tr(context, label),
             style: TextStyle(
                 color: Palette.black,
                 fontFamily: "NotoSansKR",

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolMapPage.dart';
@@ -126,7 +127,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "GLEAM ISLAND 교원 소개",
+            tr(context, "GLEAM ISLAND 교원 소개"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
@@ -134,7 +135,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
             height: 30,
           ),
           Text(
-            "원장 Mia 선생님",
+            tr(context, "원장 Mia 선생님"),
             style: TextStyle(
                 fontFamily: "Jalnan", fontSize: 15, color: Palette.primary),
           ),
@@ -160,14 +161,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
                         color: Palette.black,
                         fontFamily: "NotoSansKR",
                         fontSize: 14),
-                    "Mia Kim \n\n"
-                    "현 Gi 글림아일랜드 어학원 파주 원장\n"
-                    "전 서대문구 소재 청담 에이프릴 어학원 교수부장\n"
-                    "서대문구 소재 위즈빌 어학원 영어 유초등부 강사\n"
-                    "하이잉글리쉬 대기업 출강강사 (현대케피코, 두산중공업 등)\n"
-                    "강남 유명 OPIC (영어 구술 시험) 전문 어학원 강사\n"
-                    "비욘드 어학원 초, 중등 강사\n"
-                    "JTBC 다큐멘터리 “스포츠관광을 디렉팅하라” 영문번역"),
+                    tr(context, "Mia Kim \n\n현 Gi 글림아일랜드 어학원 파주 원장\n전 서대문구 소재 청담 에이프릴 어학원 교수부장\n서대문구 소재 위즈빌 어학원 영어 유초등부 강사\n하이잉글리쉬 대기업 출강강사 (현대케피코, 두산중공업 등)\n강남 유명 OPIC (영어 구술 시험) 전문 어학원 강사\n비욘드 어학원 초, 중등 강사\nJTBC 다큐멘터리 “스포츠관광을 디렉팅하라” 영문번역")),
                 SizedBox(
                   width: 20,
                 ),
@@ -176,14 +170,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
                         color: Palette.black,
                         fontFamily: "NotoSansKR",
                         fontSize: 14),
-                    "학력 및 자격\n"
-                    "\n"
-                    "뉴질랜드 오클랜드 공과 대학교\n"
-                    "(Auckland University of Technology) 석사졸\n"
-                    "뉴질랜드 오클랜드 소재 Glenfield College 고등학교 졸\n"
-                    "TESOL 영어 강사 자격 보유\n"
-                    "(Certificate in Teaching English as a Second Language)\n"
-                    "(Queens Academic Group)")
+                    tr(context, "학력 및 자격\n\n뉴질랜드 오클랜드 공과 대학교\n(Auckland University of Technology) 석사졸\n뉴질랜드 오클랜드 소재 Glenfield College 고등학교 졸\nTESOL 영어 강사 자격 보유\n(Certificate in Teaching English as a Second Language)\n(Queens Academic Group)"))
               ],
             ),
           ),
@@ -241,7 +228,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
-                    child: Text("상담신청",
+                    child: Text(tr(context, "상담신청"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "Jalnan",
@@ -368,7 +355,7 @@ class _SchoolTeachersPageState extends State<SchoolTeachersPage> {
                   height: 40,
                   child: ElevatedButton(
                     child: Text(
-                      "상담신청",
+                      tr(context, "상담신청"),
                       style:
                           TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),

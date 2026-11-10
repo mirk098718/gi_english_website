@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolAboutPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumElePage.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
@@ -98,14 +99,14 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content:
-              Text('로그아웃되었습니다.', style: TextStyle(fontFamily: "NotoSansKR")),
+              Text(tr(context, "로그아웃되었습니다."), style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Colors.green,
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('로그아웃 중 오류가 발생했습니다.',
+          content: Text(tr(context, "로그아웃 중 오류가 발생했습니다."),
               style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Colors.red,
         ),
@@ -196,7 +197,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                         ),
                         SizedBox(width: 2),
                         Text(
-                          "로그아웃",
+                          tr(context, "로그아웃"),
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 10,
@@ -224,7 +225,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                       ),
                       SizedBox(width: 2),
                       Text(
-                        "관리자",
+                        tr(context, "관리자"),
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 10,
@@ -237,6 +238,12 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
               ],
             ),
           ),
+        Positioned(
+          left: 8,
+          top: 0,
+          bottom: 0,
+          child: Center(child: const LanguageToggle(compact: true)),
+        ),
       ],
     );
   }

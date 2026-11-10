@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolCurriculumElePage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
@@ -117,7 +118,7 @@ class _SchoolCurriculumMiddleSchoolPageState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "정규 중등부 Curriculum",
+              tr(context, "정규 중등부 Curriculum"),
               style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
             ),
             WidgetUtil.myDivider(),
@@ -239,7 +240,7 @@ class _SchoolCurriculumMiddleSchoolPageState
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
-                    child: Text("상담신청",
+                    child: Text(tr(context, "상담신청"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "Jalnan",
