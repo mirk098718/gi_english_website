@@ -235,6 +235,7 @@ exports.confirmTossPayment = functions
       }
     }
 
+    const teacherUid = payment.nativeTeacherUid || "";
     const enrollmentPayload = {
       userId,
       email: payment.email || "",
@@ -247,10 +248,11 @@ exports.confirmTossPayment = functions
       paymentNote: "토스페이먼츠 자동결제",
       nativeTeacherId: payment.nativeTeacherId || "",
       nativeTeacherName: payment.nativeTeacherName || "",
-      nativeTeacherUid: payment.nativeTeacherUid || "",
+      nativeTeacherUid: teacherUid,
       paidAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
+    if (teacherUid) enrollmentPayload.teacherId = teacherUid;
 
     if (enrollmentRef) {
       const prev = (await enrollmentRef.get()).data() || {};
@@ -434,13 +436,18 @@ exports.syncCardPaidStudents = functions
     return { ok: true, updated };
   });
 
-async function assertOwner(context) {
+async function assertOwner(context, deniedMessage) {
   if (!context.auth) {
     throw new functions.https.HttpsError(
       "unauthenticated",
       "로그인이 필요합니다."
     );
   }
+  const email = String(
+    (context.auth.token && context.auth.token.email) || ""
+  ).toLowerCase();
+  if (email === "gienglish.paju@gmail.com") return;
+
   const snap = await admin
     .firestore()
     .collection("admins")
@@ -457,7 +464,7 @@ async function assertOwner(context) {
   if (role && role !== "owner") {
     throw new functions.https.HttpsError(
       "permission-denied",
-      "메인 관리자만 강사 비밀번호를 설정할 수 있습니다."
+      deniedMessage || "메인 관리자만 할 수 있습니다."
     );
   }
 }
@@ -471,7 +478,10 @@ function authErrorCode(err) {
 exports.setTeacherPassword = functions
   .region("asia-northeast3")
   .https.onCall(async (data, context) => {
-    await assertOwner(context);
+    await assertOwner(
+      context,
+      "메인 관리자만 강사 비밀번호를 설정할 수 있습니다."
+    );
 
     const teacherUid = (data && data.teacherUid ? String(data.teacherUid) : "").trim();
     const password = data && data.password ? String(data.password) : "";
@@ -577,6 +587,92 @@ exports.setTeacherPassword = functions
     return { ok: true };
   });
 
+/// 서브 강사 활성/비활성. Firestore와 Auth 계정 정지를 함께 바꾼다.
+/// 비활성화하면 결제 선택과 코티칭을 바로 끈다. 확정된 수업은 건드리지 않는다.
+exports.setTeacherActive = functions
+  .region("asia-northeast3")
+  .https.onCall(async (data, context) => {
+    await assertOwner(context, "메인 관리자만 강사 계정을 바꿀 수 있습니다.");
+
+    const teacherUid = (data && data.teacherUid ? String(data.teacherUid) : "").trim();
+    const isActive = !!(data && data.isActive);
+    if (!teacherUid) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "강사 정보가 없습니다."
+      );
+    }
+    if (teacherUid === context.auth.uid) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "메인 관리자는 비활성화할 수 없습니다."
+      );
+    }
+
+    const db = admin.firestore();
+    const adminRef = db.collection("admins").doc(teacherUid);
+    const adminSnap = await adminRef.get();
+    if (!adminSnap.exists) {
+      throw new functions.https.HttpsError(
+        "not-found",
+        "강사 계정을 찾을 수 없습니다."
+      );
+    }
+    const teacher = adminSnap.data() || {};
+    if (teacher.role !== "teacher") {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "메인 관리자는 비활성화할 수 없습니다."
+      );
+    }
+
+    try {
+      await admin.auth().updateUser(teacherUid, { disabled: !isActive });
+      if (!isActive) {
+        await admin.auth().revokeRefreshTokens(teacherUid);
+      }
+    } catch (err) {
+      const code = authErrorCode(err);
+      if (code !== "auth/user-not-found") {
+        console.error("강사 Auth 상태 변경 실패", err);
+        throw new functions.https.HttpsError(
+          "internal",
+          "로그인 계정 상태를 바꾸지 못했습니다."
+        );
+      }
+    }
+
+    const patch = {
+      isActive,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
+    if (!isActive) {
+      patch.bookingOffer = "off";
+      patch.selectableAtCheckout = false;
+      patch.acceptsCoTeaching = false;
+    }
+    await adminRef.set(patch, { merge: true });
+
+    const profileId = publicTeacherProfileId(teacherUid, teacher);
+    const profilePatch = {
+      teacherUid,
+      name: String(teacher.name || ""),
+      isActive,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
+    if (!isActive) {
+      profilePatch.bookingOffer = "off";
+      profilePatch.selectableAtCheckout = false;
+      profilePatch.acceptsCoTeaching = false;
+    }
+    await db.collection("native_teacher_accounts").doc(profileId).set(
+      profilePatch,
+      { merge: true }
+    );
+
+    return { ok: true, isActive };
+  });
+
 function publicTeacherProfileId(teacherUid, data) {
   const existing = String((data && data.nativeProfileId) || "");
   if (existing && existing.indexOf("native_temp_") !== 0) return existing;
@@ -626,27 +722,6 @@ exports.listSelectableTeachers = functions
         selectableAtCheckout: bookingOffer === "both",
         acceptsCoTeaching: bookingOffer === "both" || bookingOffer === "coteach",
       });
-
-      db.collection("native_teacher_accounts")
-        .doc(id)
-        .set(
-          {
-            teacherUid: doc.id,
-            name,
-            email: String(data.email || ""),
-            nationality: String(data.nationality || ""),
-            intro: String(data.intro || ""),
-            photoUrl: String(data.photoUrl || ""),
-            isActive: data.isActive !== false,
-            bookingOffer,
-            selectableAtCheckout: bookingOffer === "both",
-            acceptsCoTeaching:
-              bookingOffer === "both" || bookingOffer === "coteach",
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          },
-          { merge: true }
-        )
-        .catch((err) => console.error("native profile sync", id, err));
     }
 
     teachers.sort((a, b) => {

@@ -92,9 +92,6 @@ class _AdminOnlineHubPageState extends State<AdminOnlineHubPage>
       _authorized = true;
       _checking = false;
     });
-    if (role == AdminRole.owner) {
-      AuthService.publishTeacherProfiles();
-    }
   }
 
   Widget _shell(Widget child) {
@@ -284,9 +281,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
     } else {
       final uid = _staffUid ?? await AuthService.getStaffUid() ?? '';
       members = await _membersForTeacher(uid);
-      final memberIds = members.map((m) => m['uid']?.toString() ?? '').toList();
-      enrollments =
-          await EnrollmentService.listEnrollments(memberIds: memberIds);
+      enrollments = await EnrollmentService.listEnrollments(teacherUid: uid);
     }
 
     final learning = await EnrollmentService.learningByEnrollment(enrollments);
@@ -2207,6 +2202,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
   late final TextEditingController _bankNameCtrl;
   late final TextEditingController _bankAccountCtrl;
   late final TextEditingController _accountHolderCtrl;
+  late final TextEditingController _lessonFeeCtrl;
   late final TextEditingController _passwordCtrl;
   Uint8List? _newPhoto;
   bool _saving = false;
@@ -2236,6 +2232,8 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
         text: widget.teacher['bankAccount']?.toString() ?? '');
     _accountHolderCtrl = TextEditingController(
         text: widget.teacher['accountHolder']?.toString() ?? '');
+    _lessonFeeCtrl = TextEditingController(
+        text: '${EnrollmentService.lessonFeeWonOf(widget.teacher)}');
     _passwordCtrl = TextEditingController();
   }
 
@@ -2249,6 +2247,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
     _bankNameCtrl.dispose();
     _bankAccountCtrl.dispose();
     _accountHolderCtrl.dispose();
+    _lessonFeeCtrl.dispose();
     _passwordCtrl.dispose();
     super.dispose();
   }
@@ -2275,6 +2274,11 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
       _showError(phoneError);
       return;
     }
+    final lessonFee = int.tryParse(_lessonFeeCtrl.text.replaceAll(',', '').trim());
+    if (lessonFee == null || lessonFee < 0) {
+      _showError('회차 수당은 0원 이상의 숫자로 입력해 주세요.');
+      return;
+    }
     setState(() => _saving = true);
     String? error;
     try {
@@ -2288,6 +2292,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
         bankName: _bankNameCtrl.text,
         bankAccount: _bankAccountCtrl.text,
         accountHolder: _accountHolderCtrl.text,
+        lessonFeeWon: lessonFee,
         photoBytes: _newPhoto,
         photoFileName: _newPhoto == null ? null : 'teacher.jpg',
         password: _passwordCtrl.text.trim(),
@@ -2378,10 +2383,21 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
               ),
               SizedBox(height: 12),
               TextField(
+                controller: _lessonFeeCtrl,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: '회차 수당 (원)',
+                  helperText: '없으면 회차당 10,000원으로 계산합니다.',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 12),
+              TextField(
                 controller: _bankNameCtrl,
                 decoration: InputDecoration(
-                  labelText: '월급 은행',
+                  labelText: '입금 은행',
                   hintText: '예: 국민은행',
+                  helperText: '계좌는 메인 관리자만 볼 수 있습니다.',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2485,6 +2501,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
   final _bankNameCtrl = TextEditingController();
   final _bankAccountCtrl = TextEditingController();
   final _accountHolderCtrl = TextEditingController();
+  final _lessonFeeCtrl = TextEditingController(text: '10000');
   final _nationalityCtrl = TextEditingController();
   final _introCtrl = TextEditingController();
   Uint8List? _photo;
@@ -2500,6 +2517,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
     _bankNameCtrl.dispose();
     _bankAccountCtrl.dispose();
     _accountHolderCtrl.dispose();
+    _lessonFeeCtrl.dispose();
     _nationalityCtrl.dispose();
     _introCtrl.dispose();
     super.dispose();
@@ -2529,6 +2547,12 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
       _showError(phoneError);
       return;
     }
+    final lessonFee =
+        int.tryParse(_lessonFeeCtrl.text.replaceAll(',', '').trim());
+    if (lessonFee == null || lessonFee < 0) {
+      _showError('회차 수당은 0원 이상의 숫자로 입력해 주세요.');
+      return;
+    }
     setState(() => _saving = true);
     String? error;
     try {
@@ -2545,6 +2569,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
         bankName: _bankNameCtrl.text.trim(),
         bankAccount: _bankAccountCtrl.text.trim(),
         accountHolder: _accountHolderCtrl.text.trim(),
+        lessonFeeWon: lessonFee,
       );
     } catch (e) {
       error = '강사 등록 중 오류가 발생했습니다.';
@@ -2650,10 +2675,21 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
               ),
               SizedBox(height: 12),
               TextField(
+                controller: _lessonFeeCtrl,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: '회차 수당 (원)',
+                  helperText: '기본값은 회차당 10,000원입니다.',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 12),
+              TextField(
                 controller: _bankNameCtrl,
                 decoration: InputDecoration(
-                  labelText: '월급 은행',
+                  labelText: '입금 은행',
                   hintText: '예: 국민은행',
+                  helperText: '계좌는 메인 관리자만 볼 수 있습니다.',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2738,6 +2774,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
     setState(() => _loading = true);
     await AuthService.publishTeacherProfiles();
     await AuthService.syncCardPaidStudents('');
+    await AuthService.backfillPaidTeacherIds();
     final teachers = await AuthService.listTeachers();
     final members = await AuthService.listMembers();
     final bookings = await EnrollmentService.staffWeekBookings(mineOnly: false);
@@ -2753,10 +2790,18 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
   }
 
   TeacherMonthStats _statsFor(String uid) {
+    Map<String, dynamic>? teacher;
+    for (final item in _teachers) {
+      if (item['uid']?.toString() == uid) {
+        teacher = item;
+        break;
+      }
+    }
     return LessonRatingService.monthStats(
       bookings: _bookings,
       teacherUid: uid,
       ratings: _ratings,
+      lessonFeeWon: EnrollmentService.lessonFeeWonOf(teacher),
     );
   }
 
@@ -2867,10 +2912,12 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
     if (mounted) _toast('강사 정보를 수정했습니다.');
   }
 
-  Future<void> _editOwnerBookingOffer(Map<String, dynamic> teacher) async {
+  Future<void> _editBookingOffer(Map<String, dynamic> teacher) async {
     final uid = teacher['uid']?.toString() ?? '';
     if (uid.isEmpty) return;
-    final current = TeacherBookingOffer.resolve(teacher, isOwner: true);
+    final isOwnerTeacher = teacher['role']?.toString() != 'teacher';
+    final current =
+        TeacherBookingOffer.resolve(teacher, isOwner: isOwnerTeacher);
     final next = await showDialog<String>(
       context: context,
       builder: (dialogContext) {
@@ -2930,8 +2977,57 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
     await _refresh();
   }
 
+  Future<void> _toggleTeacherActive(Map<String, dynamic> teacher) async {
+    final uid = teacher['uid']?.toString() ?? '';
+    if (uid.isEmpty) return;
+    final active = teacher['isActive'] != false;
+    final name = AuthService.profileDisplayName(teacher, fallback: '강사');
+    final assigned = _members
+        .where((member) => member['teacherId']?.toString() == uid)
+        .length;
+    final waiting = _bookings
+        .where((booking) =>
+            booking.status == 'pending' &&
+            TeacherMonthStats.taughtBy(booking, uid))
+        .length;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(active ? '강사 비활성화' : '강사 활성화',
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+        content: Text(
+          active
+              ? '$name 강사를 비활성화합니다.\n담당 수강생 $assigned명, 대기 중인 예약 $waiting건이 있습니다.\n로그인 계정이 정지되고, 새 결제 선택과 코티칭은 바로 닫힙니다. 이미 확정된 수업은 이 강사 일정에 남습니다.'
+              : '$name 강사의 로그인 정지를 풉니다.\n담당 수강생 $assigned명, 대기 중인 예약 $waiting건입니다.\n수업 받기는 꺼진 채로 둡니다. 다시 받으려면 수업 받기에서 켜 주세요.',
+          style: TextStyle(fontFamily: "NotoSansKR", height: 1.45),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(active ? '비활성화' : '활성화'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final error = await AuthService.setTeacherActive(uid, !active);
+    if (!mounted) return;
+    if (error != null) {
+      _toast(error, error: true);
+      return;
+    }
+    _toast(active ? '강사를 비활성화했습니다.' : '강사를 활성화했습니다.');
+    await _refresh();
+  }
+
   Future<void> _assignMember(Map<String, dynamic> member) async {
     String selectedTeacherId = member['teacherId']?.toString() ?? '';
+    var moveConfirmed = false;
+    final currentTeacherId = selectedTeacherId;
 
     final saved = await showDialog<bool>(
       context: context,
@@ -2975,6 +3071,23 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                   onChanged: (v) =>
                       setDialogState(() => selectedTeacherId = v ?? ''),
                 ),
+                if (selectedTeacherId != currentTeacherId) ...[
+                  SizedBox(height: 8),
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    value: moveConfirmed,
+                    onChanged: (value) => setDialogState(
+                        () => moveConfirmed = value ?? false),
+                    title: Text('이미 확정된 수업도 함께 옮기기',
+                        style: TextStyle(
+                            fontFamily: "NotoSansKR", fontSize: 14)),
+                    subtitle: Text(
+                      '끄면 회원, 수강, 대기 중인 예약만 옮깁니다. 확정된 수업은 지금 강사 일정에 남습니다.',
+                      style: TextStyle(
+                          fontFamily: "NotoSansKR", fontSize: 12),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -2987,6 +3100,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                 final error = await AuthService.assignMemberToTeacher(
                   memberId: member['uid']?.toString() ?? '',
                   teacherId: selectedTeacherId,
+                  moveConfirmed: moveConfirmed,
                 );
                 if (!mounted) return;
                 if (error != null) {
@@ -3093,7 +3207,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
           ),
           SizedBox(height: 8),
           Text(
-            '강사를 누르면 프로필·회원, 그 강사의 스케줄·예약, 한달 수업 이력을 볼 수 있습니다. 카드에는 이번 달 평균과 최근 학생 별점이 바로 보이고, 평가는 전체 이력을 엽니다. 별점은 매달 인사 평가에 쓰입니다.',
+            '강사를 누르면 프로필·회원, 그 강사의 스케줄·예약, 한달 수업 이력을 볼 수 있습니다. 카드에는 이번 달 진행·취소·수업 수당·평균과 최근 학생 별점이 바로 보이고, 평가는 전체 이력을 엽니다. 별점은 매달 인사 평가에 쓰입니다.',
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
@@ -3150,9 +3264,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                               '비밀번호 없음',
                             isOwnerTeacher
                                 ? '${TeacherBookingOffer.label(bookingOffer)} · 담당 $assignedCount명'
-                                : (active
-                                    ? '활성 · 담당 $assignedCount명'
-                                    : '비활성 · 담당 $assignedCount명'),
+                                : '${active ? '활성' : '비활성'} · ${TeacherBookingOffer.label(bookingOffer)} · 담당 $assignedCount명',
                             '이번달 진행 ${stats.completedCount}회 · 취소 ${stats.cancelledCount}회 · 대기 ${pending}건',
                             if (stats.awaitingCount > 0)
                               '평가대기 ${stats.awaitingCount}건',
@@ -3191,28 +3303,16 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                                       fontFamily: "NotoSansKR",
                                       color: Palette.secondaryDark)),
                             ),
-                            if (isOwnerTeacher)
-                              TextButton(
-                                onPressed: () => _editOwnerBookingOffer(t),
-                                child: Text('수업 받기',
-                                    style: TextStyle(
-                                        fontFamily: "NotoSansKR",
-                                        color: Palette.secondaryDark)),
-                              ),
+                            TextButton(
+                              onPressed: () => _editBookingOffer(t),
+                              child: Text('수업 받기',
+                                  style: TextStyle(
+                                      fontFamily: "NotoSansKR",
+                                      color: Palette.secondaryDark)),
+                            ),
                             if (!isOwnerTeacher)
                               TextButton(
-                                onPressed: () async {
-                                  final error = await AuthService
-                                      .setTeacherActive(uid, !active);
-                                  if (error != null) {
-                                    _toast(error, error: true);
-                                    return;
-                                  }
-                                  _toast(active
-                                      ? '강사를 비활성화했습니다.'
-                                      : '강사를 활성화했습니다.');
-                                  await _refresh();
-                                },
+                                onPressed: () => _toggleTeacherActive(t),
                                 child: Text(active ? '비활성화' : '활성화',
                                     style: TextStyle(
                                         fontFamily: "NotoSansKR",
@@ -3271,8 +3371,33 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
             alignment: Alignment.centerLeft,
             child: OutlinedButton.icon(
               onPressed: () async {
+                final count = _members.length;
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (dialogContext) => AlertDialog(
+                    title: Text('일괄 배정',
+                        style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+                    content: Text(
+                      '가입 회원 $count명의 담당 강사를 메인 관리자로 바꿉니다. '
+                      '수강과 거절되지 않은 예약도 함께 옮겨집니다.',
+                      style: TextStyle(fontFamily: "NotoSansKR", height: 1.45),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(dialogContext, false),
+                        child: Text('취소'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(dialogContext, true),
+                        child: Text('배정'),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirmed != true || !mounted) return;
                 final error =
                     await AuthService.assignOwnerNativeTeacherToAllStudents();
+                if (!mounted) return;
                 if (error != null) {
                   _toast(error, error: true);
                   return;

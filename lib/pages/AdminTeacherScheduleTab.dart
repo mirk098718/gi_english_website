@@ -164,6 +164,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   bool _saving = false;
   String _teacherUid = '';
   String _staffPhone = '';
+  int _lessonFeeWon = EnrollmentService.lessonPayWon;
   DateTime? _selectAnchorDate;
   String? _selectAnchorTime;
   bool _selecting = false;
@@ -211,16 +212,12 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     final profile = widget.teacherUid.isNotEmpty
         ? await AuthService.staffProfile(widget.teacherUid)
         : await AuthService.currentStaffProfile();
+    final lessonFeeWon = EnrollmentService.lessonFeeWonOf(profile);
     final notifications = widget.teacherUid.isNotEmpty
         ? <AppNotification>[]
         : await NotificationService.listMine();
-    final userIds = bookings
-        .map((item) => item.userId)
-        .where((id) => id.isNotEmpty)
-        .toSet()
-        .toList();
     final enrollments =
-        await EnrollmentService.listEnrollments(memberIds: userIds);
+        await EnrollmentService.listEnrollments(teacherUid: uid);
     final learning = await EnrollmentService.learningByEnrollment(enrollments);
     if (!mounted) return;
     setState(() {
@@ -231,6 +228,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       _enrollments = enrollments;
       _learning = learning;
       _staffPhone = profile?['phone']?.toString() ?? '';
+      _lessonFeeWon = lessonFeeWon;
       _notifications = notifications.where((item) => !item.read).toList();
       _loading = false;
     });
@@ -895,6 +893,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         bookings: _bookings,
         teacherUid: _teacherUid,
         ratings: _ratings,
+        lessonFeeWon: _lessonFeeWon,
       );
 
   Widget _monthSummary({bool compact = false}) {

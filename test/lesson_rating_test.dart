@@ -240,6 +240,16 @@ void main() {
       expect(stats.completedCount, 2);
       expect(stats.awaitingCount, 1);
       expect(stats.incomeWon, 20000);
+      expect(stats.lessonFeeWon, 10000);
+      final custom = LessonRatingService.monthStats(
+        bookings: bookings,
+        teacherUid: 't1',
+        ratings: ratings,
+        now: DateTime(2026, 9, 21),
+        lessonFeeWon: 15000,
+      );
+      expect(custom.incomeWon, 30000);
+      expect(custom.lessonFeeWon, 15000);
       expect(stats.ratedCount, 2);
       expect(stats.averageStars, 4.0);
       expect(stats.averageStarsLabel, '4.0점');

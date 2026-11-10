@@ -54,9 +54,14 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
         if ((teacher['uid']?.toString() ?? '').isNotEmpty)
           teacher['uid'].toString(): teacher['name']?.toString() ?? '',
     };
+    final isOwner = await AuthService.isAdmin();
+    final staffUid = await AuthService.currentStaffUid();
     final enrollments = uid.isEmpty
         ? <EnrollmentRecord>[]
-        : await EnrollmentService.listEnrollments(memberIds: [uid]);
+        : await EnrollmentService.listEnrollments(
+            memberIds: [uid],
+            teacherUid: isOwner ? null : staffUid,
+          );
     final learning = await EnrollmentService.learningByEnrollment(enrollments);
     final payments =
         uid.isEmpty ? <PaymentOrder>[] : await PaymentService.paymentsForUser(uid);

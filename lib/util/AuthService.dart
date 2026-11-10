@@ -28,6 +28,12 @@ class AuthService {
   /// 메인 관리자 이메일 (기존 계정).
   static const String ownerEmail = 'gienglish.paju@gmail.com';
 
+  /// 강사 문서에 회차 수당이 없을 때의 기본값.
+  static const int defaultLessonFeeWon = 10000;
+
+  static const String _bankCollection = 'teacher_bank_accounts';
+  static const String _settlementCollection = 'teacher_settlements';
+
   // 현재 로그인된 사용자 가져오기
   static User? get currentUser => _auth.currentUser;
 
@@ -286,17 +292,21 @@ class AuthService {
     return null;
   }
 
+  /// 담당 표시는 members.teacherId만 본다. nativeTeacherUid만 있으면 미배정이다.
   static String memberTeacherName(
     Map<String, dynamic> member, {
     Map<String, String> teacherNames = const {},
   }) {
-    final named = member['nativeTeacherName']?.toString().trim() ?? '';
-    if (named.isNotEmpty) return named;
-    final id = member['teacherId']?.toString().trim() ??
-        member['nativeTeacherUid']?.toString().trim() ??
-        '';
+    final id = member['teacherId']?.toString().trim() ?? '';
     if (id.isEmpty) return '';
-    return teacherNames[id]?.trim() ?? '';
+    final named = teacherNames[id]?.trim() ?? '';
+    if (named.isNotEmpty) return named;
+    final nativeUid = member['nativeTeacherUid']?.toString().trim() ?? '';
+    if (nativeUid == id) {
+      final fallback = member['nativeTeacherName']?.toString().trim() ?? '';
+      if (fallback.isNotEmpty) return fallback;
+    }
+    return '';
   }
 
   /// 수강생이 닉네임·프로필 사진을 저장한다. 로그인 이메일은 바꾸지 않는다.
@@ -399,10 +409,7 @@ class AuthService {
           photoUrl: photoUrl,
           nickname: trimmedNickname,
           isActive: data['isActive'] != false,
-          bookingOffer: TeacherBookingOffer.resolve(
-            data,
-            isOwner: isOwnerTeacher,
-          ),
+          publicOnly: true,
         );
       } catch (e) {
         print('원어민 프로필 동기화 오류: $e');
@@ -471,6 +478,7 @@ class AuthService {
   static Future<String?> assignMemberToTeacher({
     required String memberId,
     required String teacherId,
+    bool moveConfirmed = false,
   }) async {
     try {
       String profileId = '';
@@ -534,11 +542,41 @@ class AuthService {
           .get();
       for (final doc in enrollments.docs) {
         await doc.reference.set({
+          'teacherId': teacherId,
           'nativeTeacherId': profileId,
           'nativeTeacherName': name,
           'nativeTeacherUid': teacherId,
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
+      }
+
+      final bookings = await _firestore
+          .collection('week_bookings')
+          .where('userId', isEqualTo: memberId)
+          .get();
+      for (final doc in bookings.docs) {
+        final data = doc.data();
+        final status = data['status']?.toString() ?? '';
+        if (status == 'rejected') continue;
+        if (status == 'confirmed' && !moveConfirmed) continue;
+        final oldUid = (data['teacherId']?.toString().trim().isNotEmpty == true)
+            ? data['teacherId'].toString()
+            : (data['nativeTeacherUid']?.toString() ?? '');
+        await doc.reference.set({
+          'teacherId': teacherId,
+          'nativeTeacherId': profileId,
+          'nativeTeacherName': name,
+          'nativeTeacherUid': teacherId,
+          'assignedTeacherUid': teacherId,
+          'assignedTeacherName': name,
+          'isSubstitute': false,
+        }, SetOptions(merge: true));
+        await _moveOccupiedSlot(
+          data: data,
+          fromUid: oldUid,
+          toUid: teacherId,
+          bookingId: doc.id,
+        );
       }
       return null;
     } catch (e) {
@@ -701,6 +739,7 @@ class AuthService {
     String bankName = '',
     String bankAccount = '',
     String accountHolder = '',
+    int lessonFeeWon = defaultLessonFeeWon,
     Uint8List? photoBytes,
     String? photoFileName,
   }) async {
@@ -762,16 +801,23 @@ class AuthService {
         'phone': PhoneUtil.normalize(phone),
         'nationality': nationality.trim(),
         'intro': intro.trim(),
-        'bankName': bankName.trim(),
-        'bankAccount': bankAccount.trim(),
-        'accountHolder': accountHolder.trim(),
         'photoUrl': photoUrl,
         'nativeProfileId': profileId,
         'role': 'teacher',
         'isActive': true,
+        'lessonFeeWon': lessonFeeWon < 0 ? defaultLessonFeeWon : lessonFeeWon,
+        'bookingOffer': TeacherBookingOffer.both,
+        'selectableAtCheckout': true,
+        'acceptsCoTeaching': true,
         'hasLoginPassword': true,
         'createdAt': FieldValue.serverTimestamp(),
       });
+      await _saveBankAccount(
+        teacherUid: user.uid,
+        bankName: bankName,
+        bankAccount: bankAccount,
+        accountHolder: accountHolder,
+      );
 
       try {
         await _upsertNativeProfile(
@@ -784,6 +830,7 @@ class AuthService {
           photoUrl: photoUrl,
           nickname: trimmedNickname,
           isActive: true,
+          bookingOffer: TeacherBookingOffer.both,
         );
       } catch (e) {
         print('원어민 프로필 동기화 오류: $e');
@@ -850,6 +897,7 @@ class AuthService {
         final bName = b['name']?.toString() ?? '';
         return aName.compareTo(bName);
       });
+      await _mergeBankAccounts(list);
       return list;
     } catch (e) {
       print('강사 목록 조회 오류: $e');
@@ -926,32 +974,65 @@ class AuthService {
     }
   }
 
+  /// 비활성화는 Auth 계정 정지와 수업 받기 끄기까지 Cloud Function이 한다.
   static Future<String?> setTeacherActive(
       String teacherId, bool isActive) async {
     try {
-      final admin = await _firestore.collection('admins').doc(teacherId).get();
-      if (!admin.exists) return '강사 계정을 찾을 수 없습니다.';
-      final role = admin.data()?['role']?.toString() ?? 'owner';
-      if (role != 'teacher') {
-        return '메인 관리자는 비활성화할 수 없습니다.';
-      }
-      await _firestore.collection('admins').doc(teacherId).update({
+      final callable = FirebaseFunctions.instanceFor(region: 'asia-northeast3')
+          .httpsCallable('setTeacherActive');
+      await callable.call(<String, dynamic>{
+        'teacherUid': teacherId,
         'isActive': isActive,
-        'updatedAt': FieldValue.serverTimestamp(),
       });
-      final profileId = admin.data()?['nativeProfileId']?.toString() ?? '';
-      if (profileId.isNotEmpty) {
-        await _firestore.collection('native_teacher_accounts').doc(profileId).set({
-          'teacherUid': teacherId,
-          'isActive': isActive,
-          'updatedAt': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
-      }
       return null;
+    } on FirebaseFunctionsException catch (e) {
+      print('강사 상태 변경 오류: ${e.code} ${e.message}');
+      return e.message?.trim().isNotEmpty == true
+          ? e.message
+          : '강사 상태 변경에 실패했습니다.';
     } catch (e) {
       print('강사 상태 변경 오류: $e');
       return '강사 상태 변경에 실패했습니다.';
     }
+  }
+
+  static Future<void> _moveOccupiedSlot({
+    required Map<String, dynamic> data,
+    required String fromUid,
+    required String toUid,
+    required String bookingId,
+  }) async {
+    final time = data['time']?.toString() ?? '';
+    final dateRaw = data['date'];
+    if (time.isEmpty || dateRaw is! Timestamp) return;
+    final local = dateRaw.toDate();
+    final day = DateTime(local.year, local.month, local.day);
+    final y = day.year.toString().padLeft(4, '0');
+    final m = day.month.toString().padLeft(2, '0');
+    final d = day.day.toString().padLeft(2, '0');
+    final dateKey = '$y-$m-$d';
+    String docId(String uid) =>
+        '${uid}_${dateKey}_${time.replaceAll(':', '')}';
+
+    if (fromUid.isNotEmpty && fromUid != toUid) {
+      try {
+        await _firestore
+            .collection('teacher_occupied_slots')
+            .doc(docId(fromUid))
+            .delete();
+      } catch (e) {
+        print('이전 시간 점유 해제 오류: $e');
+      }
+    }
+    if (toUid.isEmpty || fromUid == toUid) return;
+    await _firestore.collection('teacher_occupied_slots').doc(docId(toUid)).set({
+      'teacherId': toUid,
+      'dateKey': dateKey,
+      'time': time,
+      'slotKey': '${dateKey}_$time',
+      'bookingId': bookingId,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
   }
 
   static String _uploadErrorMessage(Object e) {
@@ -1060,24 +1141,27 @@ class AuthService {
     String nickname = '',
     required bool isActive,
     String? bookingOffer,
+    bool publicOnly = false,
   }) async {
     final data = <String, dynamic>{
       'teacherUid': teacherUid,
       'name': name,
-      'email': email,
       'nationality': nationality,
       'intro': intro,
       'photoUrl': photoUrl,
       'nickname': nickname,
-      'isActive': isActive,
       'updatedAt': FieldValue.serverTimestamp(),
     };
-    if (bookingOffer != null && bookingOffer.isNotEmpty) {
-      data['bookingOffer'] = bookingOffer;
-      data['selectableAtCheckout'] =
-          TeacherBookingOffer.shownAtCheckout(bookingOffer);
-      data['acceptsCoTeaching'] =
-          TeacherBookingOffer.shownAsCoteach(bookingOffer);
+    if (!publicOnly) {
+      data['email'] = email;
+      data['isActive'] = isActive;
+      if (bookingOffer != null && bookingOffer.isNotEmpty) {
+        data['bookingOffer'] = bookingOffer;
+        data['selectableAtCheckout'] =
+            TeacherBookingOffer.shownAtCheckout(bookingOffer);
+        data['acceptsCoTeaching'] =
+            TeacherBookingOffer.shownAsCoteach(bookingOffer);
+      }
     }
     await _firestore
         .collection('native_teacher_accounts')
@@ -1174,6 +1258,7 @@ class AuthService {
     String bankName = '',
     String bankAccount = '',
     String accountHolder = '',
+    int lessonFeeWon = defaultLessonFeeWon,
     Uint8List? photoBytes,
     String? photoFileName,
     String? password,
@@ -1222,13 +1307,20 @@ class AuthService {
         'phone': PhoneUtil.normalize(phone),
         'nationality': nationality.trim(),
         'intro': intro.trim(),
-        'bankName': bankName.trim(),
-        'bankAccount': bankAccount.trim(),
-        'accountHolder': accountHolder.trim(),
         'photoUrl': photoUrl,
         'nativeProfileId': profileId,
+        'lessonFeeWon': lessonFeeWon < 0 ? defaultLessonFeeWon : lessonFeeWon,
+        'bankName': FieldValue.delete(),
+        'bankAccount': FieldValue.delete(),
+        'accountHolder': FieldValue.delete(),
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
+      await _saveBankAccount(
+        teacherUid: teacherUid,
+        bankName: bankName,
+        bankAccount: bankAccount,
+        accountHolder: accountHolder,
+      );
 
       try {
         await _upsertNativeProfile(
@@ -1331,45 +1423,176 @@ class AuthService {
     }
   }
 
-  /// 관리자 화면에 있는 강사 프로필을 수강생이 볼 수 있는 목록으로 공개한다.
-  static Future<void> publishTeacherProfiles() async {
-    try {
-      final snapshot = await _firestore.collection('admins').get();
-      for (final doc in snapshot.docs) {
-        final data = doc.data();
-        final isOwnerTeacher = data['role']?.toString() != 'teacher';
-        var existing = data['nativeProfileId']?.toString() ?? '';
-        if (existing.startsWith('native_temp_')) existing = '';
-        final profileId = OnlineNativeTeacher.profileIdFor(
-          uid: doc.id,
-          isOwner: isOwnerTeacher,
-          existing: existing,
-        );
-        await _upsertNativeProfile(
-          teacherUid: doc.id,
-          profileId: profileId,
-          name: data['name']?.toString() ?? '',
-          email: data['email']?.toString() ?? '',
-          nationality: data['nationality']?.toString() ?? '',
-          intro: data['intro']?.toString() ?? '',
-          photoUrl: data['photoUrl']?.toString() ?? '',
-          nickname: data['nickname']?.toString() ?? '',
-          isActive: data['isActive'] != false,
-          bookingOffer: TeacherBookingOffer.resolve(
-            data,
-            isOwner: isOwnerTeacher,
-          ),
-        );
-        await _firestore.collection('admins').doc(doc.id).set({
-          'nativeProfileId': profileId,
-          'bookingOffer': TeacherBookingOffer.resolve(
-            data,
-            isOwner: isOwnerTeacher,
-          ),
-        }, SetOptions(merge: true));
+  static Future<void> _saveBankAccount({
+    required String teacherUid,
+    required String bankName,
+    required String bankAccount,
+    required String accountHolder,
+  }) async {
+    await _firestore.collection(_bankCollection).doc(teacherUid).set({
+      'teacherUid': teacherUid,
+      'bankName': bankName.trim(),
+      'bankAccount': bankAccount.trim(),
+      'accountHolder': accountHolder.trim(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  /// 계좌는 강사 문서에 두지 않는다. 남아 있으면 한 번만 분리 문서로 옮긴다.
+  static Future<void> _mergeBankAccounts(
+      List<Map<String, dynamic>> teachers) async {
+    for (final teacher in teachers) {
+      final uid = teacher['uid']?.toString() ?? '';
+      if (uid.isEmpty) continue;
+      final legacyName = teacher['bankName']?.toString().trim() ?? '';
+      final legacyAccount = teacher['bankAccount']?.toString().trim() ?? '';
+      final legacyHolder = teacher['accountHolder']?.toString().trim() ?? '';
+      final hasLegacy = legacyName.isNotEmpty ||
+          legacyAccount.isNotEmpty ||
+          legacyHolder.isNotEmpty;
+      try {
+        final ref = _firestore.collection(_bankCollection).doc(uid);
+        final snap = await ref.get();
+        if (snap.exists) {
+          final data = snap.data() ?? {};
+          teacher['bankName'] = data['bankName']?.toString() ?? '';
+          teacher['bankAccount'] = data['bankAccount']?.toString() ?? '';
+          teacher['accountHolder'] = data['accountHolder']?.toString() ?? '';
+        } else if (hasLegacy) {
+          await ref.set({
+            'teacherUid': uid,
+            'bankName': legacyName,
+            'bankAccount': legacyAccount,
+            'accountHolder': legacyHolder,
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+        } else {
+          teacher['bankName'] = '';
+          teacher['bankAccount'] = '';
+          teacher['accountHolder'] = '';
+        }
+        if (hasLegacy) {
+          await _firestore.collection('admins').doc(uid).update({
+            'bankName': FieldValue.delete(),
+            'bankAccount': FieldValue.delete(),
+            'accountHolder': FieldValue.delete(),
+          });
+        }
+      } catch (e) {
+        print('강사 계좌 조회 오류: $e');
       }
+    }
+  }
+
+  static String yearMonthKey(DateTime month) {
+    final mm = month.month.toString().padLeft(2, '0');
+    return '${month.year}-$mm';
+  }
+
+  static String settlementDocId(String teacherUid, DateTime month) =>
+      '${teacherUid}_${yearMonthKey(month)}';
+
+  /// 결제된 회원 중 teacherId가 비고 nativeTeacherUid만 있는 문서를 채운다.
+  static Future<void> backfillPaidTeacherIds() async {
+    try {
+      if (!await isAdmin()) return;
+      final paidUsers = <String>{};
+      final enrollments = await _firestore.collection('enrollments').get();
+      var batch = _firestore.batch();
+      var ops = 0;
+      Future<void> flush() async {
+        if (ops == 0) return;
+        await batch.commit();
+        batch = _firestore.batch();
+        ops = 0;
+      }
+
+      Future<void> queue(
+          DocumentReference<Map<String, dynamic>> ref, String teacherUid) async {
+        batch.set(ref, {
+          'teacherId': teacherUid,
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+        ops++;
+        if (ops >= 400) await flush();
+      }
+
+      for (final doc in enrollments.docs) {
+        final data = doc.data();
+        if (data['isPaid'] != true) continue;
+        final userId = data['userId']?.toString() ?? '';
+        if (userId.isNotEmpty) paidUsers.add(userId);
+        final teacherId = data['teacherId']?.toString().trim() ?? '';
+        final native = data['nativeTeacherUid']?.toString().trim() ?? '';
+        if (teacherId.isEmpty && native.isNotEmpty) {
+          await queue(doc.reference, native);
+        }
+      }
+
+      final payments = await _firestore
+          .collection('payments')
+          .where('status', isEqualTo: 'paid')
+          .get();
+      for (final doc in payments.docs) {
+        final userId = doc.data()['userId']?.toString() ?? '';
+        if (userId.isNotEmpty) paidUsers.add(userId);
+      }
+
+      final members = await _firestore.collection('members').get();
+      for (final doc in members.docs) {
+        if (!paidUsers.contains(doc.id)) continue;
+        final data = doc.data();
+        final teacherId = data['teacherId']?.toString().trim() ?? '';
+        final native = data['nativeTeacherUid']?.toString().trim() ?? '';
+        if (teacherId.isEmpty && native.isNotEmpty) {
+          await queue(doc.reference, native);
+        }
+      }
+      await flush();
     } catch (e) {
-      print('강사 프로필 공개 오류: $e');
+      print('담당 강사 채우기 오류: $e');
+    }
+  }
+
+  static Future<Map<String, TeacherSettlement>> listLessonSettlements() async {
+    try {
+      final snap = await _firestore.collection(_settlementCollection).get();
+      final map = <String, TeacherSettlement>{};
+      for (final doc in snap.docs) {
+        final settlement = TeacherSettlement.fromMap(doc.id, doc.data());
+        map['${settlement.teacherUid}_${settlement.yearMonth}'] = settlement;
+      }
+      return map;
+    } catch (e) {
+      print('수업 수당 기록 조회 오류: $e');
+      return {};
+    }
+  }
+
+  static Future<String?> markLessonSettlementPaid({
+    required String teacherUid,
+    required DateTime month,
+    required int sessionCount,
+    required int amount,
+    required int lessonFeeWon,
+  }) async {
+    if (teacherUid.isEmpty) return '강사 정보가 없습니다.';
+    try {
+      final id = settlementDocId(teacherUid, month);
+      await _firestore.collection(_settlementCollection).doc(id).set({
+        'teacherUid': teacherUid,
+        'yearMonth': yearMonthKey(month),
+        'sessionCount': sessionCount,
+        'amount': amount,
+        'lessonFeeWon': lessonFeeWon,
+        'paid': true,
+        'paidAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      return null;
+    } catch (e) {
+      print('수업 수당 지급 기록 오류: $e');
+      return '지급 완료를 저장하지 못했습니다.';
     }
   }
 
@@ -1395,8 +1618,6 @@ class AuthService {
     }
     if (teachers.isEmpty) {
       teachers = await _teachersFromStore();
-    } else {
-      teachers = await _applyStoredBookingOffers(teachers);
     }
     OnlineNativeTeacher.cacheAll(teachers);
     return teachers;
@@ -1424,50 +1645,6 @@ class AuthService {
     } catch (e) {
       print('선택 가능 원어민 강사 조회 오류: $e');
       return [];
-    }
-  }
-
-  static Future<List<OnlineNativeTeacher>> _applyStoredBookingOffers(
-    List<OnlineNativeTeacher> teachers,
-  ) async {
-    try {
-      final snapshot =
-          await _firestore.collection('native_teacher_accounts').get();
-      final byKey = <String, String>{};
-      for (final doc in snapshot.docs) {
-        final data = doc.data();
-        final isOwner = doc.id == OnlineNativeTeacher.ownerProfileId;
-        final offer = TeacherBookingOffer.resolve(data, isOwner: isOwner);
-        byKey[doc.id] = offer;
-        final uid = data['teacherUid']?.toString() ?? '';
-        if (uid.isNotEmpty) byKey[uid] = offer;
-      }
-      return teachers.map((teacher) {
-        final offer = byKey[teacher.id] ??
-            byKey[teacher.accountUid] ??
-            TeacherBookingOffer.resolve(
-              null,
-              isOwner: teacher.id == OnlineNativeTeacher.ownerProfileId,
-            );
-        return teacher.copyWith(
-          selectableAtCheckout: TeacherBookingOffer.shownAtCheckout(offer),
-          acceptsCoTeaching: TeacherBookingOffer.shownAsCoteach(offer),
-        );
-      }).toList();
-    } catch (e) {
-      print('강사 수업 받기 설정 조회 오류: $e');
-      return teachers
-          .map((teacher) {
-            final isOwner = teacher.id == OnlineNativeTeacher.ownerProfileId;
-            final offer =
-                TeacherBookingOffer.resolve(null, isOwner: isOwner);
-            return teacher.copyWith(
-              selectableAtCheckout:
-                  TeacherBookingOffer.shownAtCheckout(offer),
-              acceptsCoTeaching: TeacherBookingOffer.shownAsCoteach(offer),
-            );
-          })
-          .toList();
     }
   }
 
@@ -1656,6 +1833,7 @@ class AuthService {
       for (final doc in enrollments.docs) {
         if (doc.data()['isActive'] == false) continue;
         await merge(doc.reference, {
+          'teacherId': ownerUid,
           'nativeTeacherId': profileId,
           'nativeTeacherName': profileName,
           'nativeTeacherUid': ownerUid,
@@ -1827,5 +2005,50 @@ class AuthService {
       print('관리자 문서 설정 오류: $e');
       return false;
     }
+  }
+}
+
+/// 강사 수업 수당 지급 기록. teacher_settlements/{uid}_{yyyy-MM}
+class TeacherSettlement {
+  final String id;
+  final String teacherUid;
+  final String yearMonth;
+  final int sessionCount;
+  final int amount;
+  final int lessonFeeWon;
+  final bool paid;
+  final DateTime? paidAt;
+
+  const TeacherSettlement({
+    required this.id,
+    required this.teacherUid,
+    required this.yearMonth,
+    required this.sessionCount,
+    required this.amount,
+    required this.lessonFeeWon,
+    required this.paid,
+    required this.paidAt,
+  });
+
+  factory TeacherSettlement.fromMap(String id, Map<String, dynamic> data) {
+    DateTime? paidAt;
+    final raw = data['paidAt'];
+    if (raw is Timestamp) paidAt = raw.toDate();
+    int asInt(dynamic value) {
+      if (value is int) return value;
+      if (value is num) return value.round();
+      return int.tryParse(value?.toString() ?? '') ?? 0;
+    }
+
+    return TeacherSettlement(
+      id: id,
+      teacherUid: data['teacherUid']?.toString() ?? '',
+      yearMonth: data['yearMonth']?.toString() ?? '',
+      sessionCount: asInt(data['sessionCount']),
+      amount: asInt(data['amount']),
+      lessonFeeWon: asInt(data['lessonFeeWon']),
+      paid: data['paid'] == true,
+      paidAt: paidAt,
+    );
   }
 }

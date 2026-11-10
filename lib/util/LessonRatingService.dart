@@ -153,7 +153,7 @@ class LessonRatingService {
     return clock.isAfter(at.add(Duration(minutes: EnrollmentService.lessonMinutes)));
   }
 
-  /// 강사 월급에 넣는 수업: 피드백+별점이 끝났거나, 예전 수업(평가 문서 없음)은 시간 경과.
+  /// 수업 수당에 넣는 수업: 피드백+별점이 끝났거나, 예전 수업(평가 문서 없음)은 시간 경과.
   static bool isPayable(WeekBooking booking, LessonRating? rating,
       {DateTime? now}) {
     if (!booking.isConfirmed) return false;
@@ -179,6 +179,7 @@ class LessonRatingService {
     required String teacherUid,
     required List<LessonRating> ratings,
     DateTime? now,
+    int? lessonFeeWon,
   }) {
     final current = now ?? DateTime.now();
     var ratedCount = 0;
@@ -205,6 +206,7 @@ class LessonRatingService {
       ratedCount: ratedCount,
       starSum: starSum,
       now: current,
+      lessonFeeWon: lessonFeeWon,
     );
   }
 

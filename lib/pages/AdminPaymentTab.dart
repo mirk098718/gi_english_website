@@ -18,6 +18,7 @@ class _AdminPaymentTabState extends State<AdminPaymentTab> {
   List<Map<String, dynamic>> _teachers = [];
   List<WeekBooking> _bookings = [];
   List<LessonRating> _ratings = [];
+  Map<String, TeacherSettlement> _settlements = {};
   bool _loading = true;
 
   @override
@@ -28,11 +29,13 @@ class _AdminPaymentTabState extends State<AdminPaymentTab> {
 
   Future<void> _refresh() async {
     setState(() => _loading = true);
+    await AuthService.backfillPaidTeacherIds();
     final payments = await PaymentService.listPayments(limit: 2000);
     final enrollments = await EnrollmentService.listEnrollments();
     final teachers = await AuthService.listTeachers();
     final bookings = await EnrollmentService.staffWeekBookings(mineOnly: false);
     final ratings = await LessonRatingService.listAll();
+    final settlements = await AuthService.listLessonSettlements();
     if (!mounted) return;
     setState(() {
       _payments = payments;
@@ -40,6 +43,7 @@ class _AdminPaymentTabState extends State<AdminPaymentTab> {
       _teachers = teachers;
       _bookings = bookings;
       _ratings = ratings;
+      _settlements = settlements;
       _loading = false;
     });
   }
@@ -61,7 +65,7 @@ class _AdminPaymentTabState extends State<AdminPaymentTab> {
                   fontFamily: "NotoSansKR", fontWeight: FontWeight.bold),
               tabs: const [
                 Tab(text: '수강생 정산'),
-                Tab(text: '강사 월급'),
+                Tab(text: '이번 달 수업 수당'),
               ],
             ),
           ),
@@ -79,6 +83,7 @@ class _AdminPaymentTabState extends State<AdminPaymentTab> {
                   teachers: _teachers,
                   bookings: _bookings,
                   ratings: _ratings,
+                  settlements: _settlements,
                   loading: _loading,
                   onRefresh: _refresh,
                 ),
@@ -515,6 +520,7 @@ class _TeacherPayrollPane extends StatefulWidget {
   final List<Map<String, dynamic>> teachers;
   final List<WeekBooking> bookings;
   final List<LessonRating> ratings;
+  final Map<String, TeacherSettlement> settlements;
   final bool loading;
   final Future<void> Function() onRefresh;
 
@@ -522,6 +528,7 @@ class _TeacherPayrollPane extends StatefulWidget {
     required this.teachers,
     required this.bookings,
     required this.ratings,
+    required this.settlements,
     required this.loading,
     required this.onRefresh,
   });
@@ -545,13 +552,38 @@ class _TeacherPayRow {
 class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
   DateTime _month = DateTime(DateTime.now().year, DateTime.now().month);
 
-  TeacherMonthStats _statsFor(String uid) {
+  TeacherMonthStats _statsFor(Map<String, dynamic> teacher) {
+    final uid = teacher['uid']?.toString() ?? '';
     return LessonRatingService.monthStats(
       bookings: widget.bookings,
       teacherUid: uid,
       ratings: widget.ratings,
       now: _month,
+      lessonFeeWon: EnrollmentService.lessonFeeWonOf(teacher),
     );
+  }
+
+  TeacherSettlement? _settlementFor(String uid) {
+    return widget.settlements['${uid}_${AuthService.yearMonthKey(_month)}'];
+  }
+
+  Future<void> _markPaid(_TeacherPayRow row) async {
+    final uid = row.teacher['uid']?.toString() ?? '';
+    final error = await AuthService.markLessonSettlementPaid(
+      teacherUid: uid,
+      month: _month,
+      sessionCount: row.stats.completedCount,
+      amount: row.stats.incomeWon,
+      lessonFeeWon: row.stats.lessonFeeWon,
+    );
+    if (!mounted) return;
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error), backgroundColor: Palette.danger),
+      );
+      return;
+    }
+    await widget.onRefresh();
   }
 
   int _pendingFor(String uid) {
@@ -573,7 +605,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
       final uid = teacher['uid']?.toString() ?? '';
       return _TeacherPayRow(
         teacher: teacher,
-        stats: _statsFor(uid),
+        stats: _statsFor(teacher),
         pending: _pendingFor(uid),
       );
     }).toList();
@@ -590,7 +622,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
         children: [
           _MonthBar(
             month: _month,
-            title: '강사 월급 정산',
+            title: '이번 달 수업 수당',
             onShift: (delta) => setState(() {
               _month = DateTime(_month.year, _month.month + delta);
             }),
@@ -599,7 +631,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
           Text(
             '수강생 별점 평가가 끝난 수업만 진행으로 셉니다. '
             '예전 수업(평가 기록 없음)은 수업 시간이 지나면 포함됩니다. '
-            '수업 ${EnrollmentService.lessonMinutes}분 · 건당 ${_formatWon(EnrollmentService.lessonPayWon)}.',
+            '수업 ${EnrollmentService.lessonMinutes}분 · 회차 수당은 강사마다 다르고, 없으면 ${_formatWon(EnrollmentService.lessonPayWon)}입니다. 지급 완료를 누르면 그때의 횟수와 금액이 기록됩니다.',
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
@@ -609,7 +641,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
           const SizedBox(height: 10),
           _summaryRow([
             _summaryCell('진행', '$completed회', Palette.secondaryDark),
-            _summaryCell('월급', _formatWon(payroll), Palette.navy),
+            _summaryCell('수당', _formatWon(payroll), Palette.navy),
           ]),
           const SizedBox(height: 8),
           _summaryRow([
@@ -617,7 +649,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
             _summaryCell('취소', '$cancelled회', Palette.danger),
           ]),
           const SizedBox(height: 24),
-          Text('강사별 월급', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+          Text('강사별 수당', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           const SizedBox(height: 10),
           if (widget.loading)
             const Center(child: CircularProgressIndicator())
@@ -664,7 +696,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
             const SizedBox(height: 10),
             _summaryRow([
               _summaryCell('진행', '${stats.completedCount}회', Palette.secondaryDark),
-              _summaryCell('월급', stats.incomeLabel, Palette.navy),
+              _summaryCell('수당', stats.incomeLabel, Palette.navy),
             ]),
             const SizedBox(height: 8),
             _summaryRow([
@@ -678,14 +710,50 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
             ]),
             const SizedBox(height: 10),
             Text(
-              bank.isEmpty ? '월급 계좌 미등록' : bank,
+              bank.isEmpty ? '수당 계좌 미등록' : bank,
               style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
                   color: bank.isEmpty ? Palette.grey500 : Palette.grey700),
             ),
+            const SizedBox(height: 8),
+            Text(
+              '회차 수당 ${_formatWon(stats.lessonFeeWon)}',
+              style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 12,
+                  color: Palette.grey600),
+            ),
+            const SizedBox(height: 8),
+            _payButton(row),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _payButton(_TeacherPayRow row) {
+    final uid = row.teacher['uid']?.toString() ?? '';
+    final settlement = _settlementFor(uid);
+    if (settlement != null && settlement.paid) {
+      final paidAt = settlement.paidAt;
+      final when = paidAt == null
+          ? ''
+          : ' · ${_formatDateTime(paidAt, dateOnly: true)}';
+      return Text(
+        '지급 완료$when · ${settlement.sessionCount}회 · ${_formatWon(settlement.amount)}',
+        style: TextStyle(
+            fontFamily: "NotoSansKR",
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: Palette.secondaryDark),
+      );
+    }
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: OutlinedButton(
+        onPressed: widget.loading ? null : () => _markPaid(row),
+        child: Text('지급 완료', style: TextStyle(fontFamily: "NotoSansKR")),
       ),
     );
   }

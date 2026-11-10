@@ -86,6 +86,7 @@ class _AllStudentsPanelState extends State<AllStudentsPanel> {
 
   Future<void> _refresh() async {
     setState(() => _loading = true);
+    await AuthService.backfillPaidTeacherIds();
     final members = await AuthService.listMembers(
       limit: 2000,
       oldestFirst: true,

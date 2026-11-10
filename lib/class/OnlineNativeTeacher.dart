@@ -4,8 +4,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 /// 온라인 화상수업용 원어민 강사.
-/// 수강생이 고르는 프로필은 Firestore `native_teacher_accounts`에 저장하고,
-/// 아래 더미 목록은 사진/소개가 없을 때의 기본값으로만 쓴다.
+/// 수강생이 고르는 프로필은 Firestore `native_teacher_accounts`에 저장한다.
+/// 예전 Emma/James 더미 아이디(native_temp_)는 선택 목록에 넣지 않는다.
 class OnlineNativeTeacher {
   final String id;
   final String name;
@@ -47,34 +47,6 @@ class OnlineNativeTeacher {
       nationality: 'Korea',
       intro: '글림아일랜드 원장. 화상수업 스케줄을 관리하고 예약을 확인합니다.',
       imageAsset: 'assets/directorPhoto.jpeg',
-    ),
-    OnlineNativeTeacher(
-      id: 'native_temp_emma',
-      name: 'Emma',
-      nationality: 'USA',
-      intro: '밝은 톤으로 기초·중급 회화를 이끌어 주는 선생님입니다.',
-      imageAsset: 'assets/nativeTeacher01.png',
-    ),
-    OnlineNativeTeacher(
-      id: 'native_temp_james',
-      name: 'James',
-      nationality: 'Canada',
-      intro: '문법 설명과 실전 대화를 균형 있게 진행합니다.',
-      imageAsset: 'assets/nativeTeacher02.png',
-    ),
-    OnlineNativeTeacher(
-      id: 'native_temp_sophie',
-      name: 'Sophie',
-      nationality: 'UK',
-      intro: '비즈니스·격식 표현을 차분하게 코칭합니다.',
-      imageAsset: 'assets/nativeTeacher03.png',
-    ),
-    OnlineNativeTeacher(
-      id: 'native_temp_daniel',
-      name: 'Daniel',
-      nationality: 'USA',
-      intro: '시사·토론 주제로 자연스러운 고급 회화를 연습합니다.',
-      imageAsset: 'assets/nativeTeacher04.png',
     ),
   ];
 

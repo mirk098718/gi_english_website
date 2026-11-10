@@ -74,14 +74,19 @@ class EnrollmentService {
       accountUid: uid,
     );
     if (assigned != null) {
+      final resolved =
+          assigned.accountUid.isNotEmpty ? assigned.accountUid : uid;
       data['nativeTeacherId'] = assigned.id;
       data['nativeTeacherName'] = assigned.name;
-      data['nativeTeacherUid'] =
-          assigned.accountUid.isNotEmpty ? assigned.accountUid : uid;
+      data['nativeTeacherUid'] = resolved;
+      if (resolved.isNotEmpty) data['teacherId'] = resolved;
       return;
     }
 
-    if (uid.isNotEmpty) data['nativeTeacherUid'] = uid;
+    if (uid.isNotEmpty) {
+      data['nativeTeacherUid'] = uid;
+      data['teacherId'] = uid;
+    }
     if (profileId.isNotEmpty &&
         !OnlineNativeTeacher.isDummyProfile(profileId)) {
       data['nativeTeacherId'] = profileId;
@@ -1290,18 +1295,40 @@ class EnrollmentService {
 
   /// 전체 수강 배정 목록.
   /// [memberIds]가 있으면 해당 회원들의 배정만 반환한다 (강사용).
-  static Future<List<EnrollmentRecord>> listEnrollments(
-      {List<String>? memberIds}) async {
+  static Future<List<EnrollmentRecord>> listEnrollments({
+    List<String>? memberIds,
+    String? teacherUid,
+  }) async {
     try {
       final allowed = memberIds
           ?.map((id) => id.trim())
           .where((id) => id.isNotEmpty)
           .toSet()
           .toList();
-      if (allowed != null && allowed.isEmpty) return [];
+      if (teacherUid == null && allowed != null && allowed.isEmpty) return [];
 
       final docs = <QueryDocumentSnapshot<Map<String, dynamic>>>[];
-      if (allowed == null) {
+      final assignedUid = teacherUid?.trim() ?? '';
+      if (assignedUid.isNotEmpty) {
+        final byId = <String, QueryDocumentSnapshot<Map<String, dynamic>>>{};
+        final byTeacher = await _firestore
+            .collection('enrollments')
+            .where('teacherId', isEqualTo: assignedUid)
+            .get();
+        final byNative = await _firestore
+            .collection('enrollments')
+            .where('nativeTeacherUid', isEqualTo: assignedUid)
+            .get();
+        for (final doc in [...byTeacher.docs, ...byNative.docs]) {
+          byId[doc.id] = doc;
+        }
+        final allowedIds = allowed?.toSet();
+        for (final doc in byId.values) {
+          final userId = doc.data()['userId']?.toString() ?? '';
+          if (allowedIds != null && !allowedIds.contains(userId)) continue;
+          docs.add(doc);
+        }
+      } else if (allowed == null) {
         docs.addAll((await _firestore.collection('enrollments').get()).docs);
       } else {
         for (var i = 0; i < allowed.length; i += 10) {
@@ -2156,6 +2183,16 @@ class EnrollmentService {
   /// 수업 시작 이 시간 전까지는 수강생이 예약을 취소하거나 옮길 수 있다.
   static const Duration bookingChangeLead = Duration(hours: 3);
 
+  /// 강사 문서의 회차 수당. 없으면 기본 10,000원.
+  static int lessonFeeWonOf(Map<String, dynamic>? data) {
+    final raw = data?['lessonFeeWon'];
+    if (raw is int && raw >= 0) return raw;
+    if (raw is num && raw >= 0) return raw.round();
+    final parsed = int.tryParse('${raw ?? ''}'.replaceAll(',', '').trim());
+    if (parsed != null && parsed >= 0) return parsed;
+    return lessonPayWon;
+  }
+
   static List<String> _buildBookingTimeSlots() {
     final slots = <String>[];
     for (var hour = 6; hour <= 23; hour++) {
@@ -2544,6 +2581,7 @@ class EnrollmentService {
           if (scheduled != null) 'scheduledAt': Timestamp.fromDate(scheduled),
           'status': 'pending',
           'teacherId': teacherUid,
+          'dateKey': TeacherScheduleService.dateKey(day),
           'nativeTeacherId': nativeTeacherId,
           'nativeTeacherName': nativeTeacherName,
           'nativeTeacherUid': teacherUid,
@@ -3294,6 +3332,7 @@ class TeacherMonthStats {
   final int awaitingCount;
   final int ratedCount;
   final int starSum;
+  final int lessonFeeWon;
 
   TeacherMonthStats({
     required this.year,
@@ -3303,9 +3342,10 @@ class TeacherMonthStats {
     this.awaitingCount = 0,
     this.ratedCount = 0,
     this.starSum = 0,
-  });
+    int? lessonFeeWon,
+  }) : lessonFeeWon = lessonFeeWon ?? EnrollmentService.lessonPayWon;
 
-  int get incomeWon => completedCount * EnrollmentService.lessonPayWon;
+  int get incomeWon => completedCount * lessonFeeWon;
 
   String get monthLabel => '$year년 $month월';
 
@@ -3342,6 +3382,7 @@ class TeacherMonthStats {
     int ratedCount = 0,
     int starSum = 0,
     DateTime? now,
+    int? lessonFeeWon,
   }) {
     final current = now ?? DateTime.now();
     var completed = 0;
@@ -3370,6 +3411,7 @@ class TeacherMonthStats {
       awaitingCount: awaiting,
       ratedCount: ratedCount,
       starSum: starSum,
+      lessonFeeWon: lessonFeeWon,
     );
   }
 }
