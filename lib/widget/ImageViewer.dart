@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:gi_english_website/class/GalleryImage.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/widget/AdminImageEditDialog.dart';
 
@@ -132,7 +133,7 @@ class _ImageViewerState extends State<ImageViewer> {
                         icon: const Icon(Icons.edit,
                             color: Colors.white, size: 24),
                         onPressed: _showEditDialog,
-                        tooltip: '이미지 수정/삭제',
+                        tooltip: tr(context, '이미지 수정/삭제'),
                       )
                     else
                       const SizedBox(width: 48), // 균형을 위한 공간

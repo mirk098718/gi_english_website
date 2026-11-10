@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'Palette.dart';
 
 class ModernWidgets {
@@ -325,6 +326,7 @@ class ModernWidgets {
 
   // 현대적인 푸터
   static Widget modernFooter() {
+    return Builder(builder: (context) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -338,7 +340,7 @@ class ModernWidgets {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Gi Gleam Island 어학원 파주",
+            tr(context, "Gi Gleam Island 어학원 파주"),
             style: TextStyle(
               color: Palette.white,
               fontFamily: "NotoSansKR",
@@ -348,10 +350,10 @@ class ModernWidgets {
           ),
           SizedBox(height: 12),
           Text(
-            "경기도 파주시 해올2길 2 태산 W 타워 7층 701~703호 (다율동 1044)\n"
+            tr(context, "경기도 파주시 해올2길 2 태산 W 타워 7층 701~703호 (다율동 1044)\n"
             "문의 : 031 942 0908\n"
             "email : gienglish.paju@gmail.com\n"
-            "사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희",
+            "사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희"),
             style: TextStyle(
               color: Palette.grey300,
               fontFamily: "NotoSansKR",
@@ -365,7 +367,7 @@ class ModernWidgets {
             margin: EdgeInsets.symmetric(vertical: 8),
           ),
           Text(
-            "Copyright ⓒ 글림아일랜드어학원",
+            tr(context, "Copyright ⓒ 글림아일랜드어학원"),
             style: TextStyle(
               color: Palette.grey400,
               fontFamily: "NotoSansKR",
@@ -375,10 +377,12 @@ class ModernWidgets {
         ],
       ),
     );
+    });
   }
 
   // 모바일용 현대적인 푸터
   static Widget modernMobileFooter() {
+    return Builder(builder: (context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -393,7 +397,7 @@ class ModernWidgets {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            "Gi Gleam Island 어학원 파주",
+            tr(context, "Gi Gleam Island 어학원 파주"),
             style: TextStyle(
               color: Palette.white,
               fontFamily: "NotoSansKR",
@@ -404,7 +408,7 @@ class ModernWidgets {
           ),
           SizedBox(height: 8),
           Text(
-            "경기도 파주시 해올2길 2 태산 W 타워 7층",
+            tr(context, "경기도 파주시 해올2길 2 태산 W 타워 7층"),
             style: TextStyle(
               color: Palette.grey300,
               fontFamily: "NotoSansKR",
@@ -414,7 +418,7 @@ class ModernWidgets {
           ),
           SizedBox(height: 8),
           Text(
-            "ⓒ 글림아일랜드교육",
+            tr(context, "ⓒ 글림아일랜드교육"),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Palette.grey400,
@@ -426,5 +430,6 @@ class ModernWidgets {
         ],
       ),
     );
+    });
   }
 }

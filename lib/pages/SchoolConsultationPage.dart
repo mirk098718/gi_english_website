@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityBoardPage.dart';
@@ -120,7 +121,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              "상담 신청하기",
+              tr(context, "상담 신청하기"),
               style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
             ),
           ),
@@ -131,7 +132,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
+              tr(context, "입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. ")),
           // Divider(),
           SizedBox(height: 20),
           Text(
@@ -140,7 +141,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "아이 이름"),
+              tr(context, "아이 이름")),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.childName = text;
           }),
@@ -151,7 +152,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "보호자님 성함"),
+              tr(context, "보호자님 성함")),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.parentName = text;
           }),
@@ -162,7 +163,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "보호자님 연락처"),
+              tr(context, "보호자님 연락처")),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.parentNumber = text;
           }),
@@ -173,7 +174,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "아이 연령"),
+              tr(context, "아이 연령")),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.childAge = int.tryParse(text) ?? 0;
           }),
@@ -184,7 +185,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "아이 레벨"),
+              tr(context, "아이 레벨")),
           WidgetUtil.myDivider(),
           levelRadio(),
           SizedBox(height: 20),
@@ -194,7 +195,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "전화상담 희망시간"),
+              tr(context, "전화상담 희망시간")),
           WidgetUtil.myDivider(),
           timeRadio(),
           SizedBox(height: 20),
@@ -216,7 +217,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              "상담 신청하기",
+              tr(context, "상담 신청하기"),
               style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
             ),
           ),
@@ -227,7 +228,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. "),
+              tr(context, "입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. ")),
           SizedBox(height: 20),
           Text(
               style: TextStyle(
@@ -235,7 +236,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "아이 이름"),
+              tr(context, "아이 이름")),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.childName = text;
           }),
@@ -246,7 +247,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "보호자님 성함"),
+              tr(context, "보호자님 성함")),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.parentName = text;
           }),
@@ -257,7 +258,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "보호자님 연락처"),
+              tr(context, "보호자님 연락처")),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.parentNumber = text;
           }),
@@ -268,7 +269,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "아이 연령"),
+              tr(context, "아이 연령")),
           MyWidget.roundEdgeTextFieldVisitorVer(onChanged: (text) {
             schoolVisitor.childAge = int.tryParse(text) ?? 0;
           }),
@@ -279,7 +280,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "아이 레벨"),
+              tr(context, "아이 레벨")),
           WidgetUtil.myDivider(),
           levelRadio(),
           SizedBox(height: 20),
@@ -289,7 +290,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "전화상담 희망시간"),
+              tr(context, "전화상담 희망시간")),
           WidgetUtil.myDivider(),
           timeRadio(),
           SizedBox(height: 20),
@@ -310,7 +311,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
               foregroundColor: Palette.black,
             ),
             child: Text(
-              "상담예약",
+              tr(context, "상담예약"),
               style: TextStyle(fontFamily: "Jalnan", color: Palette.white),
             ),
             onPressed: s.submitButtonPressed));
@@ -324,7 +325,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "상담 예약하기",
+            tr(context, "상담 예약하기"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           SizedBox(height: 20),
@@ -335,13 +336,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
               // "원하시는 대면 상담 날짜를 선택해주세요."
-              "• 상담 요일 : 월요일~금요일 / 토요일 오전\n"
-              "• 상담 시간 : 오후 1시~8시40분 / 토요일 9시~12시\n"
-              "• 상담 절차 : 031 942 0908 \n"
-              "  대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n"
-              "\n"
-              "• 전화 상담 : 031 942 0908\n"
-              "• 이메일 : gienglish.paju@gmail.com"),
+              tr(context, "• 상담 요일 : 월요일~금요일 / 토요일 오전\n• 상담 시간 : 오후 1시~8시40분 / 토요일 9시~12시\n• 상담 절차 : 031 942 0908 \n  대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n\n• 전화 상담 : 031 942 0908\n• 이메일 : gienglish.paju@gmail.com")),
           // Divider(),
           Container(
             width: 400,
@@ -364,11 +359,13 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   _focusedDay = focusedDay;
                 });
                 SnackbarUtil.showSnackBar(
-                    '${selectedDay.year}.${selectedDay.month}.${selectedDay.day} 선택됨 · 전화 예약 031 942 0908',
+                    AppLanguage.instance.isEnglish
+                        ? '${selectedDay.year}.${selectedDay.month}.${selectedDay.day} selected · call 031 942 0908'
+                        : '${selectedDay.year}.${selectedDay.month}.${selectedDay.day} 선택됨 · 전화 예약 031 942 0908',
                     context);
               },
               calendarFormat: CalendarFormat.month,
-              locale: 'ko_KR',
+              locale: AppLanguage.instance.isEnglish ? 'en_US' : 'ko_KR',
               headerStyle: HeaderStyle(
                 formatButtonVisible: false,
                 titleCentered: true,
@@ -413,7 +410,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
-                    child: Text("상담신청",
+                    child: Text(tr(context, "상담신청"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "Jalnan",
@@ -526,7 +523,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   height: 40,
                   child: ElevatedButton(
                     child: Text(
-                      "상담신청",
+                      tr(context, "상담신청"),
                       style:
                           TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
@@ -556,7 +553,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "상담 예약하기",
+            tr(context, "상담 예약하기"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           SizedBox(height: 20),
@@ -567,13 +564,7 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
               // "원하시는 대면 상담 날짜를 선택해주세요."
-              "• 상담 요일 : 월요일~금요일 / 토요일 오전\n"
-              "• 상담 시간 : 오후 1시~8시40분 / 토요일 9시~12시\n"
-              "• 상담 절차 : 031 942 0908 \n\n"
-              "대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n"
-              "\n"
-              "• 전화 상담 : 031 942 0908\n"
-              "• 이메일 : gienglish.paju@gmail.com"),
+              tr(context, "• 상담 요일 : 월요일~금요일 / 토요일 오전\n• 상담 시간 : 오후 1시~8시40분 / 토요일 9시~12시\n• 상담 절차 : 031 942 0908 \n\n대표번호로 전화 주셔서 상담실과 상담 또는 각반 담임/원장 상담 예약 바랍니다.\n\n• 전화 상담 : 031 942 0908\n• 이메일 : gienglish.paju@gmail.com")),
           Container(
             width: 400,
             margin: EdgeInsets.only(top: 40),
@@ -595,11 +586,13 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
                   _focusedDay = focusedDay;
                 });
                 SnackbarUtil.showSnackBar(
-                    '${selectedDay.year}.${selectedDay.month}.${selectedDay.day} 선택됨 · 전화 예약 031 942 0908',
+                    AppLanguage.instance.isEnglish
+                        ? '${selectedDay.year}.${selectedDay.month}.${selectedDay.day} selected · call 031 942 0908'
+                        : '${selectedDay.year}.${selectedDay.month}.${selectedDay.day} 선택됨 · 전화 예약 031 942 0908',
                     context);
               },
               calendarFormat: CalendarFormat.month,
-              locale: 'ko_KR',
+              locale: AppLanguage.instance.isEnglish ? 'en_US' : 'ko_KR',
               headerStyle: HeaderStyle(
                 formatButtonVisible: false,
                 titleCentered: true,
@@ -618,7 +611,11 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
         if (value != null) {
           levelMyGroupValue.value = value;
           schoolVisitor.level = value;
-          SnackbarUtil.showSnackBar("$value 선택", context);
+          SnackbarUtil.showSnackBar(
+              AppLanguage.instance.isEnglish
+                  ? "Selected: ${AppLanguage.instance.translate(value)}"
+                  : "$value 선택",
+              context);
           setState(() {});
         }
       },
@@ -642,7 +639,11 @@ class _SchoolConsultationPageState extends State<SchoolConsultationPage> {
         if (value != null) {
           timeMyGroupValue.value = value;
           schoolVisitor.time = value;
-          SnackbarUtil.showSnackBar("$value 선택", context);
+          SnackbarUtil.showSnackBar(
+              AppLanguage.instance.isEnglish
+                  ? "Selected: ${AppLanguage.instance.translate(value)}"
+                  : "$value 선택",
+              context);
           setState(() {});
         }
       },
@@ -666,7 +667,8 @@ class SchoolConsultationPageService {
     var context = state.context;
 
     if (!state.schoolVisitor.isValid()) {
-      SnackbarUtil.showSnackBar("정보를 입력해주세요.", context);
+      SnackbarUtil.showSnackBar(
+          AppLanguage.instance.translate("정보를 입력해주세요."), context);
       return;
     }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
@@ -124,7 +125,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "New Zealand 현지 공립학교 체험 프로그램",
+            tr(context, "New Zealand 현지 공립학교 체험 프로그램"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
@@ -135,7 +136,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
           SizedBox(
             height: 20,
           ),
-          Text("GLEAM ISLAND 어학원만의 New Zealand 현지 체험 프로그램",
+          Text(tr(context, "GLEAM ISLAND 어학원만의 New Zealand 현지 체험 프로그램"),
               style: TextStyle(
                   fontFamily: "Jalnan",
                   fontSize: 15,
@@ -149,17 +150,12 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "뻔하고 지루한 방학 특강 프로그램,\n"
-              "여기 저기서 많이 들어 보고 시켜도 봤지만, 큰 효과를 얻지 못하셨죠?\n"
-              "글림아일랜드는 파격적인 뉴질랜드 현지 공립학교 체험 프로그램을 도입하여, \n"
-              "현지 코디네이터와 협업하여, 매 년 아이들이 최상의 방학 프로그램을 즐길 수 있도록 지원합니다!\n"
-              "뉴질랜드 에듀케이션 '공식' 에이전트인 믿을만한 현지 코디네이터 '비전유학'과 함께하는 알차고 재미있는 현지 영어 체험!\n"
-              "공부도 활동도 놓치지 않는 글림아일랜드만의 방학 프로그램! 그 어떤 교육보다 유익하면서도 아이들에게는 잊지 못할 추억을 선사해드립니다!"),
+              tr(context, "뻔하고 지루한 방학 특강 프로그램,\n여기 저기서 많이 들어 보고 시켜도 봤지만, 큰 효과를 얻지 못하셨죠?\n글림아일랜드는 파격적인 뉴질랜드 현지 공립학교 체험 프로그램을 도입하여, \n현지 코디네이터와 협업하여, 매 년 아이들이 최상의 방학 프로그램을 즐길 수 있도록 지원합니다!\n뉴질랜드 에듀케이션 '공식' 에이전트인 믿을만한 현지 코디네이터 '비전유학'과 함께하는 알차고 재미있는 현지 영어 체험!\n공부도 활동도 놓치지 않는 글림아일랜드만의 방학 프로그램! 그 어떤 교육보다 유익하면서도 아이들에게는 잊지 못할 추억을 선사해드립니다!")),
           SizedBox(
             height: 20,
           ),
           Text(
-            "운영기간",
+            tr(context, "운영기간"),
             style: TextStyle(
                 fontFamily: "Jalnan",
                 fontSize: 15,
@@ -174,12 +170,12 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "여름방학 / 겨울방학 기간 동안 뉴질랜드 공립학교에서 직접 수업을 들으며 원어민 친구들을 사귈 수 있는 단기 2주 또는 4주 코스."),
+              tr(context, "여름방학 / 겨울방학 기간 동안 뉴질랜드 공립학교에서 직접 수업을 들으며 원어민 친구들을 사귈 수 있는 단기 2주 또는 4주 코스.")),
           SizedBox(
             height: 20,
           ),
           Text(
-            "대상",
+            tr(context, "대상"),
             style: TextStyle(
                 fontFamily: "Jalnan",
                 fontSize: 15,
@@ -194,12 +190,12 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "뉴질랜드 현지 단기 (2주~4주) 어학연수 코스를 경험하고 싶은 본원 초등부 학생과 학부모. 조기 유학은 부담스럽고, 단기 여행으로는 큰 영어 습득의 효과를 얻을 수 없기에, 적절한 기간의 단기 연수를 주기적으로 체험하고 싶은 학생과 학부모."),
+              tr(context, "뉴질랜드 현지 단기 (2주~4주) 어학연수 코스를 경험하고 싶은 본원 초등부 학생과 학부모. 조기 유학은 부담스럽고, 단기 여행으로는 큰 영어 습득의 효과를 얻을 수 없기에, 적절한 기간의 단기 연수를 주기적으로 체험하고 싶은 학생과 학부모.")),
           SizedBox(
             height: 40,
           ),
           Text(
-            "뉴질랜드 교육환경",
+            tr(context, "뉴질랜드 교육환경"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
           ),
           WidgetUtil.myDivider(),
@@ -226,7 +222,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
             height: 40,
           ),
           Text(
-            "Tauranga City 소개",
+            tr(context, "Tauranga City 소개"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
           ),
           WidgetUtil.myDivider(),
@@ -256,7 +252,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
             height: 40,
           ),
           Text(
-            "학교 선택",
+            tr(context, "학교 선택"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
           ),
           WidgetUtil.myDivider(),
@@ -268,7 +264,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
             height: 40,
           ),
           Text(
-            "학교 리스트",
+            tr(context, "학교 리스트"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
           ),
           WidgetUtil.myDivider(),
@@ -281,7 +277,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
             height: 40,
           ),
           Text(
-            "자료 제공: 비전유학",
+            tr(context, "자료 제공: 비전유학"),
             textAlign: TextAlign.end,
           ),
         ],
@@ -334,7 +330,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
-                    child: Text("상담신청",
+                    child: Text(tr(context, "상담신청"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "Jalnan",
@@ -461,7 +457,7 @@ class _SchoolNZPageState extends State<SchoolNZPage> {
                   height: 40,
                   child: ElevatedButton(
                     child: Text(
-                      "상담신청",
+                      tr(context, "상담신청"),
                       style:
                           TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),

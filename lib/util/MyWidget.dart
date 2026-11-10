@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
 class MyWidget {
   static Widget footer() {
+    return Builder(builder: (context) {
     return Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -18,7 +20,7 @@ class MyWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Gi Gleam Island 어학원 파주",
+              tr(context, "Gi Gleam Island 어학원 파주"),
               style: TextStyle(
                   color: Palette.white,
                   fontFamily: "NotoSansKR",
@@ -29,10 +31,10 @@ class MyWidget {
               height: 12,
             ),
             Text(
-              "경기도 파주시 해올2길 2 태산 W 타워 7층 701~703호 (다율동 1044)\n"
+              tr(context, "경기도 파주시 해올2길 2 태산 W 타워 7층 701~703호 (다율동 1044)\n"
               "문의 : 031 942 0908\n"
               "email : gienglish.paju@gmail.com\n"
-              "사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희",
+              "사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희"),
               style: TextStyle(
                   color: Palette.grey300,
                   fontFamily: "NotoSansKR",
@@ -55,7 +57,7 @@ class MyWidget {
             ),
             SizedBox(height: 8),
             Text(
-              "Copyright ⓒ 글림아일랜드어학원",
+              tr(context, "Copyright ⓒ 글림아일랜드어학원"),
               style: TextStyle(
                   color: Palette.grey400,
                   fontFamily: "NotoSansKR",
@@ -63,9 +65,11 @@ class MyWidget {
             ),
           ],
         ));
+    });
   }
 
   static Widget cafeFooter() {
+    return Builder(builder: (context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -80,7 +84,7 @@ class MyWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Gi Gleam Island 어학원 파주",
+            tr(context, "Gi Gleam Island 어학원 파주"),
             style: TextStyle(
                 color: Palette.white,
                 fontFamily: "NotoSansKR",
@@ -89,11 +93,11 @@ class MyWidget {
           ),
           SizedBox(height: 12),
           Text(
-            "경기도 파주시 교하로 100번길 00, 태산W타워 7층\n"
+            tr(context, "경기도 파주시 교하로 100번길 00, 태산W타워 7층\n"
             "문의 : 031) 949-3805  /  email : @gmail.com\n"
             "사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희\n"
             "사업자 등록번호 : 346 - 86 - 00782 제1461호\n"
-            "신고번호 : J1518020200003",
+            "신고번호 : J1518020200003"),
             style: TextStyle(
                 color: Palette.white.withValues(alpha:0.9),
                 fontFamily: "NotoSansKR",
@@ -115,7 +119,7 @@ class MyWidget {
           ),
           SizedBox(height: 8),
           Text(
-            "Copyright ⓒ 글림아일랜드교육",
+            tr(context, "Copyright ⓒ 글림아일랜드교육"),
             style: TextStyle(
                 color: Palette.white.withValues(alpha:0.7),
                 fontFamily: "NotoSansKR",
@@ -124,9 +128,11 @@ class MyWidget {
         ],
       ),
     );
+    });
   }
 
   static Widget mobileSchoolFooter() {
+    return Builder(builder: (context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -136,7 +142,7 @@ class MyWidget {
       ),
       padding: EdgeInsets.all(16),
       child: Text(
-        "ⓒ 글림아일랜드교육",
+        tr(context, "ⓒ 글림아일랜드교육"),
         textAlign: TextAlign.center,
         style: TextStyle(
           color: Palette.white,
@@ -146,9 +152,11 @@ class MyWidget {
         ),
       ),
     );
+    });
   }
 
   static Widget mobileCafeFooter() {
+    return Builder(builder: (context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -158,7 +166,7 @@ class MyWidget {
       ),
       padding: EdgeInsets.all(16),
       child: Text(
-        "ⓒ 글림아일랜드교육",
+        tr(context, "ⓒ 글림아일랜드교육"),
         textAlign: TextAlign.center,
         style: TextStyle(
           color: Palette.white,
@@ -168,6 +176,7 @@ class MyWidget {
         ),
       ),
     );
+    });
   }
 
   static Widget roundEdgeTextFieldVisitorVer(
@@ -248,10 +257,14 @@ class MyWidget {
             topLeft: Radius.circular(10), topRight: Radius.circular(10)),
         color: selectedMenuColor,
       ),
-      child: Text(
-        content,
-        textAlign: TextAlign.center,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+      child: Builder(
+        builder: (context) => Text(
+          tr(context, content),
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
@@ -262,9 +275,14 @@ class MyWidget {
       alignment: Alignment.center,
       width: 192,
       height: 40,
-      child: Text(
-        menuContent,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+      child: Builder(
+        builder: (context) => Text(
+          tr(context, menuContent),
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
@@ -279,9 +297,14 @@ class MyWidget {
               bottomLeft: Radius.circular(10),
               bottomRight: Radius.circular(10)),
           color: menuColor),
-      child: Text(
-        content,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+      child: Builder(
+        builder: (context) => Text(
+          tr(context, content),
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
@@ -383,17 +406,22 @@ class MyWidget {
   static Widget mobileLeftMenuStart(Color selectedMenuColor, String content) {
     return Container(
       alignment: Alignment.center,
-      width: 150,
+      padding: EdgeInsets.symmetric(horizontal: 14),
+      constraints: BoxConstraints(minWidth: 108),
       height: 40,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
             topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
         color: selectedMenuColor,
       ),
-      child: Text(
-        content,
-        textAlign: TextAlign.center,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+      child: Builder(
+        builder: (context) => Text(
+          tr(context, content),
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
@@ -402,11 +430,17 @@ class MyWidget {
     return Container(
       color: menuColor,
       alignment: Alignment.center,
-      width: 150,
+      padding: EdgeInsets.symmetric(horizontal: 14),
+      constraints: BoxConstraints(minWidth: 108),
       height: 40,
-      child: Text(
-        menuContent,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+      child: Builder(
+        builder: (context) => Text(
+          tr(context, menuContent),
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
@@ -414,15 +448,21 @@ class MyWidget {
   static Widget mobileLeftMenuEnd(Color menuColor, String content) {
     return Container(
       alignment: Alignment.center,
-      width: 150,
+      padding: EdgeInsets.symmetric(horizontal: 14),
+      constraints: BoxConstraints(minWidth: 108),
       height: 40,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
               topRight: Radius.circular(10), bottomRight: Radius.circular(10)),
           color: menuColor),
-      child: Text(
-        content,
-        style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+      child: Builder(
+        builder: (context) => Text(
+          tr(context, content),
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: Palette.black, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

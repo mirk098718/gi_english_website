@@ -5,6 +5,7 @@ import 'package:gi_english_website/firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:gi_english_website/util/NoticeService.dart';
 import 'package:gi_english_website/util/FAQService.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 
 import 'pages/SchoolMainPage.dart';
 
@@ -17,13 +18,15 @@ Future<void> main() async {
   // Firestore 설정 초기화
   NoticeService.initializeFirestore();
 
-  // 달력 등 한글 로케일(요일/월 이름) 사용을 위한 초기화
+  // 달력 요일/월 이름. Korean is the default; English is used when the visitor switches.
   await initializeDateFormatting('ko_KR', null);
+  await initializeDateFormatting('en_US', null);
+  await AppLanguage.instance.load();
 
   // 더미 데이터는 앱 시작 시마다 추가하지 않음 (추가할 때마다 Firestore에 중복 저장되어 게시글이 2개씩 보이는 문제 발생)
   // try { await _addDummyData(); } catch (e) { print('더미 데이터 추가 중 오류: $e'); }
 
-  runApp(MyApp());
+  runApp(LangScope(child: MyApp()));
 }
 
 // 임시: 더미 데이터 추가 함수

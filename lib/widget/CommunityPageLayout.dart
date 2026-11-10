@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
@@ -146,7 +147,7 @@ class _CommunityPageLayoutState extends State<CommunityPageLayout> {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
                     child: Text(
-                      "상담신청",
+                      tr(context, "상담신청"),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: "Jalnan",

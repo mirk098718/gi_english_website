@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
@@ -122,7 +123,7 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "올데이케어 프로그램",
+            tr(context, "올데이케어 프로그램"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
@@ -130,7 +131,7 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
             height: 20,
           ),
           Text(
-            "운영시간",
+            tr(context, "운영시간"),
             style: TextStyle(
                 fontFamily: "Jalnan", fontSize: 15, color: const Color.fromRGBO(3, 96, 70, 1)),
           ),
@@ -143,12 +144,12 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "오후 2시 20분 ~ 오후 6시 까지 (6시 이전 픽업 가능)"),
+              tr(context, "오후 2시 20분 ~ 오후 6시 까지 (6시 이전 픽업 가능)")),
           SizedBox(
             height: 20,
           ),
           Text(
-            "대상",
+            tr(context, "대상"),
             style: TextStyle(
                 fontFamily: "Jalnan", fontSize: 15, color: const Color.fromRGBO(4, 120, 87, 1)),
           ),
@@ -161,12 +162,12 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "2시에 수업을 마치는 본원 유치부 학생, 학부모님 픽업이 가능한 시간까지 돌봄 서비스"),
+              tr(context, "2시에 수업을 마치는 본원 유치부 학생, 학부모님 픽업이 가능한 시간까지 돌봄 서비스")),
           SizedBox(
             height: 20,
           ),
           Text(
-            "프로그램",
+            tr(context, "프로그램"),
             style: TextStyle(
                 fontFamily: "Jalnan", fontSize: 15, color: const Color.fromRGBO(4, 120, 87, 1)),
           ),
@@ -179,11 +180,7 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "영어로 진행되는 다양한 놀이 수업:\n"
-              "1. Origami : 영어 종이접기 놀이 수업\n"
-              "2. Mini Golf : 안전한 유아용 골프채 이용 간단한 골프 기초 놀이 수업\n"
-              "3. Media : 영상 자료를 활용한 재미있는 Theme play\n"
-              "4. Chinese : 유아를 위한 아주 쉬운 기초 중국어 놀이 수업"),
+              tr(context, "영어로 진행되는 다양한 놀이 수업:\n1. Origami : 영어 종이접기 놀이 수업\n2. Mini Golf : 안전한 유아용 골프채 이용 간단한 골프 기초 놀이 수업\n3. Media : 영상 자료를 활용한 재미있는 Theme play\n4. Chinese : 유아를 위한 아주 쉬운 기초 중국어 놀이 수업")),
           SizedBox(
             height: 50,
           ),
@@ -237,7 +234,7 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
-                    child: Text("상담신청",
+                    child: Text(tr(context, "상담신청"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "Jalnan",
@@ -364,7 +361,7 @@ class _SchoolAllDayPageState extends State<SchoolAllDayPage> {
                   height: 40,
                   child: ElevatedButton(
                     child: Text(
-                      "상담신청",
+                      tr(context, "상담신청"),
                       style:
                           TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),

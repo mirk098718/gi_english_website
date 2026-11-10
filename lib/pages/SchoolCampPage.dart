@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolAllDayPage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
@@ -124,7 +125,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Gi 방학캠프",
+            tr(context, "Gi 방학캠프"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
@@ -132,7 +133,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
             height: 20,
           ),
           Text(
-            "운영기간",
+            tr(context, "운영기간"),
             style: TextStyle(
                 fontFamily: "Jalnan", fontSize: 15, color: const Color.fromRGBO(4, 120, 87, 1)),
           ),
@@ -145,12 +146,12 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "여름방학 / 겨울방학 기간 2주 코스"),
+              tr(context, "여름방학 / 겨울방학 기간 2주 코스")),
           SizedBox(
             height: 20,
           ),
           Text(
-            "대상",
+            tr(context, "대상"),
             style: TextStyle(
                 fontFamily: "Jalnan", fontSize: 15, color: const Color.fromRGBO(4, 120, 87, 1)),
           ),
@@ -163,7 +164,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.normal,
                   fontSize: 14),
-              "본원 초등부 저학년 대상"),
+              tr(context, "본원 초등부 저학년 대상")),
           SizedBox(
             height: 150,
           ),
@@ -217,7 +218,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
-                    child: Text("상담신청",
+                    child: Text(tr(context, "상담신청"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "Jalnan",
@@ -344,7 +345,7 @@ class _SchoolCampPageState extends State<SchoolCampPage> {
                   height: 40,
                   child: ElevatedButton(
                     child: Text(
-                      "상담신청",
+                      tr(context, "상담신청"),
                       style:
                           TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),

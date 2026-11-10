@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/GalleryService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/class/GalleryImage.dart';
@@ -138,18 +139,18 @@ class _AdminImageEditDialogState extends State<AdminImageEditDialog> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          '이미지 삭제',
+          tr(context, "이미지 삭제"),
           style: TextStyle(fontFamily: "Jalnan"),
         ),
         content: Text(
-          '이 이미지를 정말 삭제하시겠습니까?\n삭제된 이미지는 복구할 수 없습니다.',
+          tr(context, "이 이미지를 정말 삭제하시겠습니까?\n삭제된 이미지는 복구할 수 없습니다."),
           style: TextStyle(fontFamily: "NotoSansKR"),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
-              '취소',
+              tr(context, "취소"),
               style: TextStyle(fontFamily: "NotoSansKR"),
             ),
           ),
@@ -157,7 +158,7 @@ class _AdminImageEditDialogState extends State<AdminImageEditDialog> {
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: Text(
-              '삭제',
+              tr(context, "삭제"),
               style: TextStyle(fontFamily: "NotoSansKR"),
             ),
           ),
@@ -231,8 +232,8 @@ class _AdminImageEditDialogState extends State<AdminImageEditDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    '이미지 수정/삭제',
+                  Text(
+                    tr(context, "이미지 수정/삭제"),
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -266,14 +267,14 @@ class _AdminImageEditDialogState extends State<AdminImageEditDialog> {
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         color: Palette.grey200,
-                        child: const Column(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.broken_image,
                                 color: Palette.grey400, size: 32),
                             SizedBox(height: 8),
                             Text(
-                              '이미지를 불러올 수 없습니다',
+                              tr(context, "이미지를 불러올 수 없습니다"),
                               style: TextStyle(
                                 color: Palette.grey600,
                                 fontSize: 12,
@@ -343,8 +344,8 @@ class _AdminImageEditDialogState extends State<AdminImageEditDialog> {
               const SizedBox(height: 20),
 
               // 설명 수정 필드
-              const Text(
-                '이미지 설명 (선택사항)',
+              Text(
+                tr(context, "이미지 설명 (선택사항)"),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -407,8 +408,8 @@ class _AdminImageEditDialogState extends State<AdminImageEditDialog> {
                   TextButton.icon(
                     onPressed: _isUpdating ? null : _deleteImage,
                     icon: const Icon(Icons.delete, color: Colors.red),
-                    label: const Text(
-                      '삭제',
+                    label: Text(
+                      tr(context, "삭제"),
                       style: TextStyle(
                         fontFamily: "NotoSansKR",
                         color: Colors.red,
@@ -423,7 +424,7 @@ class _AdminImageEditDialogState extends State<AdminImageEditDialog> {
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
                         child: Text(
-                          '취소',
+                          tr(context, "취소"),
                           style: TextStyle(
                             fontFamily: "NotoSansKR",
                             color:
@@ -452,8 +453,8 @@ class _AdminImageEditDialogState extends State<AdminImageEditDialog> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text(
-                                '수정',
+                            : Text(
+                                tr(context, "수정"),
                                 style: TextStyle(
                                   fontFamily: "NotoSansKR",
                                   fontWeight: FontWeight.bold,

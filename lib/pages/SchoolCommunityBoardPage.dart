@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/FAQ.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
@@ -79,7 +80,7 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
                 ElevatedButton.icon(
                   onPressed: () => _navigateToWritePage(),
                   icon: Icon(Icons.edit, size: 16),
-                  label: Text("글쓰기"),
+                  label: Text(tr(context, "글쓰기")),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.primary,
                     foregroundColor: Palette.white,
@@ -91,7 +92,7 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
           WidgetUtil.myDivider(),
           SizedBox(height: 20),
           Text(
-            "자주 묻는 질문과 답변을 확인하실 수 있습니다.",
+            tr(context, "자주 묻는 질문과 답변을 확인하실 수 있습니다."),
             style: TextStyle(
               fontSize: 14,
               color: Palette.grey600,
@@ -114,7 +115,7 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
             padding: EdgeInsets.all(40),
             child: Center(
               child: Text(
-                'FAQ를 불러오는데 오류가 발생했습니다.',
+                tr(context, "FAQ를 불러오는데 오류가 발생했습니다."),
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.red,
@@ -175,7 +176,7 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
               ],
               Expanded(
                 child: Text(
-                  faq['title'] ?? '',
+                  tr(context, faq['title'] ?? ''),
                   style: TextStyle(fontFamily: "NotoSansKR"),
                 ),
               ),
@@ -198,7 +199,7 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        faq['category'] ?? 'FAQ',
+                        tr(context, faq['category'] ?? 'FAQ'),
                         style: TextStyle(
                           fontSize: 12,
                           color: (faq['isImportant'] ?? false)
@@ -228,7 +229,7 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
                     border: Border.all(color: Palette.grey200),
                   ),
                   child: Text(
-                    faq['content'] ?? '',
+                    tr(context, faq['content'] ?? ''),
                     style: TextStyle(
                       fontSize: 14,
                       fontFamily: "NotoSansKR",
@@ -247,7 +248,7 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
                   _editFAQ(faq['id']);
                 },
                 icon: Icon(Icons.edit, size: 16),
-                label: Text("수정", style: TextStyle(fontFamily: "NotoSansKR")),
+                label: Text(tr(context, "수정"), style: TextStyle(fontFamily: "NotoSansKR")),
                 style: TextButton.styleFrom(foregroundColor: Palette.primary),
               ),
               TextButton.icon(
@@ -256,13 +257,13 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
                   _deleteFAQ(faq['id'], faq['title']);
                 },
                 icon: Icon(Icons.delete, size: 16),
-                label: Text("삭제", style: TextStyle(fontFamily: "NotoSansKR")),
+                label: Text(tr(context, "삭제"), style: TextStyle(fontFamily: "NotoSansKR")),
                 style: TextButton.styleFrom(foregroundColor: Colors.red),
               ),
             ],
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text("닫기", style: TextStyle(fontFamily: "NotoSansKR")),
+              child: Text(tr(context, "닫기"), style: TextStyle(fontFamily: "NotoSansKR")),
             ),
           ],
         );
@@ -297,7 +298,7 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
       if (faq == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('FAQ를 찾을 수 없습니다.'),
+            content: Text(tr(context, "FAQ를 찾을 수 없습니다.")),
             backgroundColor: Colors.red,
           ),
         );
@@ -319,7 +320,8 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('FAQ 수정 중 오류가 발생했습니다: $e'),
+          content: Text(
+              '${AppLanguage.instance.translate("FAQ 수정 중 오류가 발생했습니다")}: $e'),
           backgroundColor: Colors.red,
         ),
       );
@@ -333,18 +335,20 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          "FAQ 삭제",
+          tr(context, "FAQ 삭제"),
           style: TextStyle(fontFamily: "NotoSansKR"),
         ),
         content: Text(
-          "FAQ '$faqTitle'을(를) 삭제하시겠습니까?\n삭제된 FAQ는 복구할 수 없습니다.",
+          AppLanguage.instance.isEnglish
+              ? "Delete the FAQ \"${faqTitle ?? ''}\"?\nThis cannot be undone."
+              : "FAQ '$faqTitle'을(를) 삭제하시겠습니까?\n삭제된 FAQ는 복구할 수 없습니다.",
           style: TextStyle(fontFamily: "NotoSansKR"),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
-              "취소",
+              tr(context, "취소"),
               style: TextStyle(fontFamily: "NotoSansKR"),
             ),
           ),
@@ -352,7 +356,7 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: Text(
-              "삭제",
+              tr(context, "삭제"),
               style: TextStyle(fontFamily: "NotoSansKR"),
             ),
           ),
@@ -366,7 +370,7 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'FAQ가 삭제되었습니다.',
+              tr(context, "FAQ가 삭제되었습니다."),
               style: TextStyle(fontFamily: "NotoSansKR"),
             ),
             backgroundColor: Colors.green,
@@ -378,7 +382,7 @@ class _SchoolCommunityBoardPageState extends State<SchoolCommunityBoardPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'FAQ 삭제에 실패했습니다: $e',
+              '${AppLanguage.instance.translate("FAQ 삭제에 실패했습니다")}: $e',
               style: TextStyle(fontFamily: "NotoSansKR"),
             ),
             backgroundColor: Colors.red,

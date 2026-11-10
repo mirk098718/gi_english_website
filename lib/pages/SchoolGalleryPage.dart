@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityNoticePage.dart';
 import 'package:gi_english_website/pages/SchoolCommunityBoardPage.dart';
@@ -194,7 +195,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                   onPressed: _showUploadDialog,
                   icon: Icon(Icons.cloud_upload, size: 18),
                   label: Text(
-                    "이미지 업로드",
+                    tr(context, "이미지 업로드"),
                     style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 14,
@@ -229,7 +230,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
               if (snapshot.hasError) {
                 return Center(
                   child: Text(
-                    '갤러리를 불러오는 중 오류가 발생했습니다.',
+                    tr(context, "갤러리를 불러오는 중 오류가 발생했습니다."),
                     style: TextStyle(fontFamily: "NotoSansKR"),
                   ),
                 );
@@ -249,7 +250,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                       ),
                       SizedBox(height: 16),
                       Text(
-                        '아직 업로드된 이미지가 없습니다.',
+                        tr(context, "아직 업로드된 이미지가 없습니다."),
                         style: TextStyle(
                           fontFamily: "NotoSansKR",
                           fontSize: 16,
@@ -259,7 +260,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                       if (isAdmin) ...[
                         SizedBox(height: 8),
                         Text(
-                          '상단의 "이미지 업로드" 버튼을 클릭하여 이미지를 추가해보세요.',
+                          tr(context, "상단의 \"이미지 업로드\" 버튼을 클릭하여 이미지를 추가해보세요."),
                           style: TextStyle(
                             fontFamily: "NotoSansKR",
                             fontSize: 14,
@@ -331,7 +332,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                               color: Palette.grey400, size: 32),
                           SizedBox(height: 8),
                           Text(
-                            '이미지를 불러올 수 없습니다',
+                            tr(context, "이미지를 불러올 수 없습니다"),
                             style: TextStyle(
                               color: Palette.grey600,
                               fontSize: 12,
@@ -458,7 +459,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                   onPressed: _showUploadDialog,
                   icon: Icon(Icons.cloud_upload, size: 16),
                   label: Text(
-                    "업로드",
+                    tr(context, "업로드"),
                     style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 12,
@@ -493,7 +494,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
               if (snapshot.hasError) {
                 return Center(
                   child: Text(
-                    '갤러리를 불러오는 중 오류가 발생했습니다.',
+                    tr(context, "갤러리를 불러오는 중 오류가 발생했습니다."),
                     style: TextStyle(fontFamily: "NotoSansKR"),
                   ),
                 );
@@ -513,7 +514,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                       ),
                       SizedBox(height: 12),
                       Text(
-                        '아직 업로드된 이미지가 없습니다.',
+                        tr(context, "아직 업로드된 이미지가 없습니다."),
                         style: TextStyle(
                           fontFamily: "NotoSansKR",
                           fontSize: 14,
@@ -523,7 +524,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                       if (isAdmin) ...[
                         SizedBox(height: 6),
                         Text(
-                          '"업로드" 버튼을 눌러 이미지를 추가해보세요.',
+                          tr(context, "\"업로드\" 버튼을 눌러 이미지를 추가해보세요."),
                           style: TextStyle(
                             fontFamily: "NotoSansKR",
                             fontSize: 12,
@@ -593,7 +594,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                               color: Palette.grey400, size: 24),
                           SizedBox(height: 4),
                           Text(
-                            '이미지 오류',
+                            tr(context, "이미지 오류"),
                             style: TextStyle(
                               color: Palette.grey600,
                               fontSize: 10,
@@ -698,7 +699,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                     onPressed: () {
                       MenuUtil.push(context, SchoolConsultationPage());
                     },
-                    child: Text("상담신청",
+                    child: Text(tr(context, "상담신청"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "Jalnan",
@@ -827,7 +828,7 @@ class _SchoolGalleryPageState extends State<SchoolGalleryPage> {
                   height: 40,
                   child: ElevatedButton(
                     child: Text(
-                      "상담신청",
+                      tr(context, "상담신청"),
                       style:
                           TextStyle(fontFamily: "Jalnan", color: Palette.white),
                     ),
