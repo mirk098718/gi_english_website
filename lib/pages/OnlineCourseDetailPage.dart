@@ -22,6 +22,7 @@ import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:gi_english_website/widget/QuizResultSummary.dart';
+import 'package:gi_english_website/widget/StudentJoinButton.dart';
 import 'package:gi_english_website/widget/YoutubeLessonPlayer.dart';
 
 import '../util/WidgetUtil.dart';
@@ -57,10 +58,12 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
   bool _savingChecklist = false;
   bool _submittingBooking = false;
   String? _movingWeekId;
+  bool _watchingSessions = false;
   Timer? _sessionTicker;
   StreamSubscription<void>? _quizSavedSub;
   StreamSubscription<dynamic>? _authSub;
   StreamSubscription<List<LessonRating>>? _ratingSub;
+  StreamSubscription<List<OnlineSession>>? _sessionSub;
   int _ratingBind = 0;
 
   @override
@@ -85,6 +88,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     _quizSavedSub?.cancel();
     _authSub?.cancel();
     _ratingSub?.cancel();
+    _sessionSub?.cancel();
     _sessionTicker?.cancel();
     super.dispose();
   }
@@ -186,7 +190,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     if (!mounted) return;
     setState(() {
       _lessons = lessons;
-      _sessions = sessions;
+      if (!_watchingSessions) _sessions = sessions;
       _weeks = weeks;
       _enrollment = enrollment;
       _weekProgress = progress;
@@ -196,6 +200,23 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       _ratings = ratings;
       _teacherAvailability = availability;
       _isLoading = false;
+    });
+    _watchSessions();
+  }
+
+  /// 강사가 시작을 누르면 새로고침 없이 입장 버튼이 초록으로 바뀐다.
+  void _watchSessions() {
+    if (_watchingSessions) return;
+    _watchingSessions = true;
+    final uid = AuthService.currentUser?.uid;
+    _sessionSub = EnrollmentService.watchSessions(
+      widget.course.id,
+      userId: uid,
+    ).listen((sessions) {
+      if (!mounted) return;
+      setState(() => _sessions = sessions);
+    }, onError: (Object error) {
+      print('화상수업 회차 구독 오류: $error');
     });
   }
 
@@ -574,8 +595,16 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
   bool _canJoinBooking(WeekBooking booking) {
     if (!booking.isConfirmed) return false;
     final session = _sessionForBooking(booking);
-    if (session != null) return session.canStudentJoin;
-    return true;
+    if (session == null) return false;
+    return session.canStudentJoin;
+  }
+
+  bool _showLockedJoin(WeekBooking booking) {
+    if (!booking.isConfirmed) return false;
+    if (_canJoinBooking(booking)) return false;
+    final session = _sessionForBooking(booking);
+    if (session == null) return true;
+    return session.isWaitingForStart;
   }
 
   String get _meetingDisplayName {
@@ -590,19 +619,16 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     );
   }
 
-  Widget _joinButton(String url) {
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Palette.secondaryDark,
-        foregroundColor: Palette.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
+  Widget _joinButton(String url, {required bool enabled}) {
+    final button = StudentJoinButton(
+      enabled: enabled,
+      label: tr(context, "입장하기"),
       onPressed: () => _openStudentMeeting(url),
-      icon: Icon(Icons.login, size: 16, color: Palette.white),
-      label: Text(
-        tr(context, "화상수업 입장"),
-        style: TextStyle(fontFamily: "Jalnan", color: Palette.white, fontSize: 13),
-      ),
+    );
+    if (enabled) return button;
+    return Tooltip(
+      message: tr(context, "강사가 수업을 시작하면 입장할 수 있습니다."),
+      child: button,
     );
   }
 
@@ -802,7 +828,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
           ),
           SizedBox(height: 4),
           Text(
-            tr(context, "강사가 예약을 컨펌하면 회차가 생기고, 수업 시작 5분 전에 휴대폰으로 알림이 갑니다.\n강사가 호스트로 입장하면 수강생도 바로 들어올 수 있습니다. 수업 시간이 되면 입장하기를 누르세요."),
+            tr(context, "강사가 예약을 컨펌하면 수업 일정이 확정되고, 시작 5분 전에 휴대폰으로 알림이 갑니다.\n입장 버튼은 회색으로 기다리다가, 강사가 수업을 시작하면 초록으로 바뀌어 누를 수 있습니다."),
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 14,
@@ -917,29 +943,25 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                     color: statusColor,
                   ),
                 ),
+                if (session.isWaitingForStart) ...[
+                  SizedBox(height: 4),
+                  Text(
+                    tr(context, "수업 일정이 확정되었습니다."),
+                    style: TextStyle(
+                      fontFamily: "NotoSansKR",
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: Palette.grey600,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
           if (session.canStudentJoin)
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Palette.secondaryDark,
-                foregroundColor: Palette.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onPressed: () => _openStudentMeeting(session.meetingUrl),
-              icon: Icon(Icons.login, size: 16, color: Palette.white),
-              label: Text(
-                tr(context, "입장하기"),
-                style: TextStyle(
-                  fontFamily: "Jalnan",
-                  color: Palette.white,
-                  fontSize: 13,
-                ),
-              ),
-            )
+            _joinButton(session.meetingUrl, enabled: true)
+          else if (session.isWaitingForStart)
+            _joinButton(session.meetingUrl, enabled: false)
           else
             Text(
               countdown,
@@ -1770,7 +1792,20 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             ],
             if (_canJoinBooking(existing)) ...[
               SizedBox(height: 12),
-              _joinButton(_joinUrlForBooking(existing)),
+              _joinButton(_joinUrlForBooking(existing), enabled: true),
+            ] else if (_showLockedJoin(existing)) ...[
+              SizedBox(height: 8),
+              Text(
+                tr(context, "수업 일정이 확정되었습니다."),
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: Palette.grey600,
+                ),
+              ),
+              SizedBox(height: 12),
+              _joinButton(_joinUrlForBooking(existing), enabled: false),
             ],
             SizedBox(height: 12),
             if (EnrollmentService.canStudentChangeBooking(existing)) ...[

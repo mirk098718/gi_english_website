@@ -852,6 +852,31 @@ class EnrollmentService {
     }
   }
 
+  /// 강사가 수업을 시작하면 수강생 화면의 입장 버튼이 바로 바뀌도록 회차를 구독한다.
+  static Stream<List<OnlineSession>> watchSessions(
+    String courseId, {
+    String? userId,
+  }) {
+    return _firestore
+        .collection('online_sessions')
+        .where('courseId', isEqualTo: courseId)
+        .snapshots()
+        .map((snapshot) {
+      var list = snapshot.docs
+          .map((doc) => OnlineSession.fromMap(doc.id, doc.data()))
+          .toList();
+      if (userId != null && userId.isNotEmpty) {
+        list = list
+            .where((session) =>
+                session.userId.isEmpty || session.userId == userId)
+            .toList();
+        list = filterSessionsForStudent(list);
+      }
+      list.sort(_compareSessions);
+      return list;
+    });
+  }
+
   /// 수강생 화면: 컨펌된 예약 회차만 노출. 수동으로 미리 만든 빈 회차는 숨김.
   static List<OnlineSession> filterSessionsForStudent(
       List<OnlineSession> sessions) {
@@ -3045,12 +3070,18 @@ class OnlineSession {
   /// isLive는 true지만 자동 만료 시간이 지난 상태.
   bool get isStale => isLive && !isLiveNow;
 
-  /// 컨펌으로 생긴 회차는 종료 전까지 입장 가능. 예전 수동 회차는 수업 시작 후에만 연다.
+  /// 강사가 시작을 눌러 수업 중일 때만 입장할 수 있다.
   bool get canStudentJoin {
     if (cancelled || isFinished || isStale) return false;
     if (meetingUrl.trim().isEmpty) return false;
-    if (bookingId.isNotEmpty) return true;
     return isLiveNow;
+  }
+
+  /// 일정은 있으나 강사가 아직 시작하지 않음. 입장 버튼은 회색으로 둔다.
+  bool get isWaitingForStart {
+    if (cancelled || meetingUrl.trim().isEmpty) return false;
+    if (isFinished || isStale || isLiveNow) return false;
+    return true;
   }
 
   factory OnlineSession.fromMap(String id, Map<String, dynamic> data) {
