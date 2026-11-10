@@ -31,6 +31,8 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
   bool _isMemberLoggedIn = AuthService.currentUser != null;
   StreamSubscription<User?>? _authSub;
   _HeaderMenu _menu = _HeaderMenu.none;
+  bool _menuPinned = false;
+  bool _ignoreCampusHover = false;
   Timer? _closeTimer;
   Timer? _hoverOpenTimer;
 
@@ -71,35 +73,49 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
     }
   }
 
-  void _openMenu(_HeaderMenu menu) {
+  void _openMenu(_HeaderMenu menu, {bool pin = false}) {
     _closeTimer?.cancel();
     _hoverOpenTimer?.cancel();
-    if (_menu == menu) return;
-    setState(() => _menu = menu);
+    if (_menu == menu && _menuPinned == pin) return;
+    if (_menu == menu && _menuPinned && !pin) return;
+    setState(() {
+      _menu = menu;
+      _menuPinned = pin;
+    });
   }
 
   void _scheduleOpen(_HeaderMenu menu, Duration delay) {
+    if (menu == _HeaderMenu.campus && _ignoreCampusHover) return;
     _closeTimer?.cancel();
     _hoverOpenTimer?.cancel();
     _hoverOpenTimer = Timer(delay, () {
       if (!mounted) return;
+      if (menu == _HeaderMenu.campus && _ignoreCampusHover) return;
       _openMenu(menu);
     });
   }
 
   void _scheduleClose() {
     _hoverOpenTimer?.cancel();
+    if (_menuPinned) {
+      _closeTimer?.cancel();
+      return;
+    }
     _closeTimer?.cancel();
     _closeTimer = Timer(const Duration(milliseconds: 160), () {
-      if (mounted) setState(() => _menu = _HeaderMenu.none);
+      if (!mounted || _menuPinned) return;
+      setState(() => _menu = _HeaderMenu.none);
     });
   }
 
   void _closeMenu() {
     _hoverOpenTimer?.cancel();
     _closeTimer?.cancel();
-    if (_menu == _HeaderMenu.none) return;
-    setState(() => _menu = _HeaderMenu.none);
+    if (_menu == _HeaderMenu.none && !_menuPinned) return;
+    setState(() {
+      _menu = _HeaderMenu.none;
+      _menuPinned = false;
+    });
   }
 
   Future<void> _logout() async {
@@ -253,8 +269,13 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                     color: Palette.darkTeal,
                     hoverDelay: const Duration(milliseconds: 220),
                     onTap: () {
-                      _closeMenu();
-                      SiteNav.goAcademy(context);
+                      if (_menu == _HeaderMenu.campus && _menuPinned) {
+                        _ignoreCampusHover = true;
+                        _closeMenu();
+                      } else {
+                        _ignoreCampusHover = false;
+                        _openMenu(_HeaderMenu.campus, pin: true);
+                      }
                     },
                   ),
                 ],
@@ -307,6 +328,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
           _scheduleClose();
           return;
         }
+        if (menu == _HeaderMenu.campus && _ignoreCampusHover) return;
         if (menu != null) {
           if (hoverDelay != null) {
             _scheduleOpen(menu, hoverDelay);
@@ -316,6 +338,9 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
         } else {
           _scheduleClose();
         }
+      },
+      onExit: (_) {
+        if (menu == _HeaderMenu.campus) _ignoreCampusHover = false;
       },
       child: InkWell(
         onTap: enabled
@@ -477,37 +502,11 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
   }
 
   Widget _campusPanel() {
-    return Column(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final wide = constraints.maxWidth >= 840;
-            if (!wide) {
-              return Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  for (final group in SiteNav.academyGroups)
-                    _panelChip(
-                      label: group.title,
-                      onTap: () {
-                        _closeMenu();
-                        SiteNav.openPage(context, group.items.first);
-                      },
-                    ),
-                ],
-              );
-            }
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (final group in SiteNav.academyGroups)
-                  Expanded(child: _campusGroup(group)),
-              ],
-            );
-          },
-        ),
+        for (final group in SiteNav.academyGroups)
+          Expanded(child: _campusGroup(group)),
       ],
     );
   }
