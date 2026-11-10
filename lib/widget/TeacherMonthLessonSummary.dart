@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
+import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/LessonRatingPromptHost.dart';
 
-/// 스케줄 옆에서 보는 이번 달 진행·취소 수업 수와 수입.
+/// 스케줄 옆에서 보는 이번 달 진행·취소 수업 수와 수당.
 class TeacherMonthLessonSummary extends StatelessWidget {
   final TeacherMonthStats stats;
   final bool compact;
@@ -25,7 +26,7 @@ class TeacherMonthLessonSummary extends StatelessWidget {
     final cells = [
       _cell('진행', loading ? '-' : '${stats.completedCount}회', Palette.secondaryDark),
       _cell('취소', loading ? '-' : '${stats.cancelledCount}회', Palette.danger),
-      _cell('수입', loading ? '-' : stats.incomeLabel, Palette.navy),
+      _cell('수당', loading ? '-' : stats.incomeLabel, Palette.navy),
       if (!compact)
         _cell('평균별점', loading ? '-' : stats.averageStarsLabel, Palette.warning),
     ];
@@ -112,7 +113,7 @@ class TeacherMonthLessonSummary extends StatelessWidget {
   }
 
   String _payLabel() {
-    final digits = EnrollmentService.lessonPayWon.toString();
+    final digits = stats.lessonFeeWon.toString();
     final buffer = StringBuffer();
     for (var i = 0; i < digits.length; i++) {
       if (i > 0 && (digits.length - i) % 3 == 0) buffer.write(',');
@@ -180,6 +181,7 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
   DateTime _month = DateTime(DateTime.now().year, DateTime.now().month);
   List<WeekBooking> _bookings = [];
   List<LessonRating> _ratings = [];
+  int _lessonFeeWon = EnrollmentService.lessonPayWon;
   bool _loading = true;
 
   @override
@@ -194,10 +196,12 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
         await EnrollmentService.weekBookingsForTeacher(widget.teacherUid);
     final ratings =
         await LessonRatingService.listForTeacher(widget.teacherUid);
+    final profile = await AuthService.staffProfile(widget.teacherUid);
     if (!mounted) return;
     setState(() {
       _bookings = bookings;
       _ratings = ratings;
+      _lessonFeeWon = EnrollmentService.lessonFeeWonOf(profile);
       _loading = false;
     });
   }
@@ -221,6 +225,7 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
         teacherUid: widget.teacherUid,
         ratings: _ratings,
         now: _month,
+        lessonFeeWon: _lessonFeeWon,
       );
 
   void _shiftMonth(int delta) {

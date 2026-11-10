@@ -178,9 +178,8 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     }
     final feedbacks = await LessonFeedbackService.listForTeacher(teacherUid);
     final ratings = await LessonRatingService.listForTeacher(teacherUid);
-    final userIds = {...byId.keys, ...guestById.keys}.toList();
-    final enrollments =
-        await EnrollmentService.listEnrollments(memberIds: userIds);
+    final enrollments = await EnrollmentService.listEnrollments(
+        teacherUid: teacherUid);
     final learning = await EnrollmentService.learningByEnrollment(enrollments);
     if (!mounted) return;
     setState(() {
@@ -209,6 +208,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       bookings: _bookings,
       teacherUid: _teacherUid,
       ratings: _ratings,
+      lessonFeeWon: EnrollmentService.lessonFeeWonOf(_teacher),
     );
     if (stats.ratedCount <= 0) return '';
     return ' · 이번달 평균 ${stats.averageStarsLabel} (${stats.ratedCount}건)';

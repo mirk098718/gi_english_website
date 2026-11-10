@@ -241,6 +241,10 @@ class PaymentService {
         'paidAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       };
+      final nativeUid = payment['nativeTeacherUid']?.toString() ?? '';
+      if (nativeUid.isNotEmpty) {
+        enrollmentPayload['teacherId'] = nativeUid;
+      }
 
       if (enrollmentRef != null) {
         final prev = (await enrollmentRef.get()).data() as Map<String, dynamic>;
