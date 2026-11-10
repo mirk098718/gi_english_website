@@ -974,6 +974,8 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
           initiallyExpanded: isCurrent,
           tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           childrenPadding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+          expandedAlignment: Alignment.centerLeft,
+          expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
           title: Row(
             children: [
               Text(

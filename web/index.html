@@ -56,7 +56,7 @@
 <body>
 <script>
   (function () {
-    var key = "gleam-sw-reset-20261110b";
+    var key = "gleam-sw-reset-20261110c";
     if (!("serviceWorker" in navigator) || sessionStorage.getItem(key)) return;
     navigator.serviceWorker.getRegistrations().then(function (regs) {
       sessionStorage.setItem(key, "1");
