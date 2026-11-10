@@ -491,6 +491,54 @@ service cloud.firestore {
       allow delete: if isOwner();
     }
 
+    // 퀴즈 최근 결과. 학생·퀴즈마다 문서 하나.
+    // 다시 풀면 같은 문서를 덮어써서 점수와 주관식이 최근 풀이로 바뀐다.
+    // 읽기: 본인, 메인 관리자, 담당 강사, 그 학생 예약을 받은 강사.
+    match /quiz_results/{resultId} {
+      allow read: if isOwner()
+        || (isLoggedIn() && resource.data.userId == request.auth.uid)
+        || isAssignedTeacher(resource.data.userId)
+        || (isTeacher()
+          && exists(/databases/$(database)/documents/quiz_result_readers/$(request.auth.uid + '_' + resource.data.userId)));
+
+      allow create, update: if isLoggedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.quizId is string
+        && request.resource.data.quizId.matches('^[a-z0-9-]{3,64}$')
+        && resultId == request.auth.uid + '_' + request.resource.data.quizId
+        && request.resource.data.completed == true
+        && request.resource.data.totalCount == 25
+        && request.resource.data.correctCount is int
+        && request.resource.data.correctCount >= 0
+        && request.resource.data.correctCount <= 25
+        && request.resource.data.weekNumber is int
+        && request.resource.data.weekNumber >= 1
+        && request.resource.data.weekNumber <= 52
+        && request.resource.data.courseId is string
+        && request.resource.data.courseId.size() > 0
+        && request.resource.data.courseId.size() <= 80
+        && request.resource.data.title is string
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.essays is list
+        && request.resource.data.essays.size() <= 8
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.keys().hasOnly([
+          'userId', 'quizId', 'title', 'courseId', 'weekNumber',
+          'correctCount', 'totalCount', 'completed', 'essays', 'updatedAt'
+        ]);
+
+      allow delete: if false;
+    }
+
+    // 예약을 받은 강사와 수강생을 잇는다. 쓰기는 서버 함수만.
+    match /quiz_result_readers/{readerId} {
+      allow read: if isOwner()
+        || (isTeacher()
+          && resource.data.teacherId == request.auth.uid
+          && readerId == request.auth.uid + '_' + resource.data.userId);
+      allow create, update, delete: if false;
+    }
+
     // 예약·수업·피드백 알림. 본인만 읽고 읽음 처리. 강사는 수강생에게 생성.
     // Let's Talk 메시지는 로그인 회원이 상대에게만 생성할 수 있다.
     match /notifications/{notificationId} {
