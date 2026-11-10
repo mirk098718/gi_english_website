@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
@@ -63,7 +64,7 @@ class _AccountRecoveryDialogState extends State<AccountRecoveryDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('아이디 · 비밀번호 찾기',
+      title: Text(tr(context, "아이디 · 비밀번호 찾기"),
           style: TextStyle(fontFamily: 'Jalnan', fontSize: 18)),
       content: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: 420, maxHeight: 420),
@@ -73,7 +74,7 @@ class _AccountRecoveryDialogState extends State<AccountRecoveryDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '아이디는 가입하신 이메일입니다.',
+                tr(context, "아이디는 가입하신 이메일입니다."),
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontSize: 14,
@@ -94,7 +95,7 @@ class _AccountRecoveryDialogState extends State<AccountRecoveryDialog> {
               ),
               SizedBox(height: 20),
               Text(
-                '비밀번호 재설정',
+                tr(context, "비밀번호 재설정"),
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontSize: 14,
@@ -103,7 +104,7 @@ class _AccountRecoveryDialogState extends State<AccountRecoveryDialog> {
               ),
               SizedBox(height: 6),
               Text(
-                '가입한 이메일로 재설정 링크를 보내 드립니다.',
+                tr(context, "가입한 이메일로 재설정 링크를 보내 드립니다."),
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontSize: 13,
@@ -145,7 +146,7 @@ class _AccountRecoveryDialogState extends State<AccountRecoveryDialog> {
       actions: [
         TextButton(
           onPressed: _sending ? null : () => Navigator.of(context).pop(),
-          child: Text('닫기', style: TextStyle(fontFamily: 'NotoSansKR')),
+          child: Text(tr(context, "닫기"), style: TextStyle(fontFamily: 'NotoSansKR')),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -162,7 +163,7 @@ class _AccountRecoveryDialogState extends State<AccountRecoveryDialog> {
                     color: Palette.white,
                   ),
                 )
-              : Text('재설정 메일 보내기', style: TextStyle(fontFamily: 'Jalnan')),
+              : Text(tr(context, "재설정 메일 보내기"), style: TextStyle(fontFamily: 'Jalnan')),
         ),
       ],
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/SiteNav.dart';
 
@@ -20,7 +21,7 @@ class AcademyNavMenu extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(16, 14, 16, 4),
               child: Text(
-                group.title,
+                tr(context, group.title),
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -39,7 +40,7 @@ class AcademyNavMenu extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          item.label,
+                          tr(context, item.label),
                           style: TextStyle(
                             fontFamily: "NotoSansKR",
                             fontSize: 15,

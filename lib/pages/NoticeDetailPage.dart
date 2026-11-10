@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/Notice.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/NoticeService.dart';
@@ -57,7 +58,7 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            '공지사항을 불러오는데 실패했습니다.',
+            tr(context, "공지사항을 불러오는데 실패했습니다."),
             style: TextStyle(fontFamily: "NotoSansKR"),
           ),
           backgroundColor: Colors.red,
@@ -128,7 +129,7 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text("뒤로가기",
+                    child: Text(tr(context, "뒤로가기"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: "Jalnan",
@@ -174,7 +175,7 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
               ),
               SizedBox(height: 16),
               Text(
-                "공지사항을 찾을 수 없습니다.",
+                tr(context, "공지사항을 찾을 수 없습니다."),
                 style: TextStyle(
                   fontSize: 18,
                   fontFamily: "NotoSansKR",
@@ -217,7 +218,7 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
           OutlinedButton.icon(
             onPressed: () => _editNotice(),
             icon: Icon(Icons.edit, size: 16),
-            label: Text("수정"),
+            label: Text(tr(context, "수정")),
             style: OutlinedButton.styleFrom(
               foregroundColor: Palette.primary,
               side: BorderSide(color: Palette.primary),
@@ -227,7 +228,7 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
           OutlinedButton.icon(
             onPressed: () => _deleteNotice(),
             icon: Icon(Icons.delete, size: 16),
-            label: Text("삭제"),
+            label: Text(tr(context, "삭제")),
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.red,
               side: BorderSide(color: Colors.red),
@@ -252,7 +253,7 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
-              "중요",
+              tr(context, "중요"),
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 12,
@@ -366,18 +367,18 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          "공지사항 삭제",
+          tr(context, "공지사항 삭제"),
           style: TextStyle(fontFamily: "NotoSansKR"),
         ),
         content: Text(
-          "이 공지사항을 삭제하시겠습니까?\n삭제된 공지사항은 복구할 수 없습니다.",
+          tr(context, "이 공지사항을 삭제하시겠습니까?\n삭제된 공지사항은 복구할 수 없습니다."),
           style: TextStyle(fontFamily: "NotoSansKR"),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
-              "취소",
+              tr(context, "취소"),
               style: TextStyle(fontFamily: "NotoSansKR"),
             ),
           ),
@@ -385,7 +386,7 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: Text(
-              "삭제",
+              tr(context, "삭제"),
               style: TextStyle(fontFamily: "NotoSansKR"),
             ),
           ),
@@ -400,7 +401,7 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '공지사항이 삭제되었습니다.',
+              tr(context, "공지사항이 삭제되었습니다."),
               style: TextStyle(fontFamily: "NotoSansKR"),
             ),
             backgroundColor: Colors.green,
@@ -411,7 +412,7 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '공지사항 삭제에 실패했습니다.',
+              tr(context, "공지사항 삭제에 실패했습니다."),
               style: TextStyle(fontFamily: "NotoSansKR"),
             ),
             backgroundColor: Colors.red,

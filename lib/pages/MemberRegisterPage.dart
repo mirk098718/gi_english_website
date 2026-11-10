@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineClassroomPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -154,7 +155,7 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "회원가입",
+            tr(context, "회원가입"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
@@ -172,7 +173,7 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    "온라인 프로그램 회원 가입",
+                    tr(context, "온라인 프로그램 회원 가입"),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: "Jalnan",
@@ -182,9 +183,7 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    "가입 후 관리자 수강 배정이 완료되면 내 강의실에서 프로그램을 이용하실 수 있습니다. "
-                    "로그인은 이메일을 쓰고, 수업에서는 닉네임과 프로필 사진이 보입니다. "
-                    "휴대폰 번호는 화상수업 예약이 확정되면 알림 문자를 보내는 데 사용합니다.",
+                    tr(context, "가입 후 관리자 수강 배정이 완료되면 내 강의실에서 프로그램을 이용하실 수 있습니다. 로그인은 이메일을 쓰고, 수업에서는 닉네임과 프로필 사진이 보입니다. 휴대폰 번호는 화상수업 예약이 확정되면 알림 문자를 보내는 데 사용합니다."),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: "NotoSansKR",
@@ -224,7 +223,7 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
                                 },
                           icon: Icon(Icons.photo_camera_outlined, size: 18),
                           label: Text(
-                            _photo == null ? '프로필 사진 넣기' : '사진 다시 선택',
+                            _photo == null ? tr(context, "프로필 사진 넣기") : tr(context, "사진 다시 선택"),
                             style: TextStyle(fontFamily: "NotoSansKR"),
                           ),
                         ),
@@ -264,7 +263,7 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
                               ),
                             )
                           : Text(
-                              "가입하기",
+                              tr(context, "가입하기"),
                               style: TextStyle(
                                 fontFamily: "Jalnan",
                                 color: Palette.white,
@@ -279,7 +278,7 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
                       MenuUtil.push(context, MemberLoginPage());
                     },
                     child: Text(
-                      "이미 회원이신가요? 로그인",
+                      tr(context, "이미 회원이신가요? 로그인"),
                       style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 13,

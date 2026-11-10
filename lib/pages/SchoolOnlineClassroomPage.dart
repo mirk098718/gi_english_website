@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/QuizResult.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
@@ -81,7 +82,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('로그아웃되었습니다.', style: TextStyle(fontFamily: 'NotoSansKR')),
+        content: Text(tr(context, "로그아웃되었습니다."), style: TextStyle(fontFamily: 'NotoSansKR')),
         backgroundColor: Palette.success,
       ),
     );
@@ -130,7 +131,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('프로필을 저장했습니다.',
+        content: Text(tr(context, "프로필을 저장했습니다."),
             style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: Palette.success,
       ),
@@ -144,7 +145,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
       builder: (dialogContext) => AlertDialog(
         backgroundColor: Palette.white,
         surfaceTintColor: Palette.white,
-        title: Text('휴대폰 번호', style: TextStyle(fontFamily: "Jalnan")),
+        title: Text(tr(context, "휴대폰 번호"), style: TextStyle(fontFamily: "Jalnan")),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.phone,
@@ -158,11 +159,11 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text('닫기'),
+            child: Text(tr(context, "닫기")),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text('저장'),
+            child: Text(tr(context, "저장")),
           ),
         ],
       ),
@@ -187,7 +188,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
     setState(() => _memberPhone = PhoneUtil.normalize(phone));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('연락처를 저장했습니다.', style: TextStyle(fontFamily: "NotoSansKR")),
+        content: Text(tr(context, "연락처를 저장했습니다."), style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: Palette.success,
       ),
     );
@@ -252,7 +253,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
                           .toList();
                     });
                   },
-                  child: Text('확인',
+                  child: Text(tr(context, "확인"),
                       style: TextStyle(
                           fontFamily: "NotoSansKR",
                           color: Palette.secondaryDark)),
@@ -282,7 +283,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  displayName.isEmpty ? '수강생' : displayName,
+                  displayName.isEmpty ? tr(context, "수강생") : displayName,
                   style: TextStyle(fontFamily: "Jalnan", fontSize: 16),
                 ),
                 if (email.isNotEmpty) ...[
@@ -301,7 +302,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
           ),
           OutlinedButton(
             onPressed: _editProfile,
-            child: Text('프로필 수정',
+            child: Text(tr(context, "프로필 수정"),
                 style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
           ),
         ],
@@ -324,7 +325,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              '수업에서 불릴 닉네임과 프로필 사진을 등록해 주세요. 로그인은 이메일 그대로입니다.',
+              tr(context, "수업에서 불릴 닉네임과 프로필 사진을 등록해 주세요. 로그인은 이메일 그대로입니다."),
               style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 13,
@@ -333,7 +334,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
           ),
           TextButton(
             onPressed: _editProfile,
-            child: Text('등록',
+            child: Text(tr(context, "등록"),
                 style: TextStyle(
                     fontFamily: "NotoSansKR", color: Palette.secondaryDark)),
           ),
@@ -362,7 +363,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
             child: Text(
               hasPhone
                   ? '알림 문자 수신 번호 ${PhoneUtil.display(_memberPhone)}'
-                  : '화상수업이 확정되면 문자로 알려 드립니다. 휴대폰 번호를 등록해 주세요.',
+                  : tr(context, "화상수업이 확정되면 문자로 알려 드립니다. 휴대폰 번호를 등록해 주세요."),
               style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 13,
@@ -373,7 +374,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
             onPressed: _savingPhone
                 ? null
                 : () => _editPhone(initial: _memberPhone),
-            child: Text(hasPhone ? '변경' : '등록',
+            child: Text(hasPhone ? tr(context, "변경") : tr(context, "등록"),
                 style: TextStyle(
                     fontFamily: "NotoSansKR", color: Palette.secondaryDark)),
           ),
@@ -447,7 +448,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "내 강의실",
+            tr(context, "내 강의실"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
@@ -472,7 +473,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "로그인이 필요합니다",
+            tr(context, "로그인이 필요합니다"),
             style: TextStyle(
               fontFamily: "Jalnan",
               fontSize: 15,
@@ -481,8 +482,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
           ),
           SizedBox(height: 12),
           Text(
-            "내 강의실은 온라인 프로그램을 신청하신 회원만 이용할 수 있습니다.\n"
-            "로그인하시면 배정된 강의 목록과 수강 현황을 확인하실 수 있습니다.",
+            tr(context, "내 강의실은 온라인 프로그램을 신청하신 회원만 이용할 수 있습니다.\n로그인하시면 배정된 강의 목록과 수강 현황을 확인하실 수 있습니다."),
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 14,
@@ -506,7 +506,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
                 MenuUtil.push(context, MemberLoginPage());
               },
               child: Text(
-                "회원 로그인",
+                tr(context, "회원 로그인"),
                 style: TextStyle(
                   fontFamily: "Jalnan",
                   color: Palette.white,
@@ -545,7 +545,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
             Expanded(
               child: Text(
                 displayName.isEmpty
-                    ? "수강 중인 프로그램"
+                    ? tr(context, "수강 중인 프로그램")
                     : "$displayName 님의 수강 중인 프로그램",
                 style: TextStyle(
                   fontFamily: "Jalnan",
@@ -558,7 +558,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
               onPressed: _logout,
               icon: Icon(Icons.logout, size: 16, color: Palette.grey600),
               label: Text(
-                '로그아웃',
+                tr(context, "로그아웃"),
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontSize: 13,
@@ -592,7 +592,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
                     MenuUtil.push(context, OnlineCheckoutPage());
                   },
                   icon: Icon(Icons.add_shopping_cart, size: 16),
-                  label: Text('다른 프로그램 결제하기',
+                  label: Text(tr(context, "다른 프로그램 결제하기"),
                       style: TextStyle(fontFamily: "NotoSansKR")),
                 ),
               ),
@@ -616,7 +616,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
           Icon(Icons.play_circle_outline, size: 40, color: Palette.grey400),
           SizedBox(height: 12),
           Text(
-            "결제하신 프로그램이 없습니다.",
+            tr(context, "결제하신 프로그램이 없습니다."),
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 14,
@@ -625,7 +625,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
           ),
           SizedBox(height: 6),
           Text(
-            "과정을 선택하고 결제하시면 이곳에 프로그램이 표시됩니다.",
+            tr(context, "과정을 선택하고 결제하시면 이곳에 프로그램이 표시됩니다."),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: "NotoSansKR",
@@ -642,7 +642,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
             onPressed: () {
               MenuUtil.push(context, OnlineCheckoutPage());
             },
-            child: Text("프로그램 결제하기", style: TextStyle(fontFamily: "Jalnan")),
+            child: Text(tr(context, "프로그램 결제하기"), style: TextStyle(fontFamily: "Jalnan")),
           ),
         ],
       ),

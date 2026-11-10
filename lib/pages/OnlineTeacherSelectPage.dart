@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
@@ -156,15 +157,12 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('원어민 강사 선택',
+          Text(tr(context, "원어민 강사 선택"),
               style: TextStyle(fontFamily: 'Jalnan', fontSize: 20)),
           WidgetUtil.myDivider(),
           SizedBox(height: 12),
           Text(
-            '선택한 과정을 담당할 메인 원어민 강사입니다.\n'
-            '이후 화상수업은 이 선생님을 중심으로 진행되며, '
-            '해당 선생님이 열어 둔 시간에만 예약할 수 있습니다.\n'
-            '스케줄이 맞지 않을 때만 다른 선생님으로 변경할 수 있습니다.',
+            tr(context, "선택한 과정을 담당할 메인 원어민 강사입니다.\n이후 화상수업은 이 선생님을 중심으로 진행되며, 해당 선생님이 열어 둔 시간에만 예약할 수 있습니다.\n스케줄이 맞지 않을 때만 다른 선생님으로 변경할 수 있습니다."),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: 13,
@@ -184,7 +182,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('선택한 과정',
+                Text(tr(context, "선택한 과정"),
                     style: TextStyle(
                         fontFamily: 'NotoSansKR',
                         fontSize: 12,
@@ -206,7 +204,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
             ),
           ),
           SizedBox(height: 24),
-          Text('강사 선택', style: TextStyle(fontFamily: 'Jalnan', fontSize: 15)),
+          Text(tr(context, "강사 선택"), style: TextStyle(fontFamily: 'Jalnan', fontSize: 15)),
           SizedBox(height: 12),
           if (_loading)
             Padding(
@@ -217,7 +215,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
             Padding(
               padding: EdgeInsets.only(bottom: 16),
               child: Text(
-                '현재 선택할 수 있는 원어민 강사가 없습니다. 학원으로 문의해 주세요.',
+                tr(context, "현재 선택할 수 있는 원어민 강사가 없습니다. 학원으로 문의해 주세요."),
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontSize: 13,
@@ -279,7 +277,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
               onPressed: (_paying || _selected == null) ? null : _startPayment,
               icon: Icon(Icons.payment, color: Palette.white),
               label: Text(
-                _paying ? '결제창 여는 중...' : '선택 완료 · 결제하기',
+                _paying ? tr(context, "결제창 여는 중...") : tr(context, "선택 완료 · 결제하기"),
                 style: TextStyle(fontFamily: 'Jalnan', fontSize: 15),
               ),
             ),
@@ -372,7 +370,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
                   SizedBox(height: 12),
                   Text(
                     teacher.intro.trim().isEmpty
-                        ? '소개가 곧 업데이트됩니다.'
+                        ? tr(context, "소개가 곧 업데이트됩니다.")
                         : teacher.intro,
                     style: TextStyle(
                       fontFamily: 'NotoSansKR',

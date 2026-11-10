@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -46,7 +47,7 @@ class TeacherRosterPage extends StatelessWidget {
       return themed(Scaffold(
         backgroundColor: Palette.white,
         appBar: AppBar(
-          title: Text('강사 프로필 · 담당 회원',
+          title: Text(tr(context, "강사 프로필 · 담당 회원"),
               style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Palette.navy,
           foregroundColor: Palette.white,
@@ -308,18 +309,18 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text('수업 종료', style: TextStyle(fontFamily: "Jalnan")),
+        title: Text(tr(context, "수업 종료"), style: TextStyle(fontFamily: "Jalnan")),
         content: Text(
-          '이 회차 화상수업을 종료할까요?\n종료 후 피드백을 작성해야 수강생 평가가 시작되고, 평가가 끝나야 정산에 포함됩니다.',
+          tr(context, "이 회차 화상수업을 종료할까요?\n종료 후 피드백을 작성해야 수강생 평가가 시작되고, 평가가 끝나야 정산에 포함됩니다."),
           style: TextStyle(fontFamily: "NotoSansKR", height: 1.5),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: Text('취소')),
+              child: Text(tr(context, "취소"))),
           ElevatedButton(
               onPressed: () => Navigator.pop(dialogContext, true),
-              child: Text('수업 종료')),
+              child: Text(tr(context, "수업 종료"))),
         ],
       ),
     );
@@ -348,7 +349,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     }
     if (_teacherUid.isEmpty) {
       return Center(
-        child: Text('강사 정보를 찾을 수 없습니다.',
+        child: Text(tr(context, "강사 정보를 찾을 수 없습니다."),
             style: TextStyle(fontFamily: "NotoSansKR")),
       );
     }
@@ -359,32 +360,31 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
         children: [
           _profileCard(),
           SizedBox(height: 24),
-          Text('내 수강생', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+          Text(tr(context, "내 수강생"), style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           SizedBox(height: 8),
           Text(
-            '담당 회원의 화상수업 입장·종료와 회차별 피드백을 여기서 진행합니다. '
-            '수업 종료 직후 피드백 창이 열리고, 저장하면 수강생에게 별점 평가가 요청됩니다.',
+            tr(context, "담당 회원의 화상수업 입장·종료와 회차별 피드백을 여기서 진행합니다. 수업 종료 직후 피드백 창이 열리고, 저장하면 수강생에게 별점 평가가 요청됩니다."),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
           SizedBox(height: 16),
           if (_members.isEmpty)
-            Text('아직 배정된 회원이 없습니다.',
+            Text(tr(context, "아직 배정된 회원이 없습니다."),
                 style: TextStyle(
                     fontFamily: "NotoSansKR", color: Palette.grey500))
           else
             ..._members.map(_memberCard),
           SizedBox(height: 28),
-          Text('타 수강생', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+          Text(tr(context, "타 수강생"), style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           SizedBox(height: 8),
           Text(
-            '다른 강사 담당이지만 내 스케줄로 예약한 수강생입니다. 컨펌하면 수업 횟수에 포함됩니다.',
+            tr(context, "다른 강사 담당이지만 내 스케줄로 예약한 수강생입니다. 컨펌하면 수업 횟수에 포함됩니다."),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
           SizedBox(height: 16),
           if (_guestMembers.isEmpty)
-            Text('아직 타 수강생 수업이 없습니다.',
+            Text(tr(context, "아직 타 수강생 수업이 없습니다."),
                 style: TextStyle(
                     fontFamily: "NotoSansKR", color: Palette.grey500))
           else
@@ -493,7 +493,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
           ),
           SizedBox(height: 12),
           Text(
-            intro.trim().isEmpty ? '소개가 아직 없습니다.' : intro,
+            intro.trim().isEmpty ? tr(context, "소개가 아직 없습니다.") : intro,
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 14,
@@ -517,18 +517,18 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
               child: OutlinedButton.icon(
                 onPressed: _busy ? null : _editDisplayProfile,
                 icon: Icon(Icons.edit_outlined, size: 18),
-                label: Text('닉네임·사진 수정',
+                label: Text(tr(context, "닉네임·사진 수정"),
                     style: TextStyle(fontFamily: "NotoSansKR")),
               ),
             ),
           ],
           if (isOwnerTeacher && _canWrite) ...[
             SizedBox(height: 16),
-            Text('수업 받기',
+            Text(tr(context, "수업 받기"),
                 style: TextStyle(fontFamily: "Jalnan", fontSize: 14)),
             SizedBox(height: 6),
             Text(
-              '결제 때 고르는 강사와, 다른 강사 수강생의 코티칭을 따로 켤 수 있습니다.',
+              tr(context, "결제 때 고르는 강사와, 다른 강사 수강생의 코티칭을 따로 켤 수 있습니다."),
               style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -705,7 +705,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    '타',
+                    tr(context, "타"),
                     style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 11,
@@ -750,7 +750,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                   await _load();
                 },
                 icon: Icon(Icons.person_outline, size: 18),
-                label: Text('회원 상세 · 결제',
+                label: Text(tr(context, "회원 상세 · 결제"),
                     style: TextStyle(fontFamily: "NotoSansKR")),
               ),
             ),
@@ -767,7 +767,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '아직 화상수업 이력이 없습니다.',
+                  tr(context, "아직 화상수업 이력이 없습니다."),
                   style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 13,
@@ -841,7 +841,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  written ? '피드백 작성됨' : '피드백 미작성',
+                  written ? tr(context, "피드백 작성됨") : tr(context, "피드백 미작성"),
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 11,
@@ -859,14 +859,14 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                   ),
                   onPressed: _busy ? null : () => _enterAsHost(booking),
                   icon: Icon(Icons.videocam, size: 16),
-                  label: Text('호스트로 입장',
+                  label: Text(tr(context, "호스트로 입장"),
                       style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
                 ),
               if (canEnd && !ended)
                 OutlinedButton.icon(
                   onPressed: _busy ? null : () => _endClass(booking),
                   icon: Icon(Icons.stop_circle, size: 16),
-                  label: Text('수업 종료',
+                  label: Text(tr(context, "수업 종료"),
                       style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
                 ),
               TextButton(

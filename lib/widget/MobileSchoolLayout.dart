@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -85,7 +86,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content:
-              Text('로그아웃되었습니다.', style: TextStyle(fontFamily: "NotoSansKR")),
+              Text(tr(context, "로그아웃되었습니다."), style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Palette.success,
         ),
       );
@@ -93,7 +94,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('로그아웃 중 오류가 발생했습니다.',
+          content: Text(tr(context, "로그아웃 중 오류가 발생했습니다."),
               style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Palette.danger,
         ),
@@ -185,6 +186,8 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
               ),
             ),
           ),
+          const LanguageToggle(compact: true),
+          SizedBox(width: 4),
           NotificationBellButton(),
           HeaderSocialLinks(compact: true),
           SizedBox(width: 4),
@@ -192,7 +195,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
             TextButton(
               onPressed: _logout,
               child: Text(
-                '로그아웃',
+                tr(context, "로그아웃"),
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -203,7 +206,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
             TextButton(
               onPressed: () => SiteNav.goAdminHub(context),
               child: Text(
-                _adminRole == AdminRole.teacher ? '수업 관리' : '관리자',
+                _adminRole == AdminRole.teacher ? tr(context, "수업 관리") : tr(context, "관리자"),
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -217,7 +220,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
               TextButton(
                 onPressed: _logout,
                 child: Text(
-                  '로그아웃',
+                  tr(context, "로그아웃"),
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 12,
@@ -229,7 +232,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
               TextButton(
                 onPressed: () => SiteNav.goLogin(context),
                 child: Text(
-                  '수강생 로그인',
+                  tr(context, "수강생 로그인"),
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 12,
@@ -248,7 +251,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                 await _checkAdminStatus();
               },
               child: Text(
-                '운영자 로그인',
+                tr(context, "운영자 로그인"),
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -357,7 +360,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                label,
+                tr(context, label),
                 style: TextStyle(
                   color: tone,
                   fontFamily: "NotoSansKR",

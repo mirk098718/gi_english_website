@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/GleamMark.dart';
@@ -111,7 +112,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content:
-              Text('로그아웃되었습니다.', style: TextStyle(fontFamily: "NotoSansKR")),
+              Text(tr(context, "로그아웃되었습니다."), style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Palette.success,
         ),
       );
@@ -119,7 +120,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('로그아웃 중 오류가 발생했습니다.',
+          content: Text(tr(context, "로그아웃 중 오류가 발생했습니다."),
               style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Palette.danger,
         ),
@@ -264,6 +265,8 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                const LanguageToggle(),
+                SizedBox(width: 12),
                 NotificationBellButton(),
                 HeaderSocialLinks(),
                 SizedBox(width: 12),
@@ -337,7 +340,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                label,
+                tr(context, label),
                 style: TextStyle(
                   color: selected ? active : idle,
                   fontFamily: "NotoSansKR",
@@ -386,7 +389,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
       return [
         TextButton(
           onPressed: _logout,
-          child: Text('로그아웃', style: muted),
+          child: Text(tr(context, "로그아웃"), style: muted),
         ),
         TextButton(
           onPressed: () {
@@ -394,7 +397,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             SiteNav.goAdminHub(context);
           },
           child: Text(
-            _adminRole == AdminRole.teacher ? '수업 관리' : '관리자',
+            _adminRole == AdminRole.teacher ? tr(context, "수업 관리") : tr(context, "관리자"),
             style: operatorStyle,
           ),
         ),
@@ -405,7 +408,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
       if (_isMemberLoggedIn)
         TextButton(
           onPressed: _logout,
-          child: Text('로그아웃', style: muted),
+          child: Text(tr(context, "로그아웃"), style: muted),
         )
       else
         TextButton(
@@ -413,7 +416,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             _closeMenu();
             SiteNav.goLogin(context);
           },
-          child: Text('수강생 로그인', style: student),
+          child: Text(tr(context, "수강생 로그인"), style: student),
         ),
       Padding(
         padding: EdgeInsets.symmetric(horizontal: 2),
@@ -425,7 +428,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
           await SiteNav.goAdminLogin(context);
           await _checkAdminStatus();
         },
-        child: Text('운영자 로그인', style: operatorStyle),
+        child: Text(tr(context, "운영자 로그인"), style: operatorStyle),
       ),
     ];
   }
@@ -516,7 +519,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            group.title,
+            tr(context, group.title),
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 12,
@@ -535,7 +538,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 6),
                 child: Text(
-                  item.label,
+                  tr(context, item.label),
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 14,
@@ -568,7 +571,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              label,
+              tr(context, label),
               style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontWeight: FontWeight.w600,
@@ -579,7 +582,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             if (subtitle != null) ...[
               SizedBox(height: 4),
               Text(
-                subtitle,
+                tr(context, subtitle),
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,

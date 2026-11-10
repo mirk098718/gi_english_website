@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/NotificationService.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -104,7 +105,7 @@ class _NotificationBellButtonState extends State<NotificationBellButton>
                           padding: const EdgeInsets.fromLTRB(16, 14, 8, 8),
                           child: Row(
                             children: [
-                              Text('알림',
+                              Text(tr(context, "알림"),
                                   style: TextStyle(
                                       fontFamily: "Jalnan", fontSize: 16)),
                               const Spacer(),
@@ -123,7 +124,7 @@ class _NotificationBellButtonState extends State<NotificationBellButton>
                                   padding: const EdgeInsets.fromLTRB(
                                       16, 8, 16, 24),
                                   child: Text(
-                                    '새 알림이 없습니다.',
+                                    tr(context, "새 알림이 없습니다."),
                                     style: TextStyle(
                                       fontFamily: "NotoSansKR",
                                       fontSize: 13,
@@ -198,7 +199,7 @@ class _NotificationBellButtonState extends State<NotificationBellButton>
           ),
           TextButton(
             onPressed: () => SiteAlertCenter.instance.dismiss(item),
-            child: Text('확인',
+            child: Text(tr(context, "확인"),
                 style: TextStyle(
                     fontFamily: "NotoSansKR", color: Palette.secondaryDark)),
           ),

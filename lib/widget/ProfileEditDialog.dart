@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/ProfilePhotoPicker.dart';
@@ -166,8 +167,8 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                     icon: Icon(Icons.photo_camera_outlined, size: 18),
                     label: Text(
                       widget.photoUrl.isEmpty && _newPhoto == null
-                          ? '사진 넣기'
-                          : '사진 변경',
+                          ? tr(context, "사진 넣기")
+                          : tr(context, "사진 변경"),
                       style: TextStyle(fontFamily: "NotoSansKR"),
                     ),
                   ),
@@ -192,7 +193,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
       actions: [
         TextButton(
           onPressed: _saving ? null : () => Navigator.pop(context, false),
-          child: Text('닫기'),
+          child: Text(tr(context, "닫기")),
         ),
         ElevatedButton(
           onPressed: _saving ? null : _save,
@@ -202,7 +203,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text('저장'),
+              : Text(tr(context, "저장")),
         ),
       ],
     );

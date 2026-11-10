@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
@@ -346,7 +347,7 @@ class _LessonFeedbackDialogState extends State<LessonFeedbackDialog> {
     return AlertDialog(
       backgroundColor: Palette.white,
       surfaceTintColor: Palette.white,
-      title: Text('회차별 피드백', style: TextStyle(fontFamily: "Jalnan")),
+      title: Text(tr(context, "회차별 피드백"), style: TextStyle(fontFamily: "Jalnan")),
       content: SizedBox(
         width: 460,
         child: SingleChildScrollView(
@@ -395,7 +396,7 @@ class _LessonFeedbackDialogState extends State<LessonFeedbackDialog> {
                   ),
                   child: Text(
                     (widget.existing?.content ?? '').trim().isEmpty
-                        ? '아직 작성된 피드백이 없습니다.'
+                        ? tr(context, "아직 작성된 피드백이 없습니다.")
                         : widget.existing!.content,
                     style: TextStyle(
                         fontFamily: "NotoSansKR", fontSize: 14, height: 1.55),
@@ -408,7 +409,7 @@ class _LessonFeedbackDialogState extends State<LessonFeedbackDialog> {
       actions: [
         TextButton(
           onPressed: _saving ? null : () => Navigator.pop(context, false),
-          child: Text('닫기'),
+          child: Text(tr(context, "닫기")),
         ),
         if (widget.canWrite)
           ElevatedButton(
@@ -419,7 +420,7 @@ class _LessonFeedbackDialogState extends State<LessonFeedbackDialog> {
                     height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : Text('저장'),
+                : Text(tr(context, "저장")),
           ),
       ],
     );

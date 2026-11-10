@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/DailyWord.dart';
 import 'package:gi_english_website/util/DailyWordLookup.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -107,7 +108,7 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
                     SizedBox(height: compact ? 14 : 16),
                     word == null
                         ? Text(
-                            '오늘의 단어를 준비하고 있습니다.',
+                            tr(context, "오늘의 단어를 준비하고 있습니다."),
                             style: TextStyle(
                               fontFamily: 'NotoSansKR',
                               fontSize: 16,
@@ -165,7 +166,9 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '${today.month}월 ${today.day}일 · 오늘의 단어',
+          AppLanguage.instance.isEnglish
+              ? '${_enMonth(today.month)} ${today.day} · ${tr(context, '오늘의 단어')}'
+              : '${today.month}월 ${today.day}일 · ${tr(context, '오늘의 단어')}',
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: sidebar ? 11 : (compact ? 13 : 14),
@@ -251,7 +254,7 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
               SizedBox(width: 8),
               Flexible(
                 child: Text(
-                '오늘의 표현',
+                tr(context, "오늘의 표현"),
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontSize: sidebar ? 12 : (compact ? 13 : 14),
@@ -290,7 +293,7 @@ class _HomeDailyWordBlockState extends State<HomeDailyWordBlock> {
             InkWell(
               onTap: () => UrlUtil.open(word.sourceUrl),
               child: Text(
-                '출처: 영어 위키낱말사전',
+                tr(context, "출처: 영어 위키낱말사전"),
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontSize: 12,
@@ -355,3 +358,21 @@ class _WordLook {
         quote = Palette.talkCoralDark,
         expression = Palette.talkInk;
 }
+
+const _enMonths = [
+  '',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
+String _enMonth(int month) => _enMonths[month];

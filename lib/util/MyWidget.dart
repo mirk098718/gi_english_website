@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/GleamMark.dart';
 import 'package:gi_english_website/widget/HomeDailyWordBlock.dart';
 
 class MyWidget {
   static Widget footer() {
+    return Builder(builder: (context) {
     return Container(
         width: double.infinity,
         color: Palette.grey900,
@@ -22,7 +24,7 @@ class MyWidget {
             GleamMark(height: 36, lightPlate: true),
             SizedBox(height: 16),
             Text(
-              "글림교육",
+              tr(context, "글림교육"),
               style: TextStyle(
                   color: Palette.white,
                   fontFamily: "NotoSansKR",
@@ -42,10 +44,7 @@ class MyWidget {
               height: 12,
             ),
             Text(
-              "경기도 파주시 해올2길 2 태산 W 타워 7층 701~703호 (다율동 1044)\n"
-              "문의 : 031 942 0908\n"
-              "email : gienglish.paju@gmail.com\n"
-              "사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희",
+              tr(context, "경기도 파주시 해올2길 2 태산 W 타워 7층 701~703호 (다율동 1044)\n문의 : 031 942 0908\nemail : gienglish.paju@gmail.com\n사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희"),
               style: TextStyle(
                   color: Palette.grey400,
                   fontFamily: "NotoSansKR",
@@ -55,7 +54,7 @@ class MyWidget {
             ),
             SizedBox(height: 24),
             Text(
-              "Copyright ⓒ 글림교육",
+              tr(context, "Copyright ⓒ 글림교육"),
               style: TextStyle(
                 color: Palette.grey500,
                 fontFamily: "NotoSansKR",
@@ -64,9 +63,11 @@ class MyWidget {
             ),
           ],
         ));
+    });
   }
 
   static Widget cafeFooter() {
+    return Builder(builder: (context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -81,7 +82,7 @@ class MyWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "글림교육",
+            tr(context, "글림교육"),
             style: TextStyle(
                 color: Palette.white,
                 fontFamily: "NotoSansKR",
@@ -99,11 +100,7 @@ class MyWidget {
           ),
           SizedBox(height: 12),
           Text(
-            "경기도 파주시 교하로 100번길 00, 태산W타워 7층\n"
-            "문의 : 031) 949-3805  /  email : @gmail.com\n"
-            "사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희\n"
-            "사업자 등록번호 : 346 - 86 - 00782 제1461호\n"
-            "신고번호 : J1518020200003",
+            tr(context, "경기도 파주시 교하로 100번길 00, 태산W타워 7층\n문의 : 031) 949-3805  /  email : @gmail.com\n사업자명 : 글림아일랜드 어학원 / 대표자명 : 김남희\n사업자 등록번호 : 346 - 86 - 00782 제1461호\n신고번호 : J1518020200003"),
             style: TextStyle(
                 color: Palette.white.withValues(alpha:0.9),
                 fontFamily: "NotoSansKR",
@@ -125,7 +122,7 @@ class MyWidget {
           ),
           SizedBox(height: 8),
           Text(
-            "Copyright ⓒ 글림교육",
+            tr(context, "Copyright ⓒ 글림교육"),
             style: TextStyle(
                 color: Palette.white.withValues(alpha:0.7),
                 fontFamily: "NotoSansKR",
@@ -134,15 +131,17 @@ class MyWidget {
         ],
       ),
     );
+    });
   }
 
   static Widget mobileSchoolFooter() {
+    return Builder(builder: (context) {
     return Container(
       width: double.infinity,
       color: Palette.grey900,
       padding: EdgeInsets.symmetric(horizontal: 24, vertical: 18),
       child: Text(
-        "ⓒ 글림교육",
+        tr(context, "ⓒ 글림교육"),
         textAlign: TextAlign.center,
         style: TextStyle(
           color: Palette.grey400,
@@ -152,9 +151,11 @@ class MyWidget {
         ),
       ),
     );
+    });
   }
 
   static Widget mobileCafeFooter() {
+    return Builder(builder: (context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -164,7 +165,7 @@ class MyWidget {
       ),
       padding: EdgeInsets.all(16),
       child: Text(
-        "ⓒ 글림교육",
+        tr(context, "ⓒ 글림교육"),
         textAlign: TextAlign.center,
         style: TextStyle(
           color: Palette.white,
@@ -174,6 +175,7 @@ class MyWidget {
         ),
       ),
     );
+    });
   }
 
   static Widget roundEdgeTextFieldVisitorVer(

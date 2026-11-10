@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
@@ -90,7 +91,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
       child: Scaffold(
         backgroundColor: Palette.white,
         appBar: AppBar(
-          title: Text(name.isEmpty ? '수강생 정보' : name,
+          title: Text(name.isEmpty ? tr(context, "수강생 정보") : name,
               style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Palette.navy,
           foregroundColor: Palette.white,
@@ -112,7 +113,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                     _sectionTitle('수강 배정'),
                     const SizedBox(height: 8),
                     Text(
-                      '배정된 과정, 남은 회차, 결제 여부를 한곳에서 보고 수정할 수 있습니다.',
+                      tr(context, "배정된 과정, 남은 회차, 결제 여부를 한곳에서 보고 수정할 수 있습니다."),
                       style: TextStyle(
                           fontFamily: "NotoSansKR",
                           fontSize: 13,
@@ -124,7 +125,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                       child: ElevatedButton.icon(
                         onPressed: _showAssignDialog,
                         icon: const Icon(Icons.add, size: 18),
-                        label: Text('수업 배정',
+                        label: Text(tr(context, "수업 배정"),
                             style: TextStyle(fontFamily: "NotoSansKR")),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Palette.darkTeal,
@@ -134,7 +135,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                     ),
                     const SizedBox(height: 12),
                     if (_enrollments.isEmpty)
-                      Text('배정된 수업이 없습니다.',
+                      Text(tr(context, "배정된 수업이 없습니다."),
                           style: TextStyle(
                               fontFamily: "NotoSansKR", color: Palette.grey500))
                     else
@@ -143,7 +144,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                     _sectionTitle('결제 내역'),
                     const SizedBox(height: 8),
                     Text(
-                      '토스페이먼츠로 결제한 주문과, 수강 카드에 직접 기록한 결제 정보를 함께 보여 줍니다.',
+                      tr(context, "토스페이먼츠로 결제한 주문과, 수강 카드에 직접 기록한 결제 정보를 함께 보여 줍니다."),
                       style: TextStyle(
                           fontFamily: "NotoSansKR",
                           fontSize: 13,
@@ -153,7 +154,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                     _paymentSummary(),
                     const SizedBox(height: 12),
                     if (_payments.isEmpty)
-                      Text('토스 결제 주문이 없습니다.',
+                      Text(tr(context, "토스 결제 주문이 없습니다."),
                           style: TextStyle(
                               fontFamily: "NotoSansKR", color: Palette.grey500))
                     else
@@ -284,7 +285,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                         fontFamily: "NotoSansKR", fontWeight: FontWeight.bold)),
               ),
               if (!record.isActive)
-                Text('배정 취소됨',
+                Text(tr(context, "배정 취소됨"),
                     style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 12,
@@ -295,7 +296,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
           Text(
             sessionsConfigured
                 ? '진행 ${record.completedSessions}회 / 전체 ${record.totalSessions}회 · 남은 ${record.remainingSessions}회'
-                : '수업 횟수 미설정',
+                : tr(context, "수업 횟수 미설정"),
             style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 13,
@@ -324,7 +325,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
             record.isPaid
                 ? '결제 완료${record.paidAmount > 0 ? ' · ${_formatWon(record.paidAmount)}' : ''}'
                     '${record.paymentNote.isNotEmpty ? ' · ${record.paymentNote}' : ''}'
-                : '미결제',
+                : tr(context, "미결제"),
             style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 12,
@@ -353,17 +354,17 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
               OutlinedButton.icon(
                 onPressed: () => _showPaymentDialog(record),
                 icon: const Icon(Icons.payments_outlined, size: 16),
-                label: Text('결제 정보',
+                label: Text(tr(context, "결제 정보"),
                     style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
               ),
               OutlinedButton(
                 onPressed: () => _showEditDialog(record),
-                child: Text('배정 변경',
+                child: Text(tr(context, "배정 변경"),
                     style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
               ),
               TextButton(
                 onPressed: () => _cancelEnrollment(record),
-                child: Text(record.isActive ? '배정 취소' : '배정 복구',
+                child: Text(record.isActive ? tr(context, "배정 취소") : tr(context, "배정 복구"),
                     style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 12,
@@ -428,7 +429,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: Text('수업 배정', style: TextStyle(fontFamily: "Jalnan")),
+          title: Text(tr(context, "수업 배정"), style: TextStyle(fontFamily: "Jalnan")),
           content: SizedBox(
             width: 420,
             child: Column(
@@ -467,7 +468,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
-                child: Text('닫기')),
+                child: Text(tr(context, "닫기"))),
             ElevatedButton(
               onPressed: () async {
                 final total = int.tryParse(sessionsController.text.trim()) ?? 0;
@@ -485,7 +486,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                   Navigator.pop(dialogContext, true);
                 }
               },
-              child: Text('배정하기'),
+              child: Text(tr(context, "배정하기")),
             ),
           ],
         ),
@@ -506,7 +507,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: Text('배정 변경', style: TextStyle(fontFamily: "Jalnan")),
+          title: Text(tr(context, "배정 변경"), style: TextStyle(fontFamily: "Jalnan")),
           content: SizedBox(
             width: 420,
             child: Column(
@@ -548,7 +549,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
-                child: Text('닫기')),
+                child: Text(tr(context, "닫기"))),
             ElevatedButton(
               onPressed: () async {
                 final total = int.tryParse(sessionsController.text.trim()) ?? 0;
@@ -568,7 +569,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                   Navigator.pop(dialogContext, true);
                 }
               },
-              child: Text('변경 저장'),
+              child: Text(tr(context, "변경 저장")),
             ),
           ],
         ),
@@ -590,7 +591,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: Text('결제 정보', style: TextStyle(fontFamily: "Jalnan")),
+          title: Text(tr(context, "결제 정보"), style: TextStyle(fontFamily: "Jalnan")),
           content: SizedBox(
             width: 420,
             child: Column(
@@ -599,7 +600,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title:
-                      Text('결제 완료', style: TextStyle(fontFamily: "NotoSansKR")),
+                      Text(tr(context, "결제 완료"), style: TextStyle(fontFamily: "NotoSansKR")),
                   value: isPaid,
                   onChanged: (value) => setDialogState(() => isPaid = value),
                 ),
@@ -628,7 +629,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
-                child: Text('닫기')),
+                child: Text(tr(context, "닫기"))),
             ElevatedButton(
               onPressed: () async {
                 final amount = int.tryParse(amountController.text.trim()) ?? 0;
@@ -647,7 +648,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                   Navigator.pop(dialogContext, true);
                 }
               },
-              child: Text('저장'),
+              child: Text(tr(context, "저장")),
             ),
           ],
         ),
@@ -666,15 +667,15 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: Text('배정 취소'),
-          content: Text('이 수업을 회원의 내 강의실에서 숨길까요? 진행 횟수 기록은 보존됩니다.'),
+          title: Text(tr(context, "배정 취소")),
+          content: Text(tr(context, "이 수업을 회원의 내 강의실에서 숨길까요? 진행 횟수 기록은 보존됩니다.")),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
-                child: Text('아니요')),
+                child: Text(tr(context, "아니요"))),
             TextButton(
                 onPressed: () => Navigator.pop(dialogContext, true),
-                child: Text('배정 취소', style: TextStyle(color: Palette.danger))),
+                child: Text(tr(context, "배정 취소"), style: TextStyle(color: Palette.danger))),
           ],
         ),
       );

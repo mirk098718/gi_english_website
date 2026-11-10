@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/QuizResult.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
@@ -82,7 +83,7 @@ class _StudentLearningProgressPanelState
     final records = widget.enrollments.where((item) => item.isActive).toList();
     if (records.isEmpty) {
       return Text(
-        '수강 배정 정보가 없습니다.',
+        tr(context, "수강 배정 정보가 없습니다."),
         style: TextStyle(
           fontFamily: "NotoSansKR",
           fontSize: widget.dense ? 12 : 13,
@@ -116,7 +117,7 @@ class _StudentLearningProgressPanelState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          widget.dense ? '학습 진도 · $title' : '학습 진도',
+          widget.dense ? '학습 진도 · $title' : tr(context, "학습 진도"),
           style: TextStyle(
             fontFamily: "Jalnan",
             fontSize: widget.dense ? 12 : 13,
@@ -138,7 +139,7 @@ class _StudentLearningProgressPanelState
         if (weeks.isEmpty)
           Text(
             widget.onlyWeekNumber == null
-                ? '아직 체크한 학습이 없습니다.'
+                ? tr(context, "아직 체크한 학습이 없습니다.")
                 : '${widget.onlyWeekNumber}회차 학습 체크가 없습니다.',
             style: TextStyle(
               fontFamily: "NotoSansKR",
@@ -177,7 +178,7 @@ class _StudentLearningProgressPanelState
             [
               if (week.weekNumber > 0) '${week.weekNumber}회차',
               if (week.weekTitle.isNotEmpty) week.weekTitle,
-              if (week.readyToBook) '예약 가능',
+              if (week.readyToBook) tr(context, "예약 가능"),
             ].join(' · '),
             style: TextStyle(
               fontFamily: "NotoSansKR",
@@ -223,7 +224,7 @@ class _StudentLearningProgressPanelState
       return Padding(
         padding: EdgeInsets.only(top: 6),
         child: Text(
-          '저장된 퀴즈 결과가 없습니다.',
+          tr(context, "저장된 퀴즈 결과가 없습니다."),
           style: TextStyle(
             fontFamily: "NotoSansKR",
             fontSize: 12,
@@ -281,7 +282,7 @@ class _StudentLearningProgressPanelState
                     onTap: () =>
                         asPlayer ? UrlUtil.openPlayer(url) : UrlUtil.open(url),
                     child: Text(
-                      '열기',
+                      tr(context, "열기"),
                       style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 12,

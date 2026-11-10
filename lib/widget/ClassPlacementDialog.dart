@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/ClassPlacementQuiz.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
 enum _PlacementStep { part1, part2, result }
@@ -189,9 +190,9 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
       padding: const EdgeInsets.fromLTRB(20, 12, 8, 0),
       child: Row(
         children: [
-          const Expanded(
+          Expanded(
             child: Text(
-              '클래스 배정 테스트',
+              tr(context, "클래스 배정 테스트"),
               style: TextStyle(
                 fontFamily: 'NotoSansKR',
                 fontWeight: FontWeight.w700,
@@ -257,13 +258,13 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (_part1Index == 0) ...[
-          Text(ClassPlacementQuiz.part1Intro, style: _bodyStyle),
+          Text(tr(context, ClassPlacementQuiz.part1Intro), style: _bodyStyle),
           const SizedBox(height: 12),
-          _infoBox(ClassPlacementQuiz.skipNotice),
+          _infoBox(tr(context, ClassPlacementQuiz.skipNotice)),
           const SizedBox(height: 20),
         ],
         Text(
-          '수강 목적 및 배경',
+          tr(context, "수강 목적 및 배경"),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: 12,
@@ -273,7 +274,7 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Q${_part1Index + 1}. ${question.prompt}',
+          'Q${_part1Index + 1}. ${tr(context, question.prompt)}',
           style: const TextStyle(
             fontFamily: 'NotoSansKR',
             fontWeight: FontWeight.w700,
@@ -295,7 +296,7 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
       children: [
         if (_part2Index == 0) ...[
           Text(
-            '객관적 실력 진단입니다. 문항마다 정답이 하나이며, 정답 수에 따라 클래스가 배정됩니다.',
+            tr(context, "객관적 실력 진단입니다. 문항마다 정답이 하나이며, 정답 수에 따라 클래스가 배정됩니다."),
             style: _bodyStyle,
           ),
           const SizedBox(height: 16),
@@ -307,7 +308,7 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
             borderRadius: BorderRadius.circular(99),
           ),
           child: Text(
-            question.category,
+            tr(context, question.category),
             style: const TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: 12,
@@ -318,7 +319,7 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
         ),
         const SizedBox(height: 10),
         Text(
-          question.prompt,
+          tr(context, question.prompt),
           style: const TextStyle(
             fontFamily: 'NotoSansKR',
             fontWeight: FontWeight.w700,
@@ -370,7 +371,7 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    choice.text,
+                    tr(context, choice.text),
                     style: TextStyle(
                       fontFamily: 'NotoSansKR',
                       fontSize: 14,
@@ -397,7 +398,7 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
         border: Border.all(color: Palette.grey200),
       ),
       child: Text(
-        text,
+        tr(context, text),
         style: const TextStyle(
           fontFamily: 'NotoSansKR',
           fontSize: 13,
@@ -416,8 +417,8 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          '배정 결과',
+        Text(
+          tr(context, "배정 결과"),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: 13,
@@ -445,7 +446,9 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${course.order}번 클래스',
+                AppLanguage.instance.isEnglish
+                    ? 'Class ${course.order}'
+                    : '${course.order}번 클래스',
                 style: const TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontSize: 13,
@@ -455,7 +458,7 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
               ),
               const SizedBox(height: 6),
               Text(
-                course.title,
+                tr(context, course.title),
                 style: const TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontSize: 22,
@@ -465,7 +468,7 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
               ),
               const SizedBox(height: 4),
               Text(
-                course.subtitle,
+                tr(context, course.subtitle),
                 style: const TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontSize: 14,
@@ -473,7 +476,7 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-              Text(result.explanation, style: _bodyStyle),
+              Text(_explanation(result), style: _bodyStyle),
             ],
           ),
         ),
@@ -491,8 +494,8 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text(
-                  '닫기',
+                child: Text(
+                  tr(context, "닫기"),
                   style: TextStyle(
                     fontFamily: 'NotoSansKR',
                     fontWeight: FontWeight.w600,
@@ -514,8 +517,8 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text(
-                    '이 과정 보기',
+                  child: Text(
+                    tr(context, "이 과정 보기"),
                     style: TextStyle(
                       fontFamily: 'NotoSansKR',
                       fontWeight: FontWeight.w600,
@@ -529,6 +532,18 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
         const SizedBox(height: 8),
       ],
     );
+  }
+
+  String _explanation(PlacementResult result) {
+    tr(context, '배정 결과');
+    if (!AppLanguage.instance.isEnglish) return result.explanation;
+    if (result.skippedLevelTest) {
+      return 'You chose option 1 (alphabet / phonics) on '
+          '${result.part1Choice1Count} items, so you are placed in class '
+          '${result.course.order} without a separate level check.';
+    }
+    return 'You answered ${result.correctCount ?? 0} of '
+        '${result.totalQuestions ?? 0} level-check questions correctly.';
   }
 
   Widget _footer() {
@@ -546,8 +561,8 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: const Text(
-              '이전',
+            child: Text(
+              tr(context, "이전"),
               style: TextStyle(
                 fontFamily: 'NotoSansKR',
                 fontWeight: FontWeight.w600,

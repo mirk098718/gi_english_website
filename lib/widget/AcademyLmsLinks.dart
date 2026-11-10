@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
 
@@ -70,7 +71,7 @@ class AcademyLmsLinks extends StatelessWidget {
           children: [
             if (showHeading) ...[
               Text(
-                '초등·중등 온라인 학습',
+                tr(context, "초등·중등 온라인 학습"),
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontSize: 13,

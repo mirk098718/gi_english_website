@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
 import 'package:gi_english_website/pages/OnlineTeacherSelectPage.dart';
@@ -53,7 +54,7 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
     if (_selected == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('과정을 선택해주세요.',
+          content: Text(tr(context, "과정을 선택해주세요."),
               style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Palette.danger,
         ),
@@ -124,12 +125,11 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('프로그램 결제', style: TextStyle(fontFamily: "Jalnan", fontSize: 20)),
+          Text(tr(context, "프로그램 결제"), style: TextStyle(fontFamily: "Jalnan", fontSize: 20)),
           WidgetUtil.myDivider(),
           SizedBox(height: 12),
           Text(
-            '수강할 과정을 선택한 뒤, 원어민 메인 강사를 고르고 결제합니다.\n'
-            '결제 완료 시 내 강의실에 과정이 자동으로 배정됩니다. (테스트 결제: 실제 출금되지 않습니다)',
+            tr(context, "수강할 과정을 선택한 뒤, 원어민 메인 강사를 고르고 결제합니다.\n결제 완료 시 내 강의실에 과정이 자동으로 배정됩니다. (테스트 결제: 실제 출금되지 않습니다)"),
             style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 13,
@@ -149,13 +149,13 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('로그인이 필요합니다',
+                  Text(tr(context, "로그인이 필요합니다"),
                       style: TextStyle(
                           fontFamily: "Jalnan",
                           fontSize: 15,
                           color: Palette.secondaryDark)),
                   SizedBox(height: 10),
-                  Text('결제 전 회원 로그인 또는 회원가입을 진행해주세요.',
+                  Text(tr(context, "결제 전 회원 로그인 또는 회원가입을 진행해주세요."),
                       style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
                   SizedBox(height: 16),
                   ElevatedButton(
@@ -165,13 +165,13 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
                     ),
                     onPressed: () => MenuUtil.push(context, MemberLoginPage()),
                     child:
-                        Text('회원 로그인', style: TextStyle(fontFamily: "Jalnan")),
+                        Text(tr(context, "회원 로그인"), style: TextStyle(fontFamily: "Jalnan")),
                   ),
                 ],
               ),
             ),
           ] else ...[
-            Text('과정 선택', style: TextStyle(fontFamily: "Jalnan", fontSize: 15)),
+            Text(tr(context, "과정 선택"), style: TextStyle(fontFamily: "Jalnan", fontSize: 15)),
             SizedBox(height: 12),
             ...OnlineCourse.all.map(_courseOption),
             SizedBox(height: 24),
@@ -190,17 +190,17 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
                 onPressed: _goTeacherSelect,
                 icon: Icon(Icons.arrow_forward, color: Palette.white),
                 label: Text(
-                  '다음 · 원어민 강사 선택',
+                  tr(context, "다음 · 원어민 강사 선택"),
                   style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
                 ),
               ),
             ),
             SizedBox(height: 32),
-            Text('내 결제 내역',
+            Text(tr(context, "내 결제 내역"),
                 style: TextStyle(fontFamily: "Jalnan", fontSize: 15)),
             SizedBox(height: 12),
             if (_myPayments.isEmpty)
-              Text('아직 결제 내역이 없습니다.',
+              Text(tr(context, "아직 결제 내역이 없습니다."),
                   style: TextStyle(
                       fontFamily: "NotoSansKR", color: Palette.grey500))
             else
@@ -278,7 +278,7 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('주문 요약', style: TextStyle(fontFamily: "Jalnan", fontSize: 14)),
+          Text(tr(context, "주문 요약"), style: TextStyle(fontFamily: "Jalnan", fontSize: 14)),
           SizedBox(height: 10),
           Text('과정: ${course.title}',
               style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),

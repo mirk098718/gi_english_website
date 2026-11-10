@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/QuizResult.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
@@ -53,7 +54,7 @@ class QuizResultSummary extends StatelessWidget {
               ),
               onPressed: () => showQuizEssayDialog(context, result),
               child: Text(
-                '주관식 답안 보기',
+                tr(context, "주관식 답안 보기"),
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -64,7 +65,7 @@ class QuizResultSummary extends StatelessWidget {
           ),
           if (!dense)
             Text(
-              '다시 풀고 25문제를 모두 채점하면 이 정답률과 주관식 답이 최근 풀이로 바뀝니다.',
+              tr(context, "다시 풀고 25문제를 모두 채점하면 이 정답률과 주관식 답이 최근 풀이로 바뀝니다."),
               style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 11,
@@ -85,7 +86,7 @@ Future<void> showQuizEssayDialog(BuildContext context, QuizResult result) {
     builder: (context) {
       return AlertDialog(
         title: Text(
-          result.title.trim().isEmpty ? '주관식 답안' : result.title.trim(),
+          result.title.trim().isEmpty ? tr(context, "주관식 답안") : result.title.trim(),
           style: TextStyle(fontFamily: "Jalnan", fontSize: 16),
         ),
         content: SizedBox(
@@ -105,7 +106,7 @@ Future<void> showQuizEssayDialog(BuildContext context, QuizResult result) {
                 SizedBox(height: 12),
                 if (essays.isEmpty)
                   Text(
-                    '저장된 주관식 답이 없습니다.',
+                    tr(context, "저장된 주관식 답이 없습니다."),
                     style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 13,
@@ -144,7 +145,7 @@ Future<void> showQuizEssayDialog(BuildContext context, QuizResult result) {
                           ],
                           SizedBox(height: 4),
                           Text(
-                            essay.hasAnswer ? essay.answer.trim() : '작성하지 않음',
+                            essay.hasAnswer ? essay.answer.trim() : tr(context, "작성하지 않음"),
                             style: TextStyle(
                               fontFamily: "NotoSansKR",
                               fontSize: 14,
@@ -165,7 +166,7 @@ Future<void> showQuizEssayDialog(BuildContext context, QuizResult result) {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('닫기', style: TextStyle(fontFamily: "NotoSansKR")),
+            child: Text(tr(context, "닫기"), style: TextStyle(fontFamily: "NotoSansKR")),
           ),
         ],
       );

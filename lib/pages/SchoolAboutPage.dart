@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/ModernWidgets.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/AcademyBulletinBoards.dart';
@@ -32,7 +33,7 @@ class SchoolAboutPage extends StatelessWidget {
             HomeDailyWordBlock(),
             AcademyHomeCards(),
             AcademyBulletinBoards(),
-            _philosophy(compact: false),
+            _philosophy(context, compact: false),
             ModernWidgets.modernFooter(),
           ],
         ),
@@ -48,7 +49,7 @@ class SchoolAboutPage extends StatelessWidget {
           HomeDailyWordBlock(compact: true),
           AcademyHomeCards(compact: true),
           AcademyBulletinBoards(compact: true),
-          _philosophy(compact: true),
+          _philosophy(context, compact: true),
         ],
       ),
     );
@@ -113,7 +114,7 @@ class SchoolAboutPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '파주 운정 · 초중등 오프라인',
+          tr(context, "파주 운정 · 초중등 오프라인"),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: compact ? 12 : 13,
@@ -124,7 +125,7 @@ class SchoolAboutPage extends StatelessWidget {
         ),
         SizedBox(height: compact ? 10 : 14),
         Text(
-          '글림아일랜드 파주 캠퍼스에서\n영어를 말하고 자랍니다',
+          tr(context, "글림아일랜드 파주 캠퍼스에서\n영어를 말하고 자랍니다"),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: compact ? 26 : 40,
@@ -135,7 +136,7 @@ class SchoolAboutPage extends StatelessWidget {
         ),
         SizedBox(height: compact ? 12 : 16),
         Text(
-          '초등·중등·고등 대상 원어민 회화,\n학습과 액티비티, 그리고 내신 및 입시가 함께하는 현장입니다.',
+          tr(context, "초등·중등·고등 대상 원어민 회화,\n학습과 액티비티, 그리고 내신 및 입시가 함께하는 현장입니다."),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: compact ? 14 : 16,
@@ -154,7 +155,7 @@ class SchoolAboutPage extends StatelessWidget {
     );
   }
 
-  Widget _philosophy({required bool compact}) {
+  Widget _philosophy(BuildContext context, {required bool compact}) {
     return Container(
       width: double.infinity,
       color: Palette.white,
@@ -168,7 +169,7 @@ class SchoolAboutPage extends StatelessWidget {
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 860),
           child: Text(
-            '"GLEAM ISLAND는 반짝이는 섬이라는 뜻으로, 뉴질랜드 교육 철학을 바탕으로 한 이름입니다. 자유로운 탐구와 토론, 놀이와 학습이 함께하는 소수정예 영어 현장을 지향합니다."',
+            tr(context, "\"GLEAM ISLAND는 반짝이는 섬이라는 뜻으로, 뉴질랜드 교육 철학을 바탕으로 한 이름입니다. 자유로운 탐구와 토론, 놀이와 학습이 함께하는 소수정예 영어 현장을 지향합니다.\""),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'NotoSansKR',

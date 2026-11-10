@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
@@ -498,7 +499,7 @@ class _LessonRatingDialogState extends State<LessonRatingDialog> {
       child: AlertDialog(
         backgroundColor: Palette.white,
         surfaceTintColor: Palette.white,
-        title: Text('수업 평가', style: TextStyle(fontFamily: "Jalnan")),
+        title: Text(tr(context, "수업 평가"), style: TextStyle(fontFamily: "Jalnan")),
         content: SizedBox(
           width: 420,
           child: SingleChildScrollView(
@@ -517,7 +518,7 @@ class _LessonRatingDialogState extends State<LessonRatingDialog> {
                   ),
                 ),
                 SizedBox(height: 18),
-                Text('별점',
+                Text(tr(context, "별점"),
                     style: TextStyle(
                         fontFamily: "NotoSansKR", fontWeight: FontWeight.w700)),
                 SizedBox(height: 8),
@@ -565,7 +566,7 @@ class _LessonRatingDialogState extends State<LessonRatingDialog> {
         actions: [
           TextButton(
             onPressed: _saving ? null : _later,
-            child: Text('나중에'),
+            child: Text(tr(context, "나중에")),
           ),
           ElevatedButton(
             onPressed: _saving || _stars < LessonRating.minStars ? null : _save,
@@ -575,7 +576,7 @@ class _LessonRatingDialogState extends State<LessonRatingDialog> {
                     height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : Text('평가 제출'),
+                : Text(tr(context, "평가 제출")),
           ),
         ],
       ),
