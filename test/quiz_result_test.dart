@@ -77,9 +77,10 @@ void main() {
       ...EnrollmentService.basicLessons.map((lesson) => lesson.problemUrl),
       ...EnrollmentService.intermediateLessons
           .map((lesson) => lesson.problemUrl),
+      ...EnrollmentService.advancedLessons.map((lesson) => lesson.problemUrl),
     ];
 
-    expect(urls, hasLength(30));
+    expect(urls, hasLength(40));
     expect(
       urls.map(QuizResult.quizIdFromUrl).toSet(),
       {
@@ -113,6 +114,16 @@ void main() {
         'gleam-level3-lesson8',
         'gleam-level3-lesson9',
         'gleam-level3-lesson10',
+        'gleam-level5-lesson1',
+        'gleam-level5-lesson2',
+        'gleam-level5-lesson3',
+        'gleam-level5-lesson4',
+        'gleam-level5-lesson5',
+        'gleam-level5-lesson6',
+        'gleam-level5-lesson7',
+        'gleam-level5-lesson8',
+        'gleam-level5-lesson9',
+        'gleam-level5-lesson10',
       },
     );
   });

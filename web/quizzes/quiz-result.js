@@ -155,6 +155,56 @@
       courseId: "intermediate_grammar_speaking",
       weekNumber: 10,
       title: "중급 10강 연습문제"
+    },
+    "gleam-level5-lesson1": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 1,
+      title: "고급 1강 연습문제"
+    },
+    "gleam-level5-lesson2": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 2,
+      title: "고급 2강 연습문제"
+    },
+    "gleam-level5-lesson3": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 3,
+      title: "고급 3강 연습문제"
+    },
+    "gleam-level5-lesson4": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 4,
+      title: "고급 4강 연습문제"
+    },
+    "gleam-level5-lesson5": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 5,
+      title: "고급 5강 연습문제"
+    },
+    "gleam-level5-lesson6": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 6,
+      title: "고급 6강 연습문제"
+    },
+    "gleam-level5-lesson7": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 7,
+      title: "고급 7강 연습문제"
+    },
+    "gleam-level5-lesson8": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 8,
+      title: "고급 8강 연습문제"
+    },
+    "gleam-level5-lesson9": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 9,
+      title: "고급 9강 연습문제"
+    },
+    "gleam-level5-lesson10": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 10,
+      title: "고급 10강 연습문제"
     }
   };
 
