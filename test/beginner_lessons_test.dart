@@ -49,6 +49,19 @@ void main() {
     );
   });
 
+  test('왕초보 5강부터 10강 연습문제를 회차에 연결한다', () {
+    for (var lesson = 5; lesson <= 10; lesson++) {
+      final week = EnrollmentService.defaultWeek('beginner_phonics', lesson);
+      expect(week.title, '$lesson강');
+      expect(week.videoUrl, isEmpty);
+      expect(week.problemLinks.single.title, '$lesson강 연습문제');
+      expect(
+        week.problemLinks.single.url,
+        '/quizzes/gleam-level1-lesson$lesson-quiz.html',
+      );
+    }
+  });
+
   test('저장된 왕초보 회차에 임시 영상만 있으면 실제 인강으로 바꾼다', () {
     final stored = OnlineWeek(
       id: 'beginner_phonics_week_2',
@@ -154,8 +167,59 @@ void main() {
     );
   });
 
-  test('다른 과정 1회차는 기존 임시 인강을 유지한다', () {
-    final week = EnrollmentService.defaultWeek('basic_grammar_speaking', 1);
-    expect(week.videoUrl, EnrollmentService.defaultWeek1VideoUrl);
+  test('중급 3강부터 10강 연습문제를 회차에 연결한다', () {
+    for (var lesson = 3; lesson <= 10; lesson++) {
+      final week = EnrollmentService.defaultWeek(
+        'intermediate_grammar_speaking',
+        lesson,
+      );
+      expect(week.title, '$lesson강');
+      expect(week.videoUrl, isEmpty);
+      expect(week.problemLinks.single.title, '$lesson강 연습문제');
+      expect(
+        week.problemLinks.single.url,
+        '/quizzes/gleam-level3-lesson$lesson-quiz.html',
+      );
+    }
+  });
+
+  test('기초 1강부터 10강은 인강 없이 연습문제만 연결한다', () {
+    for (var lesson = 1; lesson <= 10; lesson++) {
+      final week = EnrollmentService.defaultWeek('basic_grammar_speaking', lesson);
+      expect(week.title, '$lesson강');
+      expect(week.videoUrl, isEmpty);
+      expect(week.problemLinks.single.title, '$lesson강 연습문제');
+      expect(
+        week.problemLinks.single.url,
+        '/quizzes/gleam-level2-lesson$lesson-quiz.html',
+      );
+    }
+  });
+
+  test('고급 1강부터 10강은 인강 없이 연습문제만 연결한다', () {
+    for (var lesson = 1; lesson <= 10; lesson++) {
+      final week =
+          EnrollmentService.defaultWeek('advanced_premium_speaking', lesson);
+      expect(week.title, '$lesson강');
+      expect(week.videoUrl, isEmpty);
+      expect(week.problemLinks.single.title, '$lesson강 연습문제');
+      expect(
+        week.problemLinks.single.url,
+        '/quizzes/gleam-level5-lesson$lesson-quiz.html',
+      );
+    }
+  });
+
+  test('비즈니스 1강부터 10강은 인강 없이 연습문제만 연결한다', () {
+    for (var lesson = 1; lesson <= 10; lesson++) {
+      final week = EnrollmentService.defaultWeek('business_english', lesson);
+      expect(week.title, '$lesson강');
+      expect(week.videoUrl, isEmpty);
+      expect(week.problemLinks.single.title, '$lesson강 연습문제');
+      expect(
+        week.problemLinks.single.url,
+        '/quizzes/gleam-level4-lesson$lesson-quiz.html',
+      );
+    }
   });
 }

@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gi_english_website/class/QuizResult.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
+import 'package:gi_english_website/widget/QuizResultSummary.dart';
 
 void main() {
   test('퀴즈 주소에서 저장 키를 만든다', () {
@@ -74,21 +76,167 @@ void main() {
   test('연결된 연습문제 주소는 모두 퀴즈 키가 된다', () {
     final urls = [
       ...EnrollmentService.beginnerLessons.map((lesson) => lesson.problemUrl),
+      ...EnrollmentService.basicLessons.map((lesson) => lesson.problemUrl),
       ...EnrollmentService.intermediateLessons
           .map((lesson) => lesson.problemUrl),
+      ...EnrollmentService.advancedLessons.map((lesson) => lesson.problemUrl),
+      ...EnrollmentService.businessLessons.map((lesson) => lesson.problemUrl),
     ];
 
-    expect(urls, hasLength(6));
+    expect(urls, hasLength(50));
     expect(
       urls.map(QuizResult.quizIdFromUrl).toSet(),
       {
         'gleam-level1-lesson1',
         'gleam-level2-lesson02',
+        'gleam-level2-lesson1',
+        'gleam-level2-lesson2',
+        'gleam-level2-lesson3',
+        'gleam-level2-lesson4',
+        'gleam-level2-lesson5',
+        'gleam-level2-lesson6',
+        'gleam-level2-lesson7',
+        'gleam-level2-lesson8',
+        'gleam-level2-lesson9',
+        'gleam-level2-lesson10',
         'gleam-level1-lesson3',
         'gleam-level1-lesson4',
+        'gleam-level1-lesson5',
+        'gleam-level1-lesson6',
+        'gleam-level1-lesson7',
+        'gleam-level1-lesson8',
+        'gleam-level1-lesson9',
+        'gleam-level1-lesson10',
         'gleam-level3-lesson1',
         'gleam-level3-lesson2',
+        'gleam-level3-lesson3',
+        'gleam-level3-lesson4',
+        'gleam-level3-lesson5',
+        'gleam-level3-lesson6',
+        'gleam-level3-lesson7',
+        'gleam-level3-lesson8',
+        'gleam-level3-lesson9',
+        'gleam-level3-lesson10',
+        'gleam-level5-lesson1',
+        'gleam-level5-lesson2',
+        'gleam-level5-lesson3',
+        'gleam-level5-lesson4',
+        'gleam-level5-lesson5',
+        'gleam-level5-lesson6',
+        'gleam-level5-lesson7',
+        'gleam-level5-lesson8',
+        'gleam-level5-lesson9',
+        'gleam-level5-lesson10',
+        'gleam-level4-lesson1',
+        'gleam-level4-lesson2',
+        'gleam-level4-lesson3',
+        'gleam-level4-lesson4',
+        'gleam-level4-lesson5',
+        'gleam-level4-lesson6',
+        'gleam-level4-lesson7',
+        'gleam-level4-lesson8',
+        'gleam-level4-lesson9',
+        'gleam-level4-lesson10',
       },
     );
+  });
+
+  test('완료로 넘긴 점수와 주관식만 강의실 저장 요청이 된다', () {
+    final saved = QuizSaveRequest.tryParse({
+      'quizId': 'gleam-level1-lesson5',
+      'title': '왕초보 5강 연습문제',
+      'courseId': 'beginner_phonics',
+      'weekNumber': 5,
+      'correctCount': 18,
+      'totalCount': 25,
+      'completed': true,
+      'essays': [
+        {
+          'index': 1,
+          'title': '상황 작문 1',
+          'prompt': '문을 닫아 달라고 해 보세요.',
+          'answer': 'Could you close the door?',
+        },
+      ],
+    });
+
+    expect(saved, isNotNull);
+    expect(saved!.correctCount, 18);
+    expect(saved.weekNumber, 5);
+    expect(saved.essays.single.answer, 'Could you close the door?');
+    expect(
+      QuizSaveRequest.tryParse({
+        'quizId': 'gleam-level1-lesson5',
+        'courseId': 'beginner_phonics',
+        'weekNumber': 5,
+        'correctCount': 18,
+        'totalCount': 24,
+        'completed': true,
+        'essays': [],
+      }),
+      isNull,
+    );
+  });
+
+  testWidgets('주관식 답은 접혀 있다가 열면 보인다', (tester) async {
+    final result = QuizResult(
+      id: 'student1_gleam-level1-lesson1',
+      userId: 'student1',
+      quizId: 'gleam-level1-lesson1',
+      title: '왕초보 1강 연습문제',
+      courseId: 'beginner_phonics',
+      weekNumber: 1,
+      correctCount: 11,
+      totalCount: 25,
+      essays: const [
+        QuizEssayAnswer(
+          index: 1,
+          title: '기본 표현 쓰기',
+          prompt: '나는 커피를 좋아해요.',
+          answer: 'I like coffee',
+        ),
+        QuizEssayAnswer(
+          index: 2,
+          title: '상황 작문 1',
+          prompt: '오늘부터 영어 공부를 시작했어요. 나는 매일 영어를 공부해요. 라고 말하고 싶어요.',
+          answer: 'I study English everyday',
+        ),
+      ],
+      updatedAt: DateTime(2026, 11, 10, 13, 53),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 420,
+              child: QuizResultSummary(result: result),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('왕초보 1강 연습문제 · 11 / 25문제 · 44%'), findsOneWidget);
+    expect(find.text('주관식 답 보기'), findsOneWidget);
+    expect(find.text('I like coffee'), findsNothing);
+    expect(find.text('나는 커피를 좋아해요.'), findsNothing);
+
+    await tester.tap(find.text('주관식 답 보기'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('I like coffee'), findsOneWidget);
+    expect(find.text('나는 커피를 좋아해요.'), findsOneWidget);
+    expect(find.text('기본 표현 쓰기'), findsOneWidget);
+    expect(find.text('상황 작문 1'), findsOneWidget);
+    final shortTitle = tester.getTopLeft(find.text('기본 표현 쓰기'));
+    final longTitle = tester.getTopLeft(find.text('상황 작문 1'));
+    final shortAnswer = tester.getTopLeft(find.text('I like coffee'));
+    final longAnswer = tester.getTopLeft(find.text('I study English everyday'));
+    expect(shortTitle.dx, longTitle.dx);
+    expect(shortAnswer.dx, longAnswer.dx);
+    expect(shortAnswer.dx, shortTitle.dx);
   });
 }

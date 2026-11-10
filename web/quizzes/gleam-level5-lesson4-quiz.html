@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>글림 고급 영어 제4강 · 문제 풀이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4ecdd; --bg-soft:#faf5ea; --card:#fffdf9;
+  --ink:#33241a; --sub:#82705d; --line:#e7d8c0;
+  --coffee:#7a4a26; --caramel:#d98a2b; --caramel-deep:#a9620f; --caramel-soft:#f8e7c8;
+  --ok:#3e7d54; --ok-bg:#e6f2e6; --no:#bc4741; --no-bg:#fae5e0;
+  --disp:'Black Han Sans', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --serif:Georgia, 'Times New Roman', serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans); color:var(--ink); background:var(--bg);
+  background-image:radial-gradient(#e2d3b8 1px, transparent 1px);
+  background-size:22px 22px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  word-break:keep-all; overflow-wrap:break-word; /* 한글은 단어 단위로만 줄바꿈 */
+}
+.en{font-family:var(--serif); letter-spacing:.01em}
+.wrap{max-width:880px; margin:0 auto; padding:0 18px}
+
+/* ── 상단바 ─────────────────────────── */
+.topbar{position:sticky; top:0; z-index:50; background:rgba(244,236,221,.92); backdrop-filter:blur(8px); border-bottom:1.5px solid var(--line)}
+.topbar .wrap{display:flex; align-items:center; gap:10px; justify-content:space-between; padding-top:10px; padding-bottom:10px; flex-wrap:wrap}
+.brand{font-family:var(--disp); font-size:1.02rem; color:var(--coffee); letter-spacing:.02em; display:flex; align-items:center; gap:6px}
+.brand small{white-space:nowrap; font-family:var(--sans); font-weight:700; color:var(--sub); font-size:.72rem; border:1.5px solid var(--line); border-radius:999px; padding:2px 8px; background:var(--card)}
+.scores{display:flex; gap:8px; align-items:center; font-weight:800; font-size:.8rem}
+.scores .chip{background:var(--card); border:1.5px solid var(--line); border-radius:999px; padding:4px 12px; color:var(--sub); white-space:nowrap}
+.scores .chip b{color:var(--coffee)}
+.scores .chip.ok b{color:var(--ok)}
+
+/* ── 히어로 ─────────────────────────── */
+.hero{padding:44px 0 10px; text-align:center}
+.lg-badge{display:inline-block; white-space:nowrap; background:var(--coffee); color:#f8ecdb; font-weight:800; font-size:.78rem; letter-spacing:.14em; border-radius:999px; padding:5px 16px}
+.hero h1{font-family:var(--disp); font-weight:400; font-size:clamp(1.7rem,5vw,2.6rem); line-height:1.28; margin:16px 0 6px; color:var(--ink)}
+.hero h1 .u{color:var(--caramel-deep); background:linear-gradient(transparent 68%, var(--caramel-soft) 68%)}
+.hero p.sub{color:var(--sub); font-weight:600; font-size:.95rem}
+
+/* 어순 공식 티켓 (시그니처) */
+.formula{display:flex; align-items:stretch; justify-content:center; gap:0; margin:30px auto 8px; flex-wrap:wrap; max-width:640px}
+.f-chip{flex:1 1 120px; min-width:100px; background:var(--card); border:2px solid var(--ink); border-radius:16px; padding:14px 12px 12px; position:relative; box-shadow:4px 4px 0 rgba(122,74,38,.22); text-align:center}
+.f-chip .role{position:absolute; top:-12px; left:50%; transform:translateX(-50%); font-size:.68rem; font-weight:900; letter-spacing:.08em; color:#fff; background:var(--coffee); border-radius:999px; padding:2px 11px; white-space:nowrap; max-width:none}
+.f-chip:nth-child(3) .role{background:var(--caramel-deep)}
+.f-chip:nth-child(5) .role{background:#3e7d54}
+.f-chip .en-big{font-family:var(--serif); font-size:1.55rem; font-weight:700; display:block; margin-top:6px}
+.f-chip .kr{font-size:.78rem; color:var(--sub); font-weight:700}
+.f-arrow{align-self:center; font-size:1.3rem; color:var(--caramel-deep); padding:0 10px; font-weight:900}
+.formula-note{color:var(--sub); font-size:.83rem; font-weight:700; margin-bottom:6px}
+.formula-note s{color:#b0473f}
+
+/* 요점 복습 */
+.recap{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:30px 0 8px}
+.r-card{background:var(--card); border:1.5px solid var(--line); border-radius:16px; padding:18px 16px; text-align:left}
+.r-card h3{font-size:.85rem; color:var(--caramel-deep); letter-spacing:.08em; font-weight:900; margin-bottom:8px}
+.r-card .ex{font-size:.95rem; margin-top:6px}
+.vs-box{background:var(--bg-soft); border:1px dashed var(--line); border-radius:10px; padding:8px 10px; margin-top:4px; font-size:.88rem}
+.vs-box .bad{color:#b0473f; font-weight:700}
+.vs-box .good{color:var(--ok); font-weight:800}
+/* 상단 정리 — 한 개념 한 줄: 항목당 2줄(영어+칩 / 한국어 뜻) */
+.freq-item{padding:4px 0}
+.freq-item + .freq-item{border-top:1px dashed var(--line); margin-top:4px; padding-top:9px}
+.fi-top{display:flex; align-items:baseline; justify-content:space-between; gap:8px; font-weight:800; font-size:.95rem}
+.fi-top .en{color:var(--ink)}
+.fi-pct{font-size:.76rem; color:var(--caramel-deep); font-weight:900; white-space:nowrap; background:var(--caramel-soft); border-radius:999px; padding:1px 8px}
+.fi-pct.pos2{background:#e3edf6; color:#2e5e83}
+.fi-kr{display:block; font-size:.84rem; color:var(--sub); font-weight:700; margin-top:2px}
+.start-btn{display:inline-block; margin:26px 0 6px; background:var(--coffee); color:#fff7ec; font-weight:900; font-size:1rem; border:none; border-radius:999px; padding:14px 34px; cursor:pointer; box-shadow:0 6px 18px rgba(122,74,38,.32); transition:transform .15s, box-shadow .15s}
+.start-btn:hover{transform:translateY(-2px); box-shadow:0 10px 22px rgba(122,74,38,.38)}
+
+/* ── 섹션 공통 ──────────────────────── */
+section.block{padding:34px 0 6px}
+.sec-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:6px}
+.sec-head h2{font-family:var(--disp); font-weight:400; font-size:1.45rem; color:var(--coffee)}
+.sec-head .count{font-weight:900; color:var(--caramel-deep); font-size:.9rem; background:var(--caramel-soft); border-radius:999px; padding:3px 14px; white-space:nowrap}
+.sec-desc{color:var(--sub); font-size:.88rem; font-weight:600; margin-bottom:20px}
+
+/* ── 문제 카드 ──────────────────────── */
+.q-card{background:var(--card); border:1.5px solid var(--line); border-radius:18px; padding:20px 20px 18px; margin-bottom:18px; box-shadow:0 2px 10px rgba(122,74,38,.06)}
+.q-top{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px}
+.stamp{font-family:var(--disp); font-size:.95rem; color:var(--coffee); border:2px solid var(--coffee); border-radius:8px; padding:1px 9px; transform:rotate(-3deg); letter-spacing:.05em; flex:none; white-space:nowrap}
+.tchip{font-size:.72rem; font-weight:900; letter-spacing:.04em; border-radius:999px; padding:4px 12px; white-space:nowrap}
+.tc-concept{background:#f2e3c8; color:#8a5a1f}
+.tc-blank{background:#e3edf6; color:#2e5e83}
+.tc-wrong{background:#f9e0dc; color:#a3403a}
+.tc-multi{background:#e9e2f5; color:#5b4a8a}
+.tc-order{background:#ddefe4; color:#2f6e4f}
+.tc-dialog{background:#fce8ee; color:#96374f}
+.tc-trans{background:#e0eef0; color:#22626b}
+.tc-part{background:#f6ecd8; color:#7a641f}
+.tc-correct{background:#e2ecdf; color:#3c6b2f}
+.tc-vocab{background:#eceae7; color:#5f5346}
+.tc-write{background:#f8e7c8; color:#a9620f}
+.multi-note{font-size:.74rem; color:var(--caramel-deep); font-weight:800; background:var(--caramel-soft); border-radius:999px; padding:3px 10px; white-space:nowrap}
+.q-text{font-size:1.02rem; font-weight:700; margin-bottom:14px}
+.q-text .q-en{font-family:var(--serif); color:var(--coffee)}
+.opts{display:grid; gap:9px}
+.opt{display:flex; align-items:flex-start; gap:10px; width:100%; text-align:left; background:var(--bg-soft); border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; cursor:pointer; font-family:var(--sans); font-size:.95rem; color:var(--ink); transition:border-color .12s, background .12s, transform .12s}
+.opt:hover:not(:disabled){border-color:var(--caramel); transform:translateX(2px)}
+.opt:disabled{cursor:default}
+.opt .mark{font-weight:900; color:var(--caramel-deep); flex:none}
+.opt .box{flex:none; width:18px; height:18px; border:2px solid var(--sub); border-radius:5px; margin-top:2px; display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; color:transparent; font-weight:900}
+.opt.sel{border-color:var(--caramel-deep); background:var(--caramel-soft)}
+.opt.sel .box{background:var(--caramel-deep); border-color:var(--caramel-deep); color:#fff}
+.opt.right{border-color:var(--ok); background:var(--ok-bg)}
+.opt.right .box{background:var(--ok); border-color:var(--ok); color:#fff}
+.opt.right .mark{color:var(--ok)}
+.opt.right .mark::after{content:" ✓"; color:var(--ok); font-weight:900}
+.opt.miss{border-color:var(--no); background:var(--no-bg)}
+.opt.miss .box{background:var(--no); border-color:var(--no); color:#fff}
+.opt.miss .mark{color:var(--no)}
+.opt.miss .mark::after{content:" ✗"; color:var(--no); font-weight:900}
+.opt.dim{opacity:.55}
+.q-actions{display:flex; gap:10px; margin-top:14px; align-items:center}
+.btn-check{background:var(--caramel-deep); color:#fff; border:none; border-radius:999px; padding:10px 26px; font-weight:900; font-size:.88rem; cursor:pointer; font-family:var(--sans); transition:opacity .15s, transform .15s}
+.btn-check:hover:not(:disabled){transform:translateY(-1px)}
+.btn-check:disabled{opacity:.35; cursor:not-allowed}
+.graded-tag{font-weight:900; font-size:.85rem}
+.graded-tag.good{color:var(--ok)} .graded-tag.bad{color:var(--no)}
+.feedback{display:none; margin-top:14px; border-top:1.5px dashed var(--line); padding-top:13px}
+.feedback.show{display:block; animation:slidein .25s ease}
+@keyframes slidein{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+.fb-title{font-weight:900; font-size:.9rem; margin-bottom:5px}
+.fb-title.good{color:var(--ok)} .fb-title.bad{color:var(--no)}
+.fb-exp{font-size:.9rem; color:var(--ink); background:var(--bg-soft); border-radius:10px; padding:10px 13px}
+.fb-exp .en{color:var(--coffee)}
+
+/* ── 주관식 ─────────────────────────── */
+.situation{background:var(--bg-soft); border:1.5px dashed var(--line); border-radius:12px; padding:13px 15px; font-size:.95rem; margin-bottom:12px}
+.hints{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:12px}
+.hint{font-size:.74rem; font-weight:800; color:var(--coffee); background:var(--caramel-soft); border-radius:999px; padding:3px 11px; white-space:nowrap}
+.hint .en{font-style:normal}
+textarea{width:100%; min-height:86px; border:1.5px solid var(--line); border-radius:12px; background:var(--bg-soft); padding:12px 14px; font-family:var(--sans); font-size:.97rem; color:var(--ink); resize:vertical}
+textarea:focus{outline:2px solid var(--caramel); border-color:var(--caramel)}
+.model{display:none; margin-top:14px; background:#f2ede2; border-radius:12px; padding:12px 15px; font-size:.93rem}
+.model.show{display:block; animation:slidein .25s ease}
+.model b{color:var(--coffee)}
+
+/* ── 결과 ───────────────────────────── */
+.result{background:var(--card); border:2px solid var(--ink); border-radius:20px; box-shadow:6px 6px 0 rgba(122,74,38,.2); padding:26px 22px; margin:34px 0 10px; text-align:center}
+.result .big{font-family:var(--disp); font-size:2.5rem; color:var(--coffee); line-height:1.1}
+.result .msg{font-weight:800; margin-top:6px}
+.type-table{width:100%; border-collapse:collapse; margin-top:16px; font-size:.85rem}
+.type-table th,.type-table td{border-bottom:1px dashed var(--line); padding:7px 6px; text-align:center}
+.type-table th{color:var(--sub); font-size:.76rem; letter-spacing:.05em}
+.type-table td:first-child{text-align:left; font-weight:700}
+.btn-reset{margin-top:18px; background:transparent; color:var(--no); border:2px solid var(--no); border-radius:999px; padding:10px 26px; font-weight:900; cursor:pointer; font-family:var(--sans); font-size:.88rem}
+.btn-reset:hover{background:var(--no-bg)}
+.quiz-actions{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center; margin:18px 0 8px}
+.quiz-actions-note{flex:1 1 100%; margin:0; text-align:center; color:var(--sub); font-size:.78rem; font-weight:700}
+.btn-grade-all,.btn-complete{border:none; border-radius:999px; padding:11px 22px; font-weight:900; cursor:pointer; font-family:var(--sans); font-size:.9rem}
+.btn-grade-all{background:var(--coffee); color:#fff}
+.btn-complete{background:var(--ok); color:#fff}
+.btn-grade-all:hover,.btn-complete:hover{transform:translateY(-1px)}
+footer{text-align:center; color:var(--sub); font-size:.78rem; font-weight:600; padding:26px 0 40px}
+.all-done{display:none; font-size:2.6rem; margin-top:4px}
+.all-done.show{display:block; animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.4); opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1); opacity:1}}
+
+button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid var(--caramel-deep); outline-offset:2px}
+/* 칩이 4개(칩+화살표 = 자식 7개)면 좁은 화면에서 2+2 그리드:
+   화살표는 줄바꿈 시 방향이 어긋나므로 숨기고, 두 줄로 균등 배치 + 줄 간격 확보 */
+@media (max-width:680px){
+  .formula:has(.f-chip:nth-child(7)){gap:18px 14px}
+  .formula:has(.f-chip:nth-child(7)) .f-chip{flex:1 1 calc(50% - 7px); min-width:calc(50% - 7px); padding:14px 10px 11px}
+  .formula:has(.f-chip:nth-child(7)) .f-arrow{display:none}
+}
+@media (max-width:560px){
+  .f-arrow{padding:0 2px; font-size:.92rem}
+  .f-chip{min-width:78px; flex:1 1 78px; padding:12px 5px 9px}
+  .f-chip .role{font-size:.58rem; letter-spacing:.01em; padding:2px 7px}
+  .f-chip .en-big{font-size:1.12rem}
+  .f-chip .kr{font-size:.66rem}
+  .hero h1{font-size:clamp(1.2rem,5.2vw,2rem)}
+  .q-card{padding:16px 14px 15px}
+  .lg-badge{font-size:.7rem; letter-spacing:.08em; padding:5px 13px}
+}
+.f-chip.wide .en-big{line-height:1.12}
+@media (max-width:560px){
+  .f-chip.wide .en-big{font-size:1rem}
+}
+/* ── 일반화 문장 틀(2행) + 예문 박스 ── */
+.formula.tpl2{flex-direction:column; align-items:stretch; gap:0; max-width:720px}
+.tpl-row{display:flex; align-items:stretch; justify-content:center; margin-top:16px}
+.tpl-row .f-chip{flex:1 1 0; min-width:0; padding:14px 8px 12px}
+.tpl-row .f-chip .en-big{font-size:1.14rem; line-height:1.25; margin-top:4px}
+.tpl-row .f-chip .kr{font-size:.76rem}
+.f-chip.cond .role{background:var(--coffee)}
+.f-chip.res .role{background:#3e7d54}
+.f-plus{align-self:center; flex:none; font-weight:900; font-size:1.25rem; color:var(--caramel-deep); padding:0 8px}
+.tpl-down{text-align:center; font-weight:900; font-size:1.15rem; color:var(--caramel-deep); line-height:1; margin:4px 0 0}
+.tpl-ex{max-width:720px; margin:14px auto 0; background:var(--card); border:1.5px dashed var(--line); border-radius:14px; padding:12px 15px; text-align:left}
+.tpl-ex-h{font-size:.74rem; font-weight:900; letter-spacing:.12em; color:var(--caramel-deep); margin-bottom:6px}
+.tpl-ex .ex-line{padding-top:8px; margin-top:8px; border-top:1px dashed var(--line)}
+.tpl-ex .ex-line:first-of-type{border-top:none; margin-top:0; padding-top:0}
+.tpl-ex .ex-line .en{display:block; font-weight:700; font-size:.95rem; color:var(--coffee)}
+.tpl-ex .ex-line .kr{display:block; font-size:.84rem; color:var(--sub); font-weight:700; margin-top:2px}
+@media (max-width:560px){
+  .tpl-row .f-chip .en-big{font-size:1rem}
+  .tpl-row .f-chip .kr{font-size:.7rem}
+  .f-plus{padding:0 5px; font-size:1.05rem}
+  .tpl-ex{padding:11px 12px}
+  .tpl-ex .ex-line .en{font-size:.9rem}
+}
+/* 초협폭(320px 미만) — 반드시 560px 블록 뒤에 둔다(CSS는 나중 규칙이 이긴다) */
+@media (max-width:319px){
+  .f-chip.wide .en-big{font-size:.9rem}
+  .f-arrow{padding:0 1px; font-size:.85rem}
+  .f-chip{min-width:64px; flex:1 1 64px; padding:11px 4px 8px}
+  .f-chip .role{font-size:.5rem; letter-spacing:0; padding:2px 5px}
+  .f-chip .en-big{font-size:1rem}
+  .f-chip .kr{font-size:.6rem}
+  .hero h1{font-size:.98rem}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} html{scroll-behavior:auto} }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">☕ 글림 고급 영어 <small>LEVEL 5 · 제4강 문제 풀이</small></div>
+    <div class="scores">
+      <span class="chip">채점 <b id="gradedN">0</b> / 25</span>
+      <span class="chip ok">정답 <b id="correctN">0</b> / 25</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <span class="lg-badge">LEVEL 5 · 제 04강 · I Wish I Had…</span>
+    <h1>I Wish I Had…<br/><span class="u">과거에 대한 깊은 아쉬움</span> 확인 문제</h1>
+    <p class="sub">대표 표현 · <span class="en">I wish I had taken the chance.</span> — 30문항으로 돌이킬 수 없는 과거를 세련되게 표현하는 wish 가정법을 완성해 보세요.</p>
+
+    <div class="formula tpl2" aria-label="wish 가정법 문장 틀">
+      <div class="tpl-row">
+        <div class="f-chip cond"><span class="role">아쉬움 · 과거</span><span class="en-big en">I wish + 주어</span><span class="kr">~했더라면</span></div>
+        <span class="f-plus">+</span>
+        <div class="f-chip cond"><span class="role">아쉬움 · 과거</span><span class="en-big en">had + p.p.</span><span class="kr">좋았을 텐데</span></div>
+      </div>
+      <div class="tpl-down">↓</div>
+      <div class="tpl-row">
+        <div class="f-chip res"><span class="role">아쉬움 · 현재</span><span class="en-big en">I wish + 주어</span><span class="kr">지금 ~하면</span></div>
+        <span class="f-plus">+</span>
+        <div class="f-chip res"><span class="role">아쉬움 · 현재</span><span class="en-big en">과거동사</span><span class="kr">좋을 텐데</span></div>
+      </div>
+    </div>
+    <p class="formula-note">과거의 후회는 <b style="color:var(--caramel-deep)">had + p.p.</b>, 현재의 아쉬움은 <b style="color:var(--caramel-deep)">과거동사</b> — 뒤에 now / last year를 붙여 시점을 확인하세요!</p>
+
+    <div class="tpl-ex">
+      <p class="tpl-ex-h">예문</p>
+      <p class="ex-line"><span class="en">I wish I had taken the chance.</span><span class="kr">그 기회를 잡았더라면 좋았을 텐데.</span></p>
+      <p class="ex-line"><span class="en">I wish I had submitted a bid last month!</span><span class="kr">지난달에 입찰서를 제출했더라면 좋았을 텐데!</span></p>
+      <p class="ex-line"><span class="en">I wish I had more free time now.</span><span class="kr">지금 시간이 더 많으면 좋을 텐데.</span></p>
+    </div>
+
+    <div class="recap">
+      <div class="r-card">
+        <h3>1. 시제별 뉘앙스</h3>
+        <div class="vs-box"><span class="bad">현재의 아쉬움</span> <span class="en">I wish + 과거동사</span> <span class="bad">+ now</span></div>
+        <div class="vs-box"><span class="good">과거의 후회</span> <span class="en">I wish + had p.p.</span> <span class="good">+ last year</span></div>
+      </div>
+      <div class="r-card">
+        <h3>2. 리더십 활용</h3>
+        <div class="vs-box"><span class="en">I wish we had communicated more transparently with the stakeholder team.</span></div>
+        <div class="vs-box">책임을 인정하고 신뢰를 쌓는 성숙한 표현</div>
+      </div>
+      <div class="r-card">
+        <h3>3. 10초 스피킹 꿀팁</h3>
+        <div class="vs-box"><span class="en">I wish I had known earlier.</span></div>
+        <div class="vs-box">단순한 <span class="bad">Sorry</span>보다 깊은 공감을 전합니다.</div>
+      </div>
+    </div>
+
+    <a href="#mcq"><button class="start-btn">객관식 25문제 풀기 ↓</button></a>
+  </section>
+
+  <section class="block" id="mcq">
+    <div class="sec-head"><h2>객관식 문제</h2><span class="count">25문제</span></div>
+    <p class="sec-desc">유형별로 구성되어 있어요: 개념 이해 · 빈칸 채우기 · 틀린 문장 찾기 · 모두 고르기 · 단어 배열 · 대화 문제 · 뜻 고르기 · 바른 문장 찾기 · 어휘. 답을 고르고 <b>채점하기</b>를 누르면 바로 해설이 나옵니다. 한꺼번에 보려면 <b>한번에 채점하기</b>를, 점수와 주관식을 남기려면 <b>완료</b>를 누르세요.</p>
+        <div class="quiz-actions">
+      <button type="button" class="btn-grade-all" data-quiz-grade-all>한번에 채점하기</button>
+      <button type="button" class="btn-complete" data-quiz-complete>완료</button>
+      <p class="quiz-actions-note">답을 고르지 않은 문제는 오답으로 채점됩니다. 완료를 누르면 점수와 주관식 답이 내 강의실에 바로 저장됩니다.</p>
+    </div>
+    <div id="mcqList"></div>
+  </section>
+
+  <section class="block" id="essay">
+    <div class="sec-head"><h2>주관식 작문</h2><span class="count">5문제</span></div>
+    <p class="sec-desc">상황을 읽고 직접 영어 문장을 써 보세요. 그다음 <b>모범답안 보기</b>를 눌러 내 답과 비교해 보세요. 정답은 하나가 아닐 수도 있어요!</p>
+    <div id="essayList"></div>
+  </section>
+
+  <section class="result" id="result">
+    <div class="all-done" id="allDone">🎉</div>
+    <div class="big"><span id="finalScore">0</span><span style="font-size:1.2rem; color:var(--sub)"> / 25</span></div>
+    <div class="msg" id="resultMsg">문제를 풀면 결과가 여기에 표시돼요.</div>
+    <table class="type-table" id="typeTable" aria-label="유형별 정답률">
+      <thead><tr><th>유형</th><th>정답 / 채점</th></tr></thead>
+      <tbody></tbody>
+    </table>
+        <div class="quiz-actions">
+      <button type="button" class="btn-grade-all" data-quiz-grade-all>한번에 채점하기</button>
+      <button type="button" class="btn-complete" data-quiz-complete>완료</button>
+      <p class="quiz-actions-note">답을 고르지 않은 문제는 오답으로 채점됩니다. 완료를 누르면 점수와 주관식 답이 내 강의실에 바로 저장됩니다.</p>
+    </div>
+    <button class="btn-reset" id="btnReset">모두 다시 풀기</button>
+  </section>
+
+</main>
+<footer>글림 고급 영어 · 제 04강 「I Wish I Had…」 — 성숙한 자기 성찰을 표현하는 I wish I had! 다음 5강 would rather 선호 표현 편에서 뵙겠습니다.</footer>
+
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore-compat.js"></script>
+<script src="quiz-result.js"></script>
+<script>
+/* ─────────── 문제 데이터 ─────────── */
+const TYPE = {
+  concept:{label:"개념 이해", cls:"tc-concept"}, blank:{label:"빈칸 채우기", cls:"tc-blank"},
+  wrong:{label:"틀린 문장 찾기", cls:"tc-wrong"}, multi:{label:"모두 고르기", cls:"tc-multi"},
+  order:{label:"단어 배열", cls:"tc-order"}, dialog:{label:"대화 문제", cls:"tc-dialog"},
+  trans:{label:"뜻 고르기", cls:"tc-trans"}, part:{label:"주어·동사 찾기", cls:"tc-part"},
+  correct:{label:"바른 문장 찾기", cls:"tc-correct"}, vocab:{label:"어휘", cls:"tc-vocab"},
+  write:{label:"작문", cls:"tc-write"}
+};
+const QUIZ = [
+ {t:"concept", q:"'I wish + had p.p.'가 나타내는 의미로 가장 알맞은 것은?",
+  o:["앞으로 ~하면 좋겠다는 바람","지금 ~하면 좋을 텐데 하는 현재의 아쉬움","과거에 하지 못한 일에 대한 아쉬움과 후회","과거에 실제로 했던 일에 대한 만족"], a:[2],
+  e:"I wish + had p.p.는 <b>돌이킬 수 없는 과거</b>에 대한 아쉬움! '~했더라면 좋았을 텐데'로 해석합니다."},
+ {t:"concept", q:"<span class='q-en'>I wish I had more free time now.</span> 와 <span class='q-en'>I wish I had bought that stock last year.</span> 의 차이는?",
+  o:["첫째는 현재의 아쉬움, 둘째는 과거의 후회를 나타낸다.","둘째 문장은 문법적으로 틀렸다.","첫째는 과거의 후회, 둘째는 현재의 아쉬움을 나타낸다.","둘째 문장은 미래에 주식을 살 계획을 말한다."], a:[0],
+  e:"now(지금)가 붙은 첫째는 <b>과거동사</b>로 현재의 아쉬움, last year(작년)의 둘째는 <b>had p.p.</b>로 과거의 후회를 나타냅니다."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>I wish I ___ submitted a bid last month!</span> (지난달에 입찰서를 제출했더라면 좋았을 텐데!)",
+  o:["have","had","would have","having"], a:[1],
+  e:"last month(지난달)에 대한 아쉬움 → <b>I wish + had p.p.</b> → I wish I had submitted a bid."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>I wish I ___ more free time now.</span> (지금 시간이 더 많으면 좋을 텐데)",
+  o:["have","would have","had had","had"], a:[3],
+  e:"now(지금)의 아쉬움은 <b>과거동사</b>! I wish I had more free time now. (had는 have의 과거형입니다.)"},
+ {t:"wrong", q:"다음 중 문법적으로 틀린 문장은?",
+  o:["I wish I had accepted that job offer in London.","I wish I have accepted that job offer in London.","I wish I had submitted a bid last month.","I wish I had been more decisive."], a:[1],
+  e:"과거에 대한 아쉬움은 <b>had + p.p.</b>! have accepted가 아니라 had accepted → I wish I had accepted that job offer in London."},
+ {t:"multi", q:"문법적으로 바른 문장을 모두 고르시오.",
+  o:["I wish I had submitted a bid last month.","I wish I had submit a bid last month.","We wish we had conducted a more thorough beta test.","We wish we have conducted a more thorough beta test."], a:[0, 2],
+  e:"I wish 뒤에는 <b>had + 과거분사</b>! submit(원형)·have conducted는 형태가 무너진 문장입니다."},
+ {t:"trans", q:"'지난달에 입찰서를 제출했더라면 좋았을 텐데!'를 영어로 옮긴 것은?",
+  o:["I wish I submitted a bid last month!","I wish I have submitted a bid last month!","I wish I would submit a bid last month!","I wish I had submitted a bid last month!"], a:[3],
+  e:"과거의 아쉬움은 I wish + had p.p.! 지난달의 일을 되돌리고 싶은 마음을 담습니다."},
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( I / wish / I / had / been / more / decisive )",
+  o:["I wish I had been more decisive.","I wish I have been more decisive.","I wish had I been more decisive.","I had wish I been more decisive."], a:[0],
+  e:"I wish + 주어 + had p.p. 순서! → I wish I had been more decisive. (좀 더 결단력 있게 행동했더라면 좋았을 텐데)"},
+ {t:"dialog", q:"대화의 빈칸을 채우세요. — Mark: <span class='q-en'>Did you see the final auction price for that downtown commercial building?</span> / Sophia: <span class='q-en'>Yes! It sold for 30% below market value. I wish I ___ a bid last month!</span>",
+  o:["submit","have submitted","had submitted","would submit"], a:[2],
+  e:"지난달에 대한 아쉬움 → had submitted! 경매에서 입찰서를 넣지 못한 것을 후회하는 장면입니다."},
+ {t:"dialog", q:"대화의 빈칸을 채우세요. — Sophia: <span class='q-en'>I hesitated because of interest rates. I truly wish I ___ more decisive.</span>",
+  o:["am","had been","was","have been"], a:[1],
+  e:"'좀 더 결단력 있게 행동했더라면' → I wish I <b>had been</b> more decisive. 과거 시점의 상태에 대한 아쉬움입니다."},
+ {t:"concept", q:"강의에서 강조한 'I wish I had ~'의 소통 효과로 가장 알맞은 것은?",
+  o:["책임을 상대에게 돌리는 인상을 준다.","감정을 숨기고 사실만 전달한다.","아쉬움을 강하게 항의하는 효과가 있다.","단순한 'Sorry'보다 깊은 공감과 인간적인 신뢰를 형성한다."], a:[3],
+  e:"mature한 자기 성찰의 표현! 단순 사과보다 진솔한 아쉬움이 담겨 신뢰를 쌓습니다."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>We wish we ___ conducted a more thorough beta test before the release.</span> (출시 전에 더 철저한 베타 테스트를 거쳤더라면 좋았을 텐데요.)",
+  o:["have","had","would","were"], a:[1],
+  e:"출시 전(과거)의 일에 대한 아쉬움 → <b>had conducted</b>! 주어가 we여도 형태는 같습니다."},
+ {t:"correct", q:"다음 중 문법적으로 바른 문장은?",
+  o:["I wish I had taken the chance.","I wish I have taken the chance.","I wish I had took the chance.","I wish I would taken the chance."], a:[0],
+  e:"had + <b>과거분사</b>(taken)! took는 과거형이라 올 수 없습니다."},
+ {t:"vocab", q:"'submit a bid'의 뜻으로 알맞은 것은?",
+  o:["낙찰가를 조사하다","금리를 인상하다","입찰서를 제출하다","시세를 재평가하다"], a:[2],
+  e:"submit(제출하다) + a bid(입찰서) = 입찰서를 제출하다. 경매 대화의 핵심 표현입니다."},
+ {t:"correct", q:"빈칸과 어순이 모두 바른 문장은?",
+  o:["I wish I known earlier.","I wish had I known earlier.","I wish I have known earlier.","I wish I had known earlier."], a:[3],
+  e:"I wish + 주어 + had p.p.! 강의 대표 표현 'I wish I had known earlier.' 그대로입니다."},
+ {t:"wrong", q:"다음 중 문법적으로 틀린 문장은?",
+  o:["I wish I had known earlier.","I wish she had taken the doctor's advice.","I wish I had knew earlier.","We wish we had communicated more transparently."], a:[2],
+  e:"had 뒤에는 과거분사! knew가 아니라 <b>known</b> → I wish I had known earlier."},
+ {t:"multi", q:"과거에 대한 아쉬움을 나타내는 문장을 모두 고르시오.",
+  o:["I wish I had submitted a bid last month.","I wish I had more free time now.","I wish I had accepted that job offer in London.","I wish I were taller."], a:[0, 2],
+  e:"<b>had p.p.</b>가 들어간 ①·③이 과거의 아쉬움! ②·④는 현재의 상태에 대한 아쉬움(과거동사)입니다."},
+ {t:"trans", q:"<span class='q-en'>I wish I had taken the chance.</span> 의 뜻은?",
+  o:["나는 그 기회를 잡았다.","나는 그 기회를 잡을 것이다.","나는 그 기회를 잡았어야만 한다.","그 기회를 잡았더라면 좋았을 텐데."], a:[3],
+  e:"I wish + had p.p. = ~했더라면 좋았을 텐데! 실제로는 잡지 못했다는 아쉬움이 담겨 있습니다."},
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( We / wish / we / had / conducted / a more thorough beta test / before the release )",
+  o:["We wish had we conducted a more thorough beta test before the release.","We wish we had conducted a more thorough beta test before the release.","We wish we have conducted a more thorough beta test before the release.","We wish we conducted had a more thorough beta test before the release."], a:[1],
+  e:"We wish + 주어(we) + had p.p.(conducted) + 나머지! 순서를 그대로 지키면 됩니다."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>I wish I ___ more quality time with my family during the holidays.</span> (연휴 동안 가족들과 더 뜻깊은 시간을 보냈더라면 좋았을 텐데.)",
+  o:["spend","had spent","have spent","would spend"], a:[1],
+  e:"during the holidays(연휴 동안)의 지난 일에 대한 아쉬움 → <b>had spent</b>."},
+ {t:"dialog", q:"대화의 흐름상 Sophia의 마음으로 가장 알맞은 것은? — Sophia: <span class='q-en'>I wish I had submitted a bid last month!</span>",
+  o:["입찰서를 제출하지 못한 것을 아쉬워한다.","입찰서를 제출해서 만족스럽다.","다음 달에 입찰서를 제출할 계획이다.","금리가 오른 것을 기뻐한다."], a:[0],
+  e:"I wish + had p.p.는 실제로 하지 못한 일에 대한 아쉬움! 이미 지난달 입찰은 끝났습니다."},
+ {t:"concept", q:"비즈니스 리더십 상황에서 <span class='q-en'>I wish we had communicated more transparently with the stakeholder team.</span> 이 주는 인상으로 가장 알맞은 것은?",
+  o:["상대를 비난하며 책임을 전가한다.","문제를 숨기려 한다.","협상을 강하게 밀어붙인다.","자기 성찰을 바탕으로 신뢰를 쌓는다."], a:[3],
+  e:"'더 투명하게 소통했더라면'이라는 표현은 책임을 인정하고 관계를 회복하는 성숙한 리더의 언어입니다."},
+ {t:"wrong", q:"다음 중 동사 형태가 틀린 문장은?",
+  o:["I wish I had submitted a bid last month.","I wish I had been more decisive.","I wish I had submit a bid last month.","I wish I had spent more time with my family."], a:[2],
+  e:"had 뒤에는 과거분사! submit(원형)이 아니라 <b>submitted</b> → I wish I had submitted a bid."},
+ {t:"multi", q:"형태가 틀린 문장을 모두 고르시오.",
+  o:["I wish I had accepted that job offer.","I wish I had accept that job offer.","We wish we had conducted a beta test.","We wish we had conduct a beta test."], a:[1, 3],
+  e:"had 뒤에 동사원형(accept·conduct)이 온 ②·④가 틀렸습니다. 과거분사(accepted·conducted)를 써야 합니다."},
+ {t:"concept", q:"'I wish + had p.p.'가 과거완료를 쓰는 이유로 가장 알맞은 것은?",
+  o:["지금보다 앞선 시점, 즉 이미 지나가 버린 과거를 가리키기 위해","미래의 계획을 강조하기 위해","현재 진행 중인 일을 나타내기 위해","상대에게 정중히 부탁하기 위해"], a:[0],
+  e:"아쉬움의 대상이 '지금보다 더 이전'이므로 한 단계 더 과거인 <b>had p.p.</b>를 씁니다. 그래서 돌이킬 수 없다는 뉘앙스가 생깁니다."}
+];
+const ESSAYS = [
+ {q:"기본 표현 쓰기", sit:"<b>『그 기회를 잡았더라면 좋았을 텐데.』</b>를 영어로 써 보세요.",
+  hints:["wish", "chance"],
+  model:"I wish I had taken the chance.", modelKr:"그 기회를 잡았더라면 좋았을 텐데."},
+ {q:"상황 작문 1", sit:"경매 결과를 듣고 아쉬워하는 상황입니다. <b>『지난달에 입찰서를 제출했더라면 좋았을 텐데!』</b>를 영어로 써 보세요.",
+  hints:["submitted", "bid"],
+  model:"I wish I had submitted a bid last month!", modelKr:"지난달에 입찰서를 제출했더라면 좋았을 텐데!"},
+ {q:"상황 작문 2", sit:"출시 후 회고 회의에서 <b>『출시 전에 더 철저한 베타 테스트를 거쳤더라면 좋았을 텐데요.』</b>라고 말해 보세요.",
+  hints:["thorough", "beta test"],
+  model:"We wish we had conducted a more thorough beta test before the release.", modelKr:"출시 전에 더 철저한 베타 테스트를 거쳤더라면 좋았을 텐데요."},
+ {q:"상황 작문 3", sit:"런던에서 온 제안을 떠올리며 <b>『런던에서의 그 일자리 제안을 수락했더라면 좋았을 텐데.』</b>를 영어로 써 보세요.",
+  hints:["accepted", "job offer"],
+  model:"I wish I had accepted that job offer in London.", modelKr:"런던에서의 그 일자리 제안을 수락했더라면 좋았을 텐데."},
+ {q:"자유 작문", sit:"지난 한 해를 돌아보며 <b>『I wish I had + 과거분사』</b> 문장 <b>2개</b>로 아쉬움을 표현해 보세요. (예시: I wish I had started earlier.)",
+  hints:["had + p.p.", "wish"],
+  model:"I wish I had spent more quality time with my family. I wish I had known earlier.", modelKr:"예시 — 가족과 더 뜻깊은 시간을 보냈더라면 좋았을 텐데. / 더 일찍 알았더라면 좋았을 텐데."}
+];
+
+/* ─────────── 렌더링 ─────────── */
+const state = QUIZ.map(()=>({sel:new Set(), graded:false, correct:false}));
+const gradeOneFns = [];
+const marks = ["①","②","③","④"];
+const mcqList = document.getElementById("mcqList");
+
+QUIZ.forEach((item, qi)=>{
+  const meta = TYPE[item.t];
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">Q.${String(qi+1).padStart(2,"0")}</span>
+      <span class="tchip ${meta.cls}">${meta.label}</span>
+      ${item.a.length>1 ? '<span class="multi-note">정답 '+item.a.length+'개를 모두 고르세요</span>' : ''}
+    </div>
+    <p class="q-text">${item.q}</p>
+    <div class="opts">${item.o.map((op,oi)=>`
+      <button type="button" class="opt" data-oi="${oi}" aria-pressed="false">
+        ${item.a.length>1 ? '<span class="box">✓</span>' : '<span class="mark">'+marks[oi]+'</span>'}
+        <span class="${/^[A-Za-z]/.test(op) ? 'en' : ''}">${op}</span>
+      </button>`).join("")}
+    </div>
+    <div class="q-actions">
+      <button type="button" class="btn-check" disabled>채점하기</button>
+      <span class="graded-tag" hidden></span>
+    </div>
+    <div class="feedback"><p class="fb-title"></p><p class="fb-exp"></p></div>`;
+  mcqList.appendChild(card);
+
+  const opts = [...card.querySelectorAll(".opt")];
+  const btn = card.querySelector(".btn-check");
+  const tag = card.querySelector(".graded-tag");
+  const fb = card.querySelector(".feedback");
+  const fbTitle = card.querySelector(".fb-title");
+  const fbExp = card.querySelector(".fb-exp");
+
+  opts.forEach((b,oi)=>b.addEventListener("click", ()=>{
+    if(state[qi].graded) return;
+    if(item.a.length>1){
+      state[qi].sel.has(oi) ? state[qi].sel.delete(oi) : state[qi].sel.add(oi);
+      b.classList.toggle("sel"); b.setAttribute("aria-pressed", b.classList.contains("sel"));
+    } else {
+      state[qi].sel.clear();
+      opts.forEach(o=>{o.classList.remove("sel"); o.setAttribute("aria-pressed","false");});
+      state[qi].sel.add(oi); b.classList.add("sel"); b.setAttribute("aria-pressed","true");
+    }
+    btn.disabled = state[qi].sel.size===0;
+  }));
+
+  function gradeOne(forceBlank){
+    const st = state[qi];
+    if(st.graded) return;
+    if(st.sel.size===0 && !forceBlank) return;
+    const isRight = st.sel.size===item.a.length && item.a.every(x=>st.sel.has(x));
+    st.graded = true; st.correct = isRight;
+    opts.forEach((b,oi)=>{
+      b.disabled = true;
+      const box = b.querySelector(".box");   // 다중선택 전용. 단일선택에는 없음(null)
+      if(item.a.includes(oi)){ b.classList.add("right"); if(box) box.textContent="✓"; }
+      else if(st.sel.has(oi)){ b.classList.add("miss"); if(box) box.textContent="✗"; }
+      else b.classList.add("dim");
+    });
+    tag.hidden = false;
+    tag.textContent = isRight ? "정답!" : (st.sel.size ? "다시 확인해 보세요" : "답을 고르지 않았어요");
+    tag.className = "graded-tag " + (isRight ? "good" : "bad");
+    fb.classList.add("show");
+    fbTitle.textContent = (isRight ? "⭕ 정답입니다! " : "❌ 아쉬워요. 정답은 " + item.a.map(i=>marks[i]).join(", ") + " ");
+    fbTitle.className = "fb-title " + (isRight ? "good" : "bad");
+    fbExp.innerHTML = "💡 " + item.e;
+    btn.disabled = true;
+    updateScores();
+  }
+  gradeOneFns.push(gradeOne);
+  btn.addEventListener("click", ()=> gradeOne(false));
+});
+
+/* ── 주관식 ── */
+const essayList = document.getElementById("essayList");
+ESSAYS.forEach((item, ei)=>{
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">W.${ei+1}</span>
+      <span class="tchip ${TYPE.write.cls}">${item.q}</span>
+    </div>
+    <div class="situation">${item.sit}</div>
+    <div class="hints">${item.hints.map(h=>'<span class="hint">힌트 · <span class="en">'+h+'</span></span>').join("")}</div>
+    <textarea placeholder="여기에 영어 문장을 직접 써 보세요." aria-label="${item.q} 답안 입력"></textarea>
+    <div class="q-actions">
+      <button type="button" class="btn-check">모범답안 보기</button>
+      <span style="font-size:.78rem; color:var(--sub); font-weight:700">정답은 하나가 아닐 수도 있어요</span>
+    </div>
+    <div class="model"><b>모범답안 · <span class="en" style="font-size:1.02rem">${item.model}</span></b><br/><span style="color:var(--sub); font-size:.85rem">${item.modelKr}</span></div>`;
+  essayList.appendChild(card);
+
+  const btn = card.querySelector(".btn-check");
+  const model = card.querySelector(".model");
+  btn.addEventListener("click", ()=>{
+    const open = model.classList.toggle("show");
+    btn.textContent = open ? "모범답안 숨기기" : "모범답안 보기";
+  });
+});
+
+/* ── 점수 집계 ── */
+function updateScores(){
+  const graded = state.filter(s=>s.graded).length;
+  const correct = state.filter(s=>s.correct).length;
+  document.getElementById("gradedN").textContent = graded;
+  document.getElementById("correctN").textContent = correct;
+  document.getElementById("finalScore").textContent = correct;
+
+  const tbody = document.querySelector("#typeTable tbody");
+  tbody.innerHTML = "";
+  Object.entries(TYPE).forEach(([key, meta])=>{
+    if(key==="write") return;
+    const rows = QUIZ.map((q,i)=>({q, s:state[i]})).filter(x=>x.q.t===key);
+    if(!rows.length) return;
+    const g = rows.filter(x=>x.s.graded).length;
+    const c = rows.filter(x=>x.s.correct).length;
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>"+meta.label+"</td><td>"+(g ? c+" / "+g : "–")+"</td>";
+    tbody.appendChild(tr);
+  });
+
+  const msg = document.getElementById("resultMsg");
+  const emoji = document.getElementById("allDone");
+  if(graded===QUIZ.length){
+    emoji.classList.add("show");
+    if(correct===25) msg.textContent = "만점! 돌이킬 수 없는 과거를 세련되게 표현하는 wish 가정법을 완벽하게 잡았어요. 바로 5강으로 갈 준비 끝!";
+    else if(correct>=20) msg.textContent = "훌륭해요! 틀린 문제의 해설만 다시 보면 완벽합니다.";
+    else if(correct>=14) msg.textContent = "절반 이상 성공! I wish + 주어 + had p.p. 형태를 다시 확인하고 틀린 문제를 정리해 보세요.";
+    else if(correct>=7) msg.textContent = "조금 아쉬워요. 위의 핵심 정리를 다시 복습하고 같은 문제에 다시 도전!";
+    else msg.textContent = "괜찮아요, 시작이 반이에요! 핵심 정리를 읽고 천천히 다시 풀어 보세요.";
+  } else {
+    emoji.classList.remove("show");
+    msg.textContent = "채점한 문제: " + graded + " / 25 — 계속 풀어 보세요!";
+  }
+}
+document.getElementById("btnReset").addEventListener("click", ()=>{ location.reload(); });
+var readQuizSnapshot = function () {
+  var graded = state.filter(function (item) { return item.graded; }).length;
+  var correct = state.filter(function (item) { return item.correct; }).length;
+  var areas = document.querySelectorAll("#essayList textarea");
+  var essays = ESSAYS.map(function (item, index) {
+    var area = areas[index];
+    var prompt = String(item.sit || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    return {
+      index: index + 1,
+      title: String(item.q || ""),
+      prompt: prompt,
+      answer: area ? String(area.value || "").trim() : ""
+    };
+  });
+  return {
+    graded: graded,
+    correct: correct,
+    total: QUIZ.length,
+    complete: QUIZ.length === 25 && graded === 25,
+    essays: essays
+  };
+};
+function gradeAllQuestions(){
+  gradeOneFns.forEach(function (gradeOne) { gradeOne(true); });
+}
+function completeQuiz(){
+  gradeAllQuestions();
+  if (window.GleamQuiz) GleamQuiz.finish(readQuizSnapshot());
+  var result = document.getElementById("result");
+  if (result) result.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+document.querySelectorAll("[data-quiz-grade-all]").forEach(function (button) {
+  button.addEventListener("click", gradeAllQuestions);
+});
+document.querySelectorAll("[data-quiz-complete]").forEach(function (button) {
+  button.addEventListener("click", completeQuiz);
+});
+if (window.GleamQuiz) {
+  try {
+    var originalUpdateScores = updateScores;
+    updateScores = function () {
+      originalUpdateScores();
+      GleamQuiz.report(readQuizSnapshot());
+    };
+    GleamQuiz.start(readQuizSnapshot);
+  } catch (error) {}
+}
+updateScores();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

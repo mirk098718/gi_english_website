@@ -6,6 +6,7 @@ import 'package:gi_english_website/pages/PaymentResultPage.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/NoticeService.dart';
+import 'package:gi_english_website/util/QuizResultBridge.dart';
 import 'package:gi_english_website/util/SiteAlertCenter.dart';
 
 import 'pages/AdminTeacherScheduleTab.dart';
@@ -27,6 +28,7 @@ Future<void> main() async {
   await initializeDateFormatting('en_US', null);
   await AppLanguage.instance.load();
   SiteAlertCenter.instance.start();
+  startQuizResultBridge();
 
   runApp(LangScope(child: MyApp()));
 }

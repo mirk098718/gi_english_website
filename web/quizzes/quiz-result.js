@@ -16,6 +16,56 @@
       weekNumber: 2,
       title: "왕초보 2강 연습문제"
     },
+    "gleam-level2-lesson1": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 1,
+      title: "기초 1강 연습문제"
+    },
+    "gleam-level2-lesson2": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 2,
+      title: "기초 2강 연습문제"
+    },
+    "gleam-level2-lesson3": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 3,
+      title: "기초 3강 연습문제"
+    },
+    "gleam-level2-lesson4": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 4,
+      title: "기초 4강 연습문제"
+    },
+    "gleam-level2-lesson5": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 5,
+      title: "기초 5강 연습문제"
+    },
+    "gleam-level2-lesson6": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 6,
+      title: "기초 6강 연습문제"
+    },
+    "gleam-level2-lesson7": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 7,
+      title: "기초 7강 연습문제"
+    },
+    "gleam-level2-lesson8": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 8,
+      title: "기초 8강 연습문제"
+    },
+    "gleam-level2-lesson9": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 9,
+      title: "기초 9강 연습문제"
+    },
+    "gleam-level2-lesson10": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 10,
+      title: "기초 10강 연습문제"
+    },
     "gleam-level1-lesson3": {
       courseId: "beginner_phonics",
       weekNumber: 3,
@@ -26,6 +76,36 @@
       weekNumber: 4,
       title: "왕초보 4강 연습문제"
     },
+    "gleam-level1-lesson5": {
+      courseId: "beginner_phonics",
+      weekNumber: 5,
+      title: "왕초보 5강 연습문제"
+    },
+    "gleam-level1-lesson6": {
+      courseId: "beginner_phonics",
+      weekNumber: 6,
+      title: "왕초보 6강 연습문제"
+    },
+    "gleam-level1-lesson7": {
+      courseId: "beginner_phonics",
+      weekNumber: 7,
+      title: "왕초보 7강 연습문제"
+    },
+    "gleam-level1-lesson8": {
+      courseId: "beginner_phonics",
+      weekNumber: 8,
+      title: "왕초보 8강 연습문제"
+    },
+    "gleam-level1-lesson9": {
+      courseId: "beginner_phonics",
+      weekNumber: 9,
+      title: "왕초보 9강 연습문제"
+    },
+    "gleam-level1-lesson10": {
+      courseId: "beginner_phonics",
+      weekNumber: 10,
+      title: "왕초보 10강 연습문제"
+    },
     "gleam-level3-lesson1": {
       courseId: "intermediate_grammar_speaking",
       weekNumber: 1,
@@ -35,6 +115,146 @@
       courseId: "intermediate_grammar_speaking",
       weekNumber: 2,
       title: "중급 2강 연습문제"
+    },
+    "gleam-level3-lesson3": {
+      courseId: "intermediate_grammar_speaking",
+      weekNumber: 3,
+      title: "중급 3강 연습문제"
+    },
+    "gleam-level3-lesson4": {
+      courseId: "intermediate_grammar_speaking",
+      weekNumber: 4,
+      title: "중급 4강 연습문제"
+    },
+    "gleam-level3-lesson5": {
+      courseId: "intermediate_grammar_speaking",
+      weekNumber: 5,
+      title: "중급 5강 연습문제"
+    },
+    "gleam-level3-lesson6": {
+      courseId: "intermediate_grammar_speaking",
+      weekNumber: 6,
+      title: "중급 6강 연습문제"
+    },
+    "gleam-level3-lesson7": {
+      courseId: "intermediate_grammar_speaking",
+      weekNumber: 7,
+      title: "중급 7강 연습문제"
+    },
+    "gleam-level3-lesson8": {
+      courseId: "intermediate_grammar_speaking",
+      weekNumber: 8,
+      title: "중급 8강 연습문제"
+    },
+    "gleam-level3-lesson9": {
+      courseId: "intermediate_grammar_speaking",
+      weekNumber: 9,
+      title: "중급 9강 연습문제"
+    },
+    "gleam-level3-lesson10": {
+      courseId: "intermediate_grammar_speaking",
+      weekNumber: 10,
+      title: "중급 10강 연습문제"
+    },
+    "gleam-level5-lesson1": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 1,
+      title: "고급 1강 연습문제"
+    },
+    "gleam-level5-lesson2": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 2,
+      title: "고급 2강 연습문제"
+    },
+    "gleam-level5-lesson3": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 3,
+      title: "고급 3강 연습문제"
+    },
+    "gleam-level5-lesson4": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 4,
+      title: "고급 4강 연습문제"
+    },
+    "gleam-level5-lesson5": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 5,
+      title: "고급 5강 연습문제"
+    },
+    "gleam-level5-lesson6": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 6,
+      title: "고급 6강 연습문제"
+    },
+    "gleam-level5-lesson7": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 7,
+      title: "고급 7강 연습문제"
+    },
+    "gleam-level5-lesson8": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 8,
+      title: "고급 8강 연습문제"
+    },
+    "gleam-level5-lesson9": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 9,
+      title: "고급 9강 연습문제"
+    },
+    "gleam-level5-lesson10": {
+      courseId: "advanced_premium_speaking",
+      weekNumber: 10,
+      title: "고급 10강 연습문제"
+    },
+    "gleam-level4-lesson1": {
+      courseId: "business_english",
+      weekNumber: 1,
+      title: "비즈니스 1강 연습문제"
+    },
+    "gleam-level4-lesson2": {
+      courseId: "business_english",
+      weekNumber: 2,
+      title: "비즈니스 2강 연습문제"
+    },
+    "gleam-level4-lesson3": {
+      courseId: "business_english",
+      weekNumber: 3,
+      title: "비즈니스 3강 연습문제"
+    },
+    "gleam-level4-lesson4": {
+      courseId: "business_english",
+      weekNumber: 4,
+      title: "비즈니스 4강 연습문제"
+    },
+    "gleam-level4-lesson5": {
+      courseId: "business_english",
+      weekNumber: 5,
+      title: "비즈니스 5강 연습문제"
+    },
+    "gleam-level4-lesson6": {
+      courseId: "business_english",
+      weekNumber: 6,
+      title: "비즈니스 6강 연습문제"
+    },
+    "gleam-level4-lesson7": {
+      courseId: "business_english",
+      weekNumber: 7,
+      title: "비즈니스 7강 연습문제"
+    },
+    "gleam-level4-lesson8": {
+      courseId: "business_english",
+      weekNumber: 8,
+      title: "비즈니스 8강 연습문제"
+    },
+    "gleam-level4-lesson9": {
+      courseId: "business_english",
+      weekNumber: 9,
+      title: "비즈니스 9강 연습문제"
+    },
+    "gleam-level4-lesson10": {
+      courseId: "business_english",
+      weekNumber: 10,
+      title: "비즈니스 10강 연습문제"
     }
   };
 
@@ -134,7 +354,7 @@
       var section = document.createElement("section");
       section.id = "gleamSaved";
       section.hidden = true;
-      section.innerHTML = '<h2>최근 결과</h2><p class="score"></p><p class="status"></p><div class="essays"></div><p class="note">다시 풀고 25문제를 모두 채점하면 이 정답률과 주관식 답이 방금 풀이로 바뀝니다.</p>';
+      section.innerHTML = '<h2>최근 결과</h2><p class="score"></p><p class="status"></p><div class="essays"></div><p class="note">완료를 누르면 이 점수와 주관식 답이 내 강의실에 바로 저장됩니다. 다시 풀고 완료하면 방금 풀이로 바뀝니다.</p>';
       main.insertBefore(section, main.firstChild);
       return section;
     }
@@ -164,6 +384,43 @@
       statusEl.textContent = status || "";
     }
 
+    var pendingFinish = false;
+    var siteSavePending = false;
+    var savedMessage = "문제풀이를 완료하고 결과를 저장했습니다. 내 강의실에서 점수와 주관식 답을 볼 수 있습니다.";
+
+    function previewFrom(snapshot) {
+      return {
+        title: meta ? meta.title : "",
+        correctCount: snapshot.correct,
+        essays: snapshot.essays || []
+      };
+    }
+
+    function notifySite(snapshot) {
+      if (!window.opener || window.opener === window || !meta || !snapshot) return false;
+      try {
+        window.opener.postMessage({
+          type: "gleam-quiz-result",
+          payload: buildPayload(meta, snapshot, user ? user.uid : "")
+        }, window.location.origin);
+        siteSavePending = true;
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    window.addEventListener("message", function (event) {
+      if (!event.data || event.origin !== window.location.origin) return;
+      if (event.data.type === "gleam-quiz-saved") {
+        siteSavePending = false;
+        renderSaved(queued ? previewFrom(queued) : {}, savedMessage);
+      } else if (event.data.type === "gleam-quiz-save-failed" && siteSavePending && !user) {
+        siteSavePending = false;
+        renderSaved(null, "점수 저장에 실패했습니다. 웹사이트에 로그인한 뒤 완료를 다시 눌러 주세요.");
+      }
+    });
+
     function schedule(snapshot) {
       if (!shouldSave(snapshot) || !meta) return;
       var key = snapshotKey(snapshot);
@@ -174,10 +431,12 @@
       }, 400);
     }
 
-    function save(snapshot, key) {
+    function save(snapshot, key, doneMessage) {
       if (!user || !meta || !shouldSave(snapshot)) {
         if (authReady && !user) {
-          renderSaved(null, "웹사이트에 로그인한 뒤 풀면 점수와 주관식 답이 강의실과 예약 강사에게 남습니다.");
+          renderSaved(null, doneMessage
+            ? "웹사이트에 로그인한 뒤 완료를 눌러야 점수와 주관식 답이 강의실과 예약 강사에게 남습니다."
+            : "웹사이트에 로그인한 뒤 풀면 점수와 주관식 답이 강의실과 예약 강사에게 남습니다.");
         }
         return;
       }
@@ -185,10 +444,35 @@
       payload.updatedAt = window.firebase.firestore.FieldValue.serverTimestamp();
       window.firebase.firestore().collection("quiz_results").doc(user.uid + "_" + meta.quizId).set(payload).then(function () {
         lastSavedKey = key;
-        renderSaved(payload, "최근 점수로 저장했습니다. 주관식도 방금 답으로 바뀌었습니다.");
+        renderSaved(payload, doneMessage || "최근 점수로 저장했습니다. 주관식도 방금 답으로 바뀌었습니다.");
       }).catch(function () {
         renderSaved(payload, "점수 저장에 실패했습니다. 로그인 상태를 확인해 주세요.");
       });
+    }
+
+    function commitFinish(snapshot) {
+      if (!shouldSave(snapshot) || !meta) return;
+      clearTimeout(timer);
+      var key = snapshotKey(snapshot);
+      var handed = notifySite(snapshot);
+      if (!user) {
+        if (handed) {
+          renderSaved(previewFrom(snapshot), "문제풀이를 완료하고 강의실에 저장하는 중입니다.");
+          setTimeout(function () {
+            if (!siteSavePending || user) return;
+            siteSavePending = false;
+            renderSaved(null, "웹사이트에 로그인한 뒤 완료를 눌러야 점수와 주관식 답이 내 강의실에 남습니다.");
+          }, 2500);
+        } else {
+          renderSaved(null, "웹사이트에 로그인한 뒤 완료를 눌러야 점수와 주관식 답이 내 강의실에 남습니다.");
+        }
+        return;
+      }
+      if (key === lastSavedKey) {
+        renderSaved(previewFrom(snapshot), savedMessage);
+        return;
+      }
+      save(snapshot, key, savedMessage);
     }
 
     function loadSaved() {
@@ -202,12 +486,32 @@
     return {
       report: function (snapshot) {
         queued = snapshot;
+        pendingFinish = false;
         if (!authReady) return;
         schedule(snapshot);
       },
+      finish: function (snapshot) {
+        queued = snapshot;
+        pendingFinish = true;
+        if (!meta) return;
+        if (!authReady) {
+          if (!notifySite(snapshot)) {
+            renderSaved(null, "웹사이트에 로그인한 뒤 완료를 눌러야 점수와 주관식 답이 내 강의실에 남습니다.");
+            return;
+          }
+          renderSaved(previewFrom(snapshot), "문제풀이를 완료하고 강의실에 저장하는 중입니다.");
+          setTimeout(function () {
+            if (!siteSavePending || user) return;
+            siteSavePending = false;
+            renderSaved(null, "웹사이트에 로그인한 뒤 완료를 눌러야 점수와 주관식 답이 내 강의실에 남습니다.");
+          }, 2500);
+          return;
+        }
+        pendingFinish = false;
+        commitFinish(snapshot);
+      },
       start: function (readSnapshot) {
         read = readSnapshot;
-        if (typeof window === "undefined" || !window.firebase) return;
         meta = META[quizIdFromPath(window.location.pathname)];
         if (!meta) return;
         meta = {
@@ -216,6 +520,7 @@
           weekNumber: meta.weekNumber,
           title: meta.title
         };
+        if (typeof window === "undefined" || !window.firebase) return;
         try {
           if (!window.firebase.apps.length) window.firebase.initializeApp(firebaseConfig);
         } catch (error) {
@@ -233,7 +538,13 @@
           authReady = true;
           if (user) loadSaved();
           else renderSaved(null, "웹사이트에 로그인한 뒤 풀면 점수와 주관식 답이 강의실과 예약 강사에게 남습니다.");
-          if (queued) schedule(queued);
+          if (!queued) return;
+          if (pendingFinish) {
+            pendingFinish = false;
+            commitFinish(queued);
+          } else {
+            schedule(queued);
+          }
         });
       }
     };
@@ -248,6 +559,9 @@
     buildPayload: buildPayload,
     report: function (snapshot) {
       if (browser) browser.report(snapshot);
+    },
+    finish: function (snapshot) {
+      if (browser) browser.finish(snapshot);
     },
     start: function (readSnapshot) {
       if (browser) browser.start(readSnapshot);
