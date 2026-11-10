@@ -54,6 +54,22 @@
   </style>
 </head>
 <body>
+<script>
+  (function () {
+    var key = "gleam-sw-reset-20261110b";
+    if (!("serviceWorker" in navigator) || sessionStorage.getItem(key)) return;
+    navigator.serviceWorker.getRegistrations().then(function (regs) {
+      sessionStorage.setItem(key, "1");
+      if (!regs.length) return;
+      Promise.all(regs.map(function (reg) { return reg.unregister(); }))
+        .then(function () { return caches.keys(); })
+        .then(function (keys) {
+          return Promise.all(keys.map(function (name) { return caches.delete(name); }));
+        })
+        .then(function () { location.reload(); });
+    });
+  })();
+</script>
 <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

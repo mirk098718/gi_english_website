@@ -43,40 +43,70 @@ class QuizResultSummary extends StatelessWidget {
                 color: Palette.grey500,
               ),
             ),
-          if (result.essays.isNotEmpty) _essayDropdown(context),
+          if (result.essays.isNotEmpty)
+            _EssayAnswerList(result: result, dense: dense),
         ],
       ),
     );
   }
+}
 
-  Widget _essayDropdown(BuildContext context) {
-    return Theme(
-      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-      child: ExpansionTile(
-        tilePadding: EdgeInsets.zero,
-        childrenPadding: EdgeInsets.only(bottom: 4),
-        expandedAlignment: Alignment.centerLeft,
-        expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
-        iconColor: Palette.grey600,
-        collapsedIconColor: Palette.grey600,
-        title: Text(
-          '주관식 답 보기',
-          style: TextStyle(
-            fontFamily: "NotoSansKR",
-            fontSize: dense ? 12 : 13,
-            fontWeight: FontWeight.w700,
-            color: Palette.black,
-          ),
-        ),
+class _EssayAnswerList extends StatefulWidget {
+  final QuizResult result;
+  final bool dense;
+
+  const _EssayAnswerList({
+    required this.result,
+    required this.dense,
+  });
+
+  @override
+  State<_EssayAnswerList> createState() => _EssayAnswerListState();
+}
+
+class _EssayAnswerListState extends State<_EssayAnswerList> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ...result.essays.map((essay) => _EssayAnswerBlock(
-                essay: essay,
-                dense: dense,
-              )),
-          if (!dense)
-            Padding(
-              padding: EdgeInsets.only(top: 2),
-              child: Text(
+          InkWell(
+            onTap: () => setState(() => _open = !_open),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '주관식 답 보기',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontFamily: "NotoSansKR",
+                        fontSize: widget.dense ? 12 : 13,
+                        fontWeight: FontWeight.w700,
+                        color: Palette.black,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    _open ? Icons.expand_less : Icons.expand_more,
+                    color: Palette.grey600,
+                    size: 22,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (_open) ...[
+            ...widget.result.essays.map(
+              (essay) => _EssayAnswerBlock(essay: essay, dense: widget.dense),
+            ),
+            if (!widget.dense)
+              Text(
                 '다시 풀고 완료를 누르면 이 점수와 주관식 답이 최근 풀이로 바뀝니다.',
                 textAlign: TextAlign.left,
                 style: TextStyle(
@@ -86,7 +116,7 @@ class QuizResultSummary extends StatelessWidget {
                   color: Palette.grey500,
                 ),
               ),
-            ),
+          ],
         ],
       ),
     );
@@ -119,9 +149,9 @@ class _EssayAnswerBlock extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: dense ? 8 : 10),
       alignment: Alignment.centerLeft,
       decoration: BoxDecoration(
-        color: Palette.surfaceVariant,
+        color: Palette.grey100,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Palette.grey200),
+        border: Border.all(color: Palette.grey300),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
