@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+  -->
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta name="description" content="Gleam">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Gleam">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <title>Gleam</title>
+  <link rel="manifest" href="manifest.json">
+  <!-- 토스페이먼츠 결제창 SDK -->
+  <script src="https://js.tosspayments.com/v2/standard"></script>
+  <script>
+    // Flutter(Web)에서 호출하는 토스 결제창 진입점
+    window.gleamTossPay = async function (opts) {
+      const tossPayments = TossPayments(opts.clientKey);
+      const payment = tossPayments.payment({ customerKey: opts.customerKey });
+      await payment.requestPayment({
+        method: "CARD",
+        amount: { currency: "KRW", value: opts.amount },
+        orderId: opts.orderId,
+        orderName: opts.orderName,
+        successUrl: opts.successUrl,
+        failUrl: opts.failUrl,
+        customerEmail: opts.customerEmail || undefined,
+        customerName: opts.customerName || undefined,
+      });
+    };
+  </script>
+  <!-- 모바일에서 Flutter 스크롤이 정상 동작하도록 뷰포트 고정 -->
+  <style>
+    html, body { height: 100%; margin: 0; overflow: hidden; position: fixed; width: 100%; }
+    body { touch-action: pan-y; -webkit-overflow-scrolling: touch; }
+  </style>
+</head>
+<body>
+<script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
