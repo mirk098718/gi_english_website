@@ -347,10 +347,10 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
             ),
           ),
           SizedBox(height: 32),
-          meetingSection(),
-          SizedBox(height: 32),
           weekSection(),
           if (_weeks.isEmpty) ...[
+            SizedBox(height: 32),
+            meetingSection(),
             SizedBox(height: 32),
             lessonSection(),
           ],
@@ -806,13 +806,23 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "회차 학습",
-          style: TextStyle(
-            fontFamily: "Jalnan",
-            fontSize: 15,
-            color: Palette.secondaryDark,
-          ),
+        Row(
+          children: [
+            Text(
+              "회차 학습",
+              style: TextStyle(
+                fontFamily: "Jalnan",
+                fontSize: 15,
+                color: Palette.secondaryDark,
+              ),
+            ),
+            SizedBox(width: 4),
+            IconButton(
+              tooltip: '새로고침',
+              onPressed: _loadData,
+              icon: Icon(Icons.refresh, size: 18, color: Palette.grey600),
+            ),
+          ],
         ),
         SizedBox(height: 8),
         Text(
@@ -853,7 +863,10 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
           )
         else
           Column(
-            children: _weeks.map(weekTile).toList(),
+            children: [
+              ..._weeks.map(weekTile),
+              ..._unmatchedSessions().map(sessionTile),
+            ],
           ),
       ],
     );
@@ -1017,6 +1030,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                   color: Palette.grey600,
                 ),
               ),
+              ..._sessionsForWeek(week).map(sessionTile),
             ] else ...[
             if (week.description.isNotEmpty) ...[
               Align(
@@ -1153,22 +1167,9 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
                 }).toList(),
               ),
             SizedBox(height: 16),
+            weekLiveClassSection(week, checked),
+            SizedBox(height: 16),
             weekFeedbackSection(week),
-            if (_enrollment != null) ...[
-              SizedBox(height: 16),
-              if (_readyToBook(week, checked))
-                weekBookingSection(week)
-              else
-                Text(
-                  '인강 시청과 문제풀이를 모두 체크하면 화상수업 예약이 열립니다.',
-                  style: TextStyle(
-                    fontFamily: "NotoSansKR",
-                    fontSize: 13,
-                    color: Palette.grey600,
-                    height: 1.5,
-                  ),
-                ),
-            ],
             ],
           ],
         ),
@@ -1209,6 +1210,70 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
     );
   }
 
+  List<OnlineSession> _sessionsForWeek(OnlineWeek week) {
+    final booking = _bookingFor(week.id);
+    final expectedId = booking == null
+        ? ''
+        : EnrollmentService.sessionDocIdForBooking(booking.id);
+    return _sessions.where((session) {
+      if (booking != null &&
+          (session.bookingId == booking.id || session.id == expectedId)) {
+        return true;
+      }
+      if (week.weekNumber <= 0) return false;
+      if (session.weekNumber == week.weekNumber) return true;
+      return session.weekNumber == 0 &&
+          session.bookingId.isEmpty &&
+          session.order == week.weekNumber;
+    }).toList();
+  }
+
+  List<OnlineSession> _unmatchedSessions() {
+    final matched = <String>{};
+    for (final week in _weeks) {
+      for (final session in _sessionsForWeek(week)) {
+        matched.add(session.id);
+      }
+    }
+    return _sessions.where((session) => !matched.contains(session.id)).toList();
+  }
+
+  /// 인강 · 문제 · 체크 다음, 강사 피드백 앞에 두는 이 회차의 화상수업.
+  Widget weekLiveClassSection(OnlineWeek week, List<String> checked) {
+    final sessions = _sessionsForWeek(week);
+    final booking = _bookingFor(week.id);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            '4. 화상수업',
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 13),
+          ),
+        ),
+        SizedBox(height: 8),
+        if (sessions.isNotEmpty)
+          Column(children: sessions.map(sessionTile).toList())
+        else if (_enrollment != null &&
+            (booking != null || _readyToBook(week, checked)))
+          weekBookingSection(week)
+        else
+          Text(
+            _enrollment == null
+                ? '수강이 배정되면 이 회차 화상수업을 예약할 수 있습니다.'
+                : '인강 시청과 문제풀이를 모두 체크하면 화상수업 예약이 열립니다.',
+            style: TextStyle(
+              fontFamily: "NotoSansKR",
+              fontSize: 13,
+              color: Palette.grey600,
+              height: 1.5,
+            ),
+          ),
+      ],
+    );
+  }
+
   Widget weekFeedbackSection(OnlineWeek week) {
     final feedback =
         LessonFeedbackService.forWeek(_feedbacks, week.id, week.weekNumber);
@@ -1218,7 +1283,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage> {
       children: [
         Align(
           alignment: Alignment.centerLeft,
-          child: Text('4. 강사 피드백',
+          child: Text('5. 강사 피드백',
               style: TextStyle(fontFamily: "Jalnan", fontSize: 13)),
         ),
         SizedBox(height: 8),
