@@ -93,6 +93,7 @@ class EnrollmentService {
   static const String defaultWeek1VideoUrl = 'https://youtu.be/C4Dr_beoGoc';
 
   static const String beginnerCourseId = 'beginner_phonics';
+  static const String basicCourseId = 'basic_grammar_speaking';
   static const String intermediateCourseId = 'intermediate_grammar_speaking';
 
   /// 왕초보 과정에 연결된 인강. 회차 번호와 강의 순서가 같다.
@@ -243,8 +244,83 @@ class EnrollmentService {
     ),
   ];
 
+  /// 글림 기초영어 과정에 연결된 연습문제. 인강은 아직 없다.
+  static const List<CatalogLesson> basicLessons = [
+    CatalogLesson(
+      order: 1,
+      title: '1강',
+      videoUrl: '',
+      problemTitle: '1강 연습문제',
+      problemUrl: '/quizzes/gleam-level2-lesson1-quiz.html',
+    ),
+    CatalogLesson(
+      order: 2,
+      title: '2강',
+      videoUrl: '',
+      problemTitle: '2강 연습문제',
+      problemUrl: '/quizzes/gleam-level2-lesson2-quiz.html',
+    ),
+    CatalogLesson(
+      order: 3,
+      title: '3강',
+      videoUrl: '',
+      problemTitle: '3강 연습문제',
+      problemUrl: '/quizzes/gleam-level2-lesson3-quiz.html',
+    ),
+    CatalogLesson(
+      order: 4,
+      title: '4강',
+      videoUrl: '',
+      problemTitle: '4강 연습문제',
+      problemUrl: '/quizzes/gleam-level2-lesson4-quiz.html',
+    ),
+    CatalogLesson(
+      order: 5,
+      title: '5강',
+      videoUrl: '',
+      problemTitle: '5강 연습문제',
+      problemUrl: '/quizzes/gleam-level2-lesson5-quiz.html',
+    ),
+    CatalogLesson(
+      order: 6,
+      title: '6강',
+      videoUrl: '',
+      problemTitle: '6강 연습문제',
+      problemUrl: '/quizzes/gleam-level2-lesson6-quiz.html',
+    ),
+    CatalogLesson(
+      order: 7,
+      title: '7강',
+      videoUrl: '',
+      problemTitle: '7강 연습문제',
+      problemUrl: '/quizzes/gleam-level2-lesson7-quiz.html',
+    ),
+    CatalogLesson(
+      order: 8,
+      title: '8강',
+      videoUrl: '',
+      problemTitle: '8강 연습문제',
+      problemUrl: '/quizzes/gleam-level2-lesson8-quiz.html',
+    ),
+    CatalogLesson(
+      order: 9,
+      title: '9강',
+      videoUrl: '',
+      problemTitle: '9강 연습문제',
+      problemUrl: '/quizzes/gleam-level2-lesson9-quiz.html',
+    ),
+    CatalogLesson(
+      order: 10,
+      title: '10강',
+      videoUrl: '',
+      problemTitle: '10강 연습문제',
+      problemUrl: '/quizzes/gleam-level2-lesson10-quiz.html',
+    ),
+  ];
+
   static List<CatalogLesson> catalogLessons(String courseId) {
     if (courseId == beginnerCourseId) return beginnerLessons;
+    if (courseId == basicCourseId) return basicLessons;
     if (courseId == intermediateCourseId) return intermediateLessons;
     return const [];
   }
@@ -258,6 +334,7 @@ class EnrollmentService {
 
   static String catalogLevelLabel(String courseId) {
     if (courseId == beginnerCourseId) return '왕초보';
+    if (courseId == basicCourseId) return '기초';
     if (courseId == intermediateCourseId) return '중급';
     return '';
   }

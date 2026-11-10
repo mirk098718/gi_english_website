@@ -16,6 +16,56 @@
       weekNumber: 2,
       title: "왕초보 2강 연습문제"
     },
+    "gleam-level2-lesson1": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 1,
+      title: "기초 1강 연습문제"
+    },
+    "gleam-level2-lesson2": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 2,
+      title: "기초 2강 연습문제"
+    },
+    "gleam-level2-lesson3": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 3,
+      title: "기초 3강 연습문제"
+    },
+    "gleam-level2-lesson4": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 4,
+      title: "기초 4강 연습문제"
+    },
+    "gleam-level2-lesson5": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 5,
+      title: "기초 5강 연습문제"
+    },
+    "gleam-level2-lesson6": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 6,
+      title: "기초 6강 연습문제"
+    },
+    "gleam-level2-lesson7": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 7,
+      title: "기초 7강 연습문제"
+    },
+    "gleam-level2-lesson8": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 8,
+      title: "기초 8강 연습문제"
+    },
+    "gleam-level2-lesson9": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 9,
+      title: "기초 9강 연습문제"
+    },
+    "gleam-level2-lesson10": {
+      courseId: "basic_grammar_speaking",
+      weekNumber: 10,
+      title: "기초 10강 연습문제"
+    },
     "gleam-level1-lesson3": {
       courseId: "beginner_phonics",
       weekNumber: 3,

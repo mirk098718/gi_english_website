@@ -74,16 +74,27 @@ void main() {
   test('연결된 연습문제 주소는 모두 퀴즈 키가 된다', () {
     final urls = [
       ...EnrollmentService.beginnerLessons.map((lesson) => lesson.problemUrl),
+      ...EnrollmentService.basicLessons.map((lesson) => lesson.problemUrl),
       ...EnrollmentService.intermediateLessons
           .map((lesson) => lesson.problemUrl),
     ];
 
-    expect(urls, hasLength(20));
+    expect(urls, hasLength(30));
     expect(
       urls.map(QuizResult.quizIdFromUrl).toSet(),
       {
         'gleam-level1-lesson1',
         'gleam-level2-lesson02',
+        'gleam-level2-lesson1',
+        'gleam-level2-lesson2',
+        'gleam-level2-lesson3',
+        'gleam-level2-lesson4',
+        'gleam-level2-lesson5',
+        'gleam-level2-lesson6',
+        'gleam-level2-lesson7',
+        'gleam-level2-lesson8',
+        'gleam-level2-lesson9',
+        'gleam-level2-lesson10',
         'gleam-level1-lesson3',
         'gleam-level1-lesson4',
         'gleam-level1-lesson5',

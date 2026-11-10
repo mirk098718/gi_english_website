@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>글림 기초 영어 제10강 · 문제 풀이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4ecdd; --bg-soft:#faf5ea; --card:#fffdf9;
+  --ink:#33241a; --sub:#82705d; --line:#e7d8c0;
+  --coffee:#7a4a26; --caramel:#d98a2b; --caramel-deep:#a9620f; --caramel-soft:#f8e7c8;
+  --ok:#3e7d54; --ok-bg:#e6f2e6; --no:#bc4741; --no-bg:#fae5e0;
+  --disp:'Black Han Sans', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --serif:Georgia, 'Times New Roman', serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans); color:var(--ink); background:var(--bg);
+  background-image:radial-gradient(#e2d3b8 1px, transparent 1px);
+  background-size:22px 22px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  word-break:keep-all; overflow-wrap:break-word; /* 한글은 단어 단위로만 줄바꿈 */
+}
+.en{font-family:var(--serif); letter-spacing:.01em}
+.wrap{max-width:880px; margin:0 auto; padding:0 18px}
+
+/* ── 상단바 ─────────────────────────── */
+.topbar{position:sticky; top:0; z-index:50; background:rgba(244,236,221,.92); backdrop-filter:blur(8px); border-bottom:1.5px solid var(--line)}
+.topbar .wrap{display:flex; align-items:center; gap:10px; justify-content:space-between; padding-top:10px; padding-bottom:10px; flex-wrap:wrap}
+.brand{font-family:var(--disp); font-size:1.02rem; color:var(--coffee); letter-spacing:.02em; display:flex; align-items:center; gap:6px}
+.brand small{white-space:nowrap; font-family:var(--sans); font-weight:700; color:var(--sub); font-size:.72rem; border:1.5px solid var(--line); border-radius:999px; padding:2px 8px; background:var(--card)}
+.scores{display:flex; gap:8px; align-items:center; font-weight:800; font-size:.8rem}
+.scores .chip{background:var(--card); border:1.5px solid var(--line); border-radius:999px; padding:4px 12px; color:var(--sub); white-space:nowrap}
+.scores .chip b{color:var(--coffee)}
+.scores .chip.ok b{color:var(--ok)}
+
+/* ── 히어로 ─────────────────────────── */
+.hero{padding:44px 0 10px; text-align:center}
+.lg-badge{display:inline-block; white-space:nowrap; background:var(--coffee); color:#f8ecdb; font-weight:800; font-size:.78rem; letter-spacing:.14em; border-radius:999px; padding:5px 16px}
+.hero h1{font-family:var(--disp); font-weight:400; font-size:clamp(1.7rem,5vw,2.6rem); line-height:1.28; margin:16px 0 6px; color:var(--ink)}
+.hero h1 .u{color:var(--caramel-deep); background:linear-gradient(transparent 68%, var(--caramel-soft) 68%)}
+.hero p.sub{color:var(--sub); font-weight:600; font-size:.95rem}
+
+/* 어순 공식 티켓 (시그니처) */
+.formula{display:flex; align-items:stretch; justify-content:center; gap:0; margin:30px auto 8px; flex-wrap:wrap; max-width:640px}
+.f-chip{flex:1 1 120px; min-width:100px; background:var(--card); border:2px solid var(--ink); border-radius:16px; padding:14px 12px 12px; position:relative; box-shadow:4px 4px 0 rgba(122,74,38,.22); text-align:center}
+.f-chip .role{position:absolute; top:-12px; left:50%; transform:translateX(-50%); font-size:.68rem; font-weight:900; letter-spacing:.08em; color:#fff; background:var(--coffee); border-radius:999px; padding:2px 11px; white-space:nowrap; max-width:none}
+.f-chip:nth-child(3) .role{background:var(--caramel-deep)}
+.f-chip:nth-child(5) .role{background:#3e7d54}
+.f-chip .en-big{font-family:var(--serif); font-size:1.55rem; font-weight:700; display:block; margin-top:6px}
+.f-chip .kr{font-size:.78rem; color:var(--sub); font-weight:700}
+.f-arrow{align-self:center; font-size:1.3rem; color:var(--caramel-deep); padding:0 10px; font-weight:900}
+.formula-note{color:var(--sub); font-size:.83rem; font-weight:700; margin-bottom:6px}
+.formula-note s{color:#b0473f}
+
+/* 요점 복습 */
+.recap{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:30px 0 8px}
+.r-card{background:var(--card); border:1.5px solid var(--line); border-radius:16px; padding:18px 16px; text-align:left}
+.r-card h3{font-size:.85rem; color:var(--caramel-deep); letter-spacing:.08em; font-weight:900; margin-bottom:8px}
+.r-card .ex{font-size:.95rem; margin-top:6px}
+.vs-box{background:var(--bg-soft); border:1px dashed var(--line); border-radius:10px; padding:8px 10px; margin-top:4px; font-size:.88rem}
+.vs-box .bad{color:#b0473f; font-weight:700}
+.vs-box .good{color:var(--ok); font-weight:800}
+/* 상단 정리 — 한 개념 한 줄: 항목당 2줄(영어+칩 / 한국어 뜻) */
+.freq-item{padding:4px 0}
+.freq-item + .freq-item{border-top:1px dashed var(--line); margin-top:4px; padding-top:9px}
+.fi-top{display:flex; align-items:baseline; justify-content:space-between; gap:8px; font-weight:800; font-size:.95rem}
+.fi-top .en{color:var(--ink)}
+.fi-pct{font-size:.76rem; color:var(--caramel-deep); font-weight:900; white-space:nowrap; background:var(--caramel-soft); border-radius:999px; padding:1px 8px}
+.fi-pct.pos2{background:#e3edf6; color:#2e5e83}
+.fi-kr{display:block; font-size:.84rem; color:var(--sub); font-weight:700; margin-top:2px}
+.start-btn{display:inline-block; margin:26px 0 6px; background:var(--coffee); color:#fff7ec; font-weight:900; font-size:1rem; border:none; border-radius:999px; padding:14px 34px; cursor:pointer; box-shadow:0 6px 18px rgba(122,74,38,.32); transition:transform .15s, box-shadow .15s}
+.start-btn:hover{transform:translateY(-2px); box-shadow:0 10px 22px rgba(122,74,38,.38)}
+
+/* ── 섹션 공통 ──────────────────────── */
+section.block{padding:34px 0 6px}
+.sec-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:6px}
+.sec-head h2{font-family:var(--disp); font-weight:400; font-size:1.45rem; color:var(--coffee)}
+.sec-head .count{font-weight:900; color:var(--caramel-deep); font-size:.9rem; background:var(--caramel-soft); border-radius:999px; padding:3px 14px; white-space:nowrap}
+.sec-desc{color:var(--sub); font-size:.88rem; font-weight:600; margin-bottom:20px}
+
+/* ── 문제 카드 ──────────────────────── */
+.q-card{background:var(--card); border:1.5px solid var(--line); border-radius:18px; padding:20px 20px 18px; margin-bottom:18px; box-shadow:0 2px 10px rgba(122,74,38,.06)}
+.q-top{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px}
+.stamp{font-family:var(--disp); font-size:.95rem; color:var(--coffee); border:2px solid var(--coffee); border-radius:8px; padding:1px 9px; transform:rotate(-3deg); letter-spacing:.05em; flex:none; white-space:nowrap}
+.tchip{font-size:.72rem; font-weight:900; letter-spacing:.04em; border-radius:999px; padding:4px 12px; white-space:nowrap}
+.tc-concept{background:#f2e3c8; color:#8a5a1f}
+.tc-blank{background:#e3edf6; color:#2e5e83}
+.tc-wrong{background:#f9e0dc; color:#a3403a}
+.tc-multi{background:#e9e2f5; color:#5b4a8a}
+.tc-order{background:#ddefe4; color:#2f6e4f}
+.tc-dialog{background:#fce8ee; color:#96374f}
+.tc-trans{background:#e0eef0; color:#22626b}
+.tc-part{background:#f6ecd8; color:#7a641f}
+.tc-correct{background:#e2ecdf; color:#3c6b2f}
+.tc-vocab{background:#eceae7; color:#5f5346}
+.tc-noun{background:#dfe7f2; color:#34568c}
+.tc-write{background:#f8e7c8; color:#a9620f}
+.multi-note{font-size:.74rem; color:var(--caramel-deep); font-weight:800; background:var(--caramel-soft); border-radius:999px; padding:3px 10px; white-space:nowrap}
+.q-text{font-size:1.02rem; font-weight:700; margin-bottom:14px}
+.q-text .q-en{font-family:var(--serif); color:var(--coffee)}
+.opts{display:grid; gap:9px}
+.opt{display:flex; align-items:flex-start; gap:10px; width:100%; text-align:left; background:var(--bg-soft); border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; cursor:pointer; font-family:var(--sans); font-size:.95rem; color:var(--ink); transition:border-color .12s, background .12s, transform .12s}
+.opt:hover:not(:disabled){border-color:var(--caramel); transform:translateX(2px)}
+.opt:disabled{cursor:default}
+.opt .mark{font-weight:900; color:var(--caramel-deep); flex:none}
+.opt .box{flex:none; width:18px; height:18px; border:2px solid var(--sub); border-radius:5px; margin-top:2px; display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; color:transparent; font-weight:900}
+.opt.sel{border-color:var(--caramel-deep); background:var(--caramel-soft)}
+.opt.sel .box{background:var(--caramel-deep); border-color:var(--caramel-deep); color:#fff}
+.opt.right{border-color:var(--ok); background:var(--ok-bg)}
+.opt.right .box{background:var(--ok); border-color:var(--ok); color:#fff}
+.opt.right .mark{color:var(--ok)}
+.opt.right .mark::after{content:" ✓"; color:var(--ok); font-weight:900}
+.opt.miss{border-color:var(--no); background:var(--no-bg)}
+.opt.miss .box{background:var(--no); border-color:var(--no); color:#fff}
+.opt.miss .mark{color:var(--no)}
+.opt.miss .mark::after{content:" ✗"; color:var(--no); font-weight:900}
+.opt.dim{opacity:.55}
+.q-actions{display:flex; gap:10px; margin-top:14px; align-items:center}
+.btn-check{background:var(--caramel-deep); color:#fff; border:none; border-radius:999px; padding:10px 26px; font-weight:900; font-size:.88rem; cursor:pointer; font-family:var(--sans); transition:opacity .15s, transform .15s}
+.btn-check:hover:not(:disabled){transform:translateY(-1px)}
+.btn-check:disabled{opacity:.35; cursor:not-allowed}
+.graded-tag{font-weight:900; font-size:.85rem}
+.graded-tag.good{color:var(--ok)} .graded-tag.bad{color:var(--no)}
+.feedback{display:none; margin-top:14px; border-top:1.5px dashed var(--line); padding-top:13px}
+.feedback.show{display:block; animation:slidein .25s ease}
+@keyframes slidein{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+.fb-title{font-weight:900; font-size:.9rem; margin-bottom:5px}
+.fb-title.good{color:var(--ok)} .fb-title.bad{color:var(--no)}
+.fb-exp{font-size:.9rem; color:var(--ink); background:var(--bg-soft); border-radius:10px; padding:10px 13px}
+.fb-exp .en{color:var(--coffee)}
+
+/* ── 주관식 ─────────────────────────── */
+.situation{background:var(--bg-soft); border:1.5px dashed var(--line); border-radius:12px; padding:13px 15px; font-size:.95rem; margin-bottom:12px}
+.hints{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:12px}
+.hint{font-size:.74rem; font-weight:800; color:var(--coffee); background:var(--caramel-soft); border-radius:999px; padding:3px 11px; white-space:nowrap}
+.hint .en{font-style:normal}
+textarea{width:100%; min-height:86px; border:1.5px solid var(--line); border-radius:12px; background:var(--bg-soft); padding:12px 14px; font-family:var(--sans); font-size:.97rem; color:var(--ink); resize:vertical}
+textarea:focus{outline:2px solid var(--caramel); border-color:var(--caramel)}
+.model{display:none; margin-top:14px; background:#f2ede2; border-radius:12px; padding:12px 15px; font-size:.93rem}
+.model.show{display:block; animation:slidein .25s ease}
+.model b{color:var(--coffee)}
+
+/* ── 결과 ───────────────────────────── */
+.result{background:var(--card); border:2px solid var(--ink); border-radius:20px; box-shadow:6px 6px 0 rgba(122,74,38,.2); padding:26px 22px; margin:34px 0 10px; text-align:center}
+.result .big{font-family:var(--disp); font-size:2.5rem; color:var(--coffee); line-height:1.1}
+.result .msg{font-weight:800; margin-top:6px}
+.type-table{width:100%; border-collapse:collapse; margin-top:16px; font-size:.85rem}
+.type-table th,.type-table td{border-bottom:1px dashed var(--line); padding:7px 6px; text-align:center}
+.type-table th{color:var(--sub); font-size:.76rem; letter-spacing:.05em}
+.type-table td:first-child{text-align:left; font-weight:700}
+.btn-reset{margin-top:18px; background:transparent; color:var(--no); border:2px solid var(--no); border-radius:999px; padding:10px 26px; font-weight:900; cursor:pointer; font-family:var(--sans); font-size:.88rem}
+.btn-reset:hover{background:var(--no-bg)}
+.quiz-actions{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center; margin:18px 0 8px}
+.quiz-actions-note{flex:1 1 100%; margin:0; text-align:center; color:var(--sub); font-size:.78rem; font-weight:700}
+.btn-grade-all,.btn-complete{border:none; border-radius:999px; padding:11px 22px; font-weight:900; cursor:pointer; font-family:var(--sans); font-size:.9rem}
+.btn-grade-all{background:var(--coffee); color:#fff}
+.btn-complete{background:var(--ok); color:#fff}
+.btn-grade-all:hover,.btn-complete:hover{transform:translateY(-1px)}
+footer{text-align:center; color:var(--sub); font-size:.78rem; font-weight:600; padding:26px 0 40px}
+.all-done{display:none; font-size:2.6rem; margin-top:4px}
+.all-done.show{display:block; animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.4); opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1); opacity:1}}
+
+button:focus-visible, textarea:focus-visible, a:focus-visible{outline:3px solid var(--caramel-deep); outline-offset:2px}
+/* 칩이 4개(칩+화살표 = 자식 7개)면 좁은 화면에서 2+2 그리드:
+   화살표는 줄바꿈 시 방향이 어긋나므로 숨기고, 두 줄로 균등 배치 + 줄 간격 확보 */
+@media (max-width:680px){
+  .formula:has(.f-chip:nth-child(7)){gap:18px 14px}
+  .formula:has(.f-chip:nth-child(7)) .f-chip{flex:1 1 calc(50% - 7px); min-width:calc(50% - 7px); padding:14px 10px 11px}
+  .formula:has(.f-chip:nth-child(7)) .f-arrow{display:none}
+}
+@media (max-width:560px){
+  .f-arrow{padding:0 2px; font-size:.92rem}
+  .f-chip{min-width:78px; flex:1 1 78px; padding:12px 5px 9px}
+  .f-chip .role{font-size:.58rem; letter-spacing:.01em; padding:2px 7px}
+  .f-chip .en-big{font-size:1.12rem}
+  .f-chip .kr{font-size:.66rem}
+  .hero h1{font-size:clamp(1.2rem,5.2vw,2rem)}
+  .q-card{padding:16px 14px 15px}
+  .lg-badge{font-size:.7rem; letter-spacing:.08em; padding:5px 13px}
+}
+/* 초협폭(320px 미만) — 반드시 560px 블록 뒤에 둔다(CSS는 나중 규칙이 이긴다) */
+@media (max-width:319px){
+  .f-arrow{padding:0 1px; font-size:.85rem}
+  .f-chip{min-width:64px; flex:1 1 64px; padding:11px 4px 8px}
+  .f-chip .role{font-size:.5rem; letter-spacing:0; padding:2px 5px}
+  .f-chip .en-big{font-size:1rem}
+  .f-chip .kr{font-size:.6rem}
+  .hero h1{font-size:.98rem}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} html{scroll-behavior:auto} }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">☕ 글림 기초 영어 <small>LEVEL 2 · 제10강 문제 풀이</small></div>
+    <div class="scores">
+      <span class="chip">채점 <b id="gradedN">0</b> / 25</span>
+      <span class="chip ok">정답 <b id="correctN">0</b> / 25</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">    <span class="lg-badge">LEVEL 2 · 제 10강 · How Much? How Many?</span>
+    <h1>How Much? How Many?<br/><span class="u">countable vs uncountable</span> 확인 문제</h1>
+    <p class="sub">핵심 표현 · <span class="en">How much water do you need? / How many cups?</span> — 30문항으로 명사의 성격을 파악하는 눈을 완전히 내 것으로 만들어 보세요.</p>
+
+    <div class="formula" aria-label="How many vs How much 공식">
+      <div class="f-chip"><span class="role">How many · 개수</span><span class="en-big en">many</span><span class="kr">몇 개? + 복수명사</span></div>
+      <div class="f-arrow">vs</div>
+      <div class="f-chip"><span class="role">How much · 양·가격</span><span class="en-big en">much</span><span class="kr">얼마나? 셀 수 없는 명사</span></div>
+      <div class="f-arrow">→</div>
+      <div class="f-chip"><span class="role">명사 · 주의</span><span class="en-big en">water</span><span class="kr">물·돈·시간은 셈 안 함</span></div>
+    </div>
+    <p class="formula-note">한국어식 <s>'물 두 잔'처럼 전부 셈하기</s> ✗ &nbsp;→&nbsp; 개수는 <b style="color:var(--caramel-deep)">How many</b>, 양과 가격은 <b style="color:var(--caramel-deep)">How much!</b></p>
+
+    <div class="recap">
+      <div class="r-card">
+        <h3>1. Countable vs Uncountable</h3>
+        <div class="vs-box">
+          <div class="freq-item"><span class="fi-top"><span class="en">cup · apple · car</span><span class="fi-pct">개수</span></span><span class="fi-kr">하나 둘 셀 수 있는 구체적인 형태!</span></div>
+          <div class="freq-item"><span class="fi-top"><span class="en">water · money · time</span><span class="fi-pct">양</span></span><span class="fi-kr">액체·개념은 형태가 일정치 않아서 셈 안 함!</span></div>
+        </div>
+      </div>
+      <div class="r-card">
+        <h3>2. 질문 공식</h3>
+        <div class="vs-box">
+          <div class="freq-item"><span class="fi-top"><span class="en">How many apples?</span><span class="fi-pct">질문</span></span><span class="fi-kr">몇 개? + 복수명사!</span></div>
+        </div>
+        <div class="vs-box">
+          <div class="freq-item"><span class="fi-top"><span class="en">How much water?</span><span class="fi-pct">질문</span></span><span class="fi-kr">얼마나? + 셀 수 없는 명사!</span></div>
+        </div>
+      </div>
+      <div class="r-card">
+        <h3>3. 주문 꿀팁</h3>
+        <div class="vs-box">
+          <div class="freq-item"><span class="fi-top"><span class="en">How much is an iced latte?</span><span class="fi-pct">가격</span></span><span class="fi-kr">가격도 How much로 물어요!</span></div>
+        </div>
+        <div class="vs-box">
+          <div class="freq-item"><span class="fi-top"><span class="en">Two coffees, please.</span><span class="fi-pct">주문</span></span><span class="fi-kr">coffee는 셈 안 하지만 주문할 땐 coffees OK!</span></div>
+        </div>
+      </div>
+    </div>
+
+    <a href="#mcq"><button class="start-btn">객관식 25문제 풀기 ↓</button></a>
+</section>
+
+  <section class="block" id="mcq">
+    <div class="sec-head"><h2>객관식 문제</h2><span class="count">25문제</span></div>
+    <p class="sec-desc">유형별로 구성되어 있어요: 개념 이해 · 명사 구분 · 빈칸 채우기 · 틀린 문장 찾기 · 모두 고르기 · 대화 문제 · 뜻 고르기 · 단어 배열 · 바른 문장 찾기 · 어휘. 답을 고르고 <b>채점하기</b>를 누르면 바로 해설이 나옵니다. 한꺼번에 보려면 <b>한번에 채점하기</b>를, 점수와 주관식을 남기려면 <b>완료</b>를 누르세요.</p>
+        <div class="quiz-actions">
+      <button type="button" class="btn-grade-all" data-quiz-grade-all>한번에 채점하기</button>
+      <button type="button" class="btn-complete" data-quiz-complete>완료</button>
+      <p class="quiz-actions-note">답을 고르지 않은 문제는 오답으로 채점됩니다. 완료를 누르면 점수와 주관식 답이 내 강의실에 바로 저장됩니다.</p>
+    </div>
+    <div id="mcqList"></div>
+  </section>
+
+  <section class="block" id="essay">
+    <div class="sec-head"><h2>주관식 작문</h2><span class="count">5문제</span></div>
+    <p class="sec-desc">상황을 읽고 직접 영어 문장을 써 보세요. 그다음 <b>모범답안 보기</b>를 눌러 내 답과 비교해 보세요. 정답은 하나가 아닐 수도 있어요!</p>
+    <div id="essayList"></div>
+  </section>
+
+  <section class="result" id="result">
+    <div class="all-done" id="allDone">🎉</div>
+    <div class="big"><span id="finalScore">0</span><span style="font-size:1.2rem; color:var(--sub)"> / 25</span></div>
+    <div class="msg" id="resultMsg">문제를 풀면 결과가 여기에 표시돼요.</div>
+    <table class="type-table" id="typeTable" aria-label="유형별 정답률">
+      <thead><tr><th>유형</th><th>정답 / 채점</th></tr></thead>
+      <tbody></tbody>
+    </table>
+        <div class="quiz-actions">
+      <button type="button" class="btn-grade-all" data-quiz-grade-all>한번에 채점하기</button>
+      <button type="button" class="btn-complete" data-quiz-complete>완료</button>
+      <p class="quiz-actions-note">답을 고르지 않은 문제는 오답으로 채점됩니다. 완료를 누르면 점수와 주관식 답이 내 강의실에 바로 저장됩니다.</p>
+    </div>
+    <button class="btn-reset" id="btnReset">모두 다시 풀기</button>
+  </section>
+
+</main>
+<footer>글림 기초 영어 · 제 10강 「How Much? How Many?」 — 개수는 <span class="en">How many cups?</span>, 양과 가격은 <span class="en">How much water?</span> 처럼 갈라서 말해 보세요. 다음 11강 수량사 A few, A little 편에서 만나요.</footer>
+
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore-compat.js"></script>
+<script src="quiz-result.js"></script>
+<script>
+/* ─────────── 문제 데이터 ─────────── */
+const TYPE = {
+  concept:{label:"개념 이해", cls:"tc-concept"}, blank:{label:"빈칸 채우기", cls:"tc-blank"},
+  wrong:{label:"틀린 문장 찾기", cls:"tc-wrong"}, multi:{label:"모두 고르기", cls:"tc-multi"},
+  order:{label:"단어 배열", cls:"tc-order"}, dialog:{label:"대화 문제", cls:"tc-dialog"},
+  trans:{label:"뜻 고르기", cls:"tc-trans"}, noun:{label:"명사 구분", cls:"tc-noun"}, part:{label:"주어·동사 찾기", cls:"tc-part"},
+  correct:{label:"바른 문장 찾기", cls:"tc-correct"}, vocab:{label:"어휘", cls:"tc-vocab"},
+  write:{label:"작문", cls:"tc-write"}
+};
+const QUIZ = [
+ {t:"concept", q:"Countable(셀 수 있는 명사)의 성격은?",
+  o:["하나 둘 셀 수 있는 구체적인 형태","형태가 일정치 않은 액체","개념·추상명사","양이나 가격"], a:[0],
+  e:"Countable은 cup·apple·car처럼 하나 둘 셀 수 있는 구체적인 형태! 개수를 묻는 How many와 짝이에요."},
+ {t:"concept", q:"다음 중 Uncountable(셀 수 없는 명사)이 아닌 것은?",
+  o:["water","information","apple","money"], a:[2],
+  e:"apple은 하나 둘 셀 수 있는 Countable! water·information·money는 셀 수 없어요."},
+ {t:"concept", q:"How many 바로 뒤에 오는 것은?",
+  o:["셀 수 없는 명사","단수명사","조동사","복수명사"], a:[3],
+  e:"How many + 복수명사! How many apples do you have? 처럼 '몇 개?'를 물어요."},
+ {t:"concept", q:"How much가 묻는 두 가지는?",
+  o:["개수와 순서","양과 가격","시간과 장소","사람과 사물"], a:[1],
+  e:"How much = 양(얼마나)과 가격(얼마)! How much water? / How much is it?"},
+ {t:"noun", q:"다음 중 Countable(셀 수 있는) 명사는?",
+  o:["water","sugar","cup","money"], a:[2],
+  e:"cup(컵)은 하나 둘 셀 수 있어요! water·sugar·money는 셀 수 없어요."},
+ {t:"noun", q:"다음 중 Uncountable(셀 수 없는) 명사는?",
+  o:["person","apple","advice","car"], a:[2],
+  e:"advice(조언)는 개념이라 셀 수 없어요! person·apple·car는 셀 수 있어요."},
+ {t:"noun", q:"빈칸에 알맞은 것은? — <span class='q-en'>How ___ people are attending the meeting?</span> (몇 분이 회의에 참석하시나요?)",
+  o:["many","much","long","often"], a:[0],
+  e:"people은 셀 수 있는 명사! 개수 → How many. → How many people…?"},
+ {t:"noun", q:"빈칸에 알맞은 것은? — <span class='q-en'>How ___ water do you drink a day?</span> (하루에 물을 얼마나 드세요?)",
+  o:["many","much","long","often"], a:[1],
+  e:"water는 셀 수 없는 명사! 양 → How much. → How much water…?"},
+ {t:"noun", q:"빈칸에 알맞은 것은? — <span class='q-en'>How ___ cups would you like?</span> (몇 잔 드릴까요?)",
+  o:["much","long","often","many"], a:[3],
+  e:"cups는 복수명사! 개수 → How many. → How many cups would you like?"},
+ {t:"noun", q:"가격을 물을 때 알맞은 것은?",
+  o:["How many is it?","How much is it?","How long is it?","How old is it?"], a:[1],
+  e:"가격(얼마)도 How much! → How much is an iced latte? = 아이스 라떼 얼마인가요?"},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>How ___ money do you need?</span> (돈이 얼마나 필요해요?)",
+  o:["many","long","much","often"], a:[2],
+  e:"money는 셀 수 없는 명사! → How much money? 돈이 얼마나 필요한지 물어요."},
+ {t:"blank", q:"빈칸에 알맞은 것은? — <span class='q-en'>How ___ apples do you have?</span> (사과 몇 개 있어요?)",
+  o:["much","many","long","often"], a:[1],
+  e:"apples는 복수명사! → How many apples? 몇 개 있는지 물어요."},
+ {t:"wrong", q:"다음 중 틀린 문장은?",
+  o:["How many cups would you like?","How much sugar do you put in?","How much is an iced latte?","How much apples do you need?"], a:[3],
+  e:"apples는 셀 수 있는 명사라 How many와 짝! → How many apples do you need?"},
+ {t:"wrong", q:"다음 중 틀린 문장은?",
+  o:["How much dollars do you have?","How many dollars do you have?","How much money do you have?","How much time do we have?"], a:[0],
+  e:"dollar(달러)는 셀 수 있는 명사! → How many dollars do you have? money는 셀 수 없어서 How much!"},
+ {t:"multi", q:"다음 중 How many를 써야 하는 문장을 모두 고르시오.",
+  o:["___ apples do you have?","___ money do you need?","___ cups would you like?","___ water do you drink?"], a:[0,2],
+  e:"apples·cups는 복수명사 → How many! money·water는 셀 수 없는 명사 → How much!"},
+ {t:"multi", q:"다음 중 How much를 써야 하는 문장을 모두 고르시오.",
+  o:["___ people are coming?","___ coffee do you drink?","___ cars do you own?","___ time do we have?"], a:[1,3],
+  e:"coffee·time은 셀 수 없는 명사 → How much! people·cars는 셀 수 있어요 → How many!"},
+ {t:"multi", q:"다음 중 Uncountable(셀 수 없는) 명사를 모두 고르시오.",
+  o:["information","apple","car","money"], a:[0,3],
+  e:"information(정보)·money(돈)는 셀 수 없어요! apple·car는 하나 둘 셀 수 있어요."},
+ {t:"dialog", q:"대화의 빈칸을 채워 보세요. — Barista: <span class='q-en'>Welcome to Coffee Lab! How can I help you?</span> / Customer: ___",
+  o:["I want two waters.","How much is an iced latte?","How many is an iced latte?","I am an iced latte."], a:[1],
+  e:"가격을 물을 땐 How much! → How much is an iced latte? = 아이스 라떼 얼마인가요?"},
+ {t:"dialog", q:"대화의 빈칸을 채워 보세요. — Barista: <span class='q-en'>It's 5 dollars. ___</span> (몇 잔 드릴까요?)",
+  o:["How much cups would you like?","How long cups would you like?","How many cups would you like?","How much many cups?"], a:[2],
+  e:"cups는 복수명사! 개수 → How many cups would you like?"},
+ {t:"trans", q:"<span class='q-en'>How much water do you drink a day?</span> 의 뜻은?",
+  o:["하루에 물을 몇 잔 마셔요?","하루에 물을 얼마나 드세요?","하루에 물을 마셔 본 적 있나요?","하루에 물을 마시지 마세요."], a:[1],
+  e:"How much water = 물을 얼마나! 셀 수 없는 명사의 양을 물어요."},
+ {t:"trans", q:"<span class='q-en'>How many people are attending the meeting?</span> 의 뜻은?",
+  o:["회의가 얼마나 길어요?","회의에 시간이 얼마나 남았어요?","몇 분이 회의에 참석하시나요?","회의에 참석해 주세요."], a:[2],
+  e:"How many people = 몇 명! people은 셀 수 있는 명사라 개수를 물어요."},
+ {t:"order", q:"주어진 단어를 바르게 배열한 것은? ( much / water / how / do you need )",
+  o:["How much water do you need?","How water much do you need?","How do you need much water?","Much how water do you need?"], a:[0],
+  e:"How + much + 셀 수 없는 명사(water) 순서! → How much water do you need?"},
+ {t:"correct", q:"다음 중 바르게 쓰인 문장은?",
+  o:["How many sugar do you put in?","How much apples do you need?","How much sugars do you put in?","How much sugar do you put in?"], a:[3],
+  e:"sugar는 셀 수 없는 명사 → How much! → How much sugar do you put in? = 설탕은 얼마나 들어가나요?"},
+ {t:"vocab", q:"'설탕'을 뜻하는 영어 단어는?",
+  o:["sugar","water","money","time"], a:[0],
+  e:"sugar = 설탕! 셀 수 없는 명사라 How much sugar? 처럼 물어요."},
+ {t:"concept", q:"다음 중 한국어로는 셀 수 있을 것 같지만 영어에서는 Uncountable인 명사는?",
+  o:["apple","cup","car","furniture"], a:[3],
+  e:"furniture(가구)는 영어에서 셀 수 없어요! a piece of furniture 처럼 세어요. 물·돈·시간·정보·가구는 모두 Uncountable!"}
+
+];
+const ESSAYS = [
+ {q:"기본 표현 쓰기", sit:"물을 주문하려고 해요. <b>『물이 얼마나 필요하세요?』</b>라고 물어 보세요.",
+  hints:["need"],
+  model:"How much water do you need?", modelKr:"물은 셀 수 없는 명사! How much + water."},
+ {q:"상황 작문 1", sit:"카페에서 주문할 차례예요. <b>『몇 잔 드릴까요?』</b>를 영어로 써 보세요.",
+  hints:["cups"],
+  model:"How many cups would you like?", modelKr:"cups는 복수명사! 개수 → How many + cups."},
+ {q:"상황 작문 2", sit:"음료를 만들면서 물어봐요. <b>『설탕은 얼마나 들어가나요?』</b>를 영어로 써 보세요.",
+  hints:["sugar"],
+  model:"How much sugar do you put in?", modelKr:"sugar는 셀 수 없는 명사! How much + sugar."},
+ {q:"상황 작문 3", sit:"회의 준비 중이에요. <b>『몇 분이 회의에 참석하시나요?』</b>를 영어로 써 보세요.",
+  hints:["people"],
+  model:"How many people are attending the meeting?", modelKr:"people은 셀 수 있는 명사! 개수 → How many + people."},
+ {q:"자유 작문", sit:"<b>① How many로 개수를 묻는 문장 1개</b>와 <b>② How much로 양이나 가격을 묻는 문장 1개</b>를 써 보세요. (예시: How many apples? / How much is this coffee?)",
+  hints:[],
+  model:"How many apples do you have? / How much is this coffee?", modelKr:"예시 — 개수는 How many, 양·가격은 How much!"}
+
+];
+
+/* ─────────── 렌더링 ─────────── */
+const state = QUIZ.map(()=>({sel:new Set(), graded:false, correct:false}));
+const gradeOneFns = [];
+const marks = ["①","②","③","④"];
+const mcqList = document.getElementById("mcqList");
+
+QUIZ.forEach((item, qi)=>{
+  const meta = TYPE[item.t];
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">Q.${String(qi+1).padStart(2,"0")}</span>
+      <span class="tchip ${meta.cls}">${meta.label}</span>
+      ${item.a.length>1 ? '<span class="multi-note">정답 '+item.a.length+'개를 모두 고르세요</span>' : ''}
+    </div>
+    <p class="q-text">${item.q}</p>
+    <div class="opts">${item.o.map((op,oi)=>`
+      <button type="button" class="opt" data-oi="${oi}" aria-pressed="false">
+        ${item.a.length>1 ? '<span class="box">✓</span>' : '<span class="mark">'+marks[oi]+'</span>'}
+        <span class="${/^[A-Za-z]/.test(op) ? 'en' : ''}">${op}</span>
+      </button>`).join("")}
+    </div>
+    <div class="q-actions">
+      <button type="button" class="btn-check" disabled>채점하기</button>
+      <span class="graded-tag" hidden></span>
+    </div>
+    <div class="feedback"><p class="fb-title"></p><p class="fb-exp"></p></div>`;
+  mcqList.appendChild(card);
+
+  const opts = [...card.querySelectorAll(".opt")];
+  const btn = card.querySelector(".btn-check");
+  const tag = card.querySelector(".graded-tag");
+  const fb = card.querySelector(".feedback");
+  const fbTitle = card.querySelector(".fb-title");
+  const fbExp = card.querySelector(".fb-exp");
+
+  opts.forEach((b,oi)=>b.addEventListener("click", ()=>{
+    if(state[qi].graded) return;
+    if(item.a.length>1){
+      state[qi].sel.has(oi) ? state[qi].sel.delete(oi) : state[qi].sel.add(oi);
+      b.classList.toggle("sel"); b.setAttribute("aria-pressed", b.classList.contains("sel"));
+    } else {
+      state[qi].sel.clear();
+      opts.forEach(o=>{o.classList.remove("sel"); o.setAttribute("aria-pressed","false");});
+      state[qi].sel.add(oi); b.classList.add("sel"); b.setAttribute("aria-pressed","true");
+    }
+    btn.disabled = state[qi].sel.size===0;
+  }));
+
+  function gradeOne(forceBlank){
+    const st = state[qi];
+    if(st.graded) return;
+    if(st.sel.size===0 && !forceBlank) return;
+    const isRight = st.sel.size===item.a.length && item.a.every(x=>st.sel.has(x));
+    st.graded = true; st.correct = isRight;
+    opts.forEach((b,oi)=>{
+      b.disabled = true;
+      const box = b.querySelector(".box");   // 다중선택 전용. 단일선택에는 없음(null)
+      if(item.a.includes(oi)){ b.classList.add("right"); if(box) box.textContent="✓"; }
+      else if(st.sel.has(oi)){ b.classList.add("miss"); if(box) box.textContent="✗"; }
+      else b.classList.add("dim");
+    });
+    tag.hidden = false;
+    tag.textContent = isRight ? "정답!" : (st.sel.size ? "다시 확인해 보세요" : "답을 고르지 않았어요");
+    tag.className = "graded-tag " + (isRight ? "good" : "bad");
+    fb.classList.add("show");
+    fbTitle.textContent = (isRight ? "⭕ 정답입니다! " : "❌ 아쉬워요. 정답은 " + item.a.map(i=>marks[i]).join(", ") + " ");
+    fbTitle.className = "fb-title " + (isRight ? "good" : "bad");
+    fbExp.innerHTML = "💡 " + item.e;
+    btn.disabled = true;
+    updateScores();
+  }
+  gradeOneFns.push(gradeOne);
+  btn.addEventListener("click", ()=> gradeOne(false));
+});
+
+/* ── 주관식 ── */
+const essayList = document.getElementById("essayList");
+ESSAYS.forEach((item, ei)=>{
+  const card = document.createElement("div");
+  card.className = "q-card";
+  card.innerHTML = `
+    <div class="q-top">
+      <span class="stamp">W.${ei+1}</span>
+      <span class="tchip ${TYPE.write.cls}">${item.q}</span>
+    </div>
+    <div class="situation">${item.sit}</div>
+    <div class="hints">${item.hints.map(h=>'<span class="hint">힌트 · <span class="en">'+h+'</span></span>').join("")}</div>
+    <textarea placeholder="여기에 영어 문장을 직접 써 보세요." aria-label="${item.q} 답안 입력"></textarea>
+    <div class="q-actions">
+      <button type="button" class="btn-check">모범답안 보기</button>
+      <span style="font-size:.78rem; color:var(--sub); font-weight:700">정답은 하나가 아닐 수도 있어요</span>
+    </div>
+    <div class="model"><b>모범답안 · <span class="en" style="font-size:1.02rem">${item.model}</span></b><br/><span style="color:var(--sub); font-size:.85rem">${item.modelKr}</span></div>`;
+  essayList.appendChild(card);
+
+  const btn = card.querySelector(".btn-check");
+  const model = card.querySelector(".model");
+  btn.addEventListener("click", ()=>{
+    const open = model.classList.toggle("show");
+    btn.textContent = open ? "모범답안 숨기기" : "모범답안 보기";
+  });
+});
+
+/* ── 점수 집계 ── */
+function updateScores(){
+  const graded = state.filter(s=>s.graded).length;
+  const correct = state.filter(s=>s.correct).length;
+  document.getElementById("gradedN").textContent = graded;
+  document.getElementById("correctN").textContent = correct;
+  document.getElementById("finalScore").textContent = correct;
+
+  const tbody = document.querySelector("#typeTable tbody");
+  tbody.innerHTML = "";
+  Object.entries(TYPE).forEach(([key, meta])=>{
+    if(key==="write") return;
+    const rows = QUIZ.map((q,i)=>({q, s:state[i]})).filter(x=>x.q.t===key);
+    if(!rows.length) return;
+    const g = rows.filter(x=>x.s.graded).length;
+    const c = rows.filter(x=>x.s.correct).length;
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>"+meta.label+"</td><td>"+(g ? c+" / "+g : "–")+"</td>";
+    tbody.appendChild(tr);
+  });
+
+  const msg = document.getElementById("resultMsg");
+  const emoji = document.getElementById("allDone");
+  if(graded===QUIZ.length){
+    emoji.classList.add("show");
+    if(correct===25) msg.textContent = "만점! 개수는 How many, 양과 가격은 How much! 명사의 성격을 완벽하게 구분해요. 바로 11강 수량사 A few, A little 편으로 갈 준비 끝!";
+    else if(correct>=20) msg.textContent = "훌륭해요! 틀린 문제의 해설만 다시 보면 완벽합니다.";
+    else if(correct>=14) msg.textContent = "절반 이상 성공! '개수 vs 양·가격' 핵심 정리를 다시 읽고 틀린 문제를 정리해 보세요.";
+    else if(correct>=7) msg.textContent = "조금 아쉬워요. 위의 핵심 정리를 다시 복습하고 같은 문제에 다시 도전!";
+    else msg.textContent = "괜찮아요, 시작이 반이에요! 핵심 정리를 읽고 천천히 다시 풀어 보세요.";
+  } else {
+    emoji.classList.remove("show");
+    msg.textContent = "채점한 문제: " + graded + " / 25 — 계속 풀어 보세요!";
+  }
+}
+document.getElementById("btnReset").addEventListener("click", ()=>{ location.reload(); });
+var readQuizSnapshot = function () {
+  var graded = state.filter(function (item) { return item.graded; }).length;
+  var correct = state.filter(function (item) { return item.correct; }).length;
+  var areas = document.querySelectorAll("#essayList textarea");
+  var essays = ESSAYS.map(function (item, index) {
+    var area = areas[index];
+    var prompt = String(item.sit || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    return {
+      index: index + 1,
+      title: String(item.q || ""),
+      prompt: prompt,
+      answer: area ? String(area.value || "").trim() : ""
+    };
+  });
+  return {
+    graded: graded,
+    correct: correct,
+    total: QUIZ.length,
+    complete: QUIZ.length === 25 && graded === 25,
+    essays: essays
+  };
+};
+function gradeAllQuestions(){
+  gradeOneFns.forEach(function (gradeOne) { gradeOne(true); });
+}
+function completeQuiz(){
+  gradeAllQuestions();
+  if (window.GleamQuiz) GleamQuiz.finish(readQuizSnapshot());
+  var result = document.getElementById("result");
+  if (result) result.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+document.querySelectorAll("[data-quiz-grade-all]").forEach(function (button) {
+  button.addEventListener("click", gradeAllQuestions);
+});
+document.querySelectorAll("[data-quiz-complete]").forEach(function (button) {
+  button.addEventListener("click", completeQuiz);
+});
+if (window.GleamQuiz) {
+  try {
+    var originalUpdateScores = updateScores;
+    updateScores = function () {
+      originalUpdateScores();
+      GleamQuiz.report(readQuizSnapshot());
+    };
+    GleamQuiz.start(readQuizSnapshot);
+  } catch (error) {}
+}
+updateScores();
+
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

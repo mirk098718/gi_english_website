@@ -183,8 +183,16 @@ void main() {
     }
   });
 
-  test('다른 과정 1회차는 기존 임시 인강을 유지한다', () {
-    final week = EnrollmentService.defaultWeek('basic_grammar_speaking', 1);
-    expect(week.videoUrl, EnrollmentService.defaultWeek1VideoUrl);
+  test('기초 1강부터 10강은 인강 없이 연습문제만 연결한다', () {
+    for (var lesson = 1; lesson <= 10; lesson++) {
+      final week = EnrollmentService.defaultWeek('basic_grammar_speaking', lesson);
+      expect(week.title, '$lesson강');
+      expect(week.videoUrl, isEmpty);
+      expect(week.problemLinks.single.title, '$lesson강 연습문제');
+      expect(
+        week.problemLinks.single.url,
+        '/quizzes/gleam-level2-lesson$lesson-quiz.html',
+      );
+    }
   });
 }
