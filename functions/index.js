@@ -1038,6 +1038,7 @@ async function ensureSessionForBooking(bookingId, data) {
         ? admin.firestore.Timestamp.fromDate(scheduled)
         : admin.firestore.FieldValue.delete(),
       reminderSent: false,
+      reminder1hSent: false,
     },
     { merge: true }
   );
@@ -1122,80 +1123,105 @@ exports.onWeekBookingUpdated = functions
     return null;
   });
 
+async function sendLessonReminderWindow({
+  fromMs,
+  toMs,
+  flag,
+  title,
+  studentBody,
+  teacherBody,
+}) {
+  const now = Date.now();
+  const snap = await admin
+    .firestore()
+    .collection("week_bookings")
+    .where("scheduledAt", ">=", admin.firestore.Timestamp.fromDate(new Date(now + fromMs)))
+    .where("scheduledAt", "<=", admin.firestore.Timestamp.fromDate(new Date(now + toMs)))
+    .get();
+
+  let sent = 0;
+  for (const doc of snap.docs) {
+    const data = doc.data() || {};
+    if (data.status !== "confirmed") continue;
+    if (data[flag] === true) continue;
+
+    await doc.ref.update({
+      [flag]: true,
+      [`${flag}At`]: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    const when = formatLessonWhen(data);
+    const student = String(data.memberName || data.email || "수강생");
+    const userId = String(data.userId || "");
+    const teacherUid = String(data.teacherId || data.nativeTeacherUid || "");
+    const studentText = studentBody(when);
+    const teacherText = teacherBody(when, student);
+
+    await writeNotification({
+      userId,
+      title,
+      body: studentText,
+      type: "lesson_reminder",
+      bookingId: doc.id,
+    });
+    await writeNotification({
+      userId: teacherUid,
+      title,
+      body: teacherText,
+      type: "lesson_reminder",
+      bookingId: doc.id,
+    });
+
+    const studentPhone = await memberPhone(userId, data.phone);
+    if (studentPhone) {
+      await sendSms({
+        to: studentPhone,
+        text: `[글림교육] ${studentText}`,
+      });
+    } else {
+      console.log("학생 연락처가 없어 수업 리마인드 SMS를 건너뜁니다.", userId, flag);
+    }
+
+    const staffPhone = await teacherPhone(teacherUid);
+    if (staffPhone) {
+      await sendSms({
+        to: staffPhone,
+        text: `[글림교육] ${teacherText}`,
+      });
+    } else {
+      console.log("강사 연락처가 없어 수업 리마인드 SMS를 건너뜁니다.", teacherUid, flag);
+    }
+    sent += 1;
+  }
+  return { matched: snap.size, sent, flag };
+}
+
 exports.sendLessonReminders = functions
   .region("asia-northeast3")
   .pubsub.schedule("every 1 minutes")
   .timeZone("Asia/Seoul")
   .onRun(async () => {
-    const now = Date.now();
-    const from = admin.firestore.Timestamp.fromDate(
-      new Date(now - 2 * 60 * 1000)
-    );
-    const to = admin.firestore.Timestamp.fromDate(
-      new Date(now + 5 * 60 * 1000)
-    );
-    const snap = await admin
-      .firestore()
-      .collection("week_bookings")
-      .where("scheduledAt", ">=", from)
-      .where("scheduledAt", "<=", to)
-      .get();
-
-    let sent = 0;
-    for (const doc of snap.docs) {
-      const data = doc.data() || {};
-      if (data.status !== "confirmed") continue;
-      if (data.reminderSent === true) continue;
-
-      await doc.ref.update({
-        reminderSent: true,
-        reminderSentAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-
-      const when = formatLessonWhen(data);
-      const student = String(data.memberName || data.email || "수강생");
-      const userId = String(data.userId || "");
-      const teacherUid = String(data.teacherId || data.nativeTeacherUid || "");
-      const studentBody = `5분 뒤 화상수업이 시작됩니다. ${when} 내 강의실에서 입장해 주세요.`;
-      const teacherBody = `5분 뒤 ${student}님 화상수업이 시작됩니다. ${when} 호스트로 입장해 주세요.`;
-
-      await writeNotification({
-        userId,
-        title: "화상수업 5분 전",
-        body: studentBody,
-        type: "lesson_reminder",
-        bookingId: doc.id,
-      });
-      await writeNotification({
-        userId: teacherUid,
-        title: "화상수업 5분 전",
-        body: teacherBody,
-        type: "lesson_reminder",
-        bookingId: doc.id,
-      });
-
-      const studentPhone = await memberPhone(userId, data.phone);
-      if (studentPhone) {
-        await sendSms({
-          to: studentPhone,
-          text: `[글림교육] ${studentBody}`,
-        });
-      } else {
-        console.log("학생 연락처가 없어 5분 전 SMS를 건너뜁니다.", userId);
-      }
-
-      const staffPhone = await teacherPhone(teacherUid);
-      if (staffPhone) {
-        await sendSms({
-          to: staffPhone,
-          text: `[글림교육] ${teacherBody}`,
-        });
-      } else {
-        console.log("강사 연락처가 없어 5분 전 SMS를 건너뜁니다.", teacherUid);
-      }
-      sent += 1;
-    }
-    console.log("수업 5분 전 알림 처리", { matched: snap.size, sent });
+    const hour = await sendLessonReminderWindow({
+      fromMs: 55 * 60 * 1000,
+      toMs: 65 * 60 * 1000,
+      flag: "reminder1hSent",
+      title: "화상수업 1시간 전",
+      studentBody: (when) =>
+        `1시간 뒤 화상수업이 시작됩니다. ${when} 내 강의실에서 입장해 주세요.`,
+      teacherBody: (when, student) =>
+        `1시간 뒤 ${student}님 화상수업이 시작됩니다. ${when} 호스트로 입장해 주세요.`,
+    });
+    const soon = await sendLessonReminderWindow({
+      fromMs: -2 * 60 * 1000,
+      toMs: 5 * 60 * 1000,
+      flag: "reminderSent",
+      title: "화상수업 5분 전",
+      studentBody: (when) =>
+        `5분 뒤 화상수업이 시작됩니다. ${when} 내 강의실에서 입장해 주세요.`,
+      teacherBody: (when, student) =>
+        `5분 뒤 ${student}님 화상수업이 시작됩니다. ${when} 호스트로 입장해 주세요.`,
+    });
+    console.log("수업 리마인드 처리", { hour, soon });
     return null;
   });
 
@@ -1396,7 +1422,7 @@ async function creditEnrollmentFromRating(rating, ratingId) {
 function ratingReminderText(rating) {
   const weekNumber = Number((rating && rating.weekNumber) || 0);
   const week = weekNumber > 0 ? `${weekNumber}회차` : "화상수업";
-  return `${week} 강사 평가를 아직 하지 않았습니다. 사이트에서 별점 평가를 마치면 다음 회차가 열립니다.`;
+  return `${week} 강사 평가를 아직 하지 않았습니다. 사이트에서 별점을 남겨 주세요. 별점을 눌러야 평가 창이 닫힙니다.`;
 }
 
 async function sendRatingReminder(rating, ratingId, { reason }) {
@@ -1451,7 +1477,7 @@ async function notifyRatingOpened(bookingId) {
   await writeNotification({
     userId,
     title: "수업 평가 요청",
-    body: `${week} 수업이 끝났습니다. ${teacher} 선생님 수업에 별점을 남겨 주세요. 평가를 마치면 다음 회차가 열립니다.`,
+    body: `${week} 수업이 끝났습니다. ${teacher} 선생님 수업에 별점을 남겨 주세요. 별점을 눌러야 평가 창이 닫힙니다.`,
     type: "lesson_rating",
     bookingId,
   });
@@ -1713,17 +1739,11 @@ exports.onLessonRatingWritten = functions
     if (becameRated) {
       const result = await creditEnrollmentFromRating(after, ratingId);
       if (result.credited) {
-        const opened =
-          result.nextCompleted < result.totalSessions
-            ? result.nextCompleted + 1
-            : 0;
         const label = result.weekNumber || result.nextCompleted;
         await writeNotification({
           userId: result.userId,
-          title: "화상수업 이수",
-          body: opened
-            ? `${label}회차 평가를 마쳤습니다. ${opened}회차가 열렸습니다.`
-            : `${label}회차 평가를 마쳤습니다. 전 회차를 모두 이수했습니다.`,
+          title: "화상수업 평가",
+          body: `${label}회차 별점을 남겼습니다.`,
           type: "session_completed",
           bookingId: result.bookingId,
         });
@@ -1762,6 +1782,68 @@ exports.sendRatingReminders = functions
       if (ok) sent += 1;
     }
     console.log("수업 평가 재알림", { pending: snap.size, sent });
+    return null;
+  });
+
+function checklistReady(checkedIds, week) {
+  const checked = new Set((checkedIds || []).map((id) => String(id)));
+  const videoUrl = String((week && week.videoUrl) || "").trim();
+  const items = Array.isArray(week && week.checklistItems) ? week.checklistItems : [];
+  const required = items.filter((item) => {
+    if (!item || typeof item !== "object") return false;
+    const id = String(item.id || "");
+    const label = String(item.label || "");
+    const isVideo = id === "watch_video" || label.indexOf("인강") !== -1;
+    if (!videoUrl && isVideo) return false;
+    return id.length > 0;
+  });
+  if (required.length === 0) return !videoUrl;
+  return required.every((item) => checked.has(String(item.id)));
+}
+
+exports.onWeekProgressWritten = functions
+  .region("asia-northeast3")
+  .firestore.document("enrollments/{enrollmentId}/week_progress/{weekId}")
+  .onWrite(async (change, context) => {
+    if (!change.after.exists) return null;
+    const data = change.after.data() || {};
+    const weekNumber = Number(data.weekNumber || 0);
+    if (weekNumber < 1) return null;
+    const db = admin.firestore();
+    const weekSnap = await db.collection("online_weeks").doc(context.params.weekId).get();
+    const week = weekSnap.exists
+      ? weekSnap.data() || {}
+      : {
+          videoUrl: data.videoUrl || "",
+          checklistItems: [
+            { id: "watch_video", label: "인강 시청하기" },
+            { id: "solve_problems", label: "문제풀이 하기" },
+          ],
+        };
+    if (!checklistReady(data.checkedItemIds, week)) return null;
+
+    const enrollRef = db.collection("enrollments").doc(context.params.enrollmentId);
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(enrollRef);
+      if (!snap.exists) return;
+      const enroll = snap.data() || {};
+      const opened = Math.max(
+        1,
+        Number(enroll.completedSessions || 0) + 1,
+        Number(enroll.adminUnlockedThrough || 0),
+        Number(enroll.contentUnlockedThrough || 0)
+      );
+      if (weekNumber > opened) return;
+      const total = Number(enroll.totalSessions || 0);
+      let next = weekNumber + 1;
+      if (total > 0 && next > total) next = total;
+      const current = Number(enroll.contentUnlockedThrough || 0);
+      if (next <= current) return;
+      tx.update(enrollRef, {
+        contentUnlockedThrough: next,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    });
     return null;
   });
 

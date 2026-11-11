@@ -156,6 +156,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   TeacherAvailability _availability = TeacherAvailability(teacherUid: '');
   List<WeekBooking> _bookings = [];
   List<LessonRating> _ratings = [];
+  List<LessonFeedback> _feedbacks = [];
   List<EnrollmentRecord> _enrollments = [];
   Map<String, List<StudentWeekProgress>> _learning = {};
   List<AppNotification> _notifications = [];
@@ -194,6 +195,9 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     final ratings = uid.isEmpty
         ? <LessonRating>[]
         : await LessonRatingService.listForTeacher(uid);
+    final feedbacks = uid.isEmpty || widget.schoolOverview
+        ? <LessonFeedback>[]
+        : await LessonFeedbackService.listForTeacher(uid);
     if (widget.standalone || widget.schoolOverview) {
       if (!mounted) return;
       setState(() {
@@ -201,6 +205,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         _availability = availability;
         _bookings = bookings;
         _ratings = ratings;
+        _feedbacks = feedbacks;
         _enrollments = [];
         _learning = {};
         _staffPhone = '';
@@ -225,6 +230,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       _availability = availability;
       _bookings = bookings;
       _ratings = ratings;
+      _feedbacks = feedbacks;
       _enrollments = enrollments;
       _learning = learning;
       _staffPhone = profile?['phone']?.toString() ?? '';
@@ -893,6 +899,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         bookings: _bookings,
         teacherUid: _teacherUid,
         ratings: _ratings,
+        feedbackBookingIds: LessonFeedback.bookingIds(_feedbacks),
         lessonFeeWon: _lessonFeeWon,
       );
 

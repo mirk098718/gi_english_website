@@ -120,7 +120,7 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
         SizedBox(height: 12),
         Text(
           '각 회차에 인강 URL과 문제풀이 링크, 학생이 스스로 체크할 학습 항목을 넣습니다.\n'
-          '회원은 이전 회차 화상수업을 마치면 다음 회차가 열리고, 이수한 회차는 복습할 수 있습니다.',
+          '체크리스트를 모두 체크하면 그 회차 화상 예약과 다음 회차 수업이 열립니다.',
           style: TextStyle(
               fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
         ),

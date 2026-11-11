@@ -71,6 +71,7 @@ EnrollmentRecord _enrollment({
   int completed = 0,
   int total = 8,
   int adminUnlockedThrough = 0,
+  int contentUnlockedThrough = 0,
   DateTime? expiresAt,
 }) {
   return EnrollmentRecord(
@@ -84,6 +85,7 @@ EnrollmentRecord _enrollment({
     completedSessions: completed,
     remainingSessions: total - completed,
     adminUnlockedThrough: adminUnlockedThrough,
+    contentUnlockedThrough: contentUnlockedThrough,
     expiresAt: expiresAt,
   );
 }
@@ -238,6 +240,35 @@ void main() {
     expect(EnrollmentService.isSessionUnlocked(enrollment, 2), isTrue);
     expect(EnrollmentService.isSessionUnlocked(enrollment, 3), isFalse);
     expect(enrollment.remainingSessions, 8);
+  });
+
+  test('체크리스트를 마치면 다음 회차 수업이 열린다', () {
+    final first = EnrollmentService.defaultWeek('beginner_phonics', 1);
+    final second = EnrollmentService.defaultWeek('beginner_phonics', 2);
+    expect(
+      EnrollmentService.checklistUnlockedThrough(
+        weeks: [first, second],
+        progress: {
+          first.id: const ['watch_video'],
+        },
+        totalSessions: 8,
+      ),
+      1,
+    );
+    expect(
+      EnrollmentService.checklistUnlockedThrough(
+        weeks: [first, second],
+        progress: {
+          first.id: const ['watch_video', 'solve_problems'],
+        },
+        totalSessions: 8,
+      ),
+      2,
+    );
+    final enrollment = _enrollment(completed: 0, contentUnlockedThrough: 2);
+    expect(enrollment.unlockedSessionNumber, 2);
+    expect(EnrollmentService.isSessionUnlocked(enrollment, 2), isTrue);
+    expect(EnrollmentService.isSessionUnlocked(enrollment, 3), isFalse);
   });
 
   test('연장 결제는 지난 기한을 오늘부터 다시 잇고 진행 회차를 유지한다', () {

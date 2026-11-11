@@ -188,6 +188,13 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       if (teacherUid.isNotEmpty) {
         _availabilityByUid[teacherUid] = availability;
       }
+      enrollment = enrollment.withContentUnlocked(
+        EnrollmentService.checklistUnlockedThrough(
+          weeks: weeks,
+          progress: progress,
+          totalSessions: enrollment.totalSessions,
+        ),
+      );
     }
     if (!mounted) return;
     setState(() {
@@ -277,7 +284,17 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
         ),
       );
       await _loadData();
+      return;
     }
+    setState(() {
+      _enrollment = enrollment.withContentUnlocked(
+        EnrollmentService.checklistUnlockedThrough(
+          weeks: _weeks,
+          progress: _weekProgress,
+          totalSessions: enrollment.totalSessions,
+        ),
+      );
+    });
   }
 
   bool _readyToBook(OnlineWeek week, List<String> checked) {
@@ -1162,8 +1179,8 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     if (EnrollmentService.isEnrollmentExpired(enrollment)) {
       return '수강 기한이 지났습니다. 목록에 만료로 남아 있으며, 연장 결제 후 이어서 예약할 수 있습니다.';
     }
-    return "지금 열린 수업은 $current회차입니다. 강사 피드백과 별점 평가가 끝나야 다음 회차가 열립니다. "
-        "$deadline 영상이 있는 회차는 인강과 문제풀이를, 영상이 없는 회차는 문제풀이만 체크하면 예약이 열립니다."
+    return "지금 열린 수업은 $current회차입니다. 인강과 문제풀이를 모두 체크하면 이 회차 화상 예약이 열리고, 다음 회차 수업도 열립니다. "
+        "$deadline"
         "${done > 0 ? ' 이수 $done/${enrollment.totalSessions}회.' : ''}";
   }
 
@@ -1189,20 +1206,10 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
   String _lockMessage(OnlineWeek week) {
     final previous = week.weekNumber - 1;
     if (previous > 0) {
-      LessonRating? pending;
-      for (final rating in _ratings) {
-        if (rating.weekNumber == previous && rating.canStudentRate) {
-          pending = rating;
-          break;
-        }
-      }
-      if (pending != null) {
-        return '${previous}회차 별점 평가를 마치면 이 회차가 열립니다. '
-            '하루가 지나도 평가가 없으면 관리자가 다음 회차를 열 수 있습니다.';
-      }
+      return '$previous회차 인강과 문제풀이를 모두 체크하면 이 회차 수업이 열립니다. '
+          '영상이 없는 회차는 문제풀이만 체크하면 됩니다.';
     }
-    return '이전 회차의 강사 피드백과 별점 평가가 끝나야 이 회차가 열립니다. '
-        '한쪽이 하루 넘게 멈추면 관리자만 다음 회차를 열 수 있습니다.';
+    return '이 회차 학습을 마치면 화상 예약과 다음 회차가 열립니다.';
   }
 
   Widget weekTile(OnlineWeek week) {
@@ -1664,7 +1671,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
               else
                 Text(
                   tr(context,
-                      "화상수업을 마치면 이 자리에서 강사 별점을 남길 수 있습니다. 평가를 마치면 다음 회차가 열립니다."),
+                      "화상수업을 마치면 이 자리에서 강사 별점을 남깁니다. 별점을 눌러야 평가 창이 닫히고, 후기는 선택입니다."),
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 13,

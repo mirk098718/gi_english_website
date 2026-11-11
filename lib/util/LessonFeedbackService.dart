@@ -55,6 +55,16 @@ class LessonFeedback {
 
   bool get hasContent => content.trim().isNotEmpty;
 
+  static Set<String> bookingIds(Iterable<LessonFeedback> items) {
+    final ids = <String>{};
+    for (final item in items) {
+      if (!item.hasContent) continue;
+      if (item.bookingId.isNotEmpty) ids.add(item.bookingId);
+      if (item.id.isNotEmpty) ids.add(item.id);
+    }
+    return ids;
+  }
+
   String get lessonLabel {
     final week = weekNumber > 0 ? '$weekNumber회차' : '화상수업';
     return '$week · ${EnrollmentService.formatBookingDate(date)} ${EnrollmentService.formatBookingTime(time)}';

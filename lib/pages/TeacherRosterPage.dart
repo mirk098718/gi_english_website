@@ -208,6 +208,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       bookings: _bookings,
       teacherUid: _teacherUid,
       ratings: _ratings,
+      feedbackBookingIds: LessonFeedback.bookingIds(_feedbacks),
       lessonFeeWon: EnrollmentService.lessonFeeWonOf(_teacher),
     );
     if (stats.ratedCount <= 0) return '';
@@ -314,7 +315,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       builder: (dialogContext) => AlertDialog(
         title: Text(tr(context, "수업 종료"), style: TextStyle(fontFamily: "Jalnan")),
         content: Text(
-          tr(context, "이 회차 화상수업을 종료할까요?\n종료하면 수강생에게 바로 별점 평가가 요청됩니다. 피드백도 이어서 작성해 주세요. 별점 평가가 끝나야 정산에 포함됩니다."),
+          tr(context, "이 회차 화상수업을 종료할까요?\n종료하면 수강생에게 바로 별점 평가가 요청됩니다. 이 수업은 피드백을 저장해야 완료로 인정되고 수당에 포함됩니다."),
           style: TextStyle(fontFamily: "NotoSansKR", height: 1.5),
         ),
         actions: [

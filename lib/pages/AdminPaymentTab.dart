@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/StudentDetailPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
+import 'package:gi_english_website/util/LessonFeedbackService.dart';
 import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PaymentService.dart';
@@ -18,6 +19,7 @@ class _AdminPaymentTabState extends State<AdminPaymentTab> {
   List<Map<String, dynamic>> _teachers = [];
   List<WeekBooking> _bookings = [];
   List<LessonRating> _ratings = [];
+  List<LessonFeedback> _feedbacks = [];
   Map<String, TeacherSettlement> _settlements = {};
   bool _loading = true;
 
@@ -35,6 +37,7 @@ class _AdminPaymentTabState extends State<AdminPaymentTab> {
     final teachers = await AuthService.listTeachers();
     final bookings = await EnrollmentService.staffWeekBookings(mineOnly: false);
     final ratings = await LessonRatingService.listAll();
+    final feedbacks = await LessonFeedbackService.listAll();
     final settlements = await AuthService.listLessonSettlements();
     if (!mounted) return;
     setState(() {
@@ -43,6 +46,7 @@ class _AdminPaymentTabState extends State<AdminPaymentTab> {
       _teachers = teachers;
       _bookings = bookings;
       _ratings = ratings;
+      _feedbacks = feedbacks;
       _settlements = settlements;
       _loading = false;
     });
@@ -83,6 +87,7 @@ class _AdminPaymentTabState extends State<AdminPaymentTab> {
                   teachers: _teachers,
                   bookings: _bookings,
                   ratings: _ratings,
+                  feedbacks: _feedbacks,
                   settlements: _settlements,
                   loading: _loading,
                   onRefresh: _refresh,
@@ -520,6 +525,7 @@ class _TeacherPayrollPane extends StatefulWidget {
   final List<Map<String, dynamic>> teachers;
   final List<WeekBooking> bookings;
   final List<LessonRating> ratings;
+  final List<LessonFeedback> feedbacks;
   final Map<String, TeacherSettlement> settlements;
   final bool loading;
   final Future<void> Function() onRefresh;
@@ -528,6 +534,7 @@ class _TeacherPayrollPane extends StatefulWidget {
     required this.teachers,
     required this.bookings,
     required this.ratings,
+    required this.feedbacks,
     required this.settlements,
     required this.loading,
     required this.onRefresh,
@@ -558,6 +565,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
       bookings: widget.bookings,
       teacherUid: uid,
       ratings: widget.ratings,
+      feedbackBookingIds: LessonFeedback.bookingIds(widget.feedbacks),
       now: _month,
       lessonFeeWon: EnrollmentService.lessonFeeWonOf(teacher),
     );
@@ -629,8 +637,8 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
           ),
           const SizedBox(height: 8),
           Text(
-            '수강생 별점 평가가 끝난 수업만 진행으로 셉니다. '
-            '예전 수업(평가 기록 없음)은 수업 시간이 지나면 포함됩니다. '
+            '강사 피드백이 저장된 수업만 진행으로 셉니다. '
+            '수업 시작 전에 적은 피드백은 시작 시각이 지난 뒤 포함됩니다. '
             '수업 ${EnrollmentService.lessonMinutes}분 · 회차 수당은 강사마다 다르고, 없으면 ${_formatWon(EnrollmentService.lessonPayWon)}입니다. 지급 완료를 누르면 그때의 횟수와 금액이 기록됩니다.',
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
@@ -645,7 +653,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
           ]),
           const SizedBox(height: 8),
           _summaryRow([
-            _summaryCell('평가대기', '$awaiting건', Palette.warning),
+            _summaryCell('피드백 대기', '$awaiting건', Palette.warning),
             _summaryCell('취소', '$cancelled회', Palette.danger),
           ]),
           const SizedBox(height: 24),
@@ -700,7 +708,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
             ]),
             const SizedBox(height: 8),
             _summaryRow([
-              _summaryCell('평가대기', '${stats.awaitingCount}건', Palette.warning),
+              _summaryCell('피드백 대기', '${stats.awaitingCount}건', Palette.warning),
               _summaryCell('평균별점', stats.averageStarsLabel, Palette.warning),
             ]),
             const SizedBox(height: 8),
