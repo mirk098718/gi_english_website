@@ -500,7 +500,7 @@ const Map<String, String> enTranslations = {
   "업무(이메일, 회의, 프레젠테이션 등)에서 직무 영어가 필요하다.": "I need English for work: email, meetings, presentations.",
   "오후 2:30 ~ 오후 8:40\n(자세한 시간표는 커리큘럼 참조)": "2:30 p.m. – 8:40 p.m.\n(See Curriculum for the full timetable)",
   "오후 7:10 ~ 오후 8:40\n(자세한 시간표는 커리큘럼 참조)": "7:10 p.m. – 8:40 p.m.\n(See Curriculum for the full timetable)",
-  "끝난 화상수업에 별점을 남겨 주세요. 별점은 필수이고, 평가를 마치면 다음 회차가 열립니다.": "Please rate the video class that just ended. Stars are required, and the next week opens when you submit.",
+  "오늘 화상 수업은 어떠셨나요? 별점 평가하고 다음 회차를 오픈하세요!": "How was today's video class? Rate it with stars and open the next class!",
   "화상수업을 마치면 이 자리에서 강사 별점을 남길 수 있습니다. 평가를 마치면 다음 회차가 열립니다.": "When the video class ends, you can rate the teacher here. The next week opens after you submit.",
   "강사가 수업을 종료하면 이 자리에서 별점을 남길 수 있습니다.": "You can leave a star rating here once the teacher ends the class.",
   "시사/토론 등 깊이 있는 주제로 유창하고 세련된 영어를 하고 싶다.": "I want fluent, polished English on current topics and discussion.",
