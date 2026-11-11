@@ -668,13 +668,12 @@ class _SchoolOnlineCurriculumPageState
     );
   }
 
-  String _courseSubtitle(OnlineCourse course, String plan) {
-    final subtitle = tr(context, course.subtitleFor(plan));
-    if (plan != OnlinePlan.bundle) return subtitle;
+  String _courseMeta(OnlineCourse course, String plan) {
+    if (plan != OnlinePlan.bundle) return '';
     if (AppLanguage.instance.isEnglish) {
-      return '$subtitle · ${course.defaultSessions} live classes';
+      return '${course.defaultSessions} live classes';
     }
-    return '$subtitle · 화상 ${course.defaultSessions}회';
+    return '화상 ${course.defaultSessions}회';
   }
 
   Widget _levelCourseCard(
@@ -688,11 +687,12 @@ class _SchoolOnlineCurriculumPageState
     required VoidCallback onTap,
     Key? cardKey,
   }) {
+    final meta = _courseMeta(course, plan);
     final details = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '${course.order}. ${tr(context, course.title)}',
+          '${course.order}. ${tr(context, course.nameFor(plan))}',
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontWeight: FontWeight.w800,
@@ -700,16 +700,18 @@ class _SchoolOnlineCurriculumPageState
             color: Palette.grey900,
           ),
         ),
-        SizedBox(height: 4),
-        Text(
-          _courseSubtitle(course, plan),
-          style: TextStyle(
-            fontFamily: 'NotoSansKR',
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-            color: accent,
+        if (meta.isNotEmpty) ...[
+          SizedBox(height: 4),
+          Text(
+            meta,
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: accent,
+            ),
           ),
-        ),
+        ],
         SizedBox(height: 10),
         Text(
           tr(context, course.description),

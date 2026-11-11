@@ -458,9 +458,12 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
 
   String _courseDetail(OnlineCourse course) {
     if (_plan == OnlinePlan.lecture) {
-      return '${course.subtitleFor(OnlinePlan.lecture)} · 인강 ${OnlinePlan.lessonsPerLevel}편 · 퀴즈';
+      return '인강 ${OnlinePlan.lessonsPerLevel}편 · 퀴즈';
     }
-    return '${course.subtitle} · 화상 ${course.defaultSessions}회 포함';
+    if (_plan == OnlinePlan.speaking) {
+      return '원어민 화상 1:1 회화 $_speakingSessions회';
+    }
+    return '화상 ${course.defaultSessions}회 포함';
   }
 
   String _includedLine(OnlineCourse course) {
@@ -502,7 +505,7 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${course.order}. ${course.title}',
+                  Text('${course.order}. ${course.nameFor(_plan)}',
                       style: TextStyle(
                           fontFamily: "NotoSansKR",
                           fontWeight: FontWeight.bold,
@@ -543,7 +546,7 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
           SizedBox(height: 10),
           Text('상품: ${_planTitle(_plan)}',
               style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
-          Text('과정: ${course.title}',
+          Text('과정: ${course.nameFor(_plan)}',
               style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
           Text('포함: ${_includedLine(course)}',
               style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),

@@ -465,7 +465,6 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
         ...OnlineCourse.all.map(
           (course) => _panelChip(
             label: course.title,
-            subtitle: course.subtitle,
             onTap: () {
               _closeMenu();
               SiteNav.goCourses(context, courseId: course.id);

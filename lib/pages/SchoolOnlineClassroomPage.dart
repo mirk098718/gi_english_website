@@ -694,21 +694,12 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    course.title,
+                    course.nameFor(enrollment.plan),
                     style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: Palette.black,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    course.subtitle,
-                    style: TextStyle(
-                      fontFamily: "NotoSansKR",
-                      fontSize: 13,
-                      color: course.accentColor,
                     ),
                   ),
                   if (enrollment.nativeTeacher != null ||

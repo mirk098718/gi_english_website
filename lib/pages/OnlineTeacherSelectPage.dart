@@ -173,7 +173,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
     if (widget.plan == OnlinePlan.speaking) {
       return '원어민 화상 1:1 회화 $sessions회 · $amount';
     }
-    return '${course.subtitle} · 화상 $sessions회 · $amount';
+    return '화상 $sessions회 · $amount';
   }
 
   Widget content() {
@@ -217,7 +217,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
                         fontSize: 12,
                         color: Palette.grey500)),
                 SizedBox(height: 6),
-                Text('${course.order}. ${course.title}',
+                Text('${course.order}. ${course.nameFor(widget.plan)}',
                     style: TextStyle(
                         fontFamily: 'NotoSansKR',
                         fontWeight: FontWeight.w700,

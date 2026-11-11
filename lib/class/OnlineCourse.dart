@@ -42,8 +42,8 @@ class OnlineCourse {
     OnlineCourse(
       id: 'beginner_phonics',
       order: 1,
-      title: '글림 왕초보 영어',
-      subtitle: '파닉스 + 기초회화',
+      title: '왕초보 영어: 기초회화',
+      subtitle: '기초회화',
       description:
           '알파벳과 발음부터 차근차근 시작하는 왕초보 과정입니다. 짧은 표현으로 말문을 열고, 영어에 대한 부담을 덜어 드립니다.',
       imageAsset: 'assets/audience-beginner.png',
@@ -59,7 +59,7 @@ class OnlineCourse {
     OnlineCourse(
       id: 'basic_grammar_speaking',
       order: 2,
-      title: '글림 기초영어',
+      title: '기초영어: 영문법 + 원어민 회화',
       subtitle: '영문법 + 원어민 회화',
       description:
           '꼭 필요한 기초 문법과 일상 회화를 함께 익히는 과정입니다. 바로 쓰는 표현으로 말하기 자신감을 키웁니다.',
@@ -77,7 +77,7 @@ class OnlineCourse {
     OnlineCourse(
       id: 'intermediate_grammar_speaking',
       order: 3,
-      title: '글림 중급영어',
+      title: '중급영어: 영문법 + 원어민 회화',
       subtitle: '영문법 + 원어민 회화',
       description:
           '중급 문법을 체계적으로 정리하고, 자연스러운 표현으로 회화의 폭을 넓히는 과정입니다.',
@@ -95,7 +95,7 @@ class OnlineCourse {
     OnlineCourse(
       id: 'business_english',
       order: 4,
-      title: '글림 실전 비즈니스 영어',
+      title: '실전 비즈니스 영어: 실무 중심 비즈니스 커뮤니케이션',
       subtitle: '실무 중심 비즈니스 커뮤니케이션',
       description:
           '회의, 이메일, 프레젠테이션처럼 업무에서 바로 마주치는 상황에서 쓰는 실전 영어를 익힙니다.',
@@ -113,7 +113,7 @@ class OnlineCourse {
     OnlineCourse(
       id: 'advanced_premium_speaking',
       order: 5,
-      title: '글림 고급영어',
+      title: '고급영어: 프리미엄 스피킹',
       subtitle: '프리미엄 스피킹',
       description:
           '고급 표현과 뉘앙스까지 다루며, 토론·시사 주제로 유창하고 세련된 말하기를 완성하는 과정입니다.',
@@ -159,12 +159,20 @@ class OnlineCourse {
   static const nativePracticeHighlight =
       '배운 내용을 원어민과 실전 회화로 적용해보기';
 
-  /// 1번은 원어민 회화가 없으므로 부제에서 그 부분만 뺀다.
+  /// 1번은 원어민 회화가 없으므로 이름과 부제에서 그 부분만 뺀다.
   String subtitleFor(String plan) {
     if (plan == OnlinePlan.lecture) {
       return subtitle.replaceAll(' + 원어민 회화', '');
     }
     return subtitle;
+  }
+
+  /// 화면에 보이는 프로그램 이름. 메인 제목과 소제목을 콜론으로 잇는다.
+  String nameFor(String plan) {
+    if (plan == OnlinePlan.lecture) {
+      return title.replaceAll(' + 원어민 회화', '');
+    }
+    return title;
   }
 
   /// 1번과 2번이 같은 과정 설명을 쓰고, 2번만 원어민 실전 회화 줄을 붙인다.

@@ -178,7 +178,7 @@ class EnrollmentService {
     ),
   ];
 
-  /// 글림 중급영어 과정에 연결된 인강.
+  /// 중급영어 과정에 연결된 인강.
   static const List<CatalogLesson> intermediateLessons = [
     CatalogLesson(
       order: 1,
@@ -252,7 +252,7 @@ class EnrollmentService {
     ),
   ];
 
-  /// 글림 기초영어 과정에 연결된 연습문제. 인강은 아직 없다.
+  /// 기초영어 과정에 연결된 연습문제. 인강은 아직 없다.
   static const List<CatalogLesson> basicLessons = [
     CatalogLesson(
       order: 1,
@@ -326,7 +326,7 @@ class EnrollmentService {
     ),
   ];
 
-  /// 글림 고급영어 과정에 연결된 연습문제. 인강은 아직 없다.
+  /// 고급영어 과정에 연결된 연습문제. 인강은 아직 없다.
   static const List<CatalogLesson> advancedLessons = [
     CatalogLesson(
       order: 1,
@@ -400,7 +400,7 @@ class EnrollmentService {
     ),
   ];
 
-  /// 글림 실전 비즈니스 영어 과정에 연결된 연습문제. 인강은 아직 없다.
+  /// 실전 비즈니스 영어 과정에 연결된 연습문제. 인강은 아직 없다.
   static const List<CatalogLesson> businessLessons = [
     CatalogLesson(
       order: 1,

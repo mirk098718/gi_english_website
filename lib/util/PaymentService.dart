@@ -53,7 +53,7 @@ class PaymentService {
         fallback: user.displayName ?? '',
       ),
       courseId: course.id,
-      courseTitle: course.title,
+      courseTitle: course.nameFor(kind),
       amount: amount,
       totalSessions: sessions,
       status: 'pending',
