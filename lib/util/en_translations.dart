@@ -380,6 +380,7 @@ const Map<String, String> enTranslations = {
   "지금 필요한 영어부터 고르세요": "Start with the English you need now",
   "파주 운정 · 초중등 오프라인": "Paju Unjeong · in-person elementary and middle school",
   "「나에게 맞는 클래스 선택하기」": "Find the class that fits me",
+  "내 레벨 테스트하기": "Take my level test",
   "강사 정보를 찾을 수 없습니다.": "This teacher could not be found.",
   "교재는 별도로 구매해야 하나요?": "Do we need to buy textbooks separately?",
   "실무 중심 비즈니스 커뮤니케이션": "Business communication for real work",

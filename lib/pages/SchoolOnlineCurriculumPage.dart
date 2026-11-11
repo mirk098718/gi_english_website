@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/SiteLayout.dart';
-import 'package:gi_english_website/class/ClassPlacementQuiz.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
@@ -904,22 +903,12 @@ class _SchoolOnlineCurriculumPageState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            tr(context, "「나에게 맞는 클래스 선택하기」"),
+            tr(context, "내 레벨 테스트하기"),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontWeight: FontWeight.w700,
               fontSize: 16,
               color: Palette.grey900,
-            ),
-          ),
-          SizedBox(height: 10),
-          Text(
-            ClassPlacementQuiz.skipNotice,
-            style: TextStyle(
-              fontFamily: 'NotoSansKR',
-              fontSize: 13,
-              height: 1.55,
-              color: Palette.grey600,
             ),
           ),
           SizedBox(height: 16),
