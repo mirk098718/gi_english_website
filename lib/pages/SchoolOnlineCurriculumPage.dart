@@ -886,7 +886,7 @@ class _SchoolOnlineCurriculumPageState
         ),
         SizedBox(height: 10),
         Text(
-          tr(context, "인강 · 디지털 교재 · 실시간 화상수업 · 피드백 체크리스트가 한 화면에서 이어집니다."),
+          tr(context, "인강 · 연습문제 · 실시간 화상수업 · 피드백 체크리스트가 한 화면에서 이어집니다."),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: compact ? 12 : 13,
