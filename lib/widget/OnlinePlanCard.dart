@@ -8,6 +8,8 @@ class OnlinePlanCard extends StatelessWidget {
   final String summary;
   final String priceLine;
   final Color color;
+  final String imageAsset;
+  final Alignment imageAlignment;
   final bool selected;
   final bool current;
   final VoidCallback onTap;
@@ -19,6 +21,8 @@ class OnlinePlanCard extends StatelessWidget {
     required this.summary,
     required this.priceLine,
     required this.color,
+    required this.imageAsset,
+    this.imageAlignment = Alignment.center,
     required this.selected,
     required this.onTap,
     this.current = false,
@@ -41,9 +45,24 @@ class OnlinePlanCard extends StatelessWidget {
               width: selected ? 2 : 1,
             ),
           ),
-          child: Column(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(
+                  imageAsset,
+                  width: 84,
+                  height: 84,
+                  fit: BoxFit.cover,
+                  alignment: imageAlignment,
+                ),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
               Row(
                 children: [
                   Container(
@@ -122,6 +141,9 @@ class OnlinePlanCard extends StatelessWidget {
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: Palette.grey500,
+                ),
+              ),
+                  ],
                 ),
               ),
             ],

@@ -171,7 +171,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
       course.amountFor(widget.plan, sessions: widget.sessionCount),
     );
     if (widget.plan == OnlinePlan.speaking) {
-      return '원어민 1:1 회화 $sessions회 · $amount';
+      return '원어민 화상 1:1 회화 $sessions회 · $amount';
     }
     return '${course.subtitle} · 화상 $sessions회 · $amount';
   }

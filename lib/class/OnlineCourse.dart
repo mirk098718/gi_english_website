@@ -131,11 +131,11 @@ class OnlineCourse {
     ),
   ];
 
-  /// 원어민 1:1 회화만 파는 상품. 레벨 과정 [all]에는 넣지 않는다.
+  /// 원어민 화상 1:1 회화만 파는 상품. 레벨 과정 [all]에는 넣지 않는다.
   static const speaking = OnlineCourse(
     id: OnlinePlan.speakingCourseId,
     order: 0,
-    title: '원어민 1:1 회화',
+    title: '원어민 화상 1:1 회화',
     subtitle: '실전 1:1 스피킹',
     description:
         '인강 없이 원어민과 1:1로만 말하는 회화 수업입니다. 필요한 횟수만큼 신청합니다.',

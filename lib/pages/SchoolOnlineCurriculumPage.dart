@@ -303,25 +303,31 @@ class _SchoolOnlineCurriculumPageState
         summary: '문법 빌드업과 유용한 표현. 퀴즈로 완성합니다.',
         priceLine: '레벨별 안내 99,000원~',
         color: Palette.primary,
+        imageAsset: 'assets/lecture-quiz-screen.jpg',
+        imageAlignment: const Alignment(0.72, -0.25),
         selected: _highlightedPlan == OnlinePlan.lecture,
         onTap: () => _selectPlan(OnlinePlan.lecture),
       ),
       OnlinePlanCard(
         index: '2',
-        title: '영문법 인강 + 원어민 스파링',
+        title: '영문법 인강 + 원어민 화상 회화',
         summary: '인강과 퀴즈를 다지고, 1:1 화상으로 말합니다.',
         priceLine: '레벨별 180,000원~',
         color: Palette.secondaryDark,
+        imageAsset: 'assets/curriculum-service-overview.jpg',
+        imageAlignment: const Alignment(0.55, -0.05),
         selected: _highlightedPlan == OnlinePlan.bundle,
         current: true,
         onTap: () => _selectPlan(OnlinePlan.bundle),
       ),
       OnlinePlanCard(
         index: '3',
-        title: '원어민 1:1 회화',
+        title: '원어민 화상 1:1 회화',
         summary: '인강 없이, 나에게만 집중하는 실전 회화.',
         priceLine: '1회 ${OnlinePlan.won(OnlinePlan.speakingSessionPrice)}',
         color: Palette.accent,
+        imageAsset: OnlineCourse.speaking.imageAsset,
+        imageAlignment: const Alignment(0, -0.12),
         selected: _highlightedPlan == OnlinePlan.speaking,
         onTap: () => _selectPlan(OnlinePlan.speaking),
       ),
@@ -434,7 +440,7 @@ class _SchoolOnlineCurriculumPageState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          sectionTitle('2. 영문법 인강 + 원어민 스파링'),
+          sectionTitle('2. 영문법 인강 + 원어민 화상 회화'),
           SizedBox(height: 8),
           bodyText(
             '인강과 퀴즈로 다지고, 1:1 원어민 화상으로 완성하는 실전 영어입니다.\n'
@@ -516,7 +522,7 @@ class _SchoolOnlineCurriculumPageState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          sectionTitle('3. 원어민 1:1 회화 스피킹'),
+          sectionTitle('3. 원어민 화상 1:1 회화'),
           SizedBox(height: 12),
           bodyText(
             '오직 나에게만 집중하는 실전 1:1 영어 회화입니다.\n'

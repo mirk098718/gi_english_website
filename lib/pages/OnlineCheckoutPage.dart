@@ -388,7 +388,7 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
     final items = [
       (OnlinePlan.lecture, '1. 인강+퀴즈'),
       (OnlinePlan.bundle, '2. 인강+화상'),
-      (OnlinePlan.speaking, '3. 화상만'),
+      (OnlinePlan.speaking, '3. 원어민 화상 1:1 회화'),
     ];
     return Wrap(
       spacing: 8,
@@ -452,8 +452,8 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
 
   String _planTitle(String plan) {
     if (plan == OnlinePlan.lecture) return '단계별 영문법 인강';
-    if (plan == OnlinePlan.speaking) return '원어민 1:1 회화';
-    return '영문법 인강 + 원어민 스파링';
+    if (plan == OnlinePlan.speaking) return '원어민 화상 1:1 회화';
+    return '영문법 인강 + 원어민 화상 회화';
   }
 
   String _courseDetail(OnlineCourse course) {
@@ -468,7 +468,7 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
       return '인강 ${OnlinePlan.lessonsPerLevel}편 + 퀴즈 · 수강 ${OnlinePlan.lectureAccessWeeks}주 · 화상 없음';
     }
     if (_plan == OnlinePlan.speaking) {
-      return '원어민 1:1 회화 $_speakingSessions회 · 인강 없음';
+      return '원어민 화상 1:1 회화 $_speakingSessions회 · 인강 없음';
     }
     return '화상수업 ${course.defaultSessions}회 + 인강 · 퀴즈';
   }
