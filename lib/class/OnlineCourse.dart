@@ -46,7 +46,7 @@ class OnlineCourse {
       title: '왕초보 영어',
       subtitle: '기초회화',
       description:
-          '알파벳과 발음부터 차근차근 시작하는 왕초보 과정입니다. 짧은 표현으로 말문을 열고, 영어에 대한 부담을 덜어 드립니다.',
+          '알파벳만 알아도 가능! 기초문법과 짧은 영어 표현으로 말문을 열고, 영어에 대한 부담을 덜어 드립니다.',
       imageAsset: 'assets/audience-beginner.png',
       highlights: [
         '기초 어휘와 짧은 표현으로 말하기 연습',
