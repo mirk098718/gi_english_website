@@ -540,6 +540,7 @@ const Map<String, String> enTranslations = {
   "객관적 실력 진단입니다. 문항마다 정답이 하나이며, 정답 수에 따라 클래스가 배정됩니다.": "This is an objective level check. Each question has one answer, and your score places you in a class.",
   "다른 강사 담당이지만 내 스케줄로 예약한 수강생입니다. 컨펌하면 수업 횟수에 포함됩니다.": "These students belong to another teacher but booked your open time. Confirming the class counts it toward your classes.",
   "인강 · 연습문제 · 실시간 화상수업 · 피드백 체크리스트가 한 화면에서 이어집니다.": "Video lessons, practice questions, live classes, and the feedback checklist stay on one screen.",
+  "인강 - 퀴즈 - 원어민 화상수업 - 피드백 패키지 수업": "Video lessons - quizzes - native video class - feedback package",
   "매주 강의를 보고, 연습문제를 푼 후,\n내 시간에 맞춰 원어민과 1:1 수업을 예약합니다.": "Each week, watch the lesson and do the practice,\nthen book a 1:1 class at a time that suits you.",
   "수강생의 현재 학습 목적과 주된 사용 영역을 구분하여 최적의 반을 선별하기 위한 문항입니다.": "These questions sort your goal and where you use English, so we can place you in the right class.",
   "입학 상담 및 입학 테스트를 원하시는 학부모님께서는 간단한 인적사항과 연락처를 남겨주세요. ": "If you would like an admissions consultation or a placement test, please leave a few details and a phone number. ",

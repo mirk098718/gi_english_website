@@ -506,13 +506,13 @@ class _SchoolOnlineCurriculumPageState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           sectionTitle('2. 영문법 인강 + 원어민 화상 회화'),
-          SizedBox(height: 8),
+          SizedBox(height: 12),
+          _serviceOverview(compact: compact),
+          SizedBox(height: 16),
           bodyText(
             '인강을 듣고, 퀴즈로 다지고, 1:1 화상으로 실사용해봅니다.\n'
             '지금 판매 중인 구성이며, 화상수업 ${OnlineCourse.all.first.defaultSessions}회가 포함됩니다.',
           ),
-          SizedBox(height: 20),
-          _serviceOverview(compact: compact),
           SizedBox(height: 28),
           sectionTitle("과정 구성"),
           SizedBox(height: 16),
@@ -878,7 +878,7 @@ class _SchoolOnlineCurriculumPageState
         ),
         SizedBox(height: 10),
         Text(
-          tr(context, "인강 · 연습문제 · 실시간 화상수업 · 피드백 체크리스트가 한 화면에서 이어집니다."),
+          tr(context, "인강 - 퀴즈 - 원어민 화상수업 - 피드백 패키지 수업"),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: compact ? 12 : 13,
