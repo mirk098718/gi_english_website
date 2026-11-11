@@ -2,6 +2,8 @@
 const Map<String, String> enTranslations = {
   "타": "Other",
   "과정": "Courses",
+  "온라인 과정 보기": "See online courses",
+  "레벨테스트": "Level test",
   "관리": "Manage",
   "기초": "Basic",
   "닫기": "Close",

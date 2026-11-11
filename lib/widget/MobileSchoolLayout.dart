@@ -15,6 +15,8 @@ import 'package:gi_english_website/widget/LessonRatingPromptHost.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
 import 'package:gi_english_website/widget/SiteNav.dart';
 
+enum _MobileMenu { none, courses, academy }
+
 class MobileSchoolLayout extends StatefulWidget {
   final Widget content;
   final double height = 52;
@@ -33,7 +35,7 @@ class MobileSchoolLayout extends StatefulWidget {
 class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
   AdminRole _adminRole = AdminRole.none;
   bool _isMemberLoggedIn = AuthService.currentUser != null;
-  bool _academyMenuOpen = false;
+  _MobileMenu _menu = _MobileMenu.none;
   StreamSubscription<User?>? _authSub;
 
   @override
@@ -44,6 +46,9 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
       if (mounted) {
         setState(() {
           _isMemberLoggedIn = user != null;
+          if (user == null && _menu == _MobileMenu.courses) {
+            _menu = _MobileMenu.none;
+          }
         });
         _checkAdminStatus();
       }
@@ -59,17 +64,17 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
   bool get _isStaff =>
       _adminRole == AdminRole.owner || _adminRole == AdminRole.teacher;
 
-  void _closeAcademyMenu() {
-    if (!_academyMenuOpen) return;
-    setState(() => _academyMenuOpen = false);
+  void _closeMenu() {
+    if (_menu == _MobileMenu.none) return;
+    setState(() => _menu = _MobileMenu.none);
   }
 
-  void _toggleAcademyMenu() {
-    setState(() => _academyMenuOpen = !_academyMenuOpen);
+  void _toggleMenu(_MobileMenu menu) {
+    setState(() => _menu = _menu == menu ? _MobileMenu.none : menu);
   }
 
   void _go(VoidCallback action) {
-    _closeAcademyMenu();
+    _closeMenu();
     action();
   }
 
@@ -141,14 +146,14 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                 ],
               ),
             ),
-            if (_academyMenuOpen) ...[
+            if (_menu != _MobileMenu.none) ...[
               Positioned(
                 top: topBarHeight,
                 left: 0,
                 right: 0,
                 bottom: 0,
                 child: GestureDetector(
-                  onTap: _closeAcademyMenu,
+                  onTap: _closeMenu,
                   behavior: HitTestBehavior.opaque,
                   child: ColoredBox(
                     color: Palette.black.withValues(alpha: 0.28),
@@ -159,7 +164,9 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
                 top: topBarHeight,
                 left: 0,
                 right: 0,
-                child: _academyMenu(viewportHeight - topBarHeight),
+                child: _menu == _MobileMenu.courses
+                    ? _coursesMenu()
+                    : _academyMenu(viewportHeight - topBarHeight),
               ),
             ],
             Positioned(top: 56, left: 0, right: 0, child: _navRow()),
@@ -185,7 +192,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
       child: Row(
         children: [
           InkWell(
-            onTap: () => SiteNav.goHome(context),
+            onTap: () => _go(() => SiteNav.goHome(context)),
             child: SizedBox(
               height: 32,
               child: GleamMark(height: 32),
@@ -296,13 +303,10 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
           children: [
             _navLink(
               '과정',
-              () => _go(() => SiteNav.goCourses(context)),
+              () => _toggleMenu(_MobileMenu.courses),
               enabled: _isMemberLoggedIn,
-            ),
-            _navLink(
-              '레벨 진단',
-              () => _go(() => SiteNav.openPlacement(context)),
-              enabled: _isMemberLoggedIn,
+              selected: _menu == _MobileMenu.courses,
+              expandable: true,
             ),
             _navLink(
               '내 강의실',
@@ -322,12 +326,56 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
             ),
             _navLink(
               '글림아일랜드 어학원',
-              _toggleAcademyMenu,
+              () => _toggleMenu(_MobileMenu.academy),
               color: Palette.darkTeal,
-              selected: _academyMenuOpen,
+              selected: _menu == _MobileMenu.academy,
               expandable: true,
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _coursesMenu() {
+    return Material(
+      color: Palette.white,
+      elevation: 6,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: Palette.grey200)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _menuRow(
+              '온라인 과정 보기',
+              () => _go(() => SiteNav.goCourses(context)),
+            ),
+            _menuRow(
+              '레벨테스트',
+              () => _go(() => SiteNav.openPlacement(context)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _menuRow(String label, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Text(
+          tr(context, label),
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Palette.black,
+          ),
         ),
       ),
     );
@@ -345,7 +393,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
           ),
           child: AcademyNavMenu(
             onSelect: (item) {
-              _closeAcademyMenu();
+              _closeMenu();
               SiteNav.openPage(context, item);
             },
           ),
