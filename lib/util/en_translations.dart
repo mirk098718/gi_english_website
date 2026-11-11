@@ -316,6 +316,7 @@ const Map<String, String> enTranslations = {
   "아이디 · 비밀번호 찾기": "Find ID · password",
   "온라인 프로그램 (인강)": "Online program (video lessons)",
   "온라인 상품": "Online options",
+  "원하시는 상품을 선택하세요. 클릭 시, 프로그램 상세 정보로 바로 이동합니다!": "Choose the product you want. A click takes you straight to the program details!",
   "상품 선택": "Choose an option",
   "상품 구성 보기": "See the options",
   "인강 결제하기": "Pay for video lessons",

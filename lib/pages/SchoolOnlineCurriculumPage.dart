@@ -4,11 +4,11 @@ import 'package:gi_english_website/class/ClassPlacementQuiz.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
-import 'package:gi_english_website/pages/OnlineCheckoutPage.dart';
 import 'package:gi_english_website/pages/OnlineTeacherSelectPage.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
+import 'package:gi_english_website/util/PaymentService.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/ClassPlacementDialog.dart';
@@ -38,6 +38,7 @@ class _SchoolOnlineCurriculumPageState
     extends State<SchoolOnlineCurriculumPage> {
   late OnlineCourse? _selectedCourse;
   late OnlineCourse? _lectureCourse;
+  bool _lecturePaying = false;
   int _speakingSessions = 8;
   late String _highlightedPlan;
   final GlobalKey _courseListKey = GlobalKey();
@@ -139,20 +140,52 @@ class _SchoolOnlineCurriculumPageState
     );
   }
 
-  void _goLectureCheckout() {
+  Future<void> _payLecture() async {
+    if (_lecturePaying) return;
     if (AuthService.currentUser == null) {
       MenuUtil.push(context, MemberLoginPage());
       return;
     }
     final course = _lectureCourse;
-    if (course == null) return;
-    MenuUtil.push(
-      context,
-      OnlineCheckoutPage(
-        initialCourseId: course.id,
-        initialPlan: OnlinePlan.lecture,
-      ),
+    if (course == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('과정을 선택해주세요.',
+              style: TextStyle(fontFamily: 'NotoSansKR')),
+          backgroundColor: Palette.danger,
+        ),
+      );
+      return;
+    }
+    setState(() => _lecturePaying = true);
+    final order = await PaymentService.createOrder(
+      course: course,
+      plan: OnlinePlan.lecture,
+      totalSessions: course.sessionsFor(OnlinePlan.lecture),
     );
+    if (!mounted) return;
+    if (order == null) {
+      setState(() => _lecturePaying = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('주문을 생성하지 못했습니다. 로그인 상태를 확인해주세요.',
+              style: TextStyle(fontFamily: 'NotoSansKR')),
+          backgroundColor: Palette.danger,
+        ),
+      );
+      return;
+    }
+    final error = await PaymentService.requestTossPayment(order);
+    if (!mounted) return;
+    setState(() => _lecturePaying = false);
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error, style: TextStyle(fontFamily: 'NotoSansKR')),
+          backgroundColor: Palette.danger,
+        ),
+      );
+    }
   }
 
   void _goSpeakingTeacher() {
@@ -260,7 +293,10 @@ class _SchoolOnlineCurriculumPageState
           WidgetUtil.myDivider(),
           SizedBox(height: 12),
           bodyText(
-            '필요한 구성만 골라 신청합니다. 카드를 누르면 아래 설명이 열립니다.',
+            tr(
+              context,
+              '원하시는 상품을 선택하세요. 클릭 시, 프로그램 상세 정보로 바로 이동합니다!',
+            ),
           ),
           SizedBox(height: 16),
           _planCards(compact: compact),
@@ -419,17 +455,44 @@ class _SchoolOnlineCurriculumPageState
                     selected: _lectureCourse?.id == course.id,
                     compact: compact,
                     accent: Palette.primary,
-                    priceLabel: '${course.lecturePriceLabel} · 안내 금액',
+                    priceLabel: course.lecturePriceLabel,
                     priceColor: Palette.primary,
                     onTap: () => setState(() => _lectureCourse = course),
                   ),
               ],
             ),
           ),
-          SizedBox(height: 8),
+          SizedBox(height: 16),
+          Text(
+            _lectureCourse == null
+                ? '레벨을 고르면 그 금액으로 결제합니다.'
+                : '${_lectureCourse!.order}. ${_lectureCourse!.localizedName(context, OnlinePlan.lecture)}',
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+              height: 1.5,
+              color: Palette.grey800,
+            ),
+          ),
+          SizedBox(height: 4),
+          Text(
+            '인강과 퀴즈를 바로 결제합니다.',
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontSize: 13,
+              height: 1.5,
+              color: Palette.grey600,
+            ),
+          ),
+          SizedBox(height: 12),
           _applyButton(
-            label: '이 레벨 인강 결제하기',
-            onPressed: _goLectureCheckout,
+            label: _lecturePaying
+                ? '결제창 여는 중...'
+                : '${_lectureCourse?.lecturePriceLabel ?? ''} 결제하기'.trim(),
+            onPressed: _lecturePaying ? null : _payLecture,
+            color: Palette.primary,
+            icon: Icons.payment,
           ),
         ],
       ),
@@ -631,8 +694,9 @@ class _SchoolOnlineCurriculumPageState
 
   Widget _applyButton({
     required String label,
-    required VoidCallback onPressed,
+    required VoidCallback? onPressed,
     Color? color,
+    IconData icon = Icons.arrow_forward,
   }) {
     return SizedBox(
       width: double.maxFinite,
@@ -641,12 +705,14 @@ class _SchoolOnlineCurriculumPageState
         style: ElevatedButton.styleFrom(
           backgroundColor: color ?? Palette.secondaryDark,
           foregroundColor: Palette.white,
+          disabledBackgroundColor: Palette.grey300,
+          disabledForegroundColor: Palette.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
         ),
         onPressed: onPressed,
-        icon: Icon(Icons.arrow_forward, color: Palette.white),
+        icon: Icon(icon, color: Palette.white),
         label: Text(
           label,
           style: TextStyle(fontFamily: 'Jalnan', fontSize: 15),
