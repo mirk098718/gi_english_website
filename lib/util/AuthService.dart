@@ -585,6 +585,45 @@ class AuthService {
     }
   }
 
+  /// 수강생이 메인 원어민 강사를 바꾼다.
+  /// 회원 문서와 화상수업이 있는 수강만 갱신한다. 이미 잡은 예약은 그대로 둔다.
+  static Future<String?> setMyMainTeacher(OnlineNativeTeacher teacher) async {
+    final user = currentUser;
+    if (user == null) return '로그인이 필요합니다.';
+    final uid = teacher.accountUid.trim();
+    final profileId = teacher.id.trim();
+    final name = teacher.name.trim();
+    if (uid.isEmpty || profileId.isEmpty || name.isEmpty) {
+      return '이 강사로는 메인 강사를 바꿀 수 없습니다.';
+    }
+    final fields = <String, dynamic>{
+      'teacherId': uid,
+      'nativeTeacherId': profileId,
+      'nativeTeacherName': name,
+      'nativeTeacherUid': uid,
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+    try {
+      await _firestore.collection('members').doc(user.uid).set(
+            fields,
+            SetOptions(merge: true),
+          );
+      final enrollments = await _firestore
+          .collection('enrollments')
+          .where('userId', isEqualTo: user.uid)
+          .get();
+      for (final doc in enrollments.docs) {
+        final plan = doc.data()['plan']?.toString() ?? '';
+        if (plan == 'lecture') continue;
+        await doc.reference.set(fields, SetOptions(merge: true));
+      }
+      return null;
+    } catch (e) {
+      print('메인 강사 변경 오류: $e');
+      return '메인 강사를 바꾸지 못했습니다.';
+    }
+  }
+
   // 로그아웃
   static Future<void> signOut() async {
     try {

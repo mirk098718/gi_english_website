@@ -17,6 +17,7 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/NotificationService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
+import 'package:gi_english_website/widget/MainTeacherChange.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
@@ -754,6 +755,29 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
                       ),
                     ],
                   ],
+                  if (enrollment.plan != OnlinePlan.lecture)
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size(0, 32),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      onPressed: () async {
+                        final changed = await MainTeacherChange.pick(
+                          context,
+                          currentUid: enrollment.nativeTeacher?.accountUid ??
+                              enrollment.nativeTeacherUid,
+                        );
+                        if (changed && mounted) _loadMyCourses();
+                      },
+                      child: Text(
+                        tr(context, "메인 강사 변경"),
+                        style: TextStyle(
+                          fontFamily: "NotoSansKR",
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
                   SizedBox(height: 4),
                   Text(
                     _classroomProgressCopy(enrollment, allDone),

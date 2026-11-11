@@ -77,6 +77,25 @@ service cloud.firestore {
             || memberDoc(memberId).nativeTeacherUid == request.auth.uid);
     }
 
+    // 수강생이 메인 강사로 고를 수 있는 계정. 활성 관리자(원어민)만 허용한다.
+    function activeStaffAccount(uid) {
+      return uid is string
+        && uid.size() > 0
+        && exists(/databases/$(database)/documents/admins/$(uid))
+        && (!('isActive' in get(/databases/$(database)/documents/admins/$(uid)).data)
+            || get(/databases/$(database)/documents/admins/$(uid)).data.isActive != false);
+    }
+
+    function mainTeacherFieldsOnly() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['teacherId', 'nativeTeacherId', 'nativeTeacherName',
+                    'nativeTeacherUid', 'updatedAt'])
+        && request.resource.data.teacherId == request.resource.data.nativeTeacherUid
+        && request.resource.data.nativeTeacherId is string
+        && request.resource.data.nativeTeacherName is string
+        && activeStaffAccount(request.resource.data.nativeTeacherUid);
+    }
+
     // 공지(notices): 누구나 읽기, 쓰기는 메인 관리자만
     match /notices/{noticeId} {
       allow read: if true;
@@ -112,11 +131,17 @@ service cloud.firestore {
       allow create: if isOwner();
 
       // 담당 강사는 화상수업 종료 시 진도(completedSessions)만 갱신할 수 있다.
+      // 수강 본인은 메인 강사 필드만 바꿀 수 있다. 이미 잡은 예약은 이 규칙으로 옮기지 않는다.
       allow update: if isOwner()
         || (isAssignedTeacher(resource.data.userId)
           && request.resource.data.diff(resource.data).affectedKeys()
               .hasOnly(['completedSessions', 'remainingSessions',
-                        'lastSessionAt', 'updatedAt']));
+                        'lastSessionAt', 'updatedAt']))
+        || (isLoggedIn()
+          && resource.data.userId == request.auth.uid
+          && request.resource.data.userId == resource.data.userId
+          && request.resource.data.courseId == resource.data.courseId
+          && mainTeacherFieldsOnly());
 
       allow delete: if isOwner();
 
@@ -341,7 +366,10 @@ service cloud.firestore {
         || (isLoggedIn()
           && request.auth.uid == memberId
           && request.resource.data.diff(resource.data).affectedKeys()
-              .hasOnly(['nickname', 'photoUrl', 'phone', 'updatedAt']));
+              .hasOnly(['nickname', 'photoUrl', 'phone', 'updatedAt']))
+        || (isLoggedIn()
+          && request.auth.uid == memberId
+          && mainTeacherFieldsOnly());
 
       allow delete: if isOwner();
     }

@@ -191,7 +191,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
           WidgetUtil.myDivider(),
           SizedBox(height: 12),
           Text(
-            tr(context, "선택한 과정을 담당할 메인 원어민 강사입니다.\n이후 화상수업은 이 선생님을 중심으로 진행되며, 해당 선생님이 열어 둔 시간에만 예약할 수 있습니다.\n스케줄이 맞지 않을 때만 다른 선생님으로 변경할 수 있습니다."),
+            tr(context, "선택한 과정을 담당할 메인 원어민 강사입니다.\n이후 화상수업은 이 선생님을 중심으로 진행되며, 해당 선생님이 열어 둔 시간에만 예약할 수 있습니다.\n메인 강사는 나중에 바꿀 수 있습니다. 하루 일정이 안 맞으면 다른 선생님으로 예약하고, 마음에 들면 그 선생님을 메인 강사로 고정할 수 있습니다."),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: 13,

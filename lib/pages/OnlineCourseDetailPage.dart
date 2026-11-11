@@ -24,6 +24,7 @@ import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:gi_english_website/widget/QuizResultSummary.dart';
+import 'package:gi_english_website/widget/MainTeacherChange.dart';
 import 'package:gi_english_website/widget/StudentJoinButton.dart';
 import 'package:gi_english_website/widget/YoutubeLessonPlayer.dart';
 
@@ -739,6 +740,28 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     );
   }
 
+  Future<void> _changeMainTeacher() async {
+    final changed = await MainTeacherChange.pick(
+      context,
+      currentUid: _assignedNativeTeacher?.accountUid ??
+          _enrollment?.nativeTeacherUid ??
+          '',
+    );
+    if (!changed || !mounted) return;
+    setState(_bookingTeacher.clear);
+    await _loadData();
+  }
+
+  Future<void> _pinMainTeacher(OnlineNativeTeacher teacher) async {
+    final changed = await MainTeacherChange.pin(context, teacher);
+    if (!changed || !mounted) return;
+    setState(() {
+      _bookingTeacher.removeWhere((_, picked) =>
+          picked.accountUid == teacher.accountUid || picked.id == teacher.id);
+    });
+    await _loadData();
+  }
+
   Future<void> _pickOtherTeacher(OnlineWeek week) async {
     final teachers = await AuthService.selectableNativeTeachers(
       kind: TeacherPickKind.coteach,
@@ -1098,6 +1121,14 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
               onPressed: _loadData,
               icon: Icon(Icons.refresh, size: 18, color: Palette.grey600),
             ),
+            if (_enrollment != null && !_lectureOnly)
+              TextButton(
+                onPressed: _changeMainTeacher,
+                child: Text(
+                  tr(context, "메인 강사 변경"),
+                  style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13),
+                ),
+              ),
           ],
         ),
         SizedBox(height: 8),
@@ -1848,6 +1879,24 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                           color: Palette.accent,
                         ),
                       ),
+                      if (bookingTeacher != null &&
+                          bookingTeacher.accountUid.trim().isNotEmpty)
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size(0, 32),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          onPressed: () => _pinMainTeacher(bookingTeacher),
+                          child: Text(
+                            tr(context, "이 강사를 메인 강사로 고정"),
+                            style: TextStyle(
+                              fontFamily: "NotoSansKR",
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
                     ],
                   ],
                 ),
