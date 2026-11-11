@@ -376,7 +376,7 @@ class _SchoolOnlineCurriculumPageState
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Image.asset(
-              'assets/lecture-quiz-screen.jpg',
+              'assets/plan-card-lecture.jpg',
               width: double.infinity,
               fit: BoxFit.fitWidth,
             ),
@@ -529,12 +529,10 @@ class _SchoolOnlineCurriculumPageState
           SizedBox(height: 16),
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: AspectRatio(
-              aspectRatio: 16 / 9,
-              child: Image.asset(
-                OnlineCourse.speaking.imageAsset,
-                fit: BoxFit.contain,
-              ),
+            child: Image.asset(
+              'assets/plan-card-speaking.jpg',
+              width: double.infinity,
+              fit: BoxFit.fitWidth,
             ),
           ),
           SizedBox(height: 8),
@@ -882,9 +880,9 @@ class _SchoolOnlineCurriculumPageState
         ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: Image.asset(
-            'assets/curriculum-service-overview.jpg',
+            'assets/plan-card-bundle.jpg',
             width: double.infinity,
-            fit: BoxFit.cover,
+            fit: BoxFit.fitWidth,
           ),
         ),
         SizedBox(height: 10),
