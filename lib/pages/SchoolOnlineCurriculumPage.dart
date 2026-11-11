@@ -370,6 +370,25 @@ class _SchoolOnlineCurriculumPageState
         children: [
           sectionTitle('1. 단계별 영문법 인강'),
           SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.asset(
+              'assets/lecture-quiz-screen.jpg',
+              width: double.infinity,
+              fit: BoxFit.fitWidth,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            '실제 인강 화면입니다.',
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontSize: 12,
+              height: 1.5,
+              color: Palette.grey600,
+            ),
+          ),
+          SizedBox(height: 16),
           bodyText(
             '철저한 문법 빌드업과 유용한 영어 표현을 풀어 주는 인강입니다.\n'
             '퀴즈로 문법을 완성하고, 원어민 화상은 포함되지 않습니다.\n'
@@ -507,12 +526,12 @@ class _SchoolOnlineCurriculumPageState
           SizedBox(height: 16),
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: Image.asset(
-              OnlineCourse.speaking.imageAsset,
-              width: double.infinity,
-              height: 320,
-              fit: BoxFit.cover,
-              alignment: Alignment.center,
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Image.asset(
+                OnlineCourse.speaking.imageAsset,
+                fit: BoxFit.contain,
+              ),
             ),
           ),
           SizedBox(height: 8),
