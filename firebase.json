@@ -20,6 +20,9 @@
   ],
   "hosting": {
     "public": "build/web",
+    "predeploy": [
+      "bash tool/build_web.sh"
+    ],
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -69,9 +72,9 @@
         ]
       },
       {
-        "source": "/main.dart.js",
+        "source": "/release.txt",
         "headers": [
-          { "key": "Cache-Control", "value": "no-cache" }
+          { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
         ]
       }
     ],
