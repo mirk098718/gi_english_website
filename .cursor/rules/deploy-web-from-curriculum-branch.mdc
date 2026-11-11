@@ -1,0 +1,19 @@
+---
+description: 웹 배포는 새 커리큘럼 브랜치를 받은 뒤에만 빌드한다
+alwaysApply: true
+---
+
+# 웹 배포
+
+운영 사이트(https://gleam-island.web.app)에 보이는 화면은 **마지막으로 `flutter build web` 한 브랜치**다. `main`에서 빌드하면 예전 커리큘럼이 배포된다.
+
+웹을 빌드하거나 Firebase Hosting에 배포하기 전에 항상 아래 스크립트를 실행한다. 스크립트가 `origin/cursor/online-product-plans-037b`를 받아 그 커밋에서 `flutter build web` 하고, 호스팅만 배포한다.
+
+```bash
+tool/deploy_web.sh
+```
+
+- 이 브랜치가 원격에 있으면 그 브랜치를 배포 기준으로 삼는다. 원격에서 브랜치가 사라지면 `main`을 받는다.
+- 커밋하지 않은 변경이 있으면 스크립트는 브랜치를 바꾸지 않고 멈춘다.
+- `firebase deploy --only hosting`만 쓴다. functions를 같이 배포하지 않는다. `closeStaleTalkRooms` 삭제 질문이 나와도 이 스크립트 경로에서는 나오지 않는다.
+- 사용자가 직접 `flutter build web`이나 `firebase deploy`를 치라고 시키지 않는다. 배포가 필요하면 이 스크립트를 실행한다.
