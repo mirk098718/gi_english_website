@@ -538,7 +538,7 @@ class EnrollmentService {
     final video = items.any(isVideoChecklistItem);
     final problem = items.any(isProblemChecklistItem);
     if (video && problem) {
-      return '인강 시청과 문제풀이를 모두 체크해야 아래 예약이 열립니다.';
+      return '인강 시청과 문제풀이를 모두 체크하면 이 회차 예약이 열리고, 다음 회차 수업도 열립니다.';
     }
     if (problem) {
       return '문제풀이를 체크하면 아래 예약이 열립니다. 이 회차에는 인강이 없습니다.';
@@ -1029,6 +1029,7 @@ class EnrollmentService {
           'sessionId': sessionId,
           if (scheduled != null) 'scheduledAt': Timestamp.fromDate(scheduled),
           if (data['reminderSent'] != true) 'reminderSent': false,
+          if (data['reminder1hSent'] != true) 'reminder1hSent': false,
         });
       }
     } catch (e) {
@@ -1069,6 +1070,7 @@ class EnrollmentService {
           'sessionId': sessionId,
           if (scheduled != null) 'scheduledAt': Timestamp.fromDate(scheduled),
           if (data['reminderSent'] != true) 'reminderSent': false,
+          if (data['reminder1hSent'] != true) 'reminder1hSent': false,
         });
       }
     } catch (e) {
@@ -1195,7 +1197,7 @@ class EnrollmentService {
         await ref.set(payload, SetOptions(merge: true));
       }
 
-      // 종료 시 정산·다음 회차는 강사 피드백+학생 별점이 끝난 뒤에 반영한다.
+      // 종료 후 별점 요청을 연다. 다음 회차 학습은 체크리스트가 열고, 강사 완료는 피드백이다.
       if (!isLive) {
         final data = (await ref.get()).data() ?? existing.data() ?? {};
         await _openPayGateAfterSessionEnd(
@@ -1219,7 +1221,7 @@ class EnrollmentService {
     }
   }
 
-  /// 화상수업 종료 직후 수강생 별점 요청을 연다. 별점 제출 전에는 다음 회차를 열지 않는다.
+  /// 화상수업 종료 직후 수강생 별점 요청을 연다. 다음 회차 학습은 체크리스트로 연다.
   static Future<void> _openPayGateAfterSessionEnd({
     required String sessionId,
     required Map<String, dynamic> data,
@@ -1803,19 +1805,47 @@ class EnrollmentService {
     return (leftDays + 6) ~/ 7;
   }
 
-  /// 지금 열려 있는 회차. 이수한 다음 회차.
-  /// 관리자가 정체된 회차 다음을 연 경우에는 그 회차까지 연다.
+  /// 지금 열려 있는 회차.
+  /// 체크리스트를 마친 다음 회차, 이수한 다음 회차, 관리자가 연 회차 중 가장 뒤.
   static int unlockedSessionNumber(EnrollmentRecord enrollment) {
     if (enrollment.totalSessions > 0 &&
         enrollment.completedSessions >= enrollment.totalSessions) {
       return enrollment.totalSessions;
     }
     var next = enrollment.completedSessions + 1;
+    if (enrollment.contentUnlockedThrough > next) {
+      next = enrollment.contentUnlockedThrough;
+    }
     if (enrollment.adminUnlockedThrough > next) {
       next = enrollment.adminUnlockedThrough;
     }
     if (enrollment.totalSessions <= 0) return next;
     return next.clamp(1, enrollment.totalSessions);
+  }
+
+  /// 회차 N의 필수 체크가 끝나면 N+1이 열린다. 1회차는 항상 열려 있다.
+  static int checklistUnlockedThrough({
+    required Iterable<OnlineWeek> weeks,
+    required Map<String, List<String>> progress,
+    int totalSessions = 0,
+  }) {
+    final byNumber = <int, OnlineWeek>{};
+    for (final week in weeks) {
+      if (week.weekNumber < 1) continue;
+      byNumber.putIfAbsent(week.weekNumber, () => week);
+    }
+    var opened = 1;
+    final cap = totalSessions > 0 ? totalSessions : 1000;
+    for (var n = 1; n < cap; n++) {
+      if (n > opened) break;
+      final week = byNumber[n];
+      if (week == null) break;
+      final checked = progress[week.id] ?? const <String>[];
+      if (!isWeekReadyToBook(week, checked)) break;
+      opened = n + 1;
+    }
+    if (totalSessions > 0 && opened > totalSessions) return totalSessions;
+    return opened;
   }
 
   /// 연장 결제가 더하는 기한. 남은 기한과 오늘 중 늦은 날부터 추가 회차만큼 잇는다.
@@ -1971,10 +2001,23 @@ class EnrollmentService {
     final result = <String, List<StudentWeekProgress>>{};
     await Future.wait(list.map((enrollment) async {
       final records = await weekProgressRecords(enrollment.id);
+      final courseWeeks =
+          weeksByCourse[enrollment.courseId] ?? const <OnlineWeek>[];
+      final progress = <String, List<String>>{
+        for (final entry in records.entries)
+          entry.key: entry.value.checkedItemIds,
+      };
+      final opened = enrollment.withContentUnlocked(
+        checklistUnlockedThrough(
+          weeks: courseWeeks,
+          progress: progress,
+          totalSessions: enrollment.totalSessions,
+        ),
+      );
       result[enrollment.id] = mergeLearningWeeks(
-        weeks: weeksByCourse[enrollment.courseId] ?? const [],
+        weeks: courseWeeks,
         records: records,
-        through: enrollment.unlockedSessionNumber,
+        through: opened.unlockedSessionNumber,
       );
     }));
     return result;
@@ -2477,10 +2520,23 @@ class EnrollmentService {
     if (enrollment.remainingSessions <= 0) {
       return '남은 화상수업 횟수가 없습니다.';
     }
-    if (!isSessionUnlocked(enrollment, week.weekNumber)) {
-      return '이전 회차 화상수업을 마치면 이 회차를 예약할 수 있습니다.';
+    final progressMap = await weekProgress(enrollment.id);
+    final courseWeeks = await weeks(
+      enrollment.courseId,
+      ensureThrough: enrollment.totalSessions > 0
+          ? enrollment.totalSessions
+          : week.weekNumber,
+    );
+    final checklistThrough = checklistUnlockedThrough(
+      weeks: courseWeeks,
+      progress: progressMap,
+      totalSessions: enrollment.totalSessions,
+    );
+    final opened = enrollment.withContentUnlocked(checklistThrough);
+    if (!isSessionUnlocked(opened, week.weekNumber)) {
+      return '이전 회차 체크리스트를 마치면 이 회차가 열립니다.';
     }
-    final checked = (await weekProgress(enrollment.id))[week.id] ?? const [];
+    final checked = progressMap[week.id] ?? const [];
     if (!isWeekReadyToBook(week, checked)) {
       final items = requiredChecklistItems(week);
       final needsVideo = items.any(isVideoChecklistItem);
@@ -2659,6 +2715,7 @@ class EnrollmentService {
           update['scheduledAt'] = Timestamp.fromDate(scheduled);
         }
         update['reminderSent'] = false;
+        update['reminder1hSent'] = false;
         final sessionId = await ensureSessionForBooking(
           bookingId: bookingId,
           data: data,
@@ -3583,6 +3640,7 @@ class EnrollmentRecord {
   final DateTime? expiresAt;
   final DateTime? createdAt;
   final DateTime? lastSessionAt;
+  final int contentUnlockedThrough;
   final int adminUnlockedThrough;
 
   EnrollmentRecord({
@@ -3605,6 +3663,7 @@ class EnrollmentRecord {
     this.expiresAt,
     this.createdAt,
     this.lastSessionAt,
+    this.contentUnlockedThrough = 0,
     this.adminUnlockedThrough = 0,
   });
 
@@ -3623,6 +3682,33 @@ class EnrollmentRecord {
 
   int get unlockedSessionNumber =>
       EnrollmentService.unlockedSessionNumber(this);
+
+  EnrollmentRecord withContentUnlocked(int through) {
+    if (through <= contentUnlockedThrough) return this;
+    return EnrollmentRecord(
+      id: id,
+      userId: userId,
+      email: email,
+      memberName: memberName,
+      courseId: courseId,
+      isActive: isActive,
+      totalSessions: totalSessions,
+      completedSessions: completedSessions,
+      remainingSessions: remainingSessions,
+      isPaid: isPaid,
+      paidAmount: paidAmount,
+      paymentNote: paymentNote,
+      paidAt: paidAt,
+      nativeTeacherId: nativeTeacherId,
+      nativeTeacherName: nativeTeacherName,
+      nativeTeacherUid: nativeTeacherUid,
+      expiresAt: expiresAt,
+      createdAt: createdAt,
+      lastSessionAt: lastSessionAt,
+      contentUnlockedThrough: through,
+      adminUnlockedThrough: adminUnlockedThrough,
+    );
+  }
 
   int get remainingDeadlineWeeks =>
       EnrollmentService.remainingDeadlineWeeks(this);
@@ -3672,6 +3758,8 @@ class EnrollmentRecord {
       expiresAt: expiresAt,
       createdAt: createdAt,
       lastSessionAt: lastSessionAt,
+      contentUnlockedThrough:
+          EnrollmentService._intValue(data['contentUnlockedThrough']),
       adminUnlockedThrough:
           EnrollmentService._intValue(data['adminUnlockedThrough']),
     );

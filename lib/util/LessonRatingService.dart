@@ -145,24 +145,41 @@ class LessonRatingService {
     return null;
   }
 
-  /// 예약 시각 + 수업 시간이 지났는지. 레거시 정산(평가 문서 없음)에만 쓴다.
-  static bool isLessonTimePassed(WeekBooking booking, {DateTime? now}) {
+  /// 예약 시각이 지났는지. 피드백을 미리 적어도 수업 시작 전에는 완료로 세지 않는다.
+  static bool isLessonStarted(WeekBooking booking, {DateTime? now}) {
     final at = EnrollmentService.bookingDateTime(booking.date, booking.time);
     final clock = now ?? DateTime.now();
     if (at == null) return booking.isConfirmed;
-    return clock.isAfter(at.add(Duration(minutes: EnrollmentService.lessonMinutes)));
+    return !clock.isBefore(at);
   }
 
-  /// 수업 수당에 넣는 수업: 피드백+별점이 끝났거나, 예전 수업(평가 문서 없음)은 시간 경과.
-  static bool isPayable(WeekBooking booking, LessonRating? rating,
-      {DateTime? now}) {
-    if (!booking.isConfirmed) return false;
-    if (rating != null) return rating.isRated;
-    return isLessonTimePassed(booking, now: now);
+  /// 보고 있는 달 안에서 완료 여부를 판단할 시각.
+  /// 지난 달은 그 달의 끝, 이번 달은 지금, 다음 달은 그 달의 시작.
+  static DateTime payableClock(DateTime month, {DateTime? today}) {
+    final current = today ?? DateTime.now();
+    final start = DateTime(month.year, month.month);
+    final nextMonth = DateTime(month.year, month.month + 1);
+    if (!current.isBefore(nextMonth)) {
+      return nextMonth.subtract(const Duration(minutes: 1));
+    }
+    if (current.isBefore(start)) return start;
+    return current;
+  }
+
+  /// 강사 수업 완료: 확정된 수업이고, 수업 행 피드백이 있으며, 시작 시각이 지났다.
+  static bool isPayable(
+    WeekBooking booking,
+    LessonRating? rating, {
+    bool feedbackWritten = false,
+    DateTime? now,
+  }) {
+    if (!booking.isConfirmed || !feedbackWritten) return false;
+    return isLessonStarted(booking, now: now);
   }
 
   static bool Function(WeekBooking booking) payableChecker(
     List<LessonRating> ratings, {
+    Set<String> feedbackBookingIds = const {},
     DateTime? now,
   }) {
     final byId = <String, LessonRating>{};
@@ -170,8 +187,12 @@ class LessonRatingService {
       if (rating.bookingId.isNotEmpty) byId[rating.bookingId] = rating;
       byId[rating.id] = rating;
     }
-    return (booking) =>
-        isPayable(booking, byId[booking.id], now: now);
+    return (booking) => isPayable(
+          booking,
+          byId[booking.id],
+          feedbackWritten: feedbackBookingIds.contains(booking.id),
+          now: now,
+        );
   }
 
   static TeacherMonthStats monthStats({
@@ -180,8 +201,10 @@ class LessonRatingService {
     required List<LessonRating> ratings,
     DateTime? now,
     int? lessonFeeWon,
+    Set<String> feedbackBookingIds = const {},
   }) {
     final current = now ?? DateTime.now();
+    final clock = payableClock(current);
     var ratedCount = 0;
     var starSum = 0;
     for (final rating in ratings) {
@@ -197,11 +220,14 @@ class LessonRatingService {
     return TeacherMonthStats.fromBookings(
       bookings: bookings,
       teacherUid: teacherUid,
-      isCompleted: payableChecker(ratings, now: now),
+      isCompleted: payableChecker(
+        ratings,
+        feedbackBookingIds: feedbackBookingIds,
+        now: clock,
+      ),
       isAwaitingPay: (booking) {
-        final rating = forBooking(ratings, booking.id);
-        if (rating == null) return false;
-        return !rating.isRated;
+        if (!isLessonStarted(booking, now: clock)) return false;
+        return !feedbackBookingIds.contains(booking.id);
       },
       ratedCount: ratedCount,
       starSum: starSum,
@@ -460,25 +486,15 @@ class _LessonRatingDialogState extends State<LessonRatingDialog> {
   int _stars = 0;
   final _review = TextEditingController();
   bool _saving = false;
-  bool _settled = false;
 
   @override
   void dispose() {
-    if (!_settled) {
-      LessonRatingService.markDismissed(widget.rating);
-    }
     _review.dispose();
     super.dispose();
   }
 
-  Future<void> _later() async {
-    _settled = true;
-    await LessonRatingService.markDismissed(widget.rating);
-    if (!mounted) return;
-    Navigator.pop(context, false);
-  }
-
   Future<void> _save() async {
+    if (_stars < LessonRating.minStars || _saving) return;
     setState(() => _saving = true);
     final error = await LessonRatingService.submit(
       rating: widget.rating,
@@ -496,7 +512,6 @@ class _LessonRatingDialogState extends State<LessonRatingDialog> {
       );
       return;
     }
-    _settled = true;
     Navigator.pop(context, true);
   }
 
@@ -508,10 +523,6 @@ class _LessonRatingDialogState extends State<LessonRatingDialog> {
         : rating.teacherName.trim();
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, _) {
-        if (didPop || _settled) return;
-        _later();
-      },
       child: AlertDialog(
         backgroundColor: Palette.white,
         surfaceTintColor: Palette.white,
@@ -525,7 +536,7 @@ class _LessonRatingDialogState extends State<LessonRatingDialog> {
               children: [
                 Text(
                   tr(context,
-                      "끝난 화상수업에 별점을 남겨 주세요. 별점은 필수이고, 평가를 마치면 다음 회차가 열립니다."),
+                      "끝난 화상수업에 별점을 남겨 주세요. 별점을 눌러 제출해야 이 창이 닫히고, 후기는 선택입니다."),
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 13,
@@ -590,10 +601,6 @@ class _LessonRatingDialogState extends State<LessonRatingDialog> {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: _saving ? null : _later,
-            child: Text(tr(context, "나중에")),
-          ),
           ElevatedButton(
             onPressed: _saving || _stars < LessonRating.minStars ? null : _save,
             child: _saving

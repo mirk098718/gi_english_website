@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
+import 'package:gi_english_website/util/LessonFeedbackService.dart';
 import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/LessonRatingPromptHost.dart';
@@ -59,7 +60,7 @@ class TeacherMonthLessonSummary extends StatelessWidget {
                     Text(
                       '${EnrollmentService.lessonMinutes}분 · ${_payLabel()}'
                       ' · 평균 ${stats.averageStarsLabel}'
-                      '${stats.awaitingCount > 0 ? ' · 평가대기 ${stats.awaitingCount}건' : ''}',
+                      '${stats.awaitingCount > 0 ? ' · 피드백 대기 ${stats.awaitingCount}건' : ''}',
                       style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 10,
@@ -91,7 +92,7 @@ class TeacherMonthLessonSummary extends StatelessWidget {
                 SizedBox(height: 4),
                 Text(
                   '${stats.monthLabel} · 수업 ${EnrollmentService.lessonMinutes}분 · 건당 ${_payLabel()}'
-                  '${stats.awaitingCount > 0 ? ' · 평가 대기 ${stats.awaitingCount}건' : ''}',
+                  '${stats.awaitingCount > 0 ? ' · 피드백 대기 ${stats.awaitingCount}건' : ''}',
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 12,
@@ -181,6 +182,7 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
   DateTime _month = DateTime(DateTime.now().year, DateTime.now().month);
   List<WeekBooking> _bookings = [];
   List<LessonRating> _ratings = [];
+  List<LessonFeedback> _feedbacks = [];
   int _lessonFeeWon = EnrollmentService.lessonPayWon;
   bool _loading = true;
 
@@ -196,11 +198,14 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
         await EnrollmentService.weekBookingsForTeacher(widget.teacherUid);
     final ratings =
         await LessonRatingService.listForTeacher(widget.teacherUid);
+    final feedbacks =
+        await LessonFeedbackService.listForTeacher(widget.teacherUid);
     final profile = await AuthService.staffProfile(widget.teacherUid);
     if (!mounted) return;
     setState(() {
       _bookings = bookings;
       _ratings = ratings;
+      _feedbacks = feedbacks;
       _lessonFeeWon = EnrollmentService.lessonFeeWonOf(profile);
       _loading = false;
     });
@@ -224,6 +229,7 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
         bookings: _bookings,
         teacherUid: widget.teacherUid,
         ratings: _ratings,
+        feedbackBookingIds: LessonFeedback.bookingIds(_feedbacks),
         now: _month,
         lessonFeeWon: _lessonFeeWon,
       );
@@ -296,7 +302,12 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
         '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)}';
     final guest = booking.isSubstitute;
     final rating = LessonRatingService.forBooking(_ratings, booking.id);
-    final done = LessonRatingService.isPayable(booking, rating, now: _month);
+    final done = LessonRatingService.isPayable(
+      booking,
+      rating,
+      feedbackWritten: LessonFeedback.bookingIds(_feedbacks).contains(booking.id),
+      now: LessonRatingService.payableClock(_month),
+    );
     return Container(
       width: double.maxFinite,
       margin: const EdgeInsets.only(bottom: 8),
@@ -310,7 +321,7 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '$when · ${booking.statusLabel}${done ? ' · 정산' : ''}',
+            '$when · ${booking.statusLabel}${done ? ' · 완료' : ''}',
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontWeight: FontWeight.w700,

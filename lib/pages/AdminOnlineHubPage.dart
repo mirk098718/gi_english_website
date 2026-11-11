@@ -2762,6 +2762,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
   List<Map<String, dynamic>> _members = [];
   List<WeekBooking> _bookings = [];
   List<LessonRating> _ratings = [];
+  List<LessonFeedback> _feedbacks = [];
   bool _loading = true;
 
   @override
@@ -2772,19 +2773,20 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
 
   Future<void> _refresh() async {
     setState(() => _loading = true);
-    await AuthService.publishTeacherProfiles();
     await AuthService.syncCardPaidStudents('');
     await AuthService.backfillPaidTeacherIds();
     final teachers = await AuthService.listTeachers();
     final members = await AuthService.listMembers();
     final bookings = await EnrollmentService.staffWeekBookings(mineOnly: false);
     final ratings = await LessonRatingService.listAll();
+    final feedbacks = await LessonFeedbackService.listAll();
     if (!mounted) return;
     setState(() {
       _teachers = teachers;
       _members = members;
       _bookings = bookings;
       _ratings = ratings;
+      _feedbacks = feedbacks;
       _loading = false;
     });
   }
@@ -2801,6 +2803,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
       bookings: _bookings,
       teacherUid: uid,
       ratings: _ratings,
+      feedbackBookingIds: LessonFeedback.bookingIds(_feedbacks),
       lessonFeeWon: EnrollmentService.lessonFeeWonOf(teacher),
     );
   }
@@ -3267,7 +3270,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                                 : '${active ? '활성' : '비활성'} · ${TeacherBookingOffer.label(bookingOffer)} · 담당 $assignedCount명',
                             '이번달 진행 ${stats.completedCount}회 · 취소 ${stats.cancelledCount}회 · 대기 ${pending}건',
                             if (stats.awaitingCount > 0)
-                              '평가대기 ${stats.awaitingCount}건',
+                              '피드백 대기 ${stats.awaitingCount}건',
                             stats.incomeLabel,
                             if (bank.isNotEmpty) bank,
                             PhoneUtil.isValid(t['phone']?.toString() ?? '')

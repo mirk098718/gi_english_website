@@ -25,7 +25,6 @@ class _LessonRatingPromptHostState extends State<LessonRatingPromptHost> {
   StreamSubscription<User?>? _authSub;
   StreamSubscription<List<LessonRating>>? _ratingSub;
   bool _dialogOpen = false;
-  final Set<String> _snoozed = {};
 
   @override
   void initState() {
@@ -64,7 +63,6 @@ class _LessonRatingPromptHostState extends State<LessonRatingPromptHost> {
     if (!mounted || _dialogOpen) return;
     LessonRating? next;
     for (final item in pending) {
-      if (_snoozed.contains(item.id)) continue;
       next = item;
       break;
     }
@@ -81,7 +79,8 @@ class _LessonRatingPromptHostState extends State<LessonRatingPromptHost> {
         rating: rating,
       );
       _dialogOpen = false;
-      if (saved != true) _snoozed.add(rating.id);
+      if (saved == true || !mounted) return;
+      _onPending([rating]);
     });
   }
 

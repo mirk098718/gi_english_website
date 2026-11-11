@@ -4,8 +4,8 @@ import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonFeedbackService.dart';
 import 'package:gi_english_website/util/LessonRatingService.dart';
 
-/// 다음 회차는 강사 피드백과 학생 별점이 끝나야 열린다.
-/// 한쪽이 이 시간 넘게 멈추면 관리자만 다음 회차를 열 수 있다.
+/// 학습 회차는 체크리스트로 열린다.
+/// 이 판단은 화상수업 뒤 피드백이나 별점이 하루 넘게 멈췄을 때, 관리자가 예외로 다음 회차를 여는 기준이다.
 class SessionGateHold {
   final int sessionNumber;
   final bool waitingOnTeacher;

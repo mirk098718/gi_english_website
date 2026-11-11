@@ -51,33 +51,13 @@ LessonRating _rating({
 
 void main() {
   group('LessonRatingService.isPayable', () {
-    test('counts legacy confirmed lessons after class time', () {
+    test('does not count a lesson until the teacher writes feedback', () {
       final booking = _booking(date: DateTime(2026, 9, 1), time: '10:00');
+      final now = DateTime(2026, 9, 1, 10, 21);
       expect(
         LessonRatingService.isPayable(
           booking,
           null,
-          now: DateTime(2026, 9, 1, 10, 21),
-        ),
-        isTrue,
-      );
-    });
-
-    test('does not count a gated lesson until the student rates', () {
-      final booking = _booking(date: DateTime(2026, 9, 1), time: '10:00');
-      final now = DateTime(2026, 9, 1, 12);
-      expect(
-        LessonRatingService.isPayable(
-          booking,
-          _rating(status: LessonRating.statusAwaitingFeedback),
-          now: now,
-        ),
-        isFalse,
-      );
-      expect(
-        LessonRatingService.isPayable(
-          booking,
-          _rating(status: LessonRating.statusPending),
           now: now,
         ),
         isFalse,
@@ -88,7 +68,29 @@ void main() {
           _rating(status: LessonRating.statusRated, stars: 5),
           now: now,
         ),
+        isFalse,
+      );
+      expect(
+        LessonRatingService.isPayable(
+          booking,
+          _rating(status: LessonRating.statusRated, stars: 5),
+          feedbackWritten: true,
+          now: now,
+        ),
         isTrue,
+      );
+    });
+
+    test('waits until the class has started even if feedback exists', () {
+      final booking = _booking(date: DateTime(2026, 9, 1), time: '10:00');
+      expect(
+        LessonRatingService.isPayable(
+          booking,
+          null,
+          feedbackWritten: true,
+          now: DateTime(2026, 9, 1, 9, 59),
+        ),
+        isFalse,
       );
     });
 
@@ -97,6 +99,7 @@ void main() {
         LessonRatingService.isPayable(
           _booking(status: 'pending'),
           _rating(status: LessonRating.statusRated, stars: 4),
+          feedbackWritten: true,
         ),
         isFalse,
       );
@@ -205,7 +208,7 @@ void main() {
   });
 
   group('LessonRatingService.monthStats', () {
-    test('pays only rated lessons and averages stars for the month', () {
+    test('pays confirmed lessons after the teacher writes feedback', () {
       final bookings = [
         _booking(id: 'a', date: DateTime(2026, 9, 2)),
         _booking(id: 'b', date: DateTime(2026, 9, 8)),
@@ -235,6 +238,7 @@ void main() {
         bookings: bookings,
         teacherUid: 't1',
         ratings: ratings,
+        feedbackBookingIds: const {'a', 'c'},
         now: DateTime(2026, 9, 21),
       );
       expect(stats.completedCount, 2);
@@ -245,6 +249,7 @@ void main() {
         bookings: bookings,
         teacherUid: 't1',
         ratings: ratings,
+        feedbackBookingIds: const {'a', 'c'},
         now: DateTime(2026, 9, 21),
         lessonFeeWon: 15000,
       );
