@@ -413,6 +413,7 @@ class _SchoolOnlineCurriculumPageState
                   _compactCourseOption(
                     course,
                     selected: _lectureCourse?.id == course.id,
+                    compact: compact,
                     priceLabel: '${course.lecturePriceLabel} · 안내 금액',
                     detail:
                         '인강 ${OnlinePlan.lessonsPerLevel}편 · 퀴즈 · 화상 없음',
@@ -643,19 +644,66 @@ class _SchoolOnlineCurriculumPageState
     );
   }
 
+  Widget _levelThumb(OnlineCourse course) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Image.asset(
+        course.imageAsset,
+        width: 96,
+        height: 72,
+        fit: BoxFit.cover,
+      ),
+    );
+  }
+
   Widget _compactCourseOption(
     OnlineCourse course, {
     required bool selected,
+    required bool compact,
     required String priceLabel,
     required String detail,
   }) {
+    final price = Text(
+      priceLabel,
+      style: TextStyle(
+        fontFamily: 'Jalnan',
+        fontSize: 13,
+        color: Palette.primary,
+      ),
+    );
+    final copy = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${course.order}. ${course.title}',
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontWeight: FontWeight.w700,
+            fontSize: 14,
+          ),
+        ),
+        SizedBox(height: 2),
+        Text(
+          detail,
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: 12,
+            color: Palette.grey600,
+          ),
+        ),
+        if (compact) ...[
+          SizedBox(height: 6),
+          price,
+        ],
+      ],
+    );
     return InkWell(
       onTap: () => setState(() => _lectureCourse = course),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         width: double.maxFinite,
         margin: EdgeInsets.only(bottom: 8),
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        padding: EdgeInsets.fromLTRB(4, 8, 12, 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
@@ -672,38 +720,13 @@ class _SchoolOnlineCurriculumPageState
               }),
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${course.order}. ${course.title}',
-                    style: TextStyle(
-                      fontFamily: 'NotoSansKR',
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                    ),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    detail,
-                    style: TextStyle(
-                      fontFamily: 'NotoSansKR',
-                      fontSize: 12,
-                      color: Palette.grey600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Text(
-              priceLabel,
-              style: TextStyle(
-                fontFamily: 'Jalnan',
-                fontSize: 13,
-                color: Palette.primary,
-              ),
-            ),
+            _levelThumb(course),
+            SizedBox(width: 12),
+            Expanded(child: copy),
+            if (!compact) ...[
+              SizedBox(width: 12),
+              price,
+            ],
           ],
         ),
       ),
@@ -712,16 +735,6 @@ class _SchoolOnlineCurriculumPageState
 
   Widget _courseRadioOption(OnlineCourse course, {required bool compact}) {
     final selected = _selectedCourse?.id == course.id;
-    final image = ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Image.asset(
-        course.imageAsset,
-        width: compact ? double.infinity : 260,
-        height: compact ? 188 : 200,
-        fit: BoxFit.cover,
-        alignment: Alignment.center,
-      ),
-    );
     final details = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -730,7 +743,7 @@ class _SchoolOnlineCurriculumPageState
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontWeight: FontWeight.w800,
-            fontSize: compact ? 18 : 20,
+            fontSize: compact ? 16 : 18,
             color: Palette.grey900,
           ),
         ),
@@ -819,46 +832,17 @@ class _SchoolOnlineCurriculumPageState
               : Palette.white,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: compact
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _courseRadioHeader(course, selected),
-                  SizedBox(height: 12),
-                  image,
-                  SizedBox(height: 14),
-                  details,
-                ],
-              )
-            : Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _courseRadio(course),
-                  SizedBox(width: 8),
-                  image,
-                  SizedBox(width: 20),
-                  Expanded(child: details),
-                ],
-              ),
-      ),
-    );
-  }
-
-  Widget _courseRadioHeader(OnlineCourse course, bool selected) {
-    return Row(
-      children: [
-        _courseRadio(course),
-        SizedBox(width: 4),
-        Text(
-          selected ? tr(context, "선택됨") : tr(context, "이 과정 선택"),
-          style: TextStyle(
-            fontFamily: 'NotoSansKR',
-            fontWeight: FontWeight.w600,
-            fontSize: 13,
-            color: selected ? Palette.darkTeal : Palette.grey500,
-          ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _courseRadio(course),
+            SizedBox(width: 4),
+            _levelThumb(course),
+            SizedBox(width: compact ? 12 : 16),
+            Expanded(child: details),
+          ],
         ),
-      ],
+      ),
     );
   }
 
