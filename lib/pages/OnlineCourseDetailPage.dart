@@ -147,6 +147,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     );
     final enrollment =
         await EnrollmentService.myEnrollmentForCourse(widget.course.id);
+    var shownEnrollment = enrollment;
     final weeks = await EnrollmentService.weeks(
       widget.course.id,
       ensureThrough: enrollment?.unlockedSessionNumber ?? 1,
@@ -188,7 +189,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       if (teacherUid.isNotEmpty) {
         _availabilityByUid[teacherUid] = availability;
       }
-      enrollment = enrollment.withContentUnlocked(
+      shownEnrollment = enrollment.withContentUnlocked(
         EnrollmentService.checklistUnlockedThrough(
           weeks: weeks,
           progress: progress,
@@ -201,7 +202,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       _lessons = lessons;
       if (!_watchingSessions) _sessions = sessions;
       _weeks = weeks;
-      _enrollment = enrollment;
+      _enrollment = shownEnrollment;
       _weekProgress = progress;
       _quizResults = quizResults;
       _bookings = bookings;
