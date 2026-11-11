@@ -505,7 +505,7 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${course.order}. ${course.nameFor(_plan)}',
+                  Text('${course.order}. ${course.localizedName(context, _plan)}',
                       style: TextStyle(
                           fontFamily: "NotoSansKR",
                           fontWeight: FontWeight.bold,
@@ -546,7 +546,7 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
           SizedBox(height: 10),
           Text('상품: ${_planTitle(_plan)}',
               style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
-          Text('과정: ${course.nameFor(_plan)}',
+          Text('과정: ${course.localizedName(context, _plan)}',
               style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
           Text('포함: ${_includedLine(course)}',
               style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),

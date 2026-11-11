@@ -217,7 +217,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
                         fontSize: 12,
                         color: Palette.grey500)),
                 SizedBox(height: 6),
-                Text('${course.order}. ${course.nameFor(widget.plan)}',
+                Text('${course.order}. ${course.localizedName(context, widget.plan)}',
                     style: TextStyle(
                         fontFamily: 'NotoSansKR',
                         fontWeight: FontWeight.w700,

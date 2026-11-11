@@ -523,11 +523,20 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            tr(context, course.nameFor(_enrollment?.plan ?? OnlinePlan.bundle)),
+            course.localizedName(context, _enrollment?.plan ?? OnlinePlan.bundle),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
           SizedBox(height: 20),
+          Text(
+            tr(context, course.subtitleFor(_enrollment?.plan ?? OnlinePlan.bundle)),
+            style: TextStyle(
+              fontFamily: "Jalnan",
+              fontSize: 15,
+              color: course.accentColor,
+            ),
+          ),
+          SizedBox(height: 16),
           Text(
             course.highlights.map((line) => "• ${tr(context, line)}").join("\n"),
             style: TextStyle(

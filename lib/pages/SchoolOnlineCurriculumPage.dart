@@ -669,11 +669,12 @@ class _SchoolOnlineCurriculumPageState
   }
 
   String _courseMeta(OnlineCourse course, String plan) {
-    if (plan != OnlinePlan.bundle) return '';
+    final subtitle = tr(context, course.subtitleFor(plan));
+    if (plan != OnlinePlan.bundle) return subtitle;
     if (AppLanguage.instance.isEnglish) {
-      return '${course.defaultSessions} live classes';
+      return '$subtitle · ${course.defaultSessions} live classes';
     }
-    return '화상 ${course.defaultSessions}회';
+    return '$subtitle · 화상 ${course.defaultSessions}회';
   }
 
   Widget _levelCourseCard(
@@ -692,7 +693,7 @@ class _SchoolOnlineCurriculumPageState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '${course.order}. ${tr(context, course.nameFor(plan))}',
+          '${course.order}. ${course.localizedName(context, plan)}',
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontWeight: FontWeight.w800,

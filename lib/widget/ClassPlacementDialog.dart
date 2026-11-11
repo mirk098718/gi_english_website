@@ -466,6 +466,15 @@ class _ClassPlacementDialogState extends State<ClassPlacementDialog> {
                   color: Palette.grey900,
                 ),
               ),
+              const SizedBox(height: 4),
+              Text(
+                tr(context, course.subtitle),
+                style: const TextStyle(
+                  fontFamily: 'NotoSansKR',
+                  fontSize: 14,
+                  color: Palette.grey600,
+                ),
+              ),
               const SizedBox(height: 16),
               Text(_explanation(result), style: _bodyStyle),
             ],

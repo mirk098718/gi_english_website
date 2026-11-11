@@ -67,7 +67,7 @@ class ClassPlacementQuiz {
 
   static const String skipNotice =
       '설문에서 1번 항목(알파벳/파닉스 단계)을 선택하신 수강생은 별도의 실력 테스트 없이 '
-      '[1번: 왕초보 영어: 기초회화] 클래스로 바로 배정됩니다.';
+      '[1번: 왕초보 영어] 클래스로 바로 배정됩니다.';
 
   static const List<Part1Question> part1Questions = [
     Part1Question(

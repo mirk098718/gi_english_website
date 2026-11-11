@@ -24,6 +24,13 @@ class OnlinePlan {
 
   static const speakingCourseId = 'native_speaking';
 
+  /// 상품 카드와 프로그램 이름 앞에 쓰는 제목.
+  static String label(String plan) {
+    if (plan == lecture) return '단계별 영문법 인강';
+    if (plan == speaking) return '원어민 화상 1:1 회화';
+    return '영문법 인강 + 원어민 화상 회화';
+  }
+
   static String normalize(String? raw) {
     if (raw == lecture || raw == speaking) return raw!;
     return bundle;
