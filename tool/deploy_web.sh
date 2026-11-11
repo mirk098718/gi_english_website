@@ -28,6 +28,7 @@ else
 fi
 
 echo "빌드 기준: $(git rev-parse --abbrev-ref HEAD) @ $(git rev-parse --short HEAD)"
-flutter build web
+# 서비스 워커를 만들지 않는다. 예전 화면을 캐시에 남겨 두지 않기 위해서다.
+flutter build web --pwa-strategy=none
 firebase deploy --only hosting --project "${PROJECT}"
 echo "호스팅 배포가 끝났습니다. https://${PROJECT}.web.app"
