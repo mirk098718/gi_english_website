@@ -410,13 +410,15 @@ class _SchoolOnlineCurriculumPageState
             child: Column(
               children: [
                 for (final course in OnlineCourse.all)
-                  _compactCourseOption(
+                  _levelCourseCard(
                     course,
+                    plan: OnlinePlan.lecture,
                     selected: _lectureCourse?.id == course.id,
                     compact: compact,
+                    accent: Palette.primary,
                     priceLabel: '${course.lecturePriceLabel} · 안내 금액',
-                    detail:
-                        '인강 ${OnlinePlan.lessonsPerLevel}편 · 퀴즈 · 화상 없음',
+                    priceColor: Palette.primary,
+                    onTap: () => setState(() => _lectureCourse = course),
                   ),
               ],
             ),
@@ -475,7 +477,17 @@ class _SchoolOnlineCurriculumPageState
             child: Column(
               children: [
                 for (final course in OnlineCourse.all)
-                  _courseRadioOption(course, compact: compact),
+                  _levelCourseCard(
+                    course,
+                    plan: OnlinePlan.bundle,
+                    selected: _selectedCourse?.id == course.id,
+                    compact: compact,
+                    accent: Palette.darkTeal,
+                    priceLabel: course.priceLabel,
+                    priceColor: Palette.secondaryDark,
+                    onTap: () => setState(() => _selectedCourse = course),
+                    cardKey: _courseKeys[course.id],
+                  ),
               ],
             ),
           ),
@@ -656,85 +668,26 @@ class _SchoolOnlineCurriculumPageState
     );
   }
 
-  Widget _compactCourseOption(
-    OnlineCourse course, {
-    required bool selected,
-    required bool compact,
-    required String priceLabel,
-    required String detail,
-  }) {
-    final price = Text(
-      priceLabel,
-      style: TextStyle(
-        fontFamily: 'Jalnan',
-        fontSize: 13,
-        color: Palette.primary,
-      ),
-    );
-    final copy = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '${course.order}. ${course.title}',
-          style: TextStyle(
-            fontFamily: 'NotoSansKR',
-            fontWeight: FontWeight.w700,
-            fontSize: 14,
-          ),
-        ),
-        SizedBox(height: 2),
-        Text(
-          detail,
-          style: TextStyle(
-            fontFamily: 'NotoSansKR',
-            fontSize: 12,
-            color: Palette.grey600,
-          ),
-        ),
-        if (compact) ...[
-          SizedBox(height: 6),
-          price,
-        ],
-      ],
-    );
-    return InkWell(
-      onTap: () => setState(() => _lectureCourse = course),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: double.maxFinite,
-        margin: EdgeInsets.only(bottom: 8),
-        padding: EdgeInsets.fromLTRB(4, 8, 12, 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: selected ? Palette.primary : Palette.grey200,
-          ),
-        ),
-        child: Row(
-          children: [
-            Radio<String>(
-              value: course.id,
-              fillColor: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.selected)) return Palette.primary;
-                return Palette.grey400;
-              }),
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            _levelThumb(course),
-            SizedBox(width: 12),
-            Expanded(child: copy),
-            if (!compact) ...[
-              SizedBox(width: 12),
-              price,
-            ],
-          ],
-        ),
-      ),
-    );
+  String _courseSubtitle(OnlineCourse course, String plan) {
+    final subtitle = tr(context, course.subtitleFor(plan));
+    if (plan != OnlinePlan.bundle) return subtitle;
+    if (AppLanguage.instance.isEnglish) {
+      return '$subtitle · ${course.defaultSessions} live classes';
+    }
+    return '$subtitle · 화상 ${course.defaultSessions}회';
   }
 
-  Widget _courseRadioOption(OnlineCourse course, {required bool compact}) {
-    final selected = _selectedCourse?.id == course.id;
+  Widget _levelCourseCard(
+    OnlineCourse course, {
+    required String plan,
+    required bool selected,
+    required bool compact,
+    required Color accent,
+    required String priceLabel,
+    required Color priceColor,
+    required VoidCallback onTap,
+    Key? cardKey,
+  }) {
     final details = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -749,18 +702,12 @@ class _SchoolOnlineCurriculumPageState
         ),
         SizedBox(height: 4),
         Text(
-          () {
-            final subtitle = tr(context, course.subtitle);
-            if (AppLanguage.instance.isEnglish) {
-              return '$subtitle · ${course.defaultSessions} live classes';
-            }
-            return '$subtitle · 화상 ${course.defaultSessions}회';
-          }(),
+          _courseSubtitle(course, plan),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontWeight: FontWeight.w600,
             fontSize: 14,
-            color: Palette.darkTeal,
+            color: accent,
           ),
         ),
         SizedBox(height: 10),
@@ -774,7 +721,7 @@ class _SchoolOnlineCurriculumPageState
           ),
         ),
         SizedBox(height: 12),
-        ...course.highlights.map(
+        ...course.highlightsFor(plan).map(
           (item) => Padding(
             padding: EdgeInsets.only(bottom: 6),
             child: Row(
@@ -782,13 +729,12 @@ class _SchoolOnlineCurriculumPageState
               children: [
                 Padding(
                   padding: EdgeInsets.only(top: 2),
-                  child: Icon(Icons.check_circle,
-                      size: 16, color: Palette.darkTeal),
+                  child: Icon(Icons.check_circle, size: 16, color: accent),
                 ),
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    item,
+                    tr(context, item),
                     style: TextStyle(
                       fontFamily: 'NotoSansKR',
                       fontSize: 13,
@@ -803,19 +749,19 @@ class _SchoolOnlineCurriculumPageState
         ),
         SizedBox(height: 8),
         Text(
-          course.priceLabel,
+          priceLabel,
           style: TextStyle(
             fontFamily: 'Jalnan',
             fontSize: 18,
-            color: Palette.secondaryDark,
+            color: priceColor,
           ),
         ),
       ],
     );
 
     return InkWell(
-      key: _courseKeys[course.id],
-      onTap: () => setState(() => _selectedCourse = course),
+      key: cardKey,
+      onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
@@ -824,18 +770,23 @@ class _SchoolOnlineCurriculumPageState
         padding: EdgeInsets.all(compact ? 16 : 20),
         decoration: BoxDecoration(
           border: Border.all(
-            color: selected ? Palette.darkTeal : Palette.grey200,
+            color: selected ? accent : Palette.grey200,
             width: selected ? 2 : 1,
           ),
-          color: selected
-              ? Palette.darkTeal.withValues(alpha: 0.04)
-              : Palette.white,
+          color: selected ? accent.withValues(alpha: 0.04) : Palette.white,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _courseRadio(course),
+            Radio<String>(
+              value: course.id,
+              fillColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return accent;
+                return Palette.grey400;
+              }),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
             SizedBox(width: 4),
             _levelThumb(course),
             SizedBox(width: compact ? 12 : 16),
@@ -843,17 +794,6 @@ class _SchoolOnlineCurriculumPageState
           ],
         ),
       ),
-    );
-  }
-
-  Widget _courseRadio(OnlineCourse course) {
-    return Radio<String>(
-      value: course.id,
-      fillColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.selected)) return Palette.darkTeal;
-        return Palette.grey400;
-      }),
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }
 

@@ -48,7 +48,6 @@ class OnlineCourse {
           '알파벳과 발음부터 차근차근 시작하는 왕초보 과정입니다. 짧은 표현으로 말문을 열고, 영어에 대한 부담을 덜어 드립니다.',
       imageAsset: 'assets/audience-beginner.png',
       highlights: [
-        '영어 발음의 기본 파닉스부터 시작',
         '기초 어휘와 짧은 표현으로 말하기 연습',
         '영어에 자신감을 갖고 싶은 분들께 추천',
       ],
@@ -155,6 +154,26 @@ class OnlineCourse {
   static List<OnlineCourse> get catalog => [...all, speaking];
 
   bool get isSpeakingProduct => id == speaking.id;
+
+  /// 2번 묶음 설명의 마지막 줄. 1번 인강 설명에는 넣지 않는다.
+  static const nativePracticeHighlight =
+      '배운 내용을 원어민과 실전 회화로 적용해보기';
+
+  /// 1번은 원어민 회화가 없으므로 부제에서 그 부분만 뺀다.
+  String subtitleFor(String plan) {
+    if (plan == OnlinePlan.lecture) {
+      return subtitle.replaceAll(' + 원어민 회화', '');
+    }
+    return subtitle;
+  }
+
+  /// 1번과 2번이 같은 과정 설명을 쓰고, 2번만 원어민 실전 회화 줄을 붙인다.
+  List<String> highlightsFor(String plan) {
+    if (plan == OnlinePlan.bundle) {
+      return [...highlights, nativePracticeHighlight];
+    }
+    return highlights;
+  }
 
   String get priceLabel => OnlinePlan.won(price);
 

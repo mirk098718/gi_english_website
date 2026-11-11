@@ -458,7 +458,7 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
 
   String _courseDetail(OnlineCourse course) {
     if (_plan == OnlinePlan.lecture) {
-      return '${course.subtitle} · 인강 ${OnlinePlan.lessonsPerLevel}편 · 퀴즈';
+      return '${course.subtitleFor(OnlinePlan.lecture)} · 인강 ${OnlinePlan.lessonsPerLevel}편 · 퀴즈';
     }
     return '${course.subtitle} · 화상 ${course.defaultSessions}회 포함';
   }
