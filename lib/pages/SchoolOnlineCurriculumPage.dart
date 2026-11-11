@@ -78,7 +78,7 @@ class _SchoolOnlineCurriculumPageState
     Scrollable.ensureVisible(
       target,
       duration: const Duration(milliseconds: 420),
-      alignment: 0.08,
+      alignment: 0,
     );
   }
 
@@ -512,14 +512,6 @@ class _SchoolOnlineCurriculumPageState
           bodyText(
             '인강을 듣고, 퀴즈로 다지고, 1:1 화상으로 실사용해봅니다.\n'
             '지금 판매 중인 구성이며, 화상수업 ${OnlineCourse.all.first.defaultSessions}회가 포함됩니다.',
-          ),
-          SizedBox(height: 28),
-          sectionTitle("과정 구성"),
-          SizedBox(height: 16),
-          bodyText(
-            "온라인 프로그램은 학습 목표에 따라 단계별로 구성되어 있으며, 각 과정은 주 단위로 진행됩니다.\n"
-            "매주 인강을 보고, 문제풀이 링크로 복습한 뒤, 체크리스트를 스스로 확인합니다.\n"
-            "수강생의 레벨 진단 후 적합한 과정을 배정해 드립니다.",
           ),
           SizedBox(height: 28),
           KeyedSubtree(
