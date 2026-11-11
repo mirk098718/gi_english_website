@@ -264,16 +264,19 @@ class _SchoolOnlineCurriculumPageState
           ),
           SizedBox(height: 16),
           _planCards(compact: compact),
-          SizedBox(height: 10),
+          SizedBox(height: 28),
           Text(
-            '1번과 3번 수강료는 안내 금액입니다. 2번은 지금 결제되는 금액입니다.',
+            tr(context, '과정을 선택하세요'),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
-              fontSize: 12,
-              height: 1.5,
-              color: Palette.grey500,
+              fontWeight: FontWeight.w800,
+              fontSize: compact ? 20 : 22,
+              height: 1.35,
+              color: Palette.grey900,
             ),
           ),
+          SizedBox(height: 16),
+          _placementSection(),
           SizedBox(height: 28),
           KeyedSubtree(
             key: _lectureKey,
@@ -449,8 +452,6 @@ class _SchoolOnlineCurriculumPageState
           SizedBox(height: 20),
           _serviceOverview(compact: compact),
           SizedBox(height: 28),
-          _placementSection(),
-          SizedBox(height: 28),
           sectionTitle("과정 구성"),
           SizedBox(height: 16),
           bodyText(
@@ -461,10 +462,8 @@ class _SchoolOnlineCurriculumPageState
           SizedBox(height: 28),
           KeyedSubtree(
             key: _courseListKey,
-            child: sectionTitle("과정을 선택하세요"),
+            child: bodyText('각 과정의 이미지와 설명을 보고, 맞는 과정을 선택해 주세요.'),
           ),
-          SizedBox(height: 8),
-          bodyText('각 과정의 이미지와 설명을 보고, 맞는 과정을 선택해 주세요.'),
           SizedBox(height: 16),
           RadioGroup<String>(
             groupValue: _selectedCourse?.id,
