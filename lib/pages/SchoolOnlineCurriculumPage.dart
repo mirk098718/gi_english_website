@@ -421,7 +421,7 @@ class _SchoolOnlineCurriculumPageState
           ),
           SizedBox(height: 8),
           Text(
-            '녹화해 둔 인강입니다. 재생과 일시정지로 봅니다.',
+            tr(context, '실제 인강 이미지'),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: 12,
@@ -432,9 +432,7 @@ class _SchoolOnlineCurriculumPageState
           SizedBox(height: 16),
           bodyText(
             '인강으로 문법 빌드업, 유용한 표현을 배우고, 퀴즈로 최종 정리합니다.\n'
-            '원어민 화상은 포함되지 않습니다.\n'
-            '레벨마다 인강 ${OnlinePlan.lessonsPerLevel}편을 기준으로 하고, 강의실에는 등록된 편부터 열립니다.\n'
-            '수강 기간은 ${OnlinePlan.lectureAccessWeeks}주입니다.',
+            '원어민 화상은 포함되지 않습니다.',
           ),
           SizedBox(height: 16),
           RadioGroup<String>(
@@ -587,12 +585,6 @@ class _SchoolOnlineCurriculumPageState
         children: [
           sectionTitle('3. 원어민 화상 1:1 회화'),
           SizedBox(height: 12),
-          bodyText(
-            '실전 원어민 회화.\n'
-            '인강과 퀴즈는 없고, 고른 원어민과 회화만 진행합니다.\n'
-            '1회 ${OnlinePlan.won(OnlinePlan.speakingSessionPrice)}이며, 횟수를 고르면 금액이 정해집니다.',
-          ),
-          SizedBox(height: 16),
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Image.asset(
@@ -610,6 +602,12 @@ class _SchoolOnlineCurriculumPageState
               height: 1.5,
               color: Palette.grey600,
             ),
+          ),
+          SizedBox(height: 16),
+          bodyText(
+            '실전 원어민 회화.\n'
+            '인강과 퀴즈는 없고, 고른 원어민과 회화만 진행합니다.\n'
+            '1회 ${OnlinePlan.won(OnlinePlan.speakingSessionPrice)}이며, 횟수를 고르면 금액이 정해집니다.',
           ),
           SizedBox(height: 16),
           Wrap(
