@@ -525,12 +525,13 @@ class _LessonRatingDialogState extends State<LessonRatingDialog> {
               children: [
                 Text(
                   tr(context,
-                      "끝난 화상수업에 별점을 남겨 주세요. 별점은 필수이고, 평가를 마치면 다음 회차가 열립니다."),
+                      "오늘 화상 수업은 어떠셨나요? 별점 평가하고 다음 회차를 오픈하세요!"),
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
-                    fontSize: 13,
+                    fontSize: 14,
                     height: 1.5,
-                    color: Palette.grey700,
+                    fontWeight: FontWeight.w700,
+                    color: Palette.black,
                   ),
                 ),
                 SizedBox(height: 8),

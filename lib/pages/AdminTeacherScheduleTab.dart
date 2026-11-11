@@ -12,6 +12,7 @@ import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/NotificationService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
+import 'package:gi_english_website/util/TeacherPayroll.dart';
 import 'package:gi_english_website/util/TeacherScheduleService.dart';
 import 'package:gi_english_website/util/JitsiJoin.dart';
 import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
@@ -156,6 +157,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   TeacherAvailability _availability = TeacherAvailability(teacherUid: '');
   List<WeekBooking> _bookings = [];
   List<LessonRating> _ratings = [];
+  List<TeacherSettlement> _settlements = [];
   List<EnrollmentRecord> _enrollments = [];
   Map<String, List<StudentWeekProgress>> _learning = {};
   List<AppNotification> _notifications = [];
@@ -194,16 +196,28 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     final ratings = uid.isEmpty
         ? <LessonRating>[]
         : await LessonRatingService.listForTeacher(uid);
+    final settlements = uid.isEmpty || widget.schoolOverview
+        ? <TeacherSettlement>[]
+        : await AuthService.listLessonSettlementsFor(uid);
     if (widget.standalone || widget.schoolOverview) {
+      var lessonFeeWon = EnrollmentService.lessonPayWon;
+      if (widget.standalone && uid.isNotEmpty) {
+        final profile = widget.teacherUid.isNotEmpty
+            ? await AuthService.staffProfile(widget.teacherUid)
+            : await AuthService.currentStaffProfile();
+        lessonFeeWon = EnrollmentService.lessonFeeWonOf(profile);
+      }
       if (!mounted) return;
       setState(() {
         _teacherUid = uid;
         _availability = availability;
         _bookings = bookings;
         _ratings = ratings;
+        _settlements = settlements;
         _enrollments = [];
         _learning = {};
         _staffPhone = '';
+        _lessonFeeWon = lessonFeeWon;
         _notifications = [];
         _loading = false;
       });
@@ -225,6 +239,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       _availability = availability;
       _bookings = bookings;
       _ratings = ratings;
+      _settlements = settlements;
       _enrollments = enrollments;
       _learning = learning;
       _staffPhone = profile?['phone']?.toString() ?? '';
@@ -889,16 +904,22 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     );
   }
 
-  TeacherMonthStats get _monthStats => LessonRatingService.monthStats(
-        bookings: _bookings,
-        teacherUid: _teacherUid,
-        ratings: _ratings,
-        lessonFeeWon: _lessonFeeWon,
-      );
+  TeacherPayroll get _payroll {
+    final now = DateTime.now();
+    return TeacherPayroll.forTeacher(
+      bookings: _bookings,
+      ratings: _ratings,
+      teacherUid: _teacherUid,
+      year: now.year,
+      month: now.month,
+      lessonFeeWon: _lessonFeeWon,
+      settlements: _settlements,
+    );
+  }
 
   Widget _monthSummary({bool compact = false}) {
     return TeacherMonthLessonSummary(
-      stats: _monthStats,
+      payroll: _payroll,
       compact: compact,
       loading: _loading,
     );

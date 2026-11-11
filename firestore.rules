@@ -371,9 +371,11 @@ service cloud.firestore {
       allow read, create, update, delete: if isOwner();
     }
 
-    // 이번 달 수업 수당 지급 기록. 메인 관리자만.
+    // 수업 수당 지급 기록. 메인 관리자가 쓰고, 강사는 자기 기록만 읽는다.
     match /teacher_settlements/{settlementId} {
-      allow read, create, update: if isOwner();
+      allow read: if isOwner()
+        || (isTeacher() && resource.data.teacherUid == request.auth.uid);
+      allow create, update: if isOwner();
       allow delete: if false;
     }
 

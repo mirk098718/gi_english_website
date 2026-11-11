@@ -1423,6 +1423,46 @@ class AuthService {
     }
   }
 
+  /// 관리자 화면에 있는 강사 프로필을 수강생이 볼 수 있는 목록으로 공개한다.
+  static Future<void> publishTeacherProfiles() async {
+    try {
+      final snapshot = await _firestore.collection('admins').get();
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final isOwnerTeacher = data['role']?.toString() != 'teacher';
+        var existing = data['nativeProfileId']?.toString() ?? '';
+        if (existing.startsWith('native_temp_')) existing = '';
+        final profileId = OnlineNativeTeacher.profileIdFor(
+          uid: doc.id,
+          isOwner: isOwnerTeacher,
+          existing: existing,
+        );
+        final offer = TeacherBookingOffer.resolve(
+          data,
+          isOwner: isOwnerTeacher,
+        );
+        await _upsertNativeProfile(
+          teacherUid: doc.id,
+          profileId: profileId,
+          name: data['name']?.toString() ?? '',
+          email: data['email']?.toString() ?? '',
+          nationality: data['nationality']?.toString() ?? '',
+          intro: data['intro']?.toString() ?? '',
+          photoUrl: data['photoUrl']?.toString() ?? '',
+          nickname: data['nickname']?.toString() ?? '',
+          isActive: data['isActive'] != false,
+          bookingOffer: offer,
+        );
+        await _firestore.collection('admins').doc(doc.id).set({
+          'nativeProfileId': profileId,
+          'bookingOffer': offer,
+        }, SetOptions(merge: true));
+      }
+    } catch (e) {
+      print('강사 프로필 공개 오류: $e');
+    }
+  }
+
   static Future<void> _saveBankAccount({
     required String teacherUid,
     required String bankName,
@@ -1569,22 +1609,54 @@ class AuthService {
     }
   }
 
+  static Future<List<TeacherSettlement>> listLessonSettlementsFor(
+      String teacherUid) async {
+    if (teacherUid.isEmpty) return [];
+    try {
+      final snap = await _firestore
+          .collection(_settlementCollection)
+          .where('teacherUid', isEqualTo: teacherUid)
+          .get();
+      return snap.docs
+          .map((doc) => TeacherSettlement.fromMap(doc.id, doc.data()))
+          .toList();
+    } catch (e) {
+      print('수업 수당 기록 조회 오류: $e');
+      return [];
+    }
+  }
+
   static Future<String?> markLessonSettlementPaid({
     required String teacherUid,
     required DateTime month,
     required int sessionCount,
     required int amount,
     required int lessonFeeWon,
+    required int closedCount,
+    required int carryInCount,
+    required List<String> bookingIds,
+    required DateTime payDue,
+    required DateTime monthEndedAt,
   }) async {
     if (teacherUid.isEmpty) return '강사 정보가 없습니다.';
     try {
       final id = settlementDocId(teacherUid, month);
-      await _firestore.collection(_settlementCollection).doc(id).set({
+      final ref = _firestore.collection(_settlementCollection).doc(id);
+      final existing = await ref.get();
+      if (existing.data()?['paid'] == true) {
+        return '이미 이 달 지급 기록이 있습니다.';
+      }
+      await ref.set({
         'teacherUid': teacherUid,
         'yearMonth': yearMonthKey(month),
         'sessionCount': sessionCount,
         'amount': amount,
         'lessonFeeWon': lessonFeeWon,
+        'closedCount': closedCount,
+        'carryInCount': carryInCount,
+        'bookingIds': bookingIds,
+        'payDue': Timestamp.fromDate(payDue.toUtc()),
+        'monthEndedAt': Timestamp.fromDate(monthEndedAt.toUtc()),
         'paid': true,
         'paidAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
@@ -2016,8 +2088,13 @@ class TeacherSettlement {
   final int sessionCount;
   final int amount;
   final int lessonFeeWon;
+  final int closedCount;
+  final int carryInCount;
+  final List<String> bookingIds;
+  final bool hasBookingIds;
   final bool paid;
   final DateTime? paidAt;
+  final DateTime? payDue;
 
   const TeacherSettlement({
     required this.id,
@@ -2026,18 +2103,36 @@ class TeacherSettlement {
     required this.sessionCount,
     required this.amount,
     required this.lessonFeeWon,
+    required this.closedCount,
+    required this.carryInCount,
+    required this.bookingIds,
+    required this.hasBookingIds,
     required this.paid,
     required this.paidAt,
+    required this.payDue,
   });
 
   factory TeacherSettlement.fromMap(String id, Map<String, dynamic> data) {
-    DateTime? paidAt;
-    final raw = data['paidAt'];
-    if (raw is Timestamp) paidAt = raw.toDate();
+    DateTime? asDate(dynamic raw) {
+      if (raw is Timestamp) return raw.toDate();
+      if (raw is DateTime) return raw;
+      return null;
+    }
+
     int asInt(dynamic value) {
       if (value is int) return value;
       if (value is num) return value.round();
       return int.tryParse(value?.toString() ?? '') ?? 0;
+    }
+
+    final hasBookingIds = data.containsKey('bookingIds');
+    final bookingIds = <String>[];
+    final rawIds = data['bookingIds'];
+    if (rawIds is List) {
+      for (final item in rawIds) {
+        final bookingId = item?.toString() ?? '';
+        if (bookingId.isNotEmpty) bookingIds.add(bookingId);
+      }
     }
 
     return TeacherSettlement(
@@ -2047,8 +2142,13 @@ class TeacherSettlement {
       sessionCount: asInt(data['sessionCount']),
       amount: asInt(data['amount']),
       lessonFeeWon: asInt(data['lessonFeeWon']),
+      closedCount: asInt(data['closedCount']),
+      carryInCount: asInt(data['carryInCount']),
+      bookingIds: bookingIds,
+      hasBookingIds: hasBookingIds,
       paid: data['paid'] == true,
-      paidAt: paidAt,
+      paidAt: asDate(data['paidAt']),
+      payDue: asDate(data['payDue']),
     );
   }
 }

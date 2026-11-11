@@ -176,6 +176,10 @@ void main() {
     ));
 
     expect(find.text('수업 평가'), findsOneWidget);
+    expect(
+      find.text('오늘 화상 수업은 어떠셨나요? 별점 평가하고 다음 회차를 오픈하세요!'),
+      findsOneWidget,
+    );
     expect(find.text('별점'), findsOneWidget);
     final submit = find.widgetWithText(ElevatedButton, '평가 제출');
     expect(tester.widget<ElevatedButton>(submit).onPressed, isNull);
