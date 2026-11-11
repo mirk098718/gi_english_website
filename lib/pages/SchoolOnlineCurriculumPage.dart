@@ -300,7 +300,7 @@ class _SchoolOnlineCurriculumPageState
       OnlinePlanCard(
         index: '1',
         title: '단계별 영문법 인강',
-        summary: '문법 빌드업과 유용한 표현. 퀴즈로 완성합니다.',
+        summary: '인강으로 문법 빌드업, 유용한 표현을 배우고, 퀴즈로 최종 정리합니다.',
         priceLine: '레벨별 안내 99,000원~',
         color: Palette.primary,
         imageAsset: 'assets/plan-card-lecture.jpg',
@@ -310,7 +310,7 @@ class _SchoolOnlineCurriculumPageState
       OnlinePlanCard(
         index: '2',
         title: '영문법 인강 + 원어민 화상 회화',
-        summary: '인강과 퀴즈를 다지고, 1:1 화상으로 말합니다.',
+        summary: '인강을 듣고, 퀴즈로 다지고, 1:1 화상으로 실사용해봅니다.',
         priceLine: '레벨별 180,000원~',
         color: Palette.secondaryDark,
         imageAsset: 'assets/plan-card-bundle.jpg',
@@ -321,7 +321,7 @@ class _SchoolOnlineCurriculumPageState
       OnlinePlanCard(
         index: '3',
         title: '원어민 화상 1:1 회화',
-        summary: '인강 없이, 나에게만 집중하는 실전 회화.',
+        summary: '실전 원어민 회화.',
         priceLine: '1회 ${OnlinePlan.won(OnlinePlan.speakingSessionPrice)}',
         color: Palette.accent,
         imageAsset: 'assets/plan-card-speaking.jpg',
@@ -383,7 +383,7 @@ class _SchoolOnlineCurriculumPageState
           ),
           SizedBox(height: 8),
           Text(
-            '실제 인강 화면입니다.',
+            '녹화해 둔 인강입니다. 재생과 일시정지로 봅니다.',
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: 12,
@@ -393,8 +393,8 @@ class _SchoolOnlineCurriculumPageState
           ),
           SizedBox(height: 16),
           bodyText(
-            '철저한 문법 빌드업과 유용한 영어 표현을 풀어 주는 인강입니다.\n'
-            '퀴즈로 문법을 완성하고, 원어민 화상은 포함되지 않습니다.\n'
+            '인강으로 문법 빌드업, 유용한 표현을 배우고, 퀴즈로 최종 정리합니다.\n'
+            '원어민 화상은 포함되지 않습니다.\n'
             '레벨마다 인강 ${OnlinePlan.lessonsPerLevel}편을 기준으로 하고, 강의실에는 등록된 편부터 열립니다.\n'
             '수강 기간은 ${OnlinePlan.lectureAccessWeeks}주입니다.',
           ),
@@ -440,7 +440,7 @@ class _SchoolOnlineCurriculumPageState
           sectionTitle('2. 영문법 인강 + 원어민 화상 회화'),
           SizedBox(height: 8),
           bodyText(
-            '인강과 퀴즈로 다지고, 1:1 원어민 화상으로 완성하는 실전 영어입니다.\n'
+            '인강을 듣고, 퀴즈로 다지고, 1:1 화상으로 실사용해봅니다.\n'
             '지금 판매 중인 구성이며, 화상수업 ${OnlineCourse.all.first.defaultSessions}회가 포함됩니다.',
           ),
           SizedBox(height: 20),
@@ -522,7 +522,7 @@ class _SchoolOnlineCurriculumPageState
           sectionTitle('3. 원어민 화상 1:1 회화'),
           SizedBox(height: 12),
           bodyText(
-            '오직 나에게만 집중하는 실전 1:1 영어 회화입니다.\n'
+            '실전 원어민 회화.\n'
             '인강과 퀴즈는 없고, 고른 원어민과 회화만 진행합니다.\n'
             '1회 ${OnlinePlan.won(OnlinePlan.speakingSessionPrice)}이며, 횟수를 고르면 금액이 정해집니다.',
           ),
