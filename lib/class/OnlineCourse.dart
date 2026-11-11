@@ -139,7 +139,7 @@ class OnlineCourse {
     subtitle: '실전 1:1 스피킹',
     description:
         '인강 없이 원어민과 1:1로만 말하는 회화 수업입니다. 필요한 횟수만큼 신청합니다.',
-    imageAsset: 'assets/audience-advanced.png',
+    imageAsset: 'assets/native-speaking-class.jpg',
     highlights: [
       '나에게만 집중하는 1:1 원어민 회화',
       '4회, 8회, 12회 중에서 횟수를 고릅니다',

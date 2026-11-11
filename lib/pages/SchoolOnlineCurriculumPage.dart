@@ -505,6 +505,27 @@ class _SchoolOnlineCurriculumPageState
             '1회 ${OnlinePlan.won(OnlinePlan.speakingSessionPrice)}이며, 횟수를 고르면 금액이 정해집니다.',
           ),
           SizedBox(height: 16),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.asset(
+              OnlineCourse.speaking.imageAsset,
+              width: double.infinity,
+              height: 320,
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            '화상으로 만나는 원어민과 1:1로 말합니다.',
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontSize: 12,
+              height: 1.5,
+              color: Palette.grey600,
+            ),
+          ),
+          SizedBox(height: 16),
           Wrap(
             spacing: 8,
             runSpacing: 8,
