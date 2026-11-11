@@ -456,7 +456,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
       children: [
         _panelChip(
           label: '전체 과정 보기',
-          subtitle: '수강 신청 · 강사 선택',
+          subtitle: '인강 · 묶음 · 화상만',
           onTap: () {
             _closeMenu();
             SiteNav.goCourses(context);

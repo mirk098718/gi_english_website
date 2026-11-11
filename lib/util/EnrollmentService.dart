@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
+import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/util/TeacherScheduleService.dart';
@@ -1439,6 +1440,7 @@ class EnrollmentService {
         'email': email.trim(),
         'memberName': AuthService.profileDisplayName(member),
         'courseId': courseId,
+        'plan': OnlinePlan.resolve(courseId: courseId),
         'isActive': true,
         'totalSessions': totalSessions,
         'completedSessions': 0,
@@ -1527,7 +1529,13 @@ class EnrollmentService {
       if (OnlineCourse.findById(courseId) == null) {
         return '유효하지 않은 과정입니다.';
       }
-      if (totalSessions <= 0) {
+      final existingDoc =
+          await _firestore.collection('enrollments').doc(enrollmentId).get();
+      final existingPlan = OnlinePlan.resolve(
+        stored: existingDoc.data()?['plan']?.toString(),
+        courseId: existingDoc.data()?['courseId']?.toString() ?? currentCourseId,
+      );
+      if (totalSessions <= 0 && existingPlan != OnlinePlan.lecture) {
         return '전체 수업 횟수는 1회 이상이어야 합니다.';
       }
 
@@ -1563,16 +1571,19 @@ class EnrollmentService {
             : (createdRaw is Timestamp
                 ? createdRaw.toDate()
                 : DateTime.now());
+        final keepLectureAccess =
+            existingPlan == OnlinePlan.lecture && totalSessions <= 0;
 
         transaction.update(ref, {
           'courseId': courseId,
           'totalSessions': totalSessions,
           'completedSessions': completed,
-          'remainingSessions': totalSessions - completed,
+          'remainingSessions': (totalSessions - completed).clamp(0, 1 << 31),
           'isActive': true,
-          'expiresAt': Timestamp.fromDate(
-            expiresAtFromStart(start, totalSessions),
-          ),
+          if (!keepLectureAccess)
+            'expiresAt': Timestamp.fromDate(
+              expiresAtFromStart(start, totalSessions),
+            ),
           'updatedAt': FieldValue.serverTimestamp(),
         });
       });
@@ -1823,29 +1834,69 @@ class EnrollmentService {
     required DateTime? currentExpires,
     required int addedSessions,
     DateTime? now,
+    int? addedWeeks,
   }) {
     final clock = dateOnly(now ?? DateTime.now());
     final current = currentExpires == null ? null : dateOnly(currentExpires);
     final base =
         current != null && current.isAfter(clock) ? current : clock;
-    return base.add(Duration(days: deadlineWeeks(addedSessions) * 7));
+    final weeks = addedWeeks ?? deadlineWeeks(addedSessions);
+    return base.add(Duration(days: weeks * 7));
+  }
+
+  /// 상품에 맞는 수강 종료일. 인강만은 회차와 상관없이 고정 기간이다.
+  static DateTime expiresAtForPlan(
+    DateTime start,
+    String plan,
+    int totalSessions,
+  ) {
+    if (OnlinePlan.normalize(plan) == OnlinePlan.lecture) {
+      return dateOnly(start)
+          .add(Duration(days: OnlinePlan.lectureAccessWeeks * 7));
+    }
+    return expiresAtFromStart(start, totalSessions);
   }
 
   /// 연장 결제가 기존 수강에 더하는 값. 진행 회차는 유지하고 횟수와 기한만 늘린다.
+  /// 인강만 상품은 횟수를 더하지 않고 수강 기간만 잇는다.
   static Map<String, dynamic> extensionEnrollmentFields({
     required Map<String, dynamic> previous,
     required int addedSessions,
     required int amount,
     DateTime? now,
+    String plan = OnlinePlan.bundle,
   }) {
     final completed = _intValue(previous['completedSessions']);
     final prevTotal = _intValue(previous['totalSessions']);
-    final total = prevTotal + addedSessions;
     final prevPaid = _intValue(previous['paidAmount']);
     DateTime? currentExpires;
     final raw = previous['expiresAt'];
     if (raw is Timestamp) currentExpires = raw.toDate();
+    final kind = OnlinePlan.resolve(
+      stored: plan,
+      courseId: previous['courseId']?.toString(),
+    );
+    if (kind == OnlinePlan.lecture) {
+      return {
+        'plan': OnlinePlan.lecture,
+        'totalSessions': prevTotal,
+        'completedSessions': completed,
+        'remainingSessions': (prevTotal - completed).clamp(0, 1 << 31),
+        'paidAmount': prevPaid + amount,
+        'isActive': true,
+        'isPaid': true,
+        'paymentNote': '수강 연장 결제',
+        'expiresAt': Timestamp.fromDate(extendedExpiresAt(
+          currentExpires: currentExpires,
+          addedSessions: 0,
+          addedWeeks: OnlinePlan.lectureAccessWeeks,
+          now: now,
+        )),
+      };
+    }
+    final total = prevTotal + addedSessions;
     return {
+      'plan': kind,
       'totalSessions': total,
       'completedSessions': completed,
       'remainingSessions': (total - completed).clamp(0, total),
@@ -1866,6 +1917,7 @@ class EnrollmentService {
     int sessionNumber,
   ) {
     if (sessionNumber <= 0) return false;
+    if (enrollment.plan == OnlinePlan.lecture) return true;
     return sessionNumber <= unlockedSessionNumber(enrollment);
   }
 
@@ -1956,7 +2008,12 @@ class EnrollmentService {
     final throughByCourse = <String, int>{};
     for (final enrollment in list) {
       final current = throughByCourse[enrollment.courseId] ?? 1;
-      final next = enrollment.unlockedSessionNumber;
+      final opened = enrollment.plan == OnlinePlan.lecture
+          ? catalogLessons(enrollment.courseId).length
+          : enrollment.unlockedSessionNumber;
+      final next = opened > enrollment.unlockedSessionNumber
+          ? opened
+          : enrollment.unlockedSessionNumber;
       throughByCourse[enrollment.courseId] = next > current ? next : current;
     }
 
@@ -3584,6 +3641,7 @@ class EnrollmentRecord {
   final DateTime? createdAt;
   final DateTime? lastSessionAt;
   final int adminUnlockedThrough;
+  final String plan;
 
   EnrollmentRecord({
     required this.id,
@@ -3606,9 +3664,14 @@ class EnrollmentRecord {
     this.createdAt,
     this.lastSessionAt,
     this.adminUnlockedThrough = 0,
+    this.plan = OnlinePlan.bundle,
   });
 
   OnlineCourse? get course => OnlineCourse.findById(courseId);
+
+  bool get includesLessons => plan != OnlinePlan.speaking;
+
+  bool get includesSpeaking => plan != OnlinePlan.lecture;
 
   OnlineNativeTeacher? get nativeTeacher => OnlineNativeTeacher.findAssigned(
         profileId: nativeTeacherId,
@@ -3674,6 +3737,10 @@ class EnrollmentRecord {
       lastSessionAt: lastSessionAt,
       adminUnlockedThrough:
           EnrollmentService._intValue(data['adminUnlockedThrough']),
+      plan: OnlinePlan.resolve(
+        stored: data['plan']?.toString(),
+        courseId: data['courseId']?.toString() ?? '',
+      ),
     );
   }
 }

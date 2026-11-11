@@ -9,6 +9,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
+import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
@@ -401,7 +402,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                     filled: true,
                     fillColor: Palette.white,
                   ),
-                  items: OnlineCourse.all
+                  items: OnlineCourse.catalog
                       .map((c) => DropdownMenuItem(
                             value: c,
                             child: Text('${c.order}. ${c.title} (${c.subtitle})',
@@ -797,7 +798,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   initialValue: selectedCourse,
                   decoration: InputDecoration(
                       labelText: '과정', border: OutlineInputBorder()),
-                  items: OnlineCourse.all
+                  items: OnlineCourse.catalog
                       .map((course) => DropdownMenuItem(
                             value: course,
                             child: Text(course.title,
@@ -866,7 +867,9 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
   Future<void> _showEditDialog(EnrollmentRecord record) async {
     OnlineCourse selectedCourse = record.course ?? OnlineCourse.all.first;
     final sessionsController = TextEditingController(
-        text: record.totalSessions > 0 ? '${record.totalSessions}' : '8');
+        text: record.plan == OnlinePlan.lecture
+            ? '0'
+            : (record.totalSessions > 0 ? '${record.totalSessions}' : '8'));
 
     final saved = await showDialog<bool>(
       context: context,
@@ -882,7 +885,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   initialValue: selectedCourse,
                   decoration: InputDecoration(
                       labelText: '과정', border: OutlineInputBorder()),
-                  items: OnlineCourse.all
+                  items: OnlineCourse.catalog
                       .map((course) => DropdownMenuItem(
                             value: course,
                             child: Text(course.title,
@@ -902,9 +905,11 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   decoration: InputDecoration(
                     labelText: '전체 화상수업 횟수',
                     suffixText: '회',
-                    helperText: selectedCourse.id == record.courseId
-                        ? '같은 과정이면 현재 진행 횟수를 유지합니다.'
-                        : '과정을 변경하면 진행 횟수가 0회로 초기화됩니다.',
+                    helperText: record.plan == OnlinePlan.lecture
+                        ? '인강만 상품입니다. 화상 횟수는 0으로 두세요.'
+                        : (selectedCourse.id == record.courseId
+                            ? '같은 과정이면 현재 진행 횟수를 유지합니다.'
+                            : '과정을 변경하면 진행 횟수가 0회로 초기화됩니다.'),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -2772,7 +2777,6 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
 
   Future<void> _refresh() async {
     setState(() => _loading = true);
-    await AuthService.publishTeacherProfiles();
     await AuthService.syncCardPaidStudents('');
     await AuthService.backfillPaidTeacherIds();
     final teachers = await AuthService.listTeachers();

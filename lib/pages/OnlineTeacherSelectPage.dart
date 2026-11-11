@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
+import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -19,11 +20,15 @@ import '../util/WidgetUtil.dart';
 class OnlineTeacherSelectPage extends StatefulWidget {
   final OnlineCourse course;
   final bool extendEnrollment;
+  final String plan;
+  final int sessionCount;
 
   const OnlineTeacherSelectPage({
     Key? key,
     required this.course,
     this.extendEnrollment = false,
+    this.plan = OnlinePlan.bundle,
+    this.sessionCount = 0,
   }) : super(key: key);
 
   @override
@@ -78,6 +83,11 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
       course: widget.course,
       nativeTeacher: _selected!,
       extendEnrollment: widget.extendEnrollment,
+      plan: widget.plan,
+      totalSessions: widget.course.sessionsFor(
+        widget.plan,
+        sessions: widget.sessionCount,
+      ),
     );
     if (order == null) {
       if (!mounted) return;
@@ -152,6 +162,20 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
     );
   }
 
+  String _orderSummary(OnlineCourse course) {
+    final sessions = course.sessionsFor(
+      widget.plan,
+      sessions: widget.sessionCount,
+    );
+    final amount = OnlinePlan.won(
+      course.amountFor(widget.plan, sessions: widget.sessionCount),
+    );
+    if (widget.plan == OnlinePlan.speaking) {
+      return '원어민 1:1 회화 $sessions회 · $amount';
+    }
+    return '${course.subtitle} · 화상 $sessions회 · $amount';
+  }
+
   Widget content() {
     final course = widget.course;
     return Container(
@@ -200,7 +224,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
                         fontSize: 15)),
                 SizedBox(height: 4),
                 Text(
-                    '${course.subtitle} · 화상 ${course.defaultSessions}회 · ${course.priceLabel}',
+                    _orderSummary(course),
                     style: TextStyle(
                         fontFamily: 'NotoSansKR',
                         fontSize: 13,

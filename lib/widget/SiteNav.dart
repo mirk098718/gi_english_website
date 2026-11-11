@@ -68,7 +68,6 @@ class SiteNav {
   }
 
   static void goCourses(BuildContext context, {String? courseId}) {
-    if (!isMemberLoggedIn) return;
     MenuUtil.push(
       context,
       SchoolOnlineCurriculumPage(initialCourseId: courseId),

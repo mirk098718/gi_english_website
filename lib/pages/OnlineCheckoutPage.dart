@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
+import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
 import 'package:gi_english_website/pages/OnlineTeacherSelectPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -21,11 +22,15 @@ import '../util/WidgetUtil.dart';
 class OnlineCheckoutPage extends StatefulWidget {
   final String? initialCourseId;
   final bool extendEnrollment;
+  final String? initialPlan;
+  final int? initialSessions;
 
   const OnlineCheckoutPage({
     Key? key,
     this.initialCourseId,
     this.extendEnrollment = false,
+    this.initialPlan,
+    this.initialSessions,
   }) : super(key: key);
 
   @override
@@ -34,14 +39,25 @@ class OnlineCheckoutPage extends StatefulWidget {
 
 class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
   OnlineCourse? _selected;
+  late String _plan;
+  late int _speakingSessions;
   List<PaymentOrder> _myPayments = [];
   bool _paying = false;
 
   @override
   void initState() {
     super.initState();
+    _plan = OnlinePlan.resolve(
+      stored: widget.initialPlan,
+      courseId: widget.initialCourseId,
+    );
+    _speakingSessions = widget.initialSessions ?? 8;
+    if (_speakingSessions <= 0) _speakingSessions = 8;
     if (widget.initialCourseId != null) {
       _selected = OnlineCourse.findById(widget.initialCourseId!);
+    }
+    if (_plan == OnlinePlan.speaking) {
+      _selected = OnlineCourse.speaking;
     }
     _selected ??= OnlineCourse.all.first;
     _loadMyPayments();
@@ -69,13 +85,62 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
       );
       return;
     }
+    if (_plan == OnlinePlan.lecture) {
+      _paySelected();
+      return;
+    }
     MenuUtil.push(
       context,
       OnlineTeacherSelectPage(
-        course: _selected!,
+        course: _plan == OnlinePlan.speaking
+            ? OnlineCourse.speaking
+            : _selected!,
         extendEnrollment: widget.extendEnrollment,
+        plan: _plan,
+        sessionCount: _speakingSessions,
       ),
     );
+  }
+
+  Future<void> _paySelected() async {
+    if (AuthService.currentUser == null) {
+      MenuUtil.push(context, MemberLoginPage());
+      return;
+    }
+    final course = _plan == OnlinePlan.speaking
+        ? OnlineCourse.speaking
+        : _selected;
+    if (course == null || _paying) return;
+    setState(() => _paying = true);
+    final order = await PaymentService.createOrder(
+      course: course,
+      plan: _plan,
+      totalSessions: course.sessionsFor(_plan, sessions: _speakingSessions),
+      extendEnrollment: widget.extendEnrollment,
+    );
+    if (!mounted) return;
+    if (order == null) {
+      setState(() => _paying = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(tr(context, "주문을 생성하지 못했습니다. 로그인 상태를 확인해주세요."),
+              style: TextStyle(fontFamily: "NotoSansKR")),
+          backgroundColor: Palette.danger,
+        ),
+      );
+      return;
+    }
+    final error = await PaymentService.requestTossPayment(order);
+    if (!mounted) return;
+    setState(() => _paying = false);
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error, style: TextStyle(fontFamily: "NotoSansKR")),
+          backgroundColor: Palette.danger,
+        ),
+      );
+    }
   }
 
   Future<void> _payExtension() async {
@@ -107,6 +172,8 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
       course: course,
       nativeTeacher: teacher,
       extendEnrollment: true,
+      plan: _plan,
+      totalSessions: course.sessionsFor(_plan, sessions: _speakingSessions),
     );
     if (!mounted) return;
     if (order == null) {
@@ -203,8 +270,8 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
             tr(
               context,
               widget.extendEnrollment
-                  ? "기한이 지난 수강에 회차와 수강 기한을 더합니다. 이미 진행한 회차는 그대로 남습니다. (테스트 결제: 실제 출금되지 않습니다)"
-                  : "수강할 과정을 선택한 뒤, 원어민 메인 강사를 고르고 결제합니다.\n결제 완료 시 내 강의실에 과정이 자동으로 배정됩니다. (테스트 결제: 실제 출금되지 않습니다)",
+                  ? "기한이 지난 수강에 회차와 수강 기한을 더합니다. 인강만 상품은 기간만 늘어나고, 이미 진행한 회차는 그대로 남습니다. (테스트 결제: 실제 출금되지 않습니다)"
+                  : "상품과 과정을 고른 뒤 결제합니다. 화상이 포함된 상품은 원어민 강사를 고릅니다.\n결제 완료 시 내 강의실에 과정이 자동으로 배정됩니다. (테스트 결제: 실제 출금되지 않습니다)",
             ),
             style: TextStyle(
                 fontFamily: "NotoSansKR",
@@ -247,9 +314,23 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
               ),
             ),
           ] else ...[
-            Text(tr(context, "과정 선택"), style: TextStyle(fontFamily: "Jalnan", fontSize: 15)),
-            SizedBox(height: 12),
-            ...OnlineCourse.all.map(_courseOption),
+            if (!widget.extendEnrollment) ...[
+              Text(tr(context, "상품 선택"),
+                  style: TextStyle(fontFamily: "Jalnan", fontSize: 15)),
+              SizedBox(height: 12),
+              _planSwitcher(),
+              SizedBox(height: 24),
+            ],
+            if (_plan == OnlinePlan.speaking) ...[
+              Text('화상 횟수', style: TextStyle(fontFamily: "Jalnan", fontSize: 15)),
+              SizedBox(height: 12),
+              _sessionPicker(),
+            ] else ...[
+              Text(tr(context, "과정 선택"),
+                  style: TextStyle(fontFamily: "Jalnan", fontSize: 15)),
+              SizedBox(height: 12),
+              ...OnlineCourse.all.map(_courseOption),
+            ],
             SizedBox(height: 24),
             if (_selected != null) _summaryCard(_selected!),
             SizedBox(height: 20),
@@ -265,16 +346,22 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
                 ),
                 onPressed: _paying
                     ? null
-                    : (widget.extendEnrollment ? _payExtension : _goTeacherSelect),
+                    : (widget.extendEnrollment
+                        ? (_plan == OnlinePlan.lecture
+                            ? _paySelected
+                            : _payExtension)
+                        : _goTeacherSelect),
                 icon: Icon(Icons.arrow_forward, color: Palette.white),
                 label: Text(
                   tr(
                     context,
                     _paying
                         ? "결제창 여는 중..."
-                        : (widget.extendEnrollment
-                            ? "연장 결제하기"
-                            : "다음 · 원어민 강사 선택"),
+                    : (widget.extendEnrollment
+                        ? "연장 결제하기"
+                        : (_plan == OnlinePlan.lecture
+                            ? "인강 결제하기"
+                            : "다음 · 원어민 강사 선택")),
                   ),
                   style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
                 ),
@@ -295,6 +382,95 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
         ],
       ),
     );
+  }
+
+  Widget _planSwitcher() {
+    final items = [
+      (OnlinePlan.lecture, '1. 인강+퀴즈'),
+      (OnlinePlan.bundle, '2. 인강+화상'),
+      (OnlinePlan.speaking, '3. 화상만'),
+    ];
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final item in items)
+          ChoiceChip(
+            label: Text(
+              item.$2,
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontWeight: FontWeight.w700,
+                color: _plan == item.$1 ? Palette.white : Palette.grey800,
+              ),
+            ),
+            selected: _plan == item.$1,
+            selectedColor: Palette.secondaryDark,
+            backgroundColor: Palette.white,
+            side: BorderSide(
+              color: _plan == item.$1 ? Palette.secondaryDark : Palette.grey300,
+            ),
+            onSelected: (_) {
+              setState(() {
+                _plan = item.$1;
+                if (_plan == OnlinePlan.speaking) {
+                  _selected = OnlineCourse.speaking;
+                } else if (_selected == null || _selected!.isSpeakingProduct) {
+                  _selected = OnlineCourse.all.first;
+                }
+              });
+            },
+          ),
+      ],
+    );
+  }
+
+  Widget _sessionPicker() {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final count in OnlinePlan.speakingSessionChoices)
+          ChoiceChip(
+            label: Text(
+              '$count회 · ${OnlinePlan.won(count * OnlinePlan.speakingSessionPrice)}',
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontWeight: FontWeight.w700,
+                color: _speakingSessions == count ? Palette.white : Palette.grey800,
+              ),
+            ),
+            selected: _speakingSessions == count,
+            selectedColor: Palette.accent,
+            onSelected: widget.extendEnrollment
+                ? null
+                : (_) => setState(() => _speakingSessions = count),
+          ),
+      ],
+    );
+  }
+
+  String _planTitle(String plan) {
+    if (plan == OnlinePlan.lecture) return '단계별 영문법 인강';
+    if (plan == OnlinePlan.speaking) return '원어민 1:1 회화';
+    return '영문법 인강 + 원어민 스파링';
+  }
+
+  String _courseDetail(OnlineCourse course) {
+    if (_plan == OnlinePlan.lecture) {
+      return '${course.subtitle} · 인강 ${OnlinePlan.lessonsPerLevel}편 · 퀴즈';
+    }
+    return '${course.subtitle} · 화상 ${course.defaultSessions}회 포함';
+  }
+
+  String _includedLine(OnlineCourse course) {
+    if (_plan == OnlinePlan.lecture) {
+      return '인강 ${OnlinePlan.lessonsPerLevel}편 + 퀴즈 · 수강 ${OnlinePlan.lectureAccessWeeks}주 · 화상 없음';
+    }
+    if (_plan == OnlinePlan.speaking) {
+      return '원어민 1:1 회화 $_speakingSessions회 · 인강 없음';
+    }
+    return '화상수업 ${course.defaultSessions}회 + 인강 · 퀴즈';
   }
 
   Widget _courseOption(OnlineCourse course) {
@@ -332,7 +508,7 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
                           fontWeight: FontWeight.bold,
                           fontSize: 14)),
                   SizedBox(height: 4),
-                  Text('${course.subtitle} · 화상 ${course.defaultSessions}회 포함',
+                  Text(_courseDetail(course),
                       style: TextStyle(
                           fontFamily: "NotoSansKR",
                           fontSize: 12,
@@ -340,7 +516,7 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
                 ],
               ),
             ),
-            Text(course.priceLabel,
+            Text(OnlinePlan.won(course.amountFor(_plan, sessions: _speakingSessions)),
                 style: TextStyle(
                     fontFamily: "Jalnan",
                     fontSize: 14,
@@ -365,12 +541,15 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
         children: [
           Text(tr(context, "주문 요약"), style: TextStyle(fontFamily: "Jalnan", fontSize: 14)),
           SizedBox(height: 10),
+          Text('상품: ${_planTitle(_plan)}',
+              style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
           Text('과정: ${course.title}',
               style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
-          Text('포함: 화상수업 ${course.defaultSessions}회 + YouTube 인강',
+          Text('포함: ${_includedLine(course)}',
               style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
           SizedBox(height: 8),
-          Text('결제 금액: ${course.priceLabel}',
+          Text(
+              '결제 금액: ${OnlinePlan.won(course.amountFor(_plan, sessions: _speakingSessions))}',
               style: TextStyle(
                   fontFamily: "Jalnan",
                   fontSize: 16,
