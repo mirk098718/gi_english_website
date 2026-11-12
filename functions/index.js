@@ -401,7 +401,7 @@ async function staffRole(context) {
   if (!snap.exists) return "";
   const data = snap.data() || {};
   if (data.isActive === false) return "";
-  if (!data.role || data.role === "owner") return "owner";
+  if (data.role === "owner") return "owner";
   if (data.role === "teacher") return "teacher";
   return "";
 }
@@ -506,8 +506,7 @@ async function assertOwner(context, deniedMessage) {
   if (data.isActive === false) {
     throw new functions.https.HttpsError("permission-denied", "권한이 없습니다.");
   }
-  const role = data.role;
-  if (role && role !== "owner") {
+  if (data.role !== "owner") {
     throw new functions.https.HttpsError(
       "permission-denied",
       deniedMessage || "메인 관리자만 할 수 있습니다."
@@ -722,7 +721,10 @@ exports.setTeacherActive = functions
 function publicTeacherProfileId(teacherUid, data) {
   const existing = String((data && data.nativeProfileId) || "");
   if (existing && existing.indexOf("native_temp_") !== 0) return existing;
-  if (!data || data.role !== "teacher") return "native_owner_gi";
+  const email = String((data && data.email) || "").trim().toLowerCase();
+  if (data && (data.role === "owner" || email === OWNER_EMAIL)) {
+    return "native_owner_gi";
+  }
   return "native_" + teacherUid;
 }
 
@@ -754,7 +756,7 @@ exports.listSelectableTeachers = functions
       const name = String(data.name || "").trim();
       if (!name) continue;
       const id = publicTeacherProfileId(doc.id, data);
-      const isOwner = data.role !== "teacher";
+      const isOwner = data.role === "owner";
       const bookingOffer = resolveBookingOffer(data, isOwner);
       teachers.push({
         id,

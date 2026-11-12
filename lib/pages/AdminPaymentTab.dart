@@ -667,7 +667,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
   Widget _teacherCard(_TeacherPayRow row) {
     final teacher = row.teacher;
     final stats = row.stats;
-    final isOwnerTeacher = teacher['role']?.toString() != 'teacher';
+    final isOwnerTeacher = AuthService.docIsOwner(teacher);
     final name = teacher['name']?.toString() ?? '';
     final email = teacher['email']?.toString() ?? '';
     final bank = AuthService.bankLabel(teacher);

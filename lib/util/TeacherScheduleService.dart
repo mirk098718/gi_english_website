@@ -174,7 +174,7 @@ class TeacherScheduleService {
     final admin =
         await _firestore.collection('admins').doc(teacherUid).get();
     final data = admin.data() ?? {};
-    final isOwner = data['role']?.toString() != 'teacher';
+    final isOwner = AuthService.docIsOwner(data);
     final profileId = OnlineNativeTeacher.profileIdFor(
       uid: teacherUid,
       isOwner: isOwner,

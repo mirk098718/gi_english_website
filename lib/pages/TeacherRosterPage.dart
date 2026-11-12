@@ -408,7 +408,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     final intro = teacher['intro']?.toString() ?? '';
     final photoUrl = teacher['photoUrl']?.toString() ?? '';
     final phone = teacher['phone']?.toString() ?? '';
-    final isOwnerTeacher = teacher['role']?.toString() != 'teacher';
+    final isOwnerTeacher = AuthService.docIsOwner(teacher);
     return Container(
       width: double.maxFinite,
       padding: EdgeInsets.all(16),

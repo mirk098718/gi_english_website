@@ -2919,7 +2919,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
   Future<void> _editBookingOffer(Map<String, dynamic> teacher) async {
     final uid = teacher['uid']?.toString() ?? '';
     if (uid.isEmpty) return;
-    final isOwnerTeacher = teacher['role']?.toString() != 'teacher';
+    final isOwnerTeacher = AuthService.docIsOwner(teacher);
     final current =
         TeacherBookingOffer.resolve(teacher, isOwner: isOwnerTeacher);
     final next = await showDialog<String>(
@@ -3224,7 +3224,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                     TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500))
           else
             ..._teachers.map((t) {
-              final isOwnerTeacher = t['role']?.toString() != 'teacher';
+              final isOwnerTeacher = AuthService.docIsOwner(t);
               final active = t['isActive'] != false;
               final uid = t['uid']?.toString() ?? '';
               final assignedCount = _members

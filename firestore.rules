@@ -19,13 +19,14 @@ service cloud.firestore {
         && request.auth.token.email.lower() == 'gienglish.paju@gmail.com';
     }
 
-    // 메인 관리자: 지정 이메일이거나, admins.role 이 owner(또는 없음)
+    // 메인 관리자: 지정 이메일이거나, admins.role 이 명시적으로 owner.
+    // role 이 없는 문서는 수강생 계정이 섞인 것이므로 관리자로 보지 않는다.
     function isOwner() {
       return isOwnerEmail()
         || (isLoggedIn()
           && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
           && (!('isActive' in adminDoc()) || adminDoc().isActive != false)
-          && (!('role' in adminDoc()) || adminDoc().role == 'owner'));
+          && adminDoc().role == 'owner');
     }
 
     // 서브 강사 (메인 관리자 이메일은 제외)
@@ -381,8 +382,15 @@ service cloud.firestore {
       allow read: if isLoggedIn()
         && (request.auth.uid == userId || isOwner());
 
-      allow create: if (isLoggedIn() && request.auth.uid == userId)
-        || isOwner();
+      allow create: if (isOwnerEmail()
+          && request.auth.uid == userId
+          && request.resource.data.role == 'owner'
+          && request.resource.data.email is string
+          && request.resource.data.email.lower() == 'gienglish.paju@gmail.com')
+        || (isOwner()
+          && request.resource.data.role == 'teacher'
+          && request.resource.data.email is string
+          && request.resource.data.email.lower() != 'gienglish.paju@gmail.com');
 
       allow update: if isOwner()
         || (isTeacher()

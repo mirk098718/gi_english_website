@@ -393,7 +393,7 @@ class AuthService {
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
 
-      final isOwnerTeacher = data['role']?.toString() != 'teacher';
+      final isOwnerTeacher = docIsOwner(data);
       final profileId = OnlineNativeTeacher.profileIdFor(
         uid: teacherUid,
         isOwner: isOwnerTeacher,
@@ -448,10 +448,15 @@ class AuthService {
     final uid = await currentStaffUid();
     if (uid.isEmpty) return '로그인 정보가 없습니다.';
     try {
-      await _firestore.collection('admins').doc(uid).set({
+      final ref = _firestore.collection('admins').doc(uid);
+      final snap = await ref.get();
+      if (roleFromDoc(snap.data()) == AdminRole.none) {
+        return '강사 계정이 없습니다.';
+      }
+      await ref.update({
         'phone': PhoneUtil.normalize(phone),
         'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      });
       return null;
     } catch (e) {
       print('강사 연락처 저장 오류: $e');
@@ -500,7 +505,7 @@ class AuthService {
         if (existing.startsWith('native_temp_')) existing = '';
         profileId = OnlineNativeTeacher.profileIdFor(
           uid: teacherId,
-          isOwner: data['role']?.toString() != 'teacher',
+          isOwner: docIsOwner(data),
           existing: existing,
         );
         await _upsertNativeProfile(
@@ -647,6 +652,28 @@ class AuthService {
   static bool isOwnerEmail(String? email) =>
       (email ?? '').trim().toLowerCase() == ownerEmail;
 
+  /// role 이 없거나 teacher 가 아니면 메인 관리자로 보지 않는다.
+  /// 수강생 문서가 admins 에 섞여도 관리 화면이 열리지 않게 한다.
+  static bool docIsOwner(Map? data) {
+    if (isOwnerEmail(data?['email']?.toString())) return true;
+    return data?['role']?.toString() == 'owner';
+  }
+
+  static AdminRole roleFromDoc(Map? data, {String? email}) {
+    if (isOwnerEmail(email) || isOwnerEmail(data?['email']?.toString())) {
+      return AdminRole.owner;
+    }
+    if (data == null || data['isActive'] == false) return AdminRole.none;
+    switch (data['role']?.toString()) {
+      case 'owner':
+        return AdminRole.owner;
+      case 'teacher':
+        return AdminRole.teacher;
+      default:
+        return AdminRole.none;
+    }
+  }
+
   /// 메인 관리자(소유자)인지 — 학원 갤러리/공지/FAQ 와 온라인 전체 관리.
   /// Firebase Auth 세션이 있어야 한다. prefs-only 로그인은 인정하지 않는다.
   static Future<bool> isAdmin() async =>
@@ -689,14 +716,11 @@ class AuthService {
       final adminDoc =
           await _firestore.collection('admins').doc(user.uid).get();
       if (adminDoc.exists) {
-        final data = adminDoc.data() as Map<String, dynamic>;
-        if (data['isActive'] == false) {
+        final resolved = roleFromDoc(adminDoc.data());
+        if (resolved == AdminRole.none) {
           await _clearAdminPrefs();
           return AdminRole.none;
         }
-        final role = data['role']?.toString() ?? 'owner';
-        final resolved =
-            role == 'teacher' ? AdminRole.teacher : AdminRole.owner;
         await _persistResolvedRole(resolved, user);
         return resolved;
       }
@@ -929,8 +953,8 @@ class AuthService {
         ...teachers,
       ];
       list.sort((a, b) {
-        final aOwner = a['role']?.toString() != 'teacher';
-        final bOwner = b['role']?.toString() != 'teacher';
+        final aOwner = docIsOwner(a);
+        final bOwner = docIsOwner(b);
         if (aOwner && !bOwner) return -1;
         if (!aOwner && bOwner) return 1;
         final aName = a['name']?.toString() ?? '';
@@ -1224,7 +1248,7 @@ class AuthService {
       final adminSnap = await adminRef.get();
       if (!adminSnap.exists) return '강사 계정을 찾을 수 없습니다.';
       final data = adminSnap.data() ?? {};
-      final isOwnerTeacher = data['role']?.toString() != 'teacher';
+      final isOwnerTeacher = docIsOwner(data);
       var existing = data['nativeProfileId']?.toString() ?? '';
       if (existing.startsWith('native_temp_')) existing = '';
       final profileId = OnlineNativeTeacher.profileIdFor(
@@ -1318,7 +1342,7 @@ class AuthService {
       if (!adminSnap.exists) return '강사 계정을 찾을 수 없습니다.';
 
       final data = adminSnap.data() ?? {};
-      final isOwnerTeacher = data['role']?.toString() != 'teacher';
+      final isOwnerTeacher = docIsOwner(data);
       final email = data['email']?.toString() ?? '';
       final isActive = data['isActive'] != false;
       var photoUrl = data['photoUrl']?.toString() ?? '';
@@ -1830,10 +1854,14 @@ class AuthService {
           await _firestore.collection('native_teacher_accounts').doc(profileId).get();
       final previousUid = existing.data()?['teacherUid']?.toString() ?? '';
       if (previousUid.isNotEmpty && previousUid != teacherUid) {
-        await _firestore.collection('admins').doc(previousUid).set({
-          'nativeProfileId': '',
-          'updatedAt': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
+        final previous =
+            await _firestore.collection('admins').doc(previousUid).get();
+        if (previous.exists && roleFromDoc(previous.data()) != AdminRole.none) {
+          await previous.reference.update({
+            'nativeProfileId': '',
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+        }
       }
 
       await adminRef.update({
@@ -1998,8 +2026,11 @@ class AuthService {
         return '비활성화된 계정입니다. 메인 관리자에게 문의하세요.';
       }
 
-      final roleStr = data['role']?.toString() ?? 'owner';
-      final role = roleStr == 'teacher' ? AdminRole.teacher : AdminRole.owner;
+      final role = roleFromDoc(data, email: signedEmail);
+      if (role == AdminRole.none) {
+        await _auth.signOut();
+        return '등록된 관리/강사 계정이 아닙니다.';
+      }
       final name =
           data['name']?.toString() ?? cred.user!.displayName ?? email.trim();
 
