@@ -96,6 +96,7 @@ void main() {
     expect(AppLanguage.instance.translate('지금 판매 중'), 'On sale now');
     expect(AppLanguage.instance.translate('내용 보기'), 'See details');
     expect(AppLanguage.instance.translate('정규고등부'), 'High school');
+    expect(AppLanguage.instance.translate('담당 수강생'), 'Assigned students');
     expect(AppLanguage.instance.translate('정규프로그램'), 'Regular program');
     expect(
       AppLanguage.instance.fill('1회 {p0}', {'p0': '₩15,000'}),

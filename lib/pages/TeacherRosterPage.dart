@@ -129,6 +129,10 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
   bool get _canWrite =>
       _isOwner || (_staffUid.isNotEmpty && _staffUid == _teacherUid);
 
+  /// 강사 관리에서 특정 강사를 연 화면. 로그인 주체의 수강생이 아니다.
+  bool get _viewingAssignedTeacher =>
+      widget.teacher != null && (widget.teacher!['uid']?.toString() ?? '').isNotEmpty;
+
   @override
   void initState() {
     super.initState();
@@ -363,7 +367,10 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
         children: [
           _profileCard(),
           SizedBox(height: 24),
-          Text(tr(context, "내 수강생"), style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+          Text(
+            tr(context, _viewingAssignedTeacher ? "담당 수강생" : "내 수강생"),
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 16),
+          ),
           SizedBox(height: 8),
           Text(
             tr(context, "담당 회원의 화상수업 입장·종료와 회차별 피드백을 여기서 진행합니다. 수업을 종료하면 수강생에게 바로 별점 평가가 요청되고, 이어서 피드백을 작성합니다."),
@@ -381,7 +388,12 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
           Text(tr(context, "타 수강생"), style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           SizedBox(height: 8),
           Text(
-            tr(context, "다른 강사 담당이지만 내 스케줄로 예약한 수강생입니다. 컨펌하면 수업 횟수에 포함됩니다."),
+            tr(
+              context,
+              _viewingAssignedTeacher
+                  ? "다른 강사 담당이지만 이 강사 시간에 예약한 수강생입니다. 컨펌하면 수업 횟수에 포함됩니다."
+                  : "다른 강사 담당이지만 내 스케줄로 예약한 수강생입니다. 컨펌하면 수업 횟수에 포함됩니다.",
+            ),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
@@ -506,7 +518,18 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
           ),
           SizedBox(height: 10),
           Text(
-            tf(context, '내 수강생 {p0}명 · 타 수강생 {p1}명 · 화상수업 {p2}건{p3}', {'p0': _members.length, 'p1': _guestMembers.length, 'p2': _bookings.length, 'p3': _monthAverageLabel()}),
+            tf(
+              context,
+              _viewingAssignedTeacher
+                  ? '담당 수강생 {p0}명 · 타 수강생 {p1}명 · 화상수업 {p2}건{p3}'
+                  : '내 수강생 {p0}명 · 타 수강생 {p1}명 · 화상수업 {p2}건{p3}',
+              {
+                'p0': _members.length,
+                'p1': _guestMembers.length,
+                'p2': _bookings.length,
+                'p3': _monthAverageLabel(),
+              },
+            ),
             style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 12,

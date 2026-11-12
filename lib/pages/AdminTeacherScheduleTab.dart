@@ -895,7 +895,13 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         SizedBox(height: 8),
         Text(
           widget.showAllBookings
-              ? tr(context, '회원이 신청한 회차 수업입니다. 날짜·시간을 확인하고 컨펌하세요.'): tr(context, '내 담당 수강생과, 다른 강사 담당이지만 내 시간에 신청한 타 수강생 예약이 함께 보입니다. 타 수강생은 보라색입니다.'),
+              ? tr(context, '회원이 신청한 회차 수업입니다. 날짜·시간을 확인하고 컨펌하세요.')
+              : tr(
+                  context,
+                  widget.teacherUid.isEmpty
+                      ? '내 담당 수강생과, 다른 강사 담당이지만 내 시간에 신청한 타 수강생 예약이 함께 보입니다. 타 수강생은 보라색입니다.'
+                      : '담당 수강생과, 다른 강사 담당이지만 이 강사 시간에 신청한 타 수강생 예약이 함께 보입니다. 타 수강생은 보라색입니다.',
+                ),
           style: TextStyle(
               fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
         ),
@@ -1014,7 +1020,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         _legend(Palette.warning.withValues(alpha: 0.16), Palette.warning,
             tr(context, '예약 대기')),
         _legend(Palette.primary.withValues(alpha: 0.12), Palette.primary,
-            tr(context, '내 수강생 확정')),
+            tr(context, widget.teacherUid.isEmpty ? '내 수강생 확정' : '담당 수강생 확정')),
         _legend(Palette.accent.withValues(alpha: 0.16), Palette.accent,
             tr(context, '타 수강생')),
         _legend(Palette.grey200, Palette.grey400, tr(context, '완료 · 취소')),
