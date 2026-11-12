@@ -3,6 +3,7 @@ import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/TeacherClassTimeLine.dart';
 
 /// 수강생이 메인 원어민 강사를 고르거나, 코티처로 본 선생님을 메인으로 고정한다.
 class MainTeacherChange {
@@ -49,14 +50,20 @@ class MainTeacherChange {
                     style: TextStyle(
                         fontFamily: 'NotoSansKR',
                         fontWeight: FontWeight.w700)),
-                subtitle: Text(
-                  teacher.nationality.trim().isEmpty
-                      ? tr(context, '앞으로 새 예약은 이 선생님 일정으로 열립니다.')
-                      : teacher.nationality,
-                  style: TextStyle(
-                      fontFamily: 'NotoSansKR',
-                      fontSize: 12,
-                      color: Palette.grey600),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      teacher.nationality.trim().isEmpty
+                          ? tr(context, '앞으로 새 예약은 이 선생님 일정으로 열립니다.')
+                          : teacher.nationality,
+                      style: TextStyle(
+                          fontFamily: 'NotoSansKR',
+                          fontSize: 12,
+                          color: Palette.grey600),
+                    ),
+                    TeacherClassTimeLine(bands: teacher.classBands),
+                  ],
                 ),
                 onTap: () => Navigator.pop(dialogContext, teacher),
               );

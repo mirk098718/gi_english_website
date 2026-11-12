@@ -11,6 +11,7 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PaymentService.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/TeacherClassTimeLine.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
@@ -415,6 +416,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
                       color: Palette.grey700,
                     ),
                   ),
+                  TeacherClassTimeLine(bands: teacher.classBands),
                 ],
               ),
             ),

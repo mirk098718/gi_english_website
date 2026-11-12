@@ -5,6 +5,7 @@ import 'package:gi_english_website/util/html_stub.dart'
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
+import 'package:gi_english_website/class/TeacherClassBands.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonFeedbackService.dart';
@@ -169,6 +170,8 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   String? _selectAnchorTime;
   bool _selecting = false;
   final Set<String> _selectedKeys = {};
+  TeacherClassBands _bands = TeacherClassBands.empty;
+  bool _savingBands = false;
 
   @override
   void initState() {
@@ -199,6 +202,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       setState(() {
         _teacherUid = uid;
         _availability = availability;
+        _bands = availability.classBands;
         _bookings = bookings;
         _ratings = ratings;
         _enrollments = [];
@@ -223,6 +227,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     setState(() {
       _teacherUid = uid;
       _availability = availability;
+      _bands = availability.classBands;
       _bookings = bookings;
       _ratings = ratings;
       _enrollments = enrollments;
@@ -780,6 +785,20 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   List<DateTime> get _days =>
       List.generate(7, (i) => _weekStart.add(Duration(days: i)));
 
+  List<DateTime> get _visibleDays {
+    if (widget.schoolOverview || !_bands.active) return _days;
+    return _days.where((day) => _bands.days.contains(day.weekday)).toList();
+  }
+
+  List<String> get _visibleSlots {
+    if (widget.schoolOverview || !_bands.active) {
+      return EnrollmentService.bookingTimeSlots;
+    }
+    return EnrollmentService.bookingTimeSlots
+        .where((time) => _bands.periods.contains(TeacherClassBands.periodOf(time)))
+        .toList();
+  }
+
   String _historyLabel(WeekBooking booking) {
     final cancelled = booking.status == 'rejected';
     final status = cancelled ? '취소' : '완료';
@@ -805,6 +824,8 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         children: [
           _weekBar(compact: true),
           _monthSummary(compact: true),
+          SizedBox(height: 6),
+          _bandPicker(compact: true),
           SizedBox(height: 6),
           _grid(),
         ],
@@ -869,6 +890,8 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         SizedBox(height: 8),
         _legendRow(),
         SizedBox(height: 16),
+        _bandPicker(),
+        SizedBox(height: 12),
         _grid(),
         if (!widget.schoolOverview) ...[
         SizedBox(height: 28),
@@ -1022,6 +1045,137 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     );
   }
 
+  Future<void> _setBands(TeacherClassBands next) async {
+    if (_teacherUid.isEmpty || _savingBands) return;
+    final previous = _bands;
+    setState(() {
+      _bands = next;
+      _savingBands = true;
+    });
+    final error = await TeacherScheduleService.saveClassBands(
+      teacherUid: _teacherUid,
+      bands: next,
+    );
+    if (!mounted) return;
+    setState(() => _savingBands = false);
+    if (error != null) {
+      setState(() => _bands = previous);
+      _toast(error);
+    }
+  }
+
+  Widget _bandPicker({bool compact = false}) {
+    if (widget.schoolOverview) return const SizedBox.shrink();
+    const dayNames = ['월', '화', '수', '목', '금', '토', '일'];
+    final preview = _bands.keywords.join(', ');
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(compact ? 8 : 12),
+      decoration: BoxDecoration(
+        color: Palette.grey50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Palette.grey200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '수업 가능 시간',
+            style: TextStyle(fontFamily: 'Jalnan', fontSize: compact ? 13 : 14),
+          ),
+          SizedBox(height: 4),
+          Text(
+            '가능 요일과 오전·오후를 고르면 그 칸만 시간표에 나옵니다. 고르지 않으면 모든 시간이 열립니다. 고른 뒤에도 칸을 눌러 개인 일정이나 특정 시간을 막을 수 있습니다.',
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontSize: compact ? 11 : 12,
+              height: 1.45,
+              color: Palette.grey600,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text('가능 요일',
+              style: TextStyle(fontFamily: 'NotoSansKR', fontSize: 12)),
+          SizedBox(height: 4),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (var i = 0; i < dayNames.length; i++)
+                FilterChip(
+                  label: Text(dayNames[i],
+                      style: TextStyle(fontFamily: 'NotoSansKR', fontSize: 12)),
+                  selected: _bands.days.contains(i + 1),
+                  onSelected: _savingBands
+                      ? null
+                      : (_) => _setBands(_bands.toggleDay(i + 1)),
+                ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text('시간대',
+              style: TextStyle(fontFamily: 'NotoSansKR', fontSize: 12)),
+          SizedBox(height: 4),
+          Wrap(
+            spacing: 6,
+            children: [
+              FilterChip(
+                label: Text('오전',
+                    style: TextStyle(fontFamily: 'NotoSansKR', fontSize: 12)),
+                selected: _bands.periods.contains(TeacherClassBands.am),
+                onSelected: _savingBands
+                    ? null
+                    : (_) => _setBands(_bands.togglePeriod(TeacherClassBands.am)),
+              ),
+              FilterChip(
+                label: Text('오후',
+                    style: TextStyle(fontFamily: 'NotoSansKR', fontSize: 12)),
+                selected: _bands.periods.contains(TeacherClassBands.pm),
+                onSelected: _savingBands
+                    ? null
+                    : (_) => _setBands(_bands.togglePeriod(TeacherClassBands.pm)),
+              ),
+            ],
+          ),
+          if (_bands.days.isNotEmpty && _bands.periods.isEmpty) ...[
+            SizedBox(height: 8),
+            Text(
+              '오전 또는 오후를 고르면 그 시간만 시간표에 나옵니다.',
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontSize: 12,
+                color: Palette.accent,
+              ),
+            ),
+          ],
+          if (_bands.periods.isNotEmpty && _bands.days.isEmpty) ...[
+            SizedBox(height: 8),
+            Text(
+              '요일을 고르면 그 요일만 시간표에 나옵니다.',
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontSize: 12,
+                color: Palette.accent,
+              ),
+            ),
+          ],
+          if (preview.isNotEmpty) ...[
+            SizedBox(height: 8),
+            Text(
+              'Class Time : $preview',
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: Palette.darkTeal,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _grid() {
     if (_loading) {
       return const Padding(
@@ -1040,19 +1194,18 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
           Column(
             children: [
               SizedBox(width: _timeColWidth, height: _dayHeaderHeight),
-              ...EnrollmentService.bookingTimeSlots
-                  .map((t) => _timeLabel(t, height: rowH)),
+              ..._visibleSlots.map((t) => _timeLabel(t, height: rowH)),
             ],
           ),
           Expanded(
             child: Column(
               children: [
                 Row(
-                  children: _days
+                  children: _visibleDays
                       .map((d) => Expanded(child: _dayHeader(d)))
                       .toList(),
                 ),
-                ...EnrollmentService.bookingTimeSlots.map(
+                ..._visibleSlots.map(
                   (t) => _timeCells(t, height: cellH),
                 ),
               ],
@@ -1065,6 +1218,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
 
   bool _canToggleSlot(DateTime date, String time) {
     if (widget.schoolOverview) return false;
+    if (!_bands.allows(date.weekday, time)) return false;
     if (_isSlotPast(date, time)) return false;
     if (_bookingAt(date, time) != null) return false;
     if (_availability.isOccupied(date, time)) return false;
@@ -1107,6 +1261,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         day = day.add(const Duration(days: 1))) {
       for (var i = startTime; i <= endTime; i++) {
         final slotTime = slots[i];
+        if (!_bands.allows(day.weekday, slotTime)) continue;
         if (!_canToggleSlot(day, slotTime)) continue;
         keys.add(TeacherScheduleService.slotKey(day, slotTime));
       }
@@ -1373,7 +1528,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
 
   Widget _timeCells(String time, {double? height}) {
     return Row(
-      children: _days
+      children: _visibleDays
           .map((day) => Expanded(
                 child: _cell(day, time, height: height),
               ))

@@ -26,6 +26,7 @@ import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:gi_english_website/widget/QuizResultSummary.dart';
 import 'package:gi_english_website/widget/MainTeacherChange.dart';
 import 'package:gi_english_website/widget/StudentJoinButton.dart';
+import 'package:gi_english_website/widget/TeacherClassTimeLine.dart';
 import 'package:gi_english_website/widget/YoutubeLessonPlayer.dart';
 
 import '../util/WidgetUtil.dart';
@@ -809,14 +810,20 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                     style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontWeight: FontWeight.w700)),
-                subtitle: Text(
-                  teacher.nationality.isEmpty
-                      ? tr(context, "담당 선생님 시간이 안 맞을 때 이 선생님 스케줄로 예약합니다.")
-                      : teacher.nationality,
-                  style: TextStyle(
-                      fontFamily: "NotoSansKR",
-                      fontSize: 12,
-                      color: Palette.grey600),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      teacher.nationality.isEmpty
+                          ? tr(context, "담당 선생님 시간이 안 맞을 때 이 선생님 스케줄로 예약합니다.")
+                          : teacher.nationality,
+                      style: TextStyle(
+                          fontFamily: "NotoSansKR",
+                          fontSize: 12,
+                          color: Palette.grey600),
+                    ),
+                    TeacherClassTimeLine(bands: teacher.classBands),
+                  ],
                 ),
                 onTap: () => Navigator.pop(dialogContext, teacher),
               );

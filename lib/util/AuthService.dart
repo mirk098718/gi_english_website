@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
+import 'package:gi_english_website/class/TeacherClassBands.dart';
 import 'package:gi_english_website/firebase_options.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -1657,9 +1658,38 @@ class AuthService {
     }
     if (teachers.isEmpty) {
       teachers = await _teachersFromStore();
+    } else {
+      teachers = await _overlayClassBands(teachers);
     }
     OnlineNativeTeacher.cacheAll(teachers);
     return teachers;
+  }
+
+  static Future<List<OnlineNativeTeacher>> _overlayClassBands(
+    List<OnlineNativeTeacher> teachers,
+  ) async {
+    try {
+      final snapshot =
+          await _firestore.collection('native_teacher_accounts').get();
+      final byUid = <String, TeacherClassBands>{};
+      final byId = <String, TeacherClassBands>{};
+      for (final doc in snapshot.docs) {
+        final bands = TeacherClassBands.fromMap(doc.data());
+        byId[doc.id] = bands;
+        final uid = doc.data()['teacherUid']?.toString() ?? '';
+        if (uid.isNotEmpty) byUid[uid] = bands;
+      }
+      return teachers
+          .map((teacher) => teacher.copyWith(
+                classBands: byUid[teacher.accountUid] ??
+                    byId[teacher.id] ??
+                    teacher.classBands,
+              ))
+          .toList();
+    } catch (e) {
+      print('수업 가능 시간 조회 오류: $e');
+      return teachers;
+    }
   }
 
   static Future<List<OnlineNativeTeacher>> _teachersFromStore() async {
