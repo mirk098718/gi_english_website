@@ -433,7 +433,11 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
         for (final count in OnlinePlan.speakingSessionChoices)
           ChoiceChip(
             label: Text(
-              '$count회 · ${OnlinePlan.won(count * OnlinePlan.speakingSessionPrice)}',
+              tf(context, '{p0}회 · {p1}', {
+                'p0': count,
+                'p1': OnlinePlan.money(
+                    count * OnlinePlan.speakingSessionPrice),
+              }),
               style: TextStyle(
                 fontFamily: 'NotoSansKR',
                 fontWeight: FontWeight.w700,

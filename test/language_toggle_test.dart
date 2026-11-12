@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
+import 'package:gi_english_website/util/MyWidget.dart';
+import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/OnlinePlanCard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -84,5 +87,75 @@ void main() {
       AppLanguage.instance.fill('{p0}년 {p1}월', {'p0': 2026, 'p1': 11}),
       '11/2026',
     );
+    expect(
+      AppLanguage.instance.translate(
+        '인강을 듣고, 퀴즈로 다지고, 1:1 화상으로 실사용해봅니다.',
+      ),
+      'Watch the lessons, lock them in with a quiz, and use them in a 1:1 live class.',
+    );
+    expect(AppLanguage.instance.translate('지금 판매 중'), 'On sale now');
+    expect(AppLanguage.instance.translate('내용 보기'), 'See details');
+    expect(AppLanguage.instance.translate('정규고등부'), 'High school');
+    expect(AppLanguage.instance.translate('정규프로그램'), 'Regular program');
+    expect(
+      AppLanguage.instance.fill('1회 {p0}', {'p0': '₩15,000'}),
+      '₩15,000 per class',
+    );
+  });
+
+  testWidgets('상품 카드와 학원 왼쪽 메뉴가 영어로 바뀐다', (tester) async {
+    await tester.pumpWidget(
+      LangScope(
+        child: MaterialApp(
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: SingleChildScrollView(
+                child: Column(
+                children: [
+                  const LanguageToggle(),
+                  OnlinePlanCard(
+                    index: '2',
+                    title: '영문법 인강 + 원어민 화상 회화',
+                    summary: '인강을 듣고, 퀴즈로 다지고, 1:1 화상으로 실사용해봅니다.',
+                    priceLine: '레벨별 180,000원~',
+                    color: Palette.secondaryDark,
+                    imageAsset: 'assets/plan-card-bundle.jpg',
+                    selected: false,
+                    current: true,
+                    onTap: () {},
+                  ),
+                  MyWidget.leftMenuMiddle(Palette.navy, '정규고등부'),
+                  MyWidget.leftMenuMiddle(Palette.white, '정규프로그램'),
+                ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('지금 판매 중'), findsOneWidget);
+    expect(find.text('내용 보기'), findsOneWidget);
+    expect(find.text('레벨별 180,000원~'), findsOneWidget);
+    expect(find.text('정규고등부'), findsOneWidget);
+    expect(find.text('정규프로그램'), findsOneWidget);
+
+    await tester.tap(find.text('English'));
+    await tester.pump();
+
+    expect(find.text('On sale now'), findsOneWidget);
+    expect(find.text('See details'), findsOneWidget);
+    expect(
+      find.text(
+        'Watch the lessons, lock them in with a quiz, and use them in a 1:1 live class.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('From ₩180,000 by level'), findsOneWidget);
+    expect(find.text('High school'), findsOneWidget);
+    expect(find.text('Regular program'), findsOneWidget);
+    expect(find.text('지금 판매 중'), findsNothing);
+    expect(find.text('정규고등부'), findsNothing);
   });
 }

@@ -149,7 +149,7 @@ class _SchoolOnlineCurriculumPageState
     if (course == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('과정을 선택해주세요.',
+          content: Text(tr(context, '과정을 선택해주세요.'),
               style: TextStyle(fontFamily: 'NotoSansKR')),
           backgroundColor: Palette.danger,
         ),
@@ -167,7 +167,8 @@ class _SchoolOnlineCurriculumPageState
       setState(() => _lecturePaying = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('주문을 생성하지 못했습니다. 로그인 상태를 확인해주세요.',
+          content: Text(
+              tr(context, '주문을 생성하지 못했습니다. 로그인 상태를 확인해주세요.'),
               style: TextStyle(fontFamily: 'NotoSansKR')),
           backgroundColor: Palette.danger,
         ),
@@ -254,7 +255,7 @@ class _SchoolOnlineCurriculumPageState
 
   Widget sectionTitle(String title) {
     return Text(
-      title,
+      tr(context, title),
       style: TextStyle(
         fontFamily: "Jalnan",
         fontSize: 15,
@@ -265,7 +266,7 @@ class _SchoolOnlineCurriculumPageState
 
   Widget bodyText(String text) {
     return Text(
-      text,
+      tr(context, text),
       style: TextStyle(
         color: Palette.black,
         fontFamily: "NotoSansKR",
@@ -360,7 +361,11 @@ class _SchoolOnlineCurriculumPageState
         index: '3',
         title: '원어민 화상 1:1 회화',
         summary: '실전 원어민 회화.',
-        priceLine: '1회 ${OnlinePlan.won(OnlinePlan.speakingSessionPrice)}',
+        priceLine: tf(
+          context,
+          '1회 {p0}',
+          {'p0': OnlinePlan.money(OnlinePlan.speakingSessionPrice)},
+        ),
         color: Palette.accent,
         imageAsset: 'assets/plan-card-speaking.jpg',
         selected: _highlightedPlan == OnlinePlan.speaking,
@@ -462,7 +467,7 @@ class _SchoolOnlineCurriculumPageState
           SizedBox(height: 16),
           Text(
             _lectureCourse == null
-                ? '레벨을 고르면 그 금액으로 결제합니다.'
+                ? tr(context, '레벨을 고르면 그 금액으로 결제합니다.')
                 : '${_lectureCourse!.order}. ${_lectureCourse!.localizedName(context, OnlinePlan.lecture)}',
             style: TextStyle(
               fontFamily: 'NotoSansKR',
@@ -474,7 +479,7 @@ class _SchoolOnlineCurriculumPageState
           ),
           SizedBox(height: 4),
           Text(
-            '인강과 퀴즈를 바로 결제합니다.',
+            tr(context, '인강과 퀴즈를 바로 결제합니다.'),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: 13,
@@ -485,8 +490,10 @@ class _SchoolOnlineCurriculumPageState
           SizedBox(height: 12),
           _applyButton(
             label: _lecturePaying
-                ? '결제창 여는 중...'
-                : '${_lectureCourse?.lecturePriceLabel ?? ''} 결제하기'.trim(),
+                ? tr(context, '결제창 여는 중...')
+                : tf(context, '{p0} 결제하기', {
+                    'p0': _lectureCourse?.lecturePriceLabel ?? '',
+                  }).trim(),
             onPressed: _lecturePaying ? null : _payLecture,
             color: Palette.primary,
             icon: Icons.payment,
@@ -508,13 +515,18 @@ class _SchoolOnlineCurriculumPageState
           _serviceOverview(compact: compact),
           SizedBox(height: 16),
           bodyText(
-            '인강을 듣고, 퀴즈로 다지고, 1:1 화상으로 실사용해봅니다.\n'
-            '지금 판매 중인 구성이며, 화상수업 ${OnlineCourse.all.first.defaultSessions}회가 포함됩니다.',
+            tf(
+              context,
+              '인강을 듣고, 퀴즈로 다지고, 1:1 화상으로 실사용해봅니다.\n'
+              '지금 판매 중인 구성이며, 화상수업 {p0}회가 포함됩니다.',
+              {'p0': OnlineCourse.all.first.defaultSessions},
+            ),
           ),
           SizedBox(height: 28),
           KeyedSubtree(
             key: _courseListKey,
-            child: bodyText('각 과정의 이미지와 설명을 보고, 맞는 과정을 선택해 주세요.'),
+            child: bodyText(
+                '각 과정의 이미지와 설명을 보고, 맞는 과정을 선택해 주세요.'),
           ),
           SizedBox(height: 16),
           RadioGroup<String>(
@@ -595,7 +607,7 @@ class _SchoolOnlineCurriculumPageState
           ),
           SizedBox(height: 8),
           Text(
-            '화상으로 만나는 원어민과 1:1로 말합니다.',
+            tr(context, '화상으로 만나는 원어민과 1:1로 말합니다.'),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: 12,
@@ -605,9 +617,13 @@ class _SchoolOnlineCurriculumPageState
           ),
           SizedBox(height: 16),
           bodyText(
-            '실전 원어민 회화.\n'
-            '인강과 퀴즈는 없고, 고른 원어민과 회화만 진행합니다.\n'
-            '1회 ${OnlinePlan.won(OnlinePlan.speakingSessionPrice)}이며, 횟수를 고르면 금액이 정해집니다.',
+            tf(
+              context,
+              '실전 원어민 회화.\n'
+              '인강과 퀴즈는 없고, 고른 원어민과 회화만 진행합니다.\n'
+              '1회 {p0}이며, 횟수를 고르면 금액이 정해집니다.',
+              {'p0': OnlinePlan.money(OnlinePlan.speakingSessionPrice)},
+            ),
           ),
           SizedBox(height: 16),
           Wrap(
@@ -617,7 +633,11 @@ class _SchoolOnlineCurriculumPageState
               for (final count in OnlinePlan.speakingSessionChoices)
                 ChoiceChip(
                   label: Text(
-                    '$count회 · ${OnlinePlan.won(count * OnlinePlan.speakingSessionPrice)}',
+                    tf(context, '{p0}회 · {p1}', {
+                      'p0': count,
+                      'p1': OnlinePlan.money(
+                          count * OnlinePlan.speakingSessionPrice),
+                    }),
                     style: TextStyle(
                       fontFamily: 'NotoSansKR',
                       fontWeight: FontWeight.w700,
@@ -641,8 +661,10 @@ class _SchoolOnlineCurriculumPageState
           SizedBox(height: 8),
           Text(
             _speakingSessions == 8
-                ? '8회는 지금 판매 중인 묶음과 같은 횟수입니다.'
-                : '안내 금액이며, 회당 ${OnlinePlan.won(OnlinePlan.speakingSessionPrice)}입니다.',
+                ? tr(context, '8회는 지금 판매 중인 묶음과 같은 횟수입니다.')
+                : tf(context, '안내 금액이며, 회당 {p0}입니다.', {
+                    'p0': OnlinePlan.money(OnlinePlan.speakingSessionPrice),
+                  }),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: 12,
@@ -651,7 +673,7 @@ class _SchoolOnlineCurriculumPageState
           ),
           SizedBox(height: 16),
           _applyButton(
-            label: '원어민 강사 선택하기',
+            label: tr(context, '원어민 강사 선택하기'),
             onPressed: _goSpeakingTeacher,
             color: Palette.accent,
           ),
@@ -703,7 +725,7 @@ class _SchoolOnlineCurriculumPageState
         onPressed: onPressed,
         icon: Icon(icon, color: Palette.white),
         label: Text(
-          label,
+          tr(context, label),
           style: TextStyle(fontFamily: 'Jalnan', fontSize: 15),
         ),
       ),

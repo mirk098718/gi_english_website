@@ -189,9 +189,9 @@ class OnlineCourse {
     return highlights;
   }
 
-  String get priceLabel => OnlinePlan.won(price);
+  String get priceLabel => OnlinePlan.money(price);
 
-  String get lecturePriceLabel => OnlinePlan.won(lecturePrice);
+  String get lecturePriceLabel => OnlinePlan.money(lecturePrice);
 
   int amountFor(String plan, {int? sessions}) {
     final kind = OnlinePlan.normalize(plan);

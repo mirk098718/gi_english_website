@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 
 /// 온라인 상품 3종 중 하나를 고르는 카드.
@@ -85,7 +86,7 @@ class OnlinePlanCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        '지금 판매 중',
+                        tr(context, '지금 판매 중'),
                         style: TextStyle(
                           fontFamily: 'NotoSansKR',
                           fontSize: 11,
@@ -99,7 +100,7 @@ class OnlinePlanCard extends StatelessWidget {
               ),
               SizedBox(height: 12),
               Text(
-                title,
+                tr(context, title),
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontWeight: FontWeight.w800,
@@ -110,7 +111,7 @@ class OnlinePlanCard extends StatelessWidget {
               ),
               SizedBox(height: 8),
               Text(
-                summary,
+                tr(context, summary),
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontSize: 13,
@@ -120,7 +121,7 @@ class OnlinePlanCard extends StatelessWidget {
               ),
               SizedBox(height: 12),
               Text(
-                priceLine,
+                tr(context, priceLine),
                 style: TextStyle(
                   fontFamily: 'Jalnan',
                   fontSize: 13,
@@ -129,7 +130,7 @@ class OnlinePlanCard extends StatelessWidget {
               ),
               SizedBox(height: 8),
               Text(
-                '내용 보기',
+                tr(context, '내용 보기'),
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
                   fontSize: 12,

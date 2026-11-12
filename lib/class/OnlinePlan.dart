@@ -1,3 +1,5 @@
+import 'package:gi_english_website/util/AppLanguage.dart';
+
 /// 온라인 상품 구성.
 ///
 /// - [lecture]: 단계별 영문법 인강 + 퀴즈. 화상수업 없음.
@@ -46,13 +48,19 @@ class OnlinePlan {
 
   static bool includesSpeaking(String? raw) => normalize(raw) != lecture;
 
-  static String won(int amount) {
+  static String grouped(int amount) {
     final s = amount.toString();
     final buf = StringBuffer();
     for (int i = 0; i < s.length; i++) {
       if (i > 0 && (s.length - i) % 3 == 0) buf.write(',');
       buf.write(s[i]);
     }
-    return '${buf.toString()}원';
+    return buf.toString();
   }
+
+  static String won(int amount) => '${grouped(amount)}원';
+
+  /// 화면 언어에 맞춘 금액. 한국어는 15,000원, 영어는 ₩15,000.
+  static String money(int amount) =>
+      AppLanguage.instance.fill('{p0}원', {'p0': grouped(amount)});
 }

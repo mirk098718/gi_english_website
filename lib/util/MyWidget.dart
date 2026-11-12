@@ -252,6 +252,20 @@ class MyWidget {
     return background == Palette.navy ? Palette.white : Palette.black;
   }
 
+  static Widget _menuLabel(String source, Color background, double fontSize) {
+    return Builder(
+      builder: (context) => Text(
+        tr(context, source),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: _leftMenuTextColor(background),
+          fontWeight: FontWeight.bold,
+          fontSize: fontSize,
+        ),
+      ),
+    );
+  }
+
   static Widget leftMenuTop(Color selectedMenuColor, String content) {
     return Container(
       alignment: Alignment.center,
@@ -263,14 +277,7 @@ class MyWidget {
             topLeft: Radius.circular(10), topRight: Radius.circular(10)),
         color: selectedMenuColor,
       ),
-      child: Text(
-        content,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-            color: _leftMenuTextColor(selectedMenuColor),
-            fontWeight: FontWeight.bold,
-            fontSize: 13),
-      ),
+      child: _menuLabel(content, selectedMenuColor, 13),
     );
   }
 
@@ -281,14 +288,7 @@ class MyWidget {
       width: 192,
       constraints: BoxConstraints(minHeight: 40),
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: Text(
-        menuContent,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-            color: _leftMenuTextColor(menuColor),
-            fontWeight: FontWeight.bold,
-            fontSize: 13),
-      ),
+      child: _menuLabel(menuContent, menuColor, 13),
     );
   }
 
@@ -303,14 +303,7 @@ class MyWidget {
               bottomLeft: Radius.circular(10),
               bottomRight: Radius.circular(10)),
           color: menuColor),
-      child: Text(
-        content,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-            color: _leftMenuTextColor(menuColor),
-            fontWeight: FontWeight.bold,
-            fontSize: 13),
-      ),
+      child: _menuLabel(content, menuColor, 13),
     );
   }
 
@@ -419,14 +412,7 @@ class MyWidget {
             topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
         color: selectedMenuColor,
       ),
-      child: Text(
-        content,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-            color: _leftMenuTextColor(selectedMenuColor),
-            fontWeight: FontWeight.bold,
-            fontSize: 12),
-      ),
+      child: _menuLabel(content, selectedMenuColor, 12),
     );
   }
 
@@ -437,14 +423,7 @@ class MyWidget {
       width: 210,
       constraints: BoxConstraints(minHeight: 40),
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: Text(
-        menuContent,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-            color: _leftMenuTextColor(menuColor),
-            fontWeight: FontWeight.bold,
-            fontSize: 12),
-      ),
+      child: _menuLabel(menuContent, menuColor, 12),
     );
   }
 
@@ -458,14 +437,7 @@ class MyWidget {
           borderRadius: BorderRadius.only(
               topRight: Radius.circular(10), bottomRight: Radius.circular(10)),
           color: menuColor),
-      child: Text(
-        content,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-            color: _leftMenuTextColor(menuColor),
-            fontWeight: FontWeight.bold,
-            fontSize: 12),
-      ),
+      child: _menuLabel(content, menuColor, 12),
     );
   }
 
