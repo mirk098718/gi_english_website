@@ -110,6 +110,7 @@ const Map<String, String> staffEnTranslations = {
   "예약 대기": "Awaiting confirm",
   "내 수강생 확정": "My student, confirmed",
   "담당 수강생": "Assigned students",
+  "수강완료": "Completed",
   "객관식 25문제는 맞은 개수가 0입니다. 주관식 답은 따로 저장되어 있습니다.": "The 25 multiple-choice questions scored 0. The written answers are saved separately.",
   "담당 수강생 확정": "Assigned student, confirmed",
   "담당 수강생 {p0}명 · 타 수강생 {p1}명 · 화상수업 {p2}건{p3}": "Assigned students {p0} · other students {p1} · video classes {p2}{p3}",
