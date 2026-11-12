@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -35,7 +36,7 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
   void _toast(String message, {bool error = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
+        content: Text(tr(context, message), style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: error ? Palette.danger : Palette.success,
       ),
     );
@@ -51,7 +52,7 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
       ),
     );
     if (saved == true) {
-      _toast(existing == null ? '회차가 등록되었습니다.' : '회차가 수정되었습니다.');
+      _toast(existing == null ? tr(context, '회차가 등록되었습니다.'): tr(context, '회차가 수정되었습니다.'));
       await _refresh();
     }
   }
@@ -60,20 +61,20 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('${week.weekNumber}회차 삭제',
+        title: Text(tf(context, '{p0}회차 삭제', {'p0': week.weekNumber}),
             style: TextStyle(fontFamily: "Jalnan")),
         content: Text(
-          '이 회차의 인강·문제 링크·체크리스트가 삭제됩니다.\n학생들의 체크 기록은 남아 있을 수 있습니다.',
+          tr(context, '이 회차의 인강·문제 링크·체크리스트가 삭제됩니다.\n학생들의 체크 기록은 남아 있을 수 있습니다.'),
           style: TextStyle(fontFamily: "NotoSansKR"),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('취소'),
+            child: Text(tr(context, '취소')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('삭제', style: TextStyle(color: Palette.danger)),
+            child: Text(tr(context, '삭제'), style: TextStyle(color: Palette.danger)),
           ),
         ],
       ),
@@ -83,7 +84,7 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
     if (error != null) {
       _toast(error, error: true);
     } else {
-      _toast('삭제되었습니다.');
+      _toast(tr(context, '삭제되었습니다.'));
       await _refresh();
     }
   }
@@ -93,7 +94,7 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
     return ListView(
       padding: EdgeInsets.all(20),
       children: [
-        Text('과정 선택', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+        Text(tr(context, '과정 선택'), style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
         SizedBox(height: 8),
         DropdownButtonFormField<OnlineCourse>(
           initialValue: _selectedCourse,
@@ -119,8 +120,7 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
         ),
         SizedBox(height: 12),
         Text(
-          '각 회차에 인강 URL과 문제풀이 링크, 학생이 스스로 체크할 학습 항목을 넣습니다.\n'
-          '회원은 이전 회차 화상수업을 마치면 다음 회차가 열리고, 이수한 회차는 복습할 수 있습니다.',
+          tr(context, '각 회차에 인강 URL과 문제풀이 링크, 학생이 스스로 체크할 학습 항목을 넣습니다.\n회원은 이전 회차 화상수업을 마치면 다음 회차가 열리고, 이수한 회차는 복습할 수 있습니다.'),
           style: TextStyle(
               fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
         ),
@@ -135,16 +135,16 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
             ),
             onPressed: () => _openEditor(),
             icon: Icon(Icons.add),
-            label: Text('회차 추가', style: TextStyle(fontFamily: "Jalnan")),
+            label: Text(tr(context, '회차 추가'), style: TextStyle(fontFamily: "Jalnan")),
           ),
         ),
         Divider(height: 36),
-        Text('등록된 회차', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+        Text(tr(context, '등록된 회차'), style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
         SizedBox(height: 12),
         if (_loading)
           Center(child: CircularProgressIndicator())
         else if (_weeks.isEmpty)
-          Text('등록된 회차가 없습니다. 1회차부터 추가해주세요.',
+          Text(tr(context, '등록된 회차가 없습니다. 1회차부터 추가해주세요.'),
               style:
                   TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500))
         else
@@ -160,26 +160,24 @@ class _AdminWeekCurriculumTabState extends State<AdminWeekCurriculumTab> {
                             fontSize: 13)),
                   ),
                   title: Text(
-                    week.title.isEmpty ? '${week.weekNumber}회차' : week.title,
+                    week.title.isEmpty ? tf(context, '{p0}회차', {'p0': week.weekNumber}): week.title,
                     style: TextStyle(
                         fontFamily: "NotoSansKR", fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
-                    '인강 ${week.videoUrl.isEmpty ? "없음" : "있음"} · '
-                    '문제 ${week.problemLinks.length}개 · '
-                    '체크 ${week.checklistItems.length}개',
+                    tf(context, '인강 {p0} · 문제 {p1}개 · 체크 {p2}개', {'p0': week.videoUrl.isEmpty ? tr(context, '없음'): tr(context, '있음'), 'p1': week.problemLinks.length, 'p2': week.checklistItems.length}),
                     style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12),
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        tooltip: '수정',
+                        tooltip: tr(context, '수정'),
                         icon: Icon(Icons.edit_outlined),
                         onPressed: () => _openEditor(existing: week),
                       ),
                       IconButton(
-                        tooltip: '삭제',
+                        tooltip: tr(context, '삭제'),
                         icon: Icon(Icons.delete_outline, color: Palette.danger),
                         onPressed: () => _delete(week),
                       ),
@@ -258,8 +256,8 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
     }
     if (_links.isEmpty) _links.add(_LinkDraft());
     if (_checks.isEmpty) {
-      _checks.add(_CheckDraft(id: 'watch_video', label: '인강 시청하기'));
-      _checks.add(_CheckDraft(id: 'solve_problems', label: '문제풀이 하기'));
+      _checks.add(_CheckDraft(id: 'watch_video', label: tr(context, '인강 시청하기')));
+      _checks.add(_CheckDraft(id: 'solve_problems', label: tr(context, '문제풀이 하기')));
     }
   }
 
@@ -342,7 +340,7 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
     final isEdit = widget.existing != null;
     return AlertDialog(
       title: Text(
-        isEdit ? '${widget.existing!.weekNumber}회차 수정' : '회차 추가',
+        isEdit ? tf(context, '{p0}회차 수정', {'p0': widget.existing!.weekNumber}): tr(context, '회차 추가'),
         style: TextStyle(fontFamily: "Jalnan"),
       ),
       content: SizedBox(
@@ -355,7 +353,7 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
                 controller: weekNumberController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: '회차 번호',
+                  labelText: tr(context, '회차 번호'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -363,7 +361,7 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
               TextField(
                 controller: titleController,
                 decoration: InputDecoration(
-                  labelText: '회차 제목 (예: 1회차 자기소개)',
+                  labelText: tr(context, '회차 제목 (예: 1회차 자기소개)'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -372,7 +370,7 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
                 controller: descriptionController,
                 maxLines: 2,
                 decoration: InputDecoration(
-                  labelText: '이번 회차 안내 (선택)',
+                  labelText: tr(context, '이번 회차 안내 (선택)'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -380,12 +378,12 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
               TextField(
                 controller: videoUrlController,
                 decoration: InputDecoration(
-                  labelText: '인강 URL (YouTube 등)',
+                  labelText: tr(context, '인강 URL (YouTube 등)'),
                   border: OutlineInputBorder(),
                 ),
               ),
               SizedBox(height: 18),
-              Text('문제풀이 링크',
+              Text(tr(context, '문제풀이 링크'),
                   style: TextStyle(fontFamily: "Jalnan", fontSize: 14)),
               SizedBox(height: 8),
               ...List.generate(_links.length, (index) {
@@ -399,7 +397,7 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
                         child: TextField(
                           controller: draft.title,
                           decoration: InputDecoration(
-                            labelText: '이름',
+                            labelText: tr(context, '이름'),
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -436,11 +434,11 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
                   });
                 },
                 icon: Icon(Icons.add),
-                label: Text('문제 링크 추가',
+                label: Text(tr(context, '문제 링크 추가'),
                     style: TextStyle(fontFamily: "NotoSansKR")),
               ),
               SizedBox(height: 12),
-              Text('이번 주 체크리스트',
+              Text(tr(context, '이번 주 체크리스트'),
                   style: TextStyle(fontFamily: "Jalnan", fontSize: 14)),
               SizedBox(height: 8),
               ...List.generate(_checks.length, (index) {
@@ -453,7 +451,7 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
                         child: TextField(
                           controller: draft.label,
                           decoration: InputDecoration(
-                            labelText: '학생이 체크할 항목',
+                            labelText: tr(context, '학생이 체크할 항목'),
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -481,7 +479,7 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
                   });
                 },
                 icon: Icon(Icons.add),
-                label: Text('체크 항목 추가',
+                label: Text(tr(context, '체크 항목 추가'),
                     style: TextStyle(fontFamily: "NotoSansKR")),
               ),
             ],
@@ -491,7 +489,7 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
       actions: [
         TextButton(
           onPressed: _saving ? null : () => Navigator.pop(context, false),
-          child: Text('취소'),
+          child: Text(tr(context, '취소')),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -506,7 +504,7 @@ class _WeekEditorDialogState extends State<_WeekEditorDialog> {
                   child: CircularProgressIndicator(
                       strokeWidth: 2, color: Palette.white),
                 )
-              : Text(isEdit ? '수정 저장' : '등록',
+              : Text(isEdit ? tr(context, '수정 저장'): tr(context, '등록'),
                   style: TextStyle(fontFamily: "Jalnan")),
         ),
       ],

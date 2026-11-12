@@ -117,7 +117,7 @@ class _StudentLearningProgressPanelState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          widget.dense ? '학습 진도 · $title' : tr(context, "학습 진도"),
+          widget.dense ? tf(context, '학습 진도 · {p0}', {'p0': title}): tr(context, "학습 진도"),
           style: TextStyle(
             fontFamily: "Jalnan",
             fontSize: widget.dense ? 12 : 13,
@@ -140,7 +140,7 @@ class _StudentLearningProgressPanelState
           Text(
             widget.onlyWeekNumber == null
                 ? tr(context, "아직 체크한 학습이 없습니다.")
-                : '${widget.onlyWeekNumber}회차 학습 체크가 없습니다.',
+                : tf(context, '{p0}회차 학습 체크가 없습니다.', {'p0': widget.onlyWeekNumber}),
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 12,
@@ -155,7 +155,7 @@ class _StudentLearningProgressPanelState
 
   Widget _weekBlock(StudentWeekProgress week, String userId) {
     final problems = week.problemLinks.isEmpty
-        ? const [WeekProblemLink(title: '등록된 문제 없음', url: '')]
+        ?  [WeekProblemLink(title: tr(context, '등록된 문제 없음'), url: '')]
         : week.problemLinks;
 
     return Container(
@@ -176,7 +176,7 @@ class _StudentLearningProgressPanelState
         children: [
           Text(
             [
-              if (week.weekNumber > 0) '${week.weekNumber}회차',
+              if (week.weekNumber > 0) tf(context, '{p0}회차', {'p0': week.weekNumber}),
               if (week.weekTitle.isNotEmpty) week.weekTitle,
               if (week.readyToBook) tr(context, "예약 가능"),
             ].join(' · '),
@@ -189,15 +189,15 @@ class _StudentLearningProgressPanelState
           SizedBox(height: 8),
           if (week.videoUrl.trim().isNotEmpty)
             _line(
-              label: '인강',
+              label: tr(context, '인강'),
               title: week.videoLabel,
               url: week.videoUrl,
               done: week.videoChecked,
               asPlayer: true,
             ),
           ...problems.map((link) => _line(
-                label: '문제',
-                title: link.title.trim().isEmpty ? '문제풀이' : link.title.trim(),
+                label: tr(context, '문제'),
+                title: link.title.trim().isEmpty ? tr(context, '문제풀이'): link.title.trim(),
                 url: link.url,
                 done: week.problemsChecked,
               )),

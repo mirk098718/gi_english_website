@@ -58,4 +58,31 @@ void main() {
     expect(find.text('글림아일랜드 어학원'), findsOneWidget);
     expect(find.text('무료 체험하기'), findsOneWidget);
   });
+
+  test('운영자·강사 문장도 메인 화면 언어를 따른다', () {
+    AppLanguage.instance.code = 'ko';
+    expect(
+      AppLanguage.instance.translate('온라인 프로그램 관리'),
+      '온라인 프로그램 관리',
+    );
+    expect(AppLanguage.instance.translate('월'), '월');
+
+    AppLanguage.instance.code = 'en';
+    expect(
+      AppLanguage.instance.translate('온라인 프로그램 관리'),
+      'Online program',
+    );
+    expect(AppLanguage.instance.translate('월'), 'Mon');
+    expect(
+      AppLanguage.instance.fill(
+        '매주 {p0}요일 {p1}을 다시 엽니다.',
+        {'p0': 'Mon', 'p1': '9:00 AM'},
+      ),
+      'Opens 9:00 AM every Mon again.',
+    );
+    expect(
+      AppLanguage.instance.fill('{p0}년 {p1}월', {'p0': 2026, 'p1': 11}),
+      '11/2026',
+    );
+  });
 }

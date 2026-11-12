@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/class/OnlinePlan.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/util/TeacherScheduleService.dart';
@@ -2296,7 +2297,8 @@ class EnrollmentService {
 
   static String formatBookingDate(DateTime d) {
     const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-    return '${d.year}.${d.month.toString().padLeft(2, '0')}.${d.day.toString().padLeft(2, '0')} (${weekdays[d.weekday - 1]})';
+    final day = AppLanguage.instance.translate(weekdays[d.weekday - 1]);
+    return '${d.year}.${d.month.toString().padLeft(2, '0')}.${d.day.toString().padLeft(2, '0')} ($day)';
   }
 
   static String formatBookingTime(String time) {
@@ -3235,7 +3237,7 @@ class StudentWeekProgress {
   String get videoLabel {
     if (weekTitle.trim().isNotEmpty) return weekTitle.trim();
     if (videoUrl.trim().isNotEmpty) return videoUrl.trim();
-    return '인강';
+    return AppLanguage.instance.translate('인강');
   }
 
   factory StudentWeekProgress.from(
@@ -3355,22 +3357,22 @@ class WeekBooking {
   }
 
   String get calendarLabel {
-    if (isPending) return '대기';
+    if (isPending) return AppLanguage.instance.translate('대기');
     final name = memberName.trim();
-    if (name.isEmpty) return '확정';
+    if (name.isEmpty) return AppLanguage.instance.translate('확정');
     return name.length > 6 ? name.substring(0, 6) : name;
   }
 
   String get statusLabel {
     switch (status) {
       case 'confirmed':
-        return '강사 확인 완료';
+        return AppLanguage.instance.translate('강사 확인 완료');
       case 'rejected':
-        return '거절됨';
+        return AppLanguage.instance.translate('거절됨');
       case 'cancelled':
-        return '취소됨';
+        return AppLanguage.instance.translate('취소됨');
       default:
-        return '강사 확인 대기';
+        return AppLanguage.instance.translate('강사 확인 대기');
     }
   }
 
@@ -3435,7 +3437,8 @@ class TeacherMonthStats {
 
   int get incomeWon => completedCount * lessonFeeWon;
 
-  String get monthLabel => '$year년 $month월';
+  String get monthLabel =>
+      AppLanguage.instance.fill('{p0}년 {p1}월', {'p0': year, 'p1': month});
 
   double? get averageStars =>
       ratedCount <= 0 ? null : starSum / ratedCount;
@@ -3443,7 +3446,8 @@ class TeacherMonthStats {
   String get averageStarsLabel {
     final avg = averageStars;
     if (avg == null) return '-';
-    return '${avg.toStringAsFixed(1)}점';
+    return AppLanguage.instance
+        .fill('{p0}점', {'p0': avg.toStringAsFixed(1)});
   }
 
   String get incomeLabel {
@@ -3453,7 +3457,7 @@ class TeacherMonthStats {
       if (i > 0 && (digits.length - i) % 3 == 0) buffer.write(',');
       buffer.write(digits[i]);
     }
-    return '${buffer}원';
+    return AppLanguage.instance.fill('{p0}원', {'p0': buffer.toString()});
   }
 
   static bool taughtBy(WeekBooking booking, String teacherUid) {

@@ -8,6 +8,7 @@ import 'package:gi_english_website/util/html_stub.dart'
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
@@ -74,7 +75,7 @@ class _AdminOnlineHubPageState extends State<AdminOnlineHubPage>
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('관리자 또는 강사 권한이 필요합니다.',
+          content: Text(tr(context, '관리자 또는 강사 권한이 필요합니다.'),
               style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Palette.danger,
         ),
@@ -125,7 +126,7 @@ class _AdminOnlineHubPageState extends State<AdminOnlineHubPage>
     return _shell(Scaffold(
       appBar: AppBar(
         title: Text(
-          isOwner ? '온라인 프로그램 관리' : '수업 관리',
+          isOwner ? tr(context, '온라인 프로그램 관리'): tr(context, '수업 관리'),
           style: TextStyle(fontFamily: "NotoSansKR"),
         ),
         backgroundColor: Palette.navy,
@@ -143,12 +144,12 @@ class _AdminOnlineHubPageState extends State<AdminOnlineHubPage>
                 unselectedLabelColor: Palette.white.withValues(alpha: 0.7),
                 labelStyle: TextStyle(
                     fontFamily: "NotoSansKR", fontWeight: FontWeight.bold),
-                tabs: const [
-                  Tab(text: '회원관리'),
-                  Tab(text: '결제내역'),
-                  Tab(text: '강사 관리'),
-                  Tab(text: '주간 학습'),
-                  Tab(text: "Let's Talk 신고"),
+                tabs:  [
+                  Tab(text: tr(context, '회원관리')),
+                  Tab(text: tr(context, '결제내역')),
+                  Tab(text: tr(context, '강사 관리')),
+                  Tab(text: tr(context, '주간 학습')),
+                  Tab(text: tr(context, 'Let\'s Talk 신고')),
                 ],
               )
             : null,
@@ -232,7 +233,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
   Future<void> _assign() async {
     final email = emailController.text.trim();
     if (email.isEmpty || _selectedCourse == null) {
-      _toast('회원 이메일과 과정을 선택해주세요.', error: true);
+      _toast(tr(context, '회원 이메일과 과정을 선택해주세요.'), error: true);
       return;
     }
 
@@ -263,7 +264,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
       return;
     }
 
-    _toast('수강이 배정되었습니다.');
+    _toast(tr(context, '수강이 배정되었습니다.'));
     emailController.clear();
     await _refresh();
   }
@@ -344,7 +345,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
   void _toast(String message, {bool error = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
+        content: Text(tr(context, message), style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: error ? Palette.danger : Palette.success,
       ),
     );
@@ -358,11 +359,10 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
         padding: EdgeInsets.all(20),
         children: [
           LiveSessionBanner(key: _bannerKey, hostName: _adminName),
-          Text('내 수강생 관리', style: TextStyle(fontFamily: "Jalnan", fontSize: 18)),
+          Text(tr(context, '내 수강생 관리'), style: TextStyle(fontFamily: "Jalnan", fontSize: 18)),
           SizedBox(height: 8),
           Text(
-            '나에게 배정된 수강생과, 코티칭으로 들어온 수강생만 보여 줍니다. '
-            '회차 차감과 결제 기록을 여기서 관리하세요.',
+            tr(context, '나에게 배정된 수강생과, 코티칭으로 들어온 수강생만 보여 줍니다. 회차 차감과 결제 기록을 여기서 관리하세요.'),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
@@ -374,10 +374,10 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
               tilePadding: EdgeInsets.zero,
               childrenPadding: EdgeInsets.only(bottom: 8),
               leading: Icon(Icons.playlist_add, color: Palette.navy),
-              title: Text('수동 과정 배정',
+              title: Text(tr(context, '수동 과정 배정'),
                   style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
               subtitle: Text(
-                '오프라인 이전, 체험, 결제 복구가 필요할 때만 펼치세요.',
+                tr(context, '오프라인 이전, 체험, 결제 복구가 필요할 때만 펼치세요.'),
                 style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 12,
@@ -387,7 +387,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(
-                    labelText: '회원 이메일',
+                    labelText: tr(context, '회원 이메일'),
                     border: OutlineInputBorder(),
                     filled: true,
                     fillColor: Palette.white,
@@ -397,7 +397,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                 DropdownButtonFormField<OnlineCourse>(
                   initialValue: _selectedCourse,
                   decoration: InputDecoration(
-                    labelText: '과정 선택',
+                    labelText: tr(context, '과정 선택'),
                     border: OutlineInputBorder(),
                     filled: true,
                     fillColor: Palette.white,
@@ -421,8 +421,8 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   controller: sessionsController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: '전체 화상수업 횟수',
-                    suffixText: '회',
+                    labelText: tr(context, '전체 화상수업 횟수'),
+                    suffixText: tr(context, '회'),
                     border: OutlineInputBorder(),
                     filled: true,
                     fillColor: Palette.white,
@@ -446,12 +446,12 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                             child: CircularProgressIndicator(
                                 strokeWidth: 2, color: Palette.white),
                           )
-                        : Text('배정하기', style: TextStyle(fontFamily: "Jalnan")),
+                        : Text(tr(context, '배정하기'), style: TextStyle(fontFamily: "Jalnan")),
                   ),
                 ),
                 if (_members.isNotEmpty) ...[
                   SizedBox(height: 16),
-                  Text('담당·코티칭 회원에서 이메일 채우기',
+                  Text(tr(context, '담당·코티칭 회원에서 이메일 채우기'),
                       style: TextStyle(fontFamily: "Jalnan", fontSize: 14)),
                   ..._members.take(12).map((m) {
                     final email = m['email']?.toString() ?? '';
@@ -467,7 +467,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                         onPressed: () {
                           emailController.text = email;
                         },
-                        child: Text('선택',
+                        child: Text(tr(context, '선택'),
                             style: TextStyle(
                                 fontFamily: "NotoSansKR",
                                 color: Palette.secondaryDark)),
@@ -480,11 +480,11 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
           ),
           if (_isOwner) ...[
             Divider(height: 32),
-            Text('결제·수강 내역 요약',
+            Text(tr(context, '결제·수강 내역 요약'),
                 style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
             SizedBox(height: 8),
             Text(
-              '내 수강생 배정 ${_enrollments.length}건 · 결제완료 ${_enrollments.where((e) => e.isPaid).length}건 · 미결제 ${_enrollments.where((e) => !e.isPaid).length}건',
+              tf(context, '내 수강생 배정 {p0}건 · 결제완료 {p1}건 · 미결제 {p2}건', {'p0': _enrollments.length, 'p1': _enrollments.where((e) => e.isPaid).length, 'p2': _enrollments.where((e) => !e.isPaid).length}),
               style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 13,
@@ -493,7 +493,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
             ),
             SizedBox(height: 8),
             Text(
-              '각 수업 카드의 ‘결제 정보’에서 결제 여부와 금액을 기록할 수 있습니다.',
+              tr(context, '각 수업 카드의 ‘결제 정보’에서 결제 여부와 금액을 기록할 수 있습니다.'),
               style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -501,11 +501,11 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
             ),
           ],
           Divider(height: 32),
-          Text('담당·코티칭 수강생',
+          Text(tr(context, '담당·코티칭 수강생'),
               style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           SizedBox(height: 8),
           Text(
-            '배정된 수업에서 회차를 보정하고, 이름을 눌러 회원 상세·결제를 볼 수 있습니다.',
+            tr(context, '배정된 수업에서 회차를 보정하고, 이름을 눌러 회원 상세·결제를 볼 수 있습니다.'),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
@@ -513,7 +513,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
           if (_loading)
             Center(child: CircularProgressIndicator())
           else if (_members.isEmpty)
-            Text('아직 담당하거나 코티칭으로 들어온 수강생이 없습니다.',
+            Text(tr(context, '아직 담당하거나 코티칭으로 들어온 수강생이 없습니다.'),
                 style:
                     TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500))
           else
@@ -525,7 +525,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
 
   Widget _memberCard(Map<String, dynamic> member) {
     final uid = member['uid']?.toString() ?? '';
-    final name = AuthService.profileDisplayName(member, fallback: '이름 미등록 회원');
+    final name = AuthService.profileDisplayName(member, fallback: tr(context, '이름 미등록 회원'));
     final email = member['email']?.toString().trim() ?? '';
     final guest = member['isCoteachGuest'] == true;
     final assignedTeacherName =
@@ -546,7 +546,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '코티칭',
+                  tr(context, '코티칭'),
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 11,
@@ -565,8 +565,8 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
           [
             if (email.isNotEmpty) email,
             if (guest && assignedTeacherName.isNotEmpty)
-              '담당 $assignedTeacherName',
-            '배정 ${records.length}개',
+              tf(context, '담당 {p0}', {'p0': assignedTeacherName}),
+            tf(context, '배정 {p0}개', {'p0': records.length}),
           ].join(' · '),
           style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12),
         ),
@@ -581,7 +581,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   onPressed: email.isEmpty ? null : () => _showAssignDialog(email),
                   icon: Icon(Icons.add, size: 18),
                   label:
-                      Text('수업 배정', style: TextStyle(fontFamily: "NotoSansKR")),
+                      Text(tr(context, '수업 배정'), style: TextStyle(fontFamily: "NotoSansKR")),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.darkTeal,
                     foregroundColor: Palette.white,
@@ -604,7 +604,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                     await _refresh();
                   },
                   icon: Icon(Icons.person_outline, size: 18),
-                  label: Text('회원 상세',
+                  label: Text(tr(context, '회원 상세'),
                       style: TextStyle(fontFamily: "NotoSansKR")),
                 ),
               ],
@@ -615,7 +615,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
               padding: EdgeInsets.fromLTRB(16, 0, 16, 18),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text('배정된 수업이 없습니다.',
+                child: Text(tr(context, '배정된 수업이 없습니다.'),
                     style: TextStyle(
                         fontFamily: "NotoSansKR", color: Palette.grey500)),
               ),
@@ -652,7 +652,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                         fontFamily: "NotoSansKR", fontWeight: FontWeight.bold)),
               ),
               if (!record.isActive)
-                Text('배정 취소됨',
+                Text(tr(context, '배정 취소됨'),
                     style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 12,
@@ -662,8 +662,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
           SizedBox(height: 8),
           Text(
             sessionsConfigured
-                ? '진행 ${record.completedSessions}회 / 전체 ${record.totalSessions}회 · 남은 ${record.remainingSessions}회'
-                : '수업 횟수 미설정',
+                ? tf(context, '진행 {p0}회 / 전체 {p1}회 · 남은 {p2}회', {'p0': record.completedSessions, 'p1': record.totalSessions, 'p2': record.remainingSessions}): tr(context, '수업 횟수 미설정'),
             style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 13,
@@ -674,7 +673,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
           if (record.lastSessionAt != null) ...[
             SizedBox(height: 4),
             Text(
-              '최근 수업 처리: ${_formatDateTime(record.lastSessionAt)}',
+              tf(context, '최근 수업 처리: {p0}', {'p0': _formatDateTime(record.lastSessionAt)}),
               style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -685,8 +684,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
             SizedBox(height: 4),
             Text(
               record.isPaid
-                  ? '결제 완료${record.paidAmount > 0 ? ' · ${record.paidAmount}원' : ''}'
-                  : '미결제',
+                  ? tf(context, '결제 완료{p0}', {'p0': record.paidAmount > 0 ? tf(context, ' · {p0}원', {'p0': record.paidAmount}): ''}): tr(context, '미결제'),
               style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -709,7 +707,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                 ElevatedButton.icon(
                   onPressed: () => _openNextSession(record),
                   icon: Icon(Icons.lock_open, size: 17),
-                  label: Text('다음 회차 열기',
+                  label: Text(tr(context, '다음 회차 열기'),
                       style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.accent,
@@ -723,7 +721,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                     ? () => _completeSession(record)
                     : null,
                 icon: Icon(Icons.check, size: 17),
-                label: Text('회차 차감',
+                label: Text(tr(context, '회차 차감'),
                     style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.darkTeal,
@@ -733,13 +731,13 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
               if (record.completedSessions > 0)
                 OutlinedButton(
                   onPressed: () => _adjustSession(record, -1),
-                  child: Text('차감 되돌리기',
+                  child: Text(tr(context, '차감 되돌리기'),
                       style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
                 ),
               OutlinedButton.icon(
                 onPressed: () => _showClassDialog(record),
                 icon: Icon(Icons.videocam, size: 16),
-                label: Text('화상수업',
+                label: Text(tr(context, '화상수업'),
                     style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Palette.secondaryDark,
@@ -748,24 +746,24 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
               OutlinedButton.icon(
                 onPressed: () => _showHistoryDialog(record),
                 icon: Icon(Icons.history, size: 16),
-                label: Text('처리 이력',
+                label: Text(tr(context, '처리 이력'),
                     style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
               ),
               OutlinedButton(
                 onPressed: () => _showEditDialog(record),
-                child: Text('배정 변경',
+                child: Text(tr(context, '배정 변경'),
                     style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
               ),
               if (_isOwner)
                 OutlinedButton.icon(
                   onPressed: () => _showPaymentDialog(record),
                   icon: Icon(Icons.payments_outlined, size: 16),
-                  label: Text('결제 정보',
+                  label: Text(tr(context, '결제 정보'),
                       style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
                 ),
               TextButton(
                 onPressed: () => _cancelEnrollment(record),
-                child: Text(record.isActive ? '배정 취소' : '배정 복구',
+                child: Text(record.isActive ? tr(context, '배정 취소'): tr(context, '배정 복구'),
                     style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 12,
@@ -788,7 +786,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: Text('수업 배정', style: TextStyle(fontFamily: "Jalnan")),
+          title: Text(tr(context, '수업 배정'), style: TextStyle(fontFamily: "Jalnan")),
           content: SizedBox(
             width: 420,
             child: Column(
@@ -797,7 +795,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                 DropdownButtonFormField<OnlineCourse>(
                   initialValue: selectedCourse,
                   decoration: InputDecoration(
-                      labelText: '과정', border: OutlineInputBorder()),
+                      labelText: tr(context, '과정'), border: OutlineInputBorder()),
                   items: OnlineCourse.catalog
                       .map((course) => DropdownMenuItem(
                             value: course,
@@ -816,8 +814,8 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   controller: sessionsController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: '전체 화상수업 횟수',
-                    suffixText: '회',
+                    labelText: tr(context, '전체 화상수업 횟수'),
+                    suffixText: tr(context, '회'),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -827,7 +825,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
-                child: Text('닫기')),
+                child: Text(tr(context, '닫기'))),
             ElevatedButton(
               onPressed: () async {
                 final total = int.tryParse(sessionsController.text.trim()) ?? 0;
@@ -850,7 +848,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   Navigator.pop(dialogContext, true);
                 }
               },
-              child: Text('배정하기'),
+              child: Text(tr(context, '배정하기')),
             ),
           ],
         ),
@@ -859,7 +857,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
     sessionsController.dispose();
 
     if (saved == true) {
-      _toast('수업이 배정되었습니다.');
+      _toast(tr(context, '수업이 배정되었습니다.'));
       await _refresh();
     }
   }
@@ -875,7 +873,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: Text('배정 변경', style: TextStyle(fontFamily: "Jalnan")),
+          title: Text(tr(context, '배정 변경'), style: TextStyle(fontFamily: "Jalnan")),
           content: SizedBox(
             width: 420,
             child: Column(
@@ -884,7 +882,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                 DropdownButtonFormField<OnlineCourse>(
                   initialValue: selectedCourse,
                   decoration: InputDecoration(
-                      labelText: '과정', border: OutlineInputBorder()),
+                      labelText: tr(context, '과정'), border: OutlineInputBorder()),
                   items: OnlineCourse.catalog
                       .map((course) => DropdownMenuItem(
                             value: course,
@@ -903,13 +901,11 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   controller: sessionsController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: '전체 화상수업 횟수',
-                    suffixText: '회',
+                    labelText: tr(context, '전체 화상수업 횟수'),
+                    suffixText: tr(context, '회'),
                     helperText: record.plan == OnlinePlan.lecture
-                        ? '인강만 상품입니다. 화상 횟수는 0으로 두세요.'
-                        : (selectedCourse.id == record.courseId
-                            ? '같은 과정이면 현재 진행 횟수를 유지합니다.'
-                            : '과정을 변경하면 진행 횟수가 0회로 초기화됩니다.'),
+                        ? tr(context, '인강만 상품입니다. 화상 횟수는 0으로 두세요.'): (selectedCourse.id == record.courseId
+                            ? tr(context, '같은 과정이면 현재 진행 횟수를 유지합니다.'): tr(context, '과정을 변경하면 진행 횟수가 0회로 초기화됩니다.')),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -919,7 +915,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
-                child: Text('닫기')),
+                child: Text(tr(context, '닫기'))),
             ElevatedButton(
               onPressed: () async {
                 final total = int.tryParse(sessionsController.text.trim()) ?? 0;
@@ -939,7 +935,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   Navigator.pop(dialogContext, true);
                 }
               },
-              child: Text('변경 저장'),
+              child: Text(tr(context, '변경 저장')),
             ),
           ],
         ),
@@ -948,7 +944,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
     sessionsController.dispose();
 
     if (saved == true) {
-      _toast('배정 정보가 변경되었습니다.');
+      _toast(tr(context, '배정 정보가 변경되었습니다.'));
       await _refresh();
     }
   }
@@ -965,30 +961,28 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
   Future<void> _openNextSession(EnrollmentRecord record) async {
     final hold = _gateHold(record);
     if (hold == null) {
-      _toast('강사 피드백이나 학생 별점이 하루 이상 멈추지 않았습니다.', error: true);
+      _toast(tr(context, '강사 피드백이나 학생 별점이 하루 이상 멈추지 않았습니다.'), error: true);
       return;
     }
     final reason = hold.waitingOnTeacher
-        ? '${hold.sessionNumber}회차 강사 피드백이 수업 후 하루 넘게 없습니다.'
-        : '${hold.sessionNumber}회차 학생 별점이 하루 넘게 없습니다.';
+        ? tf(context, '{p0}회차 강사 피드백이 수업 후 하루 넘게 없습니다.', {'p0': hold.sessionNumber}): tf(context, '{p0}회차 학생 별점이 하루 넘게 없습니다.', {'p0': hold.sessionNumber});
     final next = hold.sessionNumber + 1;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text('다음 회차 열기', style: TextStyle(fontFamily: "Jalnan")),
+        title: Text(tr(context, '다음 회차 열기'), style: TextStyle(fontFamily: "Jalnan")),
         content: Text(
-          '$reason\n'
-          '다음 회차($next회차)만 엽니다. 수업 횟수는 빼지 않고, 별점이 끝나면 그때 차감됩니다.',
+          tf(context, '{p0}\n다음 회차({p1}회차)만 엽니다. 수업 횟수는 빼지 않고, 별점이 끝나면 그때 차감됩니다.', {'p0': reason, 'p1': next}),
           style: TextStyle(fontFamily: "NotoSansKR", height: 1.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text('닫기', style: TextStyle(fontFamily: "NotoSansKR")),
+            child: Text(tr(context, '닫기'), style: TextStyle(fontFamily: "NotoSansKR")),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text('열기', style: TextStyle(fontFamily: "NotoSansKR")),
+            child: Text(tr(context, '열기'), style: TextStyle(fontFamily: "NotoSansKR")),
           ),
         ],
       ),
@@ -1000,7 +994,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
       _toast(error, error: true);
       return;
     }
-    _toast('$next회차를 열었습니다. 수업 횟수는 그대로입니다.');
+    _toast(tf(context, '{p0}회차를 열었습니다. 수업 횟수는 그대로입니다.', {'p0': next}));
     await _refresh();
   }
 
@@ -1010,21 +1004,18 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text('회차 차감', style: TextStyle(fontFamily: "Jalnan")),
+        title: Text(tr(context, '회차 차감'), style: TextStyle(fontFamily: "Jalnan")),
         content: Text(
-          '$title 과정의 이번 화상수업 1회를 차감할까요?\n'
-          '차감 후 남은 횟수: ${record.remainingSessions - 1}회\n\n'
-          '강사가 화상수업을 종료하면 회차가 자동으로 차감됩니다. '
-          '이 버튼은 보정할 때만 사용하세요.',
+          tf(context, '{p0} 과정의 이번 화상수업 1회를 차감할까요?\n차감 후 남은 횟수: {p1}회\n\n강사가 화상수업을 종료하면 회차가 자동으로 차감됩니다. 이 버튼은 보정할 때만 사용하세요.', {'p0': title, 'p1': record.remainingSessions - 1}),
           style: TextStyle(fontFamily: "NotoSansKR", height: 1.5),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: Text('취소', style: TextStyle(fontFamily: "NotoSansKR"))),
+              child: Text(tr(context, '취소'), style: TextStyle(fontFamily: "NotoSansKR"))),
           ElevatedButton(
               onPressed: () => Navigator.pop(dialogContext, true),
-              child: Text('차감하기', style: TextStyle(fontFamily: "NotoSansKR"))),
+              child: Text(tr(context, '차감하기'), style: TextStyle(fontFamily: "NotoSansKR"))),
         ],
       ),
     );
@@ -1042,9 +1033,9 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
     }
     if (delta > 0 && result.allCompleted) {
       _toast(
-          '마지막 회차까지 모두 완료되었습니다. (${result.completedSessions}/${result.totalSessions}회)');
+          tf(context, '마지막 회차까지 모두 완료되었습니다. ({p0}/{p1}회)', {'p0': result.completedSessions, 'p1': result.totalSessions}));
     } else {
-      _toast(delta > 0 ? '화상수업 1회가 완료 처리되었습니다.' : '진행 횟수를 1회 되돌렸습니다.');
+      _toast(delta > 0 ? tr(context, '화상수업 1회가 완료 처리되었습니다.'): tr(context, '진행 횟수를 1회 되돌렸습니다.'));
     }
     await _refresh();
   }
@@ -1077,12 +1068,12 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text('$title · 수업 처리 이력',
+        title: Text(tf(context, '{p0} · 수업 처리 이력', {'p0': title}),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
         content: SizedBox(
           width: 420,
           child: logs.isEmpty
-              ? Text('아직 처리 이력이 없습니다.',
+              ? Text(tr(context, '아직 처리 이력이 없습니다.'),
                   style: TextStyle(fontFamily: "NotoSansKR"))
               : ConstrainedBox(
                   constraints: BoxConstraints(maxHeight: 360),
@@ -1104,8 +1095,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                         ),
                         title: Text(
                           isComplete
-                              ? '수업 완료 (${log.completedAfter}/${log.totalSessions}회)'
-                              : '되돌리기 (${log.completedAfter}/${log.totalSessions}회)',
+                              ? tf(context, '수업 완료 ({p0}/{p1}회)', {'p0': log.completedAfter, 'p1': log.totalSessions}): tf(context, '되돌리기 ({p0}/{p1}회)', {'p0': log.completedAfter, 'p1': log.totalSessions}),
                           style:
                               TextStyle(fontFamily: "NotoSansKR", fontSize: 13),
                         ),
@@ -1125,14 +1115,14 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: Text('닫기', style: TextStyle(fontFamily: "NotoSansKR"))),
+              child: Text(tr(context, '닫기'), style: TextStyle(fontFamily: "NotoSansKR"))),
         ],
       ),
     );
   }
 
   String _formatDateTime(DateTime? dt) {
-    if (dt == null) return '시간 미상';
+    if (dt == null) return tr(context, '시간 미상');
     String two(int n) => n.toString().padLeft(2, '0');
     return '${dt.year}.${two(dt.month)}.${two(dt.day)} '
         '${two(dt.hour)}:${two(dt.minute)}';
@@ -1148,7 +1138,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: Text('결제 정보', style: TextStyle(fontFamily: "Jalnan")),
+          title: Text(tr(context, '결제 정보'), style: TextStyle(fontFamily: "Jalnan")),
           content: SizedBox(
             width: 420,
             child: Column(
@@ -1157,7 +1147,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title:
-                      Text('결제 완료', style: TextStyle(fontFamily: "NotoSansKR")),
+                      Text(tr(context, '결제 완료'), style: TextStyle(fontFamily: "NotoSansKR")),
                   value: isPaid,
                   onChanged: (v) => setDialogState(() => isPaid = v),
                 ),
@@ -1166,8 +1156,8 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   controller: amountController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: '결제 금액',
-                    suffixText: '원',
+                    labelText: tr(context, '결제 금액'),
+                    suffixText: tr(context, '원'),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -1176,7 +1166,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   controller: noteController,
                   maxLines: 2,
                   decoration: InputDecoration(
-                    labelText: '메모 (예: 계좌이체 / 카드)',
+                    labelText: tr(context, '메모 (예: 계좌이체 / 카드)'),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -1186,7 +1176,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
-                child: Text('닫기')),
+                child: Text(tr(context, '닫기'))),
             ElevatedButton(
               onPressed: () async {
                 final amount = int.tryParse(amountController.text.trim()) ?? 0;
@@ -1205,7 +1195,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   Navigator.pop(dialogContext, true);
                 }
               },
-              child: Text('저장'),
+              child: Text(tr(context, '저장')),
             ),
           ],
         ),
@@ -1215,7 +1205,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
     noteController.dispose();
 
     if (saved == true) {
-      _toast('결제 정보가 저장되었습니다.');
+      _toast(tr(context, '결제 정보가 저장되었습니다.'));
       await _refresh();
     }
   }
@@ -1225,15 +1215,15 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: Text('배정 취소'),
-          content: Text('이 수업을 회원의 내 강의실에서 숨길까요? 진행 횟수 기록은 보존됩니다.'),
+          title: Text(tr(context, '배정 취소')),
+          content: Text(tr(context, '이 수업을 회원의 내 강의실에서 숨길까요? 진행 횟수 기록은 보존됩니다.')),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
-                child: Text('아니요')),
+                child: Text(tr(context, '아니요'))),
             TextButton(
                 onPressed: () => Navigator.pop(dialogContext, true),
-                child: Text('배정 취소', style: TextStyle(color: Palette.danger))),
+                child: Text(tr(context, '배정 취소'), style: TextStyle(color: Palette.danger))),
           ],
         ),
       );
@@ -1246,7 +1236,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
       _toast(error, error: true);
       return;
     }
-    _toast(record.isActive ? '배정이 취소되었습니다.' : '배정이 복구되었습니다.');
+    _toast(record.isActive ? tr(context, '배정이 취소되었습니다.'): tr(context, '배정이 복구되었습니다.'));
     await _refresh();
   }
 }
@@ -1293,7 +1283,7 @@ class LiveSessionBannerState extends State<LiveSessionBanner> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(error ?? '수업을 종료했습니다.',
+        content: Text(error ?? tr(context, '수업을 종료했습니다.'),
             style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: error != null ? Palette.danger : Palette.success,
       ),
@@ -1320,7 +1310,7 @@ class LiveSessionBannerState extends State<LiveSessionBanner> {
             children: [
               Icon(Icons.videocam, size: 18, color: Palette.success),
               SizedBox(width: 8),
-              Text('진행 중인 수업 ${_live.length}건',
+              Text(tf(context, '진행 중인 수업 {p0}건', {'p0': _live.length}),
                   style: TextStyle(
                       fontFamily: "Jalnan",
                       fontSize: 14,
@@ -1329,7 +1319,7 @@ class LiveSessionBannerState extends State<LiveSessionBanner> {
           ),
           SizedBox(height: 6),
           Text(
-            '화상 창을 닫아도 자동으로 종료되지 않습니다. 수업이 끝났으면 아래에서 종료해주세요.',
+            tr(context, '화상 창을 닫아도 자동으로 종료되지 않습니다. 수업이 끝났으면 아래에서 종료해주세요.'),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 12, color: Palette.grey600),
           ),
@@ -1344,7 +1334,7 @@ class LiveSessionBannerState extends State<LiveSessionBanner> {
                 children: [
                   Expanded(
                     child: Text(
-                      session.isStale ? '$label (시간 초과로 종료 처리됨)' : label,
+                      session.isStale ? tf(context, '{p0} (시간 초과로 종료 처리됨)', {'p0': label}): label,
                       style: TextStyle(
                           fontFamily: "NotoSansKR",
                           fontSize: 12,
@@ -1361,7 +1351,7 @@ class LiveSessionBannerState extends State<LiveSessionBanner> {
                           EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     ),
                     onPressed: _working ? null : () => _end(session),
-                    child: Text('수업 종료',
+                    child: Text(tr(context, '수업 종료'),
                         style:
                             TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
                   ),
@@ -1420,7 +1410,7 @@ class _ClassControlDialogState extends State<_ClassControlDialog> {
   void _toast(String message, {bool error = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
+        content: Text(tr(context, message), style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: error ? Palette.danger : Palette.success,
       ),
     );
@@ -1435,14 +1425,14 @@ class _ClassControlDialogState extends State<_ClassControlDialog> {
 
     final sessionId = await EnrollmentService.createSessionReturningId(
       courseId: widget.courseId,
-      title: '$nextOrder회차 화상수업',
+      title: tf(context, '{p0}회차 화상수업', {'p0': nextOrder}),
       order: nextOrder,
     );
 
     if (sessionId == null) {
       if (!mounted) return;
       setState(() => _working = false);
-      _toast('회차 생성에 실패했습니다.', error: true);
+      _toast(tr(context, '회차 생성에 실패했습니다.'), error: true);
       return;
     }
 
@@ -1461,7 +1451,7 @@ class _ClassControlDialogState extends State<_ClassControlDialog> {
 
     await _load();
     if (!mounted) return;
-    _toast('$nextOrder회차 화상수업을 시작했습니다. 회원이 입장할 수 있습니다.');
+    _toast(tf(context, '{p0}회차 화상수업을 시작했습니다. 회원이 입장할 수 있습니다.', {'p0': nextOrder}));
 
     // 강사가 호스트로 먼저 들어가야 회원이 대기 없이 참여할 수 있다.
     final started = _sessions.firstWhere(
@@ -1489,14 +1479,14 @@ class _ClassControlDialogState extends State<_ClassControlDialog> {
       _toast(error, error: true);
       return;
     }
-    _toast(session.isLive ? '수업을 종료했습니다.' : '수업을 시작했습니다. 회원이 입장할 수 있습니다.');
+    _toast(session.isLive ? tr(context, '수업을 종료했습니다.'): tr(context, '수업을 시작했습니다. 회원이 입장할 수 있습니다.'));
     await _load();
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('${widget.courseTitle} · 화상수업',
+      title: Text(tf(context, '{p0} · 화상수업', {'p0': widget.courseTitle}),
           style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
       content: SizedBox(
         width: 460,
@@ -1510,7 +1500,7 @@ class _ClassControlDialogState extends State<_ClassControlDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '호스트로 입장하면 수강생도 같은 회의실로 들어올 수 있습니다.',
+                    tr(context, '호스트로 입장하면 수강생도 같은 회의실로 들어올 수 있습니다.'),
                     style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 12,
@@ -1528,16 +1518,16 @@ class _ClassControlDialogState extends State<_ClassControlDialog> {
                       ),
                       onPressed: _working ? null : _createAndStart,
                       icon: Icon(Icons.play_circle, size: 18),
-                      label: Text('다음 회차 만들어 수업 시작',
+                      label: Text(tr(context, '다음 회차 만들어 수업 시작'),
                           style: TextStyle(fontFamily: "Jalnan", fontSize: 13)),
                     ),
                   ),
                   SizedBox(height: 18),
-                  Text('등록된 회차',
+                  Text(tr(context, '등록된 회차'),
                       style: TextStyle(fontFamily: "Jalnan", fontSize: 14)),
                   SizedBox(height: 8),
                   if (_sessions.isEmpty)
-                    Text('아직 등록된 회차가 없습니다. 위 버튼으로 1회차를 시작할 수 있습니다.',
+                    Text(tr(context, '아직 등록된 회차가 없습니다. 위 버튼으로 1회차를 시작할 수 있습니다.'),
                         style: TextStyle(
                             fontFamily: "NotoSansKR",
                             fontSize: 12,
@@ -1559,12 +1549,9 @@ class _ClassControlDialogState extends State<_ClassControlDialog> {
                                     fontFamily: "NotoSansKR", fontSize: 13)),
                             subtitle: Text(
                               session.isLiveNow
-                                  ? '수업 중'
-                                  : (session.isStale
-                                      ? '시간 초과 · 종료 처리됨'
-                                      : (session.isFinished
-                                          ? '수업 종료'
-                                          : '수업 예정')),
+                                  ? tr(context, '수업 중'): (session.isStale
+                                      ? tr(context, '시간 초과 · 종료 처리됨'): (session.isFinished
+                                          ? tr(context, '수업 종료'): tr(context, '수업 예정'))),
                               style: TextStyle(
                                 fontFamily: "NotoSansKR",
                                 fontSize: 11,
@@ -1578,7 +1565,7 @@ class _ClassControlDialogState extends State<_ClassControlDialog> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                  tooltip: '호스트로 입장',
+                                  tooltip: tr(context, '호스트로 입장'),
                                   onPressed: () async {
                                     JitsiJoin.open(
                                       session.meetingUrl,
@@ -1597,7 +1584,7 @@ class _ClassControlDialogState extends State<_ClassControlDialog> {
                                       ? null
                                       : () => _toggleLive(session),
                                   child: Text(
-                                    session.isLive ? '종료' : '시작',
+                                    session.isLive ? tr(context, '종료'): tr(context, '시작'),
                                     style: TextStyle(
                                         fontFamily: "NotoSansKR",
                                         fontSize: 12,
@@ -1618,7 +1605,7 @@ class _ClassControlDialogState extends State<_ClassControlDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text('닫기', style: TextStyle(fontFamily: "NotoSansKR")),
+          child: Text(tr(context, '닫기'), style: TextStyle(fontFamily: "NotoSansKR")),
         ),
       ],
     );
@@ -1636,7 +1623,7 @@ class AdminSessionTab extends StatefulWidget {
 
 class _AdminSessionTabState extends State<AdminSessionTab> {
   OnlineCourse _selectedCourse = OnlineCourse.all.first;
-  final titleController = TextEditingController(text: '1회차 화상수업');
+  final titleController = TextEditingController();
   final orderController = TextEditingController(text: '1');
   final meetingUrlController = TextEditingController();
   DateTime? _scheduledAt;
@@ -1652,6 +1639,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
   @override
   void initState() {
     super.initState();
+    titleController.text = AppLanguage.instance.translate('1회차 화상수업');
     _bootstrap();
   }
 
@@ -1704,7 +1692,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
       _loading = false;
       final nextOrder = sessions.isEmpty ? 1 : sessions.last.order + 1;
       orderController.text = '$nextOrder';
-      titleController.text = '$nextOrder회차 화상수업';
+      titleController.text = tf(context, '{p0}회차 화상수업', {'p0': nextOrder});
     });
     _bannerKey.currentState?.reload();
   }
@@ -1712,7 +1700,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
   void _toast(String message, {bool error = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
+        content: Text(tr(context, message), style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: error ? Palette.danger : Palette.success,
       ),
     );
@@ -1760,7 +1748,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
       _toast(error, error: true);
       return;
     }
-    _toast('화상수업 회차가 등록되었습니다.');
+    _toast(tr(context, '화상수업 회차가 등록되었습니다.'));
     meetingUrlController.clear();
     setState(() => _scheduledAt = null);
     await _refresh();
@@ -1791,19 +1779,18 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: Text('수업 시작', style: TextStyle(fontFamily: "Jalnan")),
+          title: Text(tr(context, '수업 시작'), style: TextStyle(fontFamily: "Jalnan")),
           content: Text(
-            '${session.title}을 시작할까요?\n\n'
-            '호스트로 입장하면 수강생 입장도 함께 열립니다. 이 버튼은 수업을 따로 표시할 때 사용합니다.',
+            tf(context, '{p0}을 시작할까요?\n\n호스트로 입장하면 수강생 입장도 함께 열립니다. 이 버튼은 수업을 따로 표시할 때 사용합니다.', {'p0': session.title}),
             style: TextStyle(fontFamily: "NotoSansKR", height: 1.5),
           ),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
-                child: Text('취소')),
+                child: Text(tr(context, '취소'))),
             ElevatedButton(
                 onPressed: () => Navigator.pop(dialogContext, true),
-                child: Text('수업 시작')),
+                child: Text(tr(context, '수업 시작'))),
           ],
         ),
       );
@@ -1819,7 +1806,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
       _toast(error, error: true);
       return;
     }
-    _toast(session.isLive ? '수업을 종료했습니다.' : '수업을 시작했습니다. 회원이 입장할 수 있습니다.');
+    _toast(session.isLive ? tr(context, '수업을 종료했습니다.'): tr(context, '수업을 시작했습니다. 회원이 입장할 수 있습니다.'));
     await _refresh();
   }
 
@@ -1827,16 +1814,16 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text('회차 삭제'),
-        content: Text('${session.title}을 삭제할까요?',
+        title: Text(tr(context, '회차 삭제')),
+        content: Text(tf(context, '{p0}을 삭제할까요?', {'p0': session.title}),
             style: TextStyle(fontFamily: "NotoSansKR")),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: Text('아니요')),
+              child: Text(tr(context, '아니요'))),
           TextButton(
               onPressed: () => Navigator.pop(dialogContext, true),
-              child: Text('삭제', style: TextStyle(color: Palette.danger))),
+              child: Text(tr(context, '삭제'), style: TextStyle(color: Palette.danger))),
         ],
       ),
     );
@@ -1847,7 +1834,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
       _toast(error, error: true);
       return;
     }
-    _toast('회차가 삭제되었습니다.');
+    _toast(tr(context, '회차가 삭제되었습니다.'));
     await _refresh();
   }
 
@@ -1865,7 +1852,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
         padding: EdgeInsets.all(20),
         children: [
           LiveSessionBanner(key: _bannerKey, hostName: _hostName),
-          Text(_isOwner ? '화상수업 회차 관리' : '화상수업',
+          Text(_isOwner ? tr(context, '화상수업 회차 관리'): tr(context, '화상수업'),
               style: TextStyle(fontFamily: "Jalnan", fontSize: 18)),
           SizedBox(height: 8),
           Container(
@@ -1878,7 +1865,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('수업 진행 순서',
+                Text(tr(context, '수업 진행 순서'),
                     style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontWeight: FontWeight.bold,
@@ -1886,13 +1873,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
                 SizedBox(height: 6),
                 Text(
                   _isOwner
-                      ? '1) 예약을 컨펌하면 회차가 자동으로 만들어집니다. 필요하면 아래에서 직접 등록할 수도 있습니다.\n'
-                          '2) 수업 시간에 ‘호스트로 입장’을 누르면 강사가 회의실에 들어가고, 수강생 입장 버튼도 함께 열립니다.\n'
-                          '3) 수업을 직접 끄려면 ‘수업 종료’를 누릅니다.'
-                      : '1) 스케줄에서 예약을 컨펌하면 이 목록에 회차가 자동으로 생성됩니다.\n'
-                          '2) 수업 5분 전에 강사와 수강생 휴대폰으로 알림 문자가 갑니다.\n'
-                          '3) ‘호스트로 입장’을 누르면 수강생도 바로 들어올 수 있습니다.\n'
-                          '4) 수업이 끝나면 ‘수업 종료’를 누릅니다.',
+                      ? tr(context, '1) 예약을 컨펌하면 회차가 자동으로 만들어집니다. 필요하면 아래에서 직접 등록할 수도 있습니다.\n2) 수업 시간에 ‘호스트로 입장’을 누르면 강사가 회의실에 들어가고, 수강생 입장 버튼도 함께 열립니다.\n3) 수업을 직접 끄려면 ‘수업 종료’를 누릅니다.'): tr(context, '1) 스케줄에서 예약을 컨펌하면 이 목록에 회차가 자동으로 생성됩니다.\n2) 수업 5분 전에 강사와 수강생 휴대폰으로 알림 문자가 갑니다.\n3) ‘호스트로 입장’을 누르면 수강생도 바로 들어올 수 있습니다.\n4) 수업이 끝나면 ‘수업 종료’를 누릅니다.'),
                   style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 12,
@@ -1901,8 +1882,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  '※ 방을 여는 사람은 호스트로 바로 들어갑니다. Google 로그인은 처음 한 번만 하면 다음부터 기억됩니다. '
-                  '수강생은 로그인 없이 입장합니다. Google Meet·Zoom을 쓰려면 아래 회의 주소 칸에 붙여넣으세요.',
+                  tr(context, '※ 방을 여는 사람은 호스트로 바로 들어갑니다. Google 로그인은 처음 한 번만 하면 다음부터 기억됩니다. 수강생은 로그인 없이 입장합니다. Google Meet·Zoom을 쓰려면 아래 회의 주소 칸에 붙여넣으세요.'),
                   style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 12,
@@ -1917,7 +1897,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
             DropdownButtonFormField<OnlineCourse>(
               initialValue: _selectedCourse,
               decoration: InputDecoration(
-                labelText: '과정 선택',
+                labelText: tr(context, '과정 선택'),
                 border: OutlineInputBorder(),
                 filled: true,
                 fillColor: Palette.white,
@@ -1937,7 +1917,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
               },
             ),
             SizedBox(height: 20),
-            Text('새 회차 등록',
+            Text(tr(context, '새 회차 등록'),
                 style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
             SizedBox(height: 12),
             Row(
@@ -1948,7 +1928,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
                     controller: orderController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: '회차',
+                      labelText: tr(context, '회차'),
                       border: OutlineInputBorder(),
                       filled: true,
                       fillColor: Palette.white,
@@ -1960,8 +1940,8 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
                   child: TextField(
                     controller: titleController,
                     decoration: InputDecoration(
-                      labelText: '회차 제목',
-                      hintText: '예: 1회차 화상수업',
+                      labelText: tr(context, '회차 제목'),
+                      hintText: tr(context, '예: 1회차 화상수업'),
                       border: OutlineInputBorder(),
                       filled: true,
                       fillColor: Palette.white,
@@ -1974,9 +1954,9 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
             TextField(
               controller: meetingUrlController,
               decoration: InputDecoration(
-                labelText: '회의 주소 (비워두면 Jitsi 방이 자동 생성됩니다)',
+                labelText: tr(context, '회의 주소 (비워두면 Jitsi 방이 자동 생성됩니다)'),
                 hintText:
-                    'https://meet.google.com/... 또는 https://zoom.us/j/...',
+                    tr(context, 'https://meet.google.com/... 또는 https://zoom.us/j/...'),
                 border: OutlineInputBorder(),
                 filled: true,
                 fillColor: Palette.white,
@@ -1990,15 +1970,14 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
                   icon: Icon(Icons.event, size: 16),
                   label: Text(
                       _scheduledAt == null
-                          ? '수업 일시 선택 (선택사항)'
-                          : _formatDateTime(_scheduledAt!),
+                          ? tr(context, '수업 일시 선택 (선택사항)'): _formatDateTime(_scheduledAt!),
                       style:
                           TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
                 ),
                 if (_scheduledAt != null)
                   TextButton(
                     onPressed: () => setState(() => _scheduledAt = null),
-                    child: Text('지우기',
+                    child: Text(tr(context, '지우기'),
                         style: TextStyle(
                             fontFamily: "NotoSansKR", fontSize: 12)),
                   ),
@@ -2021,14 +2000,14 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: Palette.white),
                       )
-                    : Text('회차 등록', style: TextStyle(fontFamily: "Jalnan")),
+                    : Text(tr(context, '회차 등록'), style: TextStyle(fontFamily: "Jalnan")),
               ),
             ),
             Divider(height: 32),
-            Text('${_selectedCourse.title} · 등록된 회차',
+            Text(tf(context, '{p0} · 등록된 회차', {'p0': _selectedCourse.title}),
                 style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           ] else
-            Text('컨펌된 화상수업',
+            Text(tr(context, '컨펌된 화상수업'),
                 style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           SizedBox(height: 12),
           if (_loading)
@@ -2036,8 +2015,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
           else if (_sessions.isEmpty)
             Text(
                 _isOwner
-                    ? '등록된 회차가 없습니다.'
-                    : '컨펌한 수업이 여기에 자동으로 나타납니다.',
+                    ? tr(context, '등록된 회차가 없습니다.'): tr(context, '컨펌한 수업이 여기에 자동으로 나타납니다.'),
                 style:
                     TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500))
           else
@@ -2101,7 +2079,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
             if (session.scheduledAt != null) ...[
               SizedBox(height: 6),
               Text(
-                '수업 일시: ${_formatDateTime(session.scheduledAt!)}',
+                tf(context, '수업 일시: {p0}', {'p0': _formatDateTime(session.scheduledAt!)}),
                 style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 12,
@@ -2126,7 +2104,7 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
                   ),
                   onPressed: () => _enterAsHost(session),
                   icon: Icon(Icons.videocam, size: 16),
-                  label: Text('호스트로 입장',
+                  label: Text(tr(context, '호스트로 입장'),
                       style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
                 ),
                 OutlinedButton.icon(
@@ -2134,12 +2112,12 @@ class _AdminSessionTabState extends State<AdminSessionTab> {
                   icon: Icon(
                       session.isLive ? Icons.stop_circle : Icons.play_circle,
                       size: 16),
-                  label: Text(session.isLive ? '수업 종료' : '수업 시작',
+                  label: Text(session.isLive ? tr(context, '수업 종료'): tr(context, '수업 시작'),
                       style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
                 ),
                 TextButton(
                   onPressed: () => _deleteSession(session),
-                  child: Text('삭제',
+                  child: Text(tr(context, '삭제'),
                       style: TextStyle(
                           fontFamily: "NotoSansKR",
                           fontSize: 12,
@@ -2260,7 +2238,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
+        content: Text(tr(context, message), style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: Palette.danger,
       ),
     );
@@ -2271,7 +2249,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
     if (_isTeacher &&
         _missingPassword &&
         _passwordCtrl.text.trim().length < 6) {
-      _showError('이 강사는 아직 로그인 비밀번호가 없습니다. 6자 이상으로 만들어 주세요.');
+      _showError(tr(context, '이 강사는 아직 로그인 비밀번호가 없습니다. 6자 이상으로 만들어 주세요.'));
       return;
     }
     final phoneError = PhoneUtil.validate(_phoneCtrl.text);
@@ -2281,7 +2259,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
     }
     final lessonFee = int.tryParse(_lessonFeeCtrl.text.replaceAll(',', '').trim());
     if (lessonFee == null || lessonFee < 0) {
-      _showError('회차 수당은 0원 이상의 숫자로 입력해 주세요.');
+      _showError(tr(context, '회차 수당은 0원 이상의 숫자로 입력해 주세요.'));
       return;
     }
     setState(() => _saving = true);
@@ -2303,7 +2281,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
         password: _passwordCtrl.text.trim(),
       );
     } catch (e) {
-      error = '강사 정보 수정 중 오류가 발생했습니다.';
+      error = tr(context, '강사 정보 수정 중 오류가 발생했습니다.');
     }
     if (!mounted) return;
     setState(() => _saving = false);
@@ -2319,7 +2297,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
     return AlertDialog(
       backgroundColor: Palette.white,
       surfaceTintColor: Palette.white,
-      title: Text('강사 정보 수정', style: TextStyle(fontFamily: "Jalnan")),
+      title: Text(tr(context, '강사 정보 수정'), style: TextStyle(fontFamily: "Jalnan")),
       content: SizedBox(
         width: 460,
         child: SingleChildScrollView(
@@ -2351,7 +2329,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
                             setState(() => _newPhoto = cropped);
                           },
                     icon: Icon(Icons.photo_camera_outlined, size: 18),
-                    label: Text('사진 변경',
+                    label: Text(tr(context, '사진 변경'),
                         style: TextStyle(fontFamily: "NotoSansKR")),
                   ),
                 ],
@@ -2360,8 +2338,8 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
               TextField(
                 controller: _nameCtrl,
                 decoration: InputDecoration(
-                  labelText: '강사 이름',
-                  helperText: '수강생이 강사를 고를 때 보이는 이름입니다.',
+                  labelText: tr(context, '강사 이름'),
+                  helperText: tr(context, '수강생이 강사를 고를 때 보이는 이름입니다.'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2369,8 +2347,8 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
               TextField(
                 controller: _nicknameCtrl,
                 decoration: InputDecoration(
-                  labelText: '닉네임 (선택)',
-                  helperText: '로그인은 이메일, 수업 목록에는 닉네임이 보입니다.',
+                  labelText: tr(context, '닉네임 (선택)'),
+                  helperText: tr(context, '로그인은 이메일, 수업 목록에는 닉네임이 보입니다.'),
                   helperMaxLines: 2,
                   border: OutlineInputBorder(),
                 ),
@@ -2380,8 +2358,8 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
                 controller: _phoneCtrl,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
-                  labelText: '휴대폰 번호',
-                  helperText: '수업 예약이 들어오면 이 번호로 알림 문자를 보냅니다.',
+                  labelText: tr(context, '휴대폰 번호'),
+                  helperText: tr(context, '수업 예약이 들어오면 이 번호로 알림 문자를 보냅니다.'),
                   helperMaxLines: 2,
                   border: OutlineInputBorder(),
                 ),
@@ -2391,8 +2369,8 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
                 controller: _lessonFeeCtrl,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: '회차 수당 (원)',
-                  helperText: '없으면 회차당 10,000원으로 계산합니다.',
+                  labelText: tr(context, '회차 수당 (원)'),
+                  helperText: tr(context, '없으면 회차당 10,000원으로 계산합니다.'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2400,9 +2378,9 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
               TextField(
                 controller: _bankNameCtrl,
                 decoration: InputDecoration(
-                  labelText: '입금 은행',
-                  hintText: '예: 국민은행',
-                  helperText: '계좌는 메인 관리자만 볼 수 있습니다.',
+                  labelText: tr(context, '입금 은행'),
+                  hintText: tr(context, '예: 국민은행'),
+                  helperText: tr(context, '계좌는 메인 관리자만 볼 수 있습니다.'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2410,7 +2388,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
               TextField(
                 controller: _bankAccountCtrl,
                 decoration: InputDecoration(
-                  labelText: '계좌번호',
+                  labelText: tr(context, '계좌번호'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2418,7 +2396,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
               TextField(
                 controller: _accountHolderCtrl,
                 decoration: InputDecoration(
-                  labelText: '예금주',
+                  labelText: tr(context, '예금주'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2426,7 +2404,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
               TextField(
                 controller: _nationalityCtrl,
                 decoration: InputDecoration(
-                  labelText: '국적 (예: USA, UK, Korea)',
+                  labelText: tr(context, '국적 (예: USA, UK, Korea)'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2435,7 +2413,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
                 controller: _introCtrl,
                 maxLines: 5,
                 decoration: InputDecoration(
-                  labelText: '강사 프로필 / 소개',
+                  labelText: tr(context, '강사 프로필 / 소개'),
                   alignLabelWithHint: true,
                   border: OutlineInputBorder(),
                 ),
@@ -2447,11 +2425,9 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     labelText: _missingPassword
-                        ? '로그인 비밀번호 (필수, 6자 이상)'
-                        : '로그인 비밀번호 변경 (비워두면 유지)',
+                        ? tr(context, '로그인 비밀번호 (필수, 6자 이상)'): tr(context, '로그인 비밀번호 변경 (비워두면 유지)'),
                     helperText: _missingPassword
-                        ? '이 강사는 아직 로그인 비밀번호가 없습니다. 여기서 만들어 주세요.'
-                        : '운영자 로그인 화면에서 이 이메일로 들어올 때 사용합니다.',
+                        ? tr(context, '이 강사는 아직 로그인 비밀번호가 없습니다. 여기서 만들어 주세요.'): tr(context, '운영자 로그인 화면에서 이 이메일로 들어올 때 사용합니다.'),
                     helperMaxLines: 2,
                     border: OutlineInputBorder(),
                     suffixIcon: IconButton(
@@ -2471,7 +2447,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
       actions: [
         TextButton(
           onPressed: _saving ? null : () => Navigator.pop(context, false),
-          child: Text('닫기'),
+          child: Text(tr(context, '닫기')),
         ),
         ElevatedButton(
           onPressed: _saving ? null : _save,
@@ -2481,7 +2457,7 @@ class _TeacherEditDialogState extends State<_TeacherEditDialog> {
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text('저장'),
+              : Text(tr(context, '저장')),
         ),
       ],
     );
@@ -2531,7 +2507,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
+        content: Text(tr(context, message), style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: Palette.danger,
       ),
     );
@@ -2544,7 +2520,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
     final password = _passwordCtrl.text.trim();
     final phone = _phoneCtrl.text.trim();
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
-      _showError('이름, 이메일, 비밀번호를 모두 입력해주세요.');
+      _showError(tr(context, '이름, 이메일, 비밀번호를 모두 입력해주세요.'));
       return;
     }
     final phoneError = PhoneUtil.validate(phone);
@@ -2555,7 +2531,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
     final lessonFee =
         int.tryParse(_lessonFeeCtrl.text.replaceAll(',', '').trim());
     if (lessonFee == null || lessonFee < 0) {
-      _showError('회차 수당은 0원 이상의 숫자로 입력해 주세요.');
+      _showError(tr(context, '회차 수당은 0원 이상의 숫자로 입력해 주세요.'));
       return;
     }
     setState(() => _saving = true);
@@ -2577,7 +2553,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
         lessonFeeWon: lessonFee,
       );
     } catch (e) {
-      error = '강사 등록 중 오류가 발생했습니다.';
+      error = tr(context, '강사 등록 중 오류가 발생했습니다.');
     }
     if (!mounted) return;
     setState(() => _saving = false);
@@ -2593,7 +2569,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
     return AlertDialog(
       backgroundColor: Palette.white,
       surfaceTintColor: Palette.white,
-      title: Text('강사등록', style: TextStyle(fontFamily: "Jalnan")),
+      title: Text(tr(context, '강사등록'), style: TextStyle(fontFamily: "Jalnan")),
       content: SizedBox(
         width: 460,
         child: SingleChildScrollView(
@@ -2602,8 +2578,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '등록한 강사는 관리자 로그인 화면에서 이메일/비밀번호로 로그인할 수 있습니다. '
-                '사진과 소개는 수강생의 강사 선택 화면에 그대로 보입니다.',
+                tr(context, '등록한 강사는 관리자 로그인 화면에서 이메일/비밀번호로 로그인할 수 있습니다. 사진과 소개는 수강생의 강사 선택 화면에 그대로 보입니다.'),
                 style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 13,
@@ -2626,7 +2601,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
                           },
                     icon: Icon(Icons.photo_camera_outlined, size: 18),
                     label: Text(
-                        _photo == null ? '강사 사진 등록' : '사진 다시 선택',
+                        _photo == null ? tr(context, '강사 사진 등록'): tr(context, '사진 다시 선택'),
                         style: TextStyle(fontFamily: "NotoSansKR")),
                   ),
                 ],
@@ -2635,8 +2610,8 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
               TextField(
                 controller: _nameCtrl,
                 decoration: InputDecoration(
-                  labelText: '강사 이름',
-                  helperText: '수강생이 강사를 고를 때 보이는 이름입니다.',
+                  labelText: tr(context, '강사 이름'),
+                  helperText: tr(context, '수강생이 강사를 고를 때 보이는 이름입니다.'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2644,8 +2619,8 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
               TextField(
                 controller: _nicknameCtrl,
                 decoration: InputDecoration(
-                  labelText: '닉네임 (선택)',
-                  helperText: '로그인은 이메일, 수업 목록에는 닉네임이 보입니다.',
+                  labelText: tr(context, '닉네임 (선택)'),
+                  helperText: tr(context, '로그인은 이메일, 수업 목록에는 닉네임이 보입니다.'),
                   helperMaxLines: 2,
                   border: OutlineInputBorder(),
                 ),
@@ -2654,7 +2629,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
               TextField(
                 controller: _emailCtrl,
                 decoration: InputDecoration(
-                  labelText: '강사 이메일',
+                  labelText: tr(context, '강사 이메일'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2663,7 +2638,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
                 controller: _passwordCtrl,
                 obscureText: true,
                 decoration: InputDecoration(
-                  labelText: '초기 비밀번호 (6자 이상)',
+                  labelText: tr(context, '초기 비밀번호 (6자 이상)'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2672,8 +2647,8 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
                 controller: _phoneCtrl,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
-                  labelText: '휴대폰 번호',
-                  helperText: '수업 예약이 들어오면 이 번호로 알림 문자를 보냅니다.',
+                  labelText: tr(context, '휴대폰 번호'),
+                  helperText: tr(context, '수업 예약이 들어오면 이 번호로 알림 문자를 보냅니다.'),
                   helperMaxLines: 2,
                   border: OutlineInputBorder(),
                 ),
@@ -2683,8 +2658,8 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
                 controller: _lessonFeeCtrl,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: '회차 수당 (원)',
-                  helperText: '기본값은 회차당 10,000원입니다.',
+                  labelText: tr(context, '회차 수당 (원)'),
+                  helperText: tr(context, '기본값은 회차당 10,000원입니다.'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2692,9 +2667,9 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
               TextField(
                 controller: _bankNameCtrl,
                 decoration: InputDecoration(
-                  labelText: '입금 은행',
-                  hintText: '예: 국민은행',
-                  helperText: '계좌는 메인 관리자만 볼 수 있습니다.',
+                  labelText: tr(context, '입금 은행'),
+                  hintText: tr(context, '예: 국민은행'),
+                  helperText: tr(context, '계좌는 메인 관리자만 볼 수 있습니다.'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2702,7 +2677,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
               TextField(
                 controller: _bankAccountCtrl,
                 decoration: InputDecoration(
-                  labelText: '계좌번호',
+                  labelText: tr(context, '계좌번호'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2710,7 +2685,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
               TextField(
                 controller: _accountHolderCtrl,
                 decoration: InputDecoration(
-                  labelText: '예금주',
+                  labelText: tr(context, '예금주'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2718,7 +2693,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
               TextField(
                 controller: _nationalityCtrl,
                 decoration: InputDecoration(
-                  labelText: '국적 (예: USA, UK, Korea)',
+                  labelText: tr(context, '국적 (예: USA, UK, Korea)'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -2727,8 +2702,8 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
                 controller: _introCtrl,
                 maxLines: 5,
                 decoration: InputDecoration(
-                  labelText: '강사 프로필 / 소개',
-                  hintText: '경력, 수업 스타일, 학생에게 전하고 싶은 말을 적어 주세요.',
+                  labelText: tr(context, '강사 프로필 / 소개'),
+                  hintText: tr(context, '경력, 수업 스타일, 학생에게 전하고 싶은 말을 적어 주세요.'),
                   alignLabelWithHint: true,
                   border: OutlineInputBorder(),
                 ),
@@ -2740,7 +2715,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
       actions: [
         TextButton(
           onPressed: _saving ? null : () => Navigator.pop(context, false),
-          child: Text('닫기'),
+          child: Text(tr(context, '닫기')),
         ),
         ElevatedButton(
           onPressed: _saving ? null : _save,
@@ -2750,7 +2725,7 @@ class _TeacherRegisterDialogState extends State<_TeacherRegisterDialog> {
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text('등록'),
+              : Text(tr(context, '등록')),
         ),
       ],
     );
@@ -2832,7 +2807,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
 
   Future<void> _openTeacherRatings(Map<String, dynamic> teacher) async {
     final uid = teacher['uid']?.toString() ?? '';
-    final name = AuthService.profileDisplayName(teacher, fallback: '강사');
+    final name = AuthService.profileDisplayName(teacher, fallback: tr(context, '강사'));
     final items = _ratings
         .where((rating) => rating.teacherId == uid)
         .toList();
@@ -2842,7 +2817,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
       builder: (dialogContext) => AlertDialog(
         backgroundColor: Palette.white,
         surfaceTintColor: Palette.white,
-        title: Text('$name · 수업 별점',
+        title: Text(tf(context, '{p0} · 수업 별점', {'p0': name}),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
         content: SizedBox(
           width: 480,
@@ -2859,7 +2834,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text('닫기'),
+            child: Text(tr(context, '닫기')),
           ),
         ],
       ),
@@ -2870,7 +2845,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
+        content: Text(tr(context, message), style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: error ? Palette.danger : Palette.success,
       ),
     );
@@ -2883,7 +2858,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
       builder: (_) => _TeacherRegisterDialog(pickPhoto: _pickPhoto),
     );
     if (!mounted || saved != true) return;
-    _toast('강사가 등록되었습니다. 해당 계정으로 로그인할 수 있습니다.');
+    _toast(tr(context, '강사가 등록되었습니다. 해당 계정으로 로그인할 수 있습니다.'));
     await _refresh();
   }
 
@@ -2913,7 +2888,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
     );
     if (!mounted || saved != true) return;
     await _refresh();
-    if (mounted) _toast('강사 정보를 수정했습니다.');
+    if (mounted) _toast(tr(context, '강사 정보를 수정했습니다.'));
   }
 
   Future<void> _editBookingOffer(Map<String, dynamic> teacher) async {
@@ -2926,7 +2901,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: Text('수업 받기',
+          title: Text(tr(context, '수업 받기'),
               style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           content: SizedBox(
             width: 420,
@@ -2963,7 +2938,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: Text('닫기', style: TextStyle(fontFamily: "NotoSansKR")),
+              child: Text(tr(context, '닫기'), style: TextStyle(fontFamily: "NotoSansKR")),
             ),
           ],
         );
@@ -2977,7 +2952,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
       _toast(error, error: true);
       return;
     }
-    _toast('수업 받기 설정을 저장했습니다.');
+    _toast(tr(context, '수업 받기 설정을 저장했습니다.'));
     await _refresh();
   }
 
@@ -2985,7 +2960,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
     final uid = teacher['uid']?.toString() ?? '';
     if (uid.isEmpty) return;
     final active = teacher['isActive'] != false;
-    final name = AuthService.profileDisplayName(teacher, fallback: '강사');
+    final name = AuthService.profileDisplayName(teacher, fallback: tr(context, '강사'));
     final assigned = _members
         .where((member) => member['teacherId']?.toString() == uid)
         .length;
@@ -2997,22 +2972,21 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(active ? '강사 비활성화' : '강사 활성화',
+        title: Text(active ? tr(context, '강사 비활성화'): tr(context, '강사 활성화'),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
         content: Text(
           active
-              ? '$name 강사를 비활성화합니다.\n담당 수강생 $assigned명, 대기 중인 예약 $waiting건이 있습니다.\n로그인 계정이 정지되고, 새 결제 선택과 코티칭은 바로 닫힙니다. 이미 확정된 수업은 이 강사 일정에 남습니다.'
-              : '$name 강사의 로그인 정지를 풉니다.\n담당 수강생 $assigned명, 대기 중인 예약 $waiting건입니다.\n수업 받기는 꺼진 채로 둡니다. 다시 받으려면 수업 받기에서 켜 주세요.',
+              ? tf(context, '{p0} 강사를 비활성화합니다.\n담당 수강생 {p1}명, 대기 중인 예약 {p2}건이 있습니다.\n로그인 계정이 정지되고, 새 결제 선택과 코티칭은 바로 닫힙니다. 이미 확정된 수업은 이 강사 일정에 남습니다.', {'p0': name, 'p1': assigned, 'p2': waiting}): tf(context, '{p0} 강사의 로그인 정지를 풉니다.\n담당 수강생 {p1}명, 대기 중인 예약 {p2}건입니다.\n수업 받기는 꺼진 채로 둡니다. 다시 받으려면 수업 받기에서 켜 주세요.', {'p0': name, 'p1': assigned, 'p2': waiting}),
           style: TextStyle(fontFamily: "NotoSansKR", height: 1.45),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text('취소'),
+            child: Text(tr(context, '취소')),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(active ? '비활성화' : '활성화'),
+            child: Text(active ? tr(context, '비활성화'): tr(context, '활성화')),
           ),
         ],
       ),
@@ -3024,7 +2998,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
       _toast(error, error: true);
       return;
     }
-    _toast(active ? '강사를 비활성화했습니다.' : '강사를 활성화했습니다.');
+    _toast(active ? tr(context, '강사를 비활성화했습니다.'): tr(context, '강사를 활성화했습니다.'));
     await _refresh();
   }
 
@@ -3037,7 +3011,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: Text('강사 배정', style: TextStyle(fontFamily: "Jalnan")),
+          title: Text(tr(context, '강사 배정'), style: TextStyle(fontFamily: "Jalnan")),
           content: SizedBox(
             width: 400,
             child: Column(
@@ -3053,13 +3027,13 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                   initialValue:
                       selectedTeacherId.isEmpty ? '' : selectedTeacherId,
                   decoration: InputDecoration(
-                    labelText: '담당 강사',
+                    labelText: tr(context, '담당 강사'),
                     border: OutlineInputBorder(),
                   ),
                   items: [
                     DropdownMenuItem(
                       value: '',
-                      child: Text('배정 없음',
+                      child: Text(tr(context, '배정 없음'),
                           style: TextStyle(fontFamily: "NotoSansKR")),
                     ),
                     ..._teachers
@@ -3082,11 +3056,11 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                     value: moveConfirmed,
                     onChanged: (value) => setDialogState(
                         () => moveConfirmed = value ?? false),
-                    title: Text('이미 확정된 수업도 함께 옮기기',
+                    title: Text(tr(context, '이미 확정된 수업도 함께 옮기기'),
                         style: TextStyle(
                             fontFamily: "NotoSansKR", fontSize: 14)),
                     subtitle: Text(
-                      '끄면 회원, 수강, 대기 중인 예약만 옮깁니다. 확정된 수업은 지금 강사 일정에 남습니다.',
+                      tr(context, '끄면 회원, 수강, 대기 중인 예약만 옮깁니다. 확정된 수업은 지금 강사 일정에 남습니다.'),
                       style: TextStyle(
                           fontFamily: "NotoSansKR", fontSize: 12),
                     ),
@@ -3098,7 +3072,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
-                child: Text('닫기')),
+                child: Text(tr(context, '닫기'))),
             ElevatedButton(
               onPressed: () async {
                 final error = await AuthService.assignMemberToTeacher(
@@ -3115,7 +3089,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                   Navigator.pop(dialogContext, true);
                 }
               },
-              child: Text('저장'),
+              child: Text(tr(context, '저장')),
             ),
           ],
         ),
@@ -3123,7 +3097,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
     );
 
     if (saved == true) {
-      _toast('회원-강사 배정이 저장되었습니다.');
+      _toast(tr(context, '회원-강사 배정이 저장되었습니다.'));
       await _refresh();
     }
   }
@@ -3136,13 +3110,13 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
       builder: (dialogContext) => AlertDialog(
         backgroundColor: Palette.white,
         surfaceTintColor: Palette.white,
-        title: Text('회원 연락처', style: TextStyle(fontFamily: "Jalnan")),
+        title: Text(tr(context, '회원 연락처'), style: TextStyle(fontFamily: "Jalnan")),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.phone,
           decoration: InputDecoration(
-            labelText: '휴대폰 번호',
-            helperText: '예약 확정 문자를 이 번호로 보냅니다.',
+            labelText: tr(context, '휴대폰 번호'),
+            helperText: tr(context, '예약 확정 문자를 이 번호로 보냅니다.'),
             helperMaxLines: 2,
             border: OutlineInputBorder(),
           ),
@@ -3150,11 +3124,11 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text('닫기'),
+            child: Text(tr(context, '닫기')),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text('저장'),
+            child: Text(tr(context, '저장')),
           ),
         ],
       ),
@@ -3170,18 +3144,18 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
       _toast(error, error: true);
       return;
     }
-    _toast('연락처를 저장했습니다.');
+    _toast(tr(context, '연락처를 저장했습니다.'));
     await _refresh();
   }
 
   String _teacherName(String teacherId) {
-    if (teacherId.isEmpty) return '미배정';
+    if (teacherId.isEmpty) return tr(context, '미배정');
     for (final t in _teachers) {
       if (t['uid']?.toString() == teacherId) {
         return t['name']?.toString() ?? teacherId;
       }
     }
-    return '알 수 없음';
+    return tr(context, '알 수 없음');
   }
 
   @override
@@ -3194,7 +3168,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
           Row(
             children: [
               Expanded(
-                child: Text('등록된 강사',
+                child: Text(tr(context, '등록된 강사'),
                     style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
               ),
               ElevatedButton.icon(
@@ -3205,13 +3179,13 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                 ),
                 onPressed: _openRegister,
                 icon: Icon(Icons.person_add_alt_1, size: 18),
-                label: Text('강사등록', style: TextStyle(fontFamily: "Jalnan")),
+                label: Text(tr(context, '강사등록'), style: TextStyle(fontFamily: "Jalnan")),
               ),
             ],
           ),
           SizedBox(height: 8),
           Text(
-            '강사를 누르면 프로필·회원, 그 강사의 스케줄·예약, 한달 수업 이력을 볼 수 있습니다. 카드에는 이번 달 진행·취소·수업 수당·평균과 최근 학생 별점이 바로 보이고, 평가는 전체 이력을 엽니다. 별점은 매달 인사 평가에 쓰입니다.',
+            tr(context, '강사를 누르면 프로필·회원, 그 강사의 스케줄·예약, 한달 수업 이력을 볼 수 있습니다. 카드에는 이번 달 진행·취소·수업 수당·평균과 최근 학생 별점이 바로 보이고, 평가는 전체 이력을 엽니다. 별점은 매달 인사 평가에 쓰입니다.'),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
@@ -3219,7 +3193,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
           if (_loading)
             Center(child: CircularProgressIndicator())
           else if (_teachers.isEmpty)
-            Text('등록된 강사가 없습니다.',
+            Text(tr(context, '등록된 강사가 없습니다.'),
                 style:
                     TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500))
           else
@@ -3244,8 +3218,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
               final officialName = t['name']?.toString() ?? '';
               final shown = AuthService.profileDisplayName(t, fallback: officialName);
               final titleName = isOwnerTeacher
-                  ? '$shown (메인 관리자 · 강사)'
-                  : (nickname.isNotEmpty && nickname != officialName
+                  ? tf(context, '{p0} (메인 관리자 · 강사)', {'p0': shown}): (nickname.isNotEmpty && nickname != officialName
                       ? '$shown · ${t['email'] ?? ''}'
                       : '$shown (${t['email'] ?? ''})');
               return Card(
@@ -3265,18 +3238,17 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                           [
                             if (nationality.isNotEmpty) nationality,
                             if (!isOwnerTeacher && t['hasLoginPassword'] != true)
-                              '비밀번호 없음',
+                              tr(context, '비밀번호 없음'),
                             isOwnerTeacher
-                                ? '${TeacherBookingOffer.label(bookingOffer)} · 담당 $assignedCount명'
-                                : '${active ? '활성' : '비활성'} · ${TeacherBookingOffer.label(bookingOffer)} · 담당 $assignedCount명',
-                            '이번달 진행 ${stats.completedCount}회 · 취소 ${stats.cancelledCount}회 · 대기 ${pending}건',
+                                ? tf(context, '{p0} · 담당 {p1}명', {'p0': TeacherBookingOffer.label(bookingOffer), 'p1': assignedCount}): tf(context, '{p0} · {p1} · 담당 {p2}명', {'p0': active ? tr(context, '활성'): tr(context, '비활성'), 'p1': TeacherBookingOffer.label(bookingOffer), 'p2': assignedCount}),
+                            tf(context, '이번달 진행 {p0}회 · 취소 {p1}회 · 대기 {p2}건', {'p0': stats.completedCount, 'p1': stats.cancelledCount, 'p2': pending}),
                             if (stats.awaitingCount > 0)
-                              '평가대기 ${stats.awaitingCount}건',
+                              tf(context, '평가대기 {p0}건', {'p0': stats.awaitingCount}),
                             stats.incomeLabel,
                             if (bank.isNotEmpty) bank,
                             PhoneUtil.isValid(t['phone']?.toString() ?? '')
                                 ? PhoneUtil.display(t['phone']?.toString() ?? '')
-                                : '연락처 없음',
+                                : tr(context, '연락처 없음'),
                           ].join(' · '),
                           style: TextStyle(
                               fontFamily: "NotoSansKR",
@@ -3288,28 +3260,28 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                           children: [
                             TextButton(
                               onPressed: () => _openTeacherDetail(t),
-                              child: Text('상세',
+                              child: Text(tr(context, '상세'),
                                   style: TextStyle(
                                       fontFamily: "NotoSansKR",
                                       color: Palette.secondaryDark)),
                             ),
                             TextButton(
                               onPressed: () => _openTeacherRatings(t),
-                              child: Text('평가',
+                              child: Text(tr(context, '평가'),
                                   style: TextStyle(
                                       fontFamily: "NotoSansKR",
                                       color: Palette.secondaryDark)),
                             ),
                             TextButton(
                               onPressed: () => _editTeacher(t),
-                              child: Text('수정',
+                              child: Text(tr(context, '수정'),
                                   style: TextStyle(
                                       fontFamily: "NotoSansKR",
                                       color: Palette.secondaryDark)),
                             ),
                             TextButton(
                               onPressed: () => _editBookingOffer(t),
-                              child: Text('수업 받기',
+                              child: Text(tr(context, '수업 받기'),
                                   style: TextStyle(
                                       fontFamily: "NotoSansKR",
                                       color: Palette.secondaryDark)),
@@ -3317,7 +3289,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                             if (!isOwnerTeacher)
                               TextButton(
                                 onPressed: () => _toggleTeacherActive(t),
-                                child: Text(active ? '비활성화' : '활성화',
+                                child: Text(active ? tr(context, '비활성화'): tr(context, '활성화'),
                                     style: TextStyle(
                                         fontFamily: "NotoSansKR",
                                         color: active
@@ -3354,7 +3326,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                         Padding(
                           padding: EdgeInsets.only(left: 4, right: 4, bottom: 4),
                           child: Text(
-                            '소개가 없습니다. 수정에서 프로필을 채워 주세요.',
+                            tr(context, '소개가 없습니다. 수정에서 프로필을 채워 주세요.'),
                             style: TextStyle(
                               fontFamily: "NotoSansKR",
                               fontSize: 12,
@@ -3368,7 +3340,7 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
               );
             }),
           Divider(height: 32),
-          Text('회원 → 강사 배정',
+          Text(tr(context, '회원 → 강사 배정'),
               style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           SizedBox(height: 8),
           Align(
@@ -3379,21 +3351,20 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                 final confirmed = await showDialog<bool>(
                   context: context,
                   builder: (dialogContext) => AlertDialog(
-                    title: Text('일괄 배정',
+                    title: Text(tr(context, '일괄 배정'),
                         style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
                     content: Text(
-                      '가입 회원 $count명의 담당 강사를 메인 관리자로 바꿉니다. '
-                      '수강과 거절되지 않은 예약도 함께 옮겨집니다.',
+                      tf(context, '가입 회원 {p0}명의 담당 강사를 메인 관리자로 바꿉니다. 수강과 거절되지 않은 예약도 함께 옮겨집니다.', {'p0': count}),
                       style: TextStyle(fontFamily: "NotoSansKR", height: 1.45),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(dialogContext, false),
-                        child: Text('취소'),
+                        child: Text(tr(context, '취소')),
                       ),
                       ElevatedButton(
                         onPressed: () => Navigator.pop(dialogContext, true),
-                        child: Text('배정'),
+                        child: Text(tr(context, '배정')),
                       ),
                     ],
                   ),
@@ -3406,23 +3377,23 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                   _toast(error, error: true);
                   return;
                 }
-                _toast('모든 수강생에게 메인 관리자를 배정했습니다.');
+                _toast(tr(context, '모든 수강생에게 메인 관리자를 배정했습니다.'));
                 await _refresh();
               },
               icon: Icon(Icons.person_pin_circle_outlined, size: 18),
-              label: Text('모든 수강생에게 메인 관리자 배정',
+              label: Text(tr(context, '모든 수강생에게 메인 관리자 배정'),
                   style: TextStyle(fontFamily: "NotoSansKR")),
             ),
           ),
           SizedBox(height: 8),
           Text(
-            '회원을 강사에게 배정하면, 해당 강사는 스케줄·예약과 회원관리(피드백)에서 그 회원만 볼 수 있습니다. 과정 배정은 메인 관리자만 할 수 있습니다.',
+            tr(context, '회원을 강사에게 배정하면, 해당 강사는 스케줄·예약과 회원관리(피드백)에서 그 회원만 볼 수 있습니다. 과정 배정은 메인 관리자만 할 수 있습니다.'),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
           SizedBox(height: 12),
           if (_members.isEmpty)
-            Text('가입된 회원이 없습니다.',
+            Text(tr(context, '가입된 회원이 없습니다.'),
                 style:
                     TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500))
           else
@@ -3436,10 +3407,10 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                     style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
                 subtitle: Text(
                   [
-                    '담당: ${_teacherName(teacherId)}',
+                    tf(context, '담당: {p0}', {'p0': _teacherName(teacherId)}),
                     PhoneUtil.isValid(phone)
                         ? PhoneUtil.display(phone)
-                        : '연락처 없음',
+                        : tr(context, '연락처 없음'),
                   ].join(' · '),
                   style: TextStyle(
                       fontFamily: "NotoSansKR",
@@ -3450,14 +3421,14 @@ class _AdminTeacherTabState extends State<AdminTeacherTab> {
                   children: [
                     TextButton(
                       onPressed: () => _editMemberPhone(m),
-                      child: Text('연락처',
+                      child: Text(tr(context, '연락처'),
                           style: TextStyle(
                               fontFamily: "NotoSansKR",
                               color: Palette.secondaryDark)),
                     ),
                     TextButton(
                       onPressed: () => _assignMember(m),
-                      child: Text('배정',
+                      child: Text(tr(context, '배정'),
                           style: TextStyle(
                               fontFamily: "NotoSansKR",
                               color: Palette.secondaryDark)),
@@ -3571,13 +3542,13 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
     setState(() {
       _saving = false;
     });
-    _toast(error ?? '화상수업 링크가 저장되었습니다.', error: error != null);
+    _toast(error ?? tr(context, '화상수업 링크가 저장되었습니다.'), error: error != null);
   }
 
   Future<void> _addLesson() async {
     final title = titleController.text.trim();
     if (title.isEmpty) {
-      _toast('강의 제목을 입력해주세요.', error: true);
+      _toast(tr(context, '강의 제목을 입력해주세요.'), error: true);
       return;
     }
 
@@ -3603,7 +3574,7 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
         setState(() {
           _saving = false;
         });
-        _toast('영상 파일 업로드에 실패했습니다. URL로 등록하거나 다시 시도해주세요.', error: true);
+        _toast(tr(context, '영상 파일 업로드에 실패했습니다. URL로 등록하거나 다시 시도해주세요.'), error: true);
         return;
       }
       videoUrl = uploaded;
@@ -3613,7 +3584,7 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
       setState(() {
         _saving = false;
       });
-      _toast('영상 URL을 입력하거나 파일을 선택해주세요.', error: true);
+      _toast(tr(context, '영상 URL을 입력하거나 파일을 선택해주세요.'), error: true);
       return;
     }
 
@@ -3636,7 +3607,7 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
       return;
     }
 
-    _toast('강의가 등록되었습니다.');
+    _toast(tr(context, '강의가 등록되었습니다.'));
     titleController.clear();
     descriptionController.clear();
     videoUrlController.clear();
@@ -3649,7 +3620,7 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
   void _toast(String message, {bool error = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
+        content: Text(tr(context, message), style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: error ? Palette.danger : Palette.success,
       ),
     );
@@ -3660,7 +3631,7 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
     return ListView(
       padding: EdgeInsets.all(20),
       children: [
-        Text('과정 선택', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+        Text(tr(context, '과정 선택'), style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
         SizedBox(height: 8),
         DropdownButtonFormField<OnlineCourse>(
           initialValue: _selectedCourse,
@@ -3685,12 +3656,12 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
           },
         ),
         SizedBox(height: 24),
-        Text('화상수업 링크', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+        Text(tr(context, '화상수업 링크'), style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
         SizedBox(height: 8),
         TextField(
           controller: meetingUrlController,
           decoration: InputDecoration(
-            labelText: 'Jitsi / BigBlueButton 등 화상수업 URL',
+            labelText: tr(context, 'Jitsi / BigBlueButton 등 화상수업 URL'),
             border: OutlineInputBorder(),
             filled: true,
             fillColor: Palette.white,
@@ -3705,14 +3676,14 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
               foregroundColor: Palette.white,
             ),
             onPressed: _saving ? null : _saveMeetingUrl,
-            child: Text('화상링크 저장', style: TextStyle(fontFamily: "Jalnan")),
+            child: Text(tr(context, '화상링크 저장'), style: TextStyle(fontFamily: "Jalnan")),
           ),
         ),
         Divider(height: 36),
-        Text('강의 영상 등록', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+        Text(tr(context, '강의 영상 등록'), style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
         SizedBox(height: 8),
         Text(
-          'YouTube/Vimeo URL을 넣거나, 영상 파일을 직접 업로드할 수 있습니다.',
+          tr(context, 'YouTube/Vimeo URL을 넣거나, 영상 파일을 직접 업로드할 수 있습니다.'),
           style: TextStyle(
               fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
         ),
@@ -3720,7 +3691,7 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
         TextField(
           controller: titleController,
           decoration: InputDecoration(
-            labelText: '강의 제목',
+            labelText: tr(context, '강의 제목'),
             border: OutlineInputBorder(),
             filled: true,
             fillColor: Palette.white,
@@ -3731,7 +3702,7 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
           controller: descriptionController,
           maxLines: 2,
           decoration: InputDecoration(
-            labelText: '설명 (선택)',
+            labelText: tr(context, '설명 (선택)'),
             border: OutlineInputBorder(),
             filled: true,
             fillColor: Palette.white,
@@ -3741,7 +3712,7 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
         TextField(
           controller: videoUrlController,
           decoration: InputDecoration(
-            labelText: '영상 URL (선택: 파일 업로드 시 비워도 됨)',
+            labelText: tr(context, '영상 URL (선택: 파일 업로드 시 비워도 됨)'),
             border: OutlineInputBorder(),
             filled: true,
             fillColor: Palette.white,
@@ -3752,7 +3723,7 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
           controller: orderController,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
-            labelText: '정렬 순서',
+            labelText: tr(context, '정렬 순서'),
             border: OutlineInputBorder(),
             filled: true,
             fillColor: Palette.white,
@@ -3765,15 +3736,13 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
               onPressed: _pickVideoFile,
               icon: Icon(Icons.upload_file),
               label:
-                  Text('영상 파일 선택', style: TextStyle(fontFamily: "NotoSansKR")),
+                  Text(tr(context, '영상 파일 선택'), style: TextStyle(fontFamily: "NotoSansKR")),
             ),
             SizedBox(width: 12),
             Expanded(
               child: Text(
                 _pickedFileName == null
-                    ? '선택된 파일 없음'
-                    : '선택됨: $_pickedFileName'
-                        '${_pickedBytes != null ? " (${(_pickedBytes!.length / 1024 / 1024).toStringAsFixed(1)} MB)" : ""}',
+                    ? tr(context, '선택된 파일 없음'): tf(context, '선택됨: {p0}{p1}', {'p0': _pickedFileName, 'p1': _pickedBytes != null ? " (${(_pickedBytes!.length / 1024 / 1024).toStringAsFixed(1)} MB)" : ""}),
                 style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 12,
@@ -3799,17 +3768,17 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
                     child: CircularProgressIndicator(
                         strokeWidth: 2, color: Palette.white),
                   )
-                : Text(_uploading ? '업로드 중...' : '강의 등록',
+                : Text(_uploading ? tr(context, '업로드 중...'): tr(context, '강의 등록'),
                     style: TextStyle(fontFamily: "Jalnan")),
           ),
         ),
         Divider(height: 36),
-        Text('등록된 강의', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+        Text(tr(context, '등록된 강의'), style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
         SizedBox(height: 12),
         if (_loading)
           Center(child: CircularProgressIndicator())
         else if (_lessons.isEmpty)
-          Text('등록된 강의가 없습니다.',
+          Text(tr(context, '등록된 강의가 없습니다.'),
               style:
                   TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500))
         else
@@ -3834,7 +3803,7 @@ class _AdminLessonTabState extends State<AdminLessonTab> {
                       if (err != null) {
                         _toast(err, error: true);
                       } else {
-                        _toast('삭제되었습니다.');
+                        _toast(tr(context, '삭제되었습니다.'));
                         await _refresh();
                       }
                     },

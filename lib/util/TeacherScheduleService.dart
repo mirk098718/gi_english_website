@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/class/TeacherClassBands.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 
 /// 원어민 강사 스케줄: 닫힌 시간 + 매주 반복 닫기 + 이미 예약된 시간.
@@ -414,6 +415,6 @@ class TeacherAvailability {
 
   String weekdayLabel(DateTime date) {
     const names = ['월', '화', '수', '목', '금', '토', '일'];
-    return names[date.weekday - 1];
+    return AppLanguage.instance.translate(names[date.weekday - 1]);
   }
 }

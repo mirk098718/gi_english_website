@@ -110,7 +110,7 @@ class _NotificationBellButtonState extends State<NotificationBellButton>
                                       fontFamily: "Jalnan", fontSize: 16)),
                               const Spacer(),
                               IconButton(
-                                tooltip: '닫기',
+                                tooltip: tr(context, '닫기'),
                                 onPressed: () =>
                                     Navigator.pop(dialogContext),
                                 icon: Icon(Icons.close, color: Palette.grey600),
@@ -210,9 +210,9 @@ class _NotificationBellButtonState extends State<NotificationBellButton>
 
   String _timeLabel(DateTime at) {
     final diff = DateTime.now().difference(at);
-    if (diff.inMinutes < 1) return '방금';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}분 전';
-    if (diff.inHours < 24) return '${diff.inHours}시간 전';
+    if (diff.inMinutes < 1) return tr(context, '방금');
+    if (diff.inMinutes < 60) return tf(context, '{p0}분 전', {'p0': diff.inMinutes});
+    if (diff.inHours < 24) return tf(context, '{p0}시간 전', {'p0': diff.inHours});
     return '${at.month}/${at.day}';
   }
 
@@ -222,7 +222,7 @@ class _NotificationBellButtonState extends State<NotificationBellButton>
     final color = widget.light ? Palette.white : Palette.navy;
     final count = SiteAlertCenter.instance.unreadCount;
     return IconButton(
-      tooltip: count > 0 ? '알림 $count건' : '알림',
+      tooltip: count > 0 ? tf(context, '알림 {p0}건', {'p0': count}): tr(context, '알림'),
       onPressed: _openPanel,
       icon: SizedBox(
         width: 28,
