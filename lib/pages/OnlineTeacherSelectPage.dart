@@ -416,7 +416,10 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
                       color: Palette.grey700,
                     ),
                   ),
-                  TeacherClassTimeLine(bands: teacher.classBands),
+                  TeacherClassTimeLine(
+                    bands: teacher.classBands,
+                    closedRoutines: teacher.closedRoutineKeys,
+                  ),
                 ],
               ),
             ),

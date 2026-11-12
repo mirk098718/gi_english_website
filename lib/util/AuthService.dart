@@ -1658,9 +1658,8 @@ class AuthService {
     }
     if (teachers.isEmpty) {
       teachers = await _teachersFromStore();
-    } else {
-      teachers = await _overlayClassBands(teachers);
     }
+    teachers = await _overlayClassBands(teachers);
     OnlineNativeTeacher.cacheAll(teachers);
     return teachers;
   }
@@ -1679,16 +1678,38 @@ class AuthService {
         final uid = doc.data()['teacherUid']?.toString() ?? '';
         if (uid.isNotEmpty) byUid[uid] = bands;
       }
+      final routines = await _closedRoutinesByTeacher();
       return teachers
           .map((teacher) => teacher.copyWith(
                 classBands: byUid[teacher.accountUid] ??
                     byId[teacher.id] ??
                     teacher.classBands,
+                closedRoutineKeys:
+                    routines[teacher.accountUid] ?? teacher.closedRoutineKeys,
               ))
           .toList();
     } catch (e) {
       print('수업 가능 시간 조회 오류: $e');
       return teachers;
+    }
+  }
+
+  static Future<Map<String, Set<String>>> _closedRoutinesByTeacher() async {
+    try {
+      final snapshot =
+          await _firestore.collection('teacher_closed_routines').get();
+      final byTeacher = <String, Set<String>>{};
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final uid = data['teacherId']?.toString() ?? '';
+        final key = data['routineKey']?.toString() ?? '';
+        if (uid.isEmpty || key.isEmpty) continue;
+        byTeacher.putIfAbsent(uid, () => <String>{}).add(key);
+      }
+      return byTeacher;
+    } catch (e) {
+      print('매주 닫기 조회 오류: $e');
+      return const {};
     }
   }
 

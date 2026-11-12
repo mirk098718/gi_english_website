@@ -27,6 +27,9 @@ class OnlineNativeTeacher {
   /// 강사가 고른 큰 수업 시간. 비어 있으면 카드에 Class Time을 붙이지 않는다.
   final TeacherClassBands classBands;
 
+  /// 매주 닫아 둔 칸. 키는 `요일_HH:mm`.
+  final Set<String> closedRoutineKeys;
+
   const OnlineNativeTeacher({
     required this.id,
     required this.name,
@@ -38,6 +41,7 @@ class OnlineNativeTeacher {
     this.selectableAtCheckout = true,
     this.acceptsCoTeaching = true,
     this.classBands = TeacherClassBands.empty,
+    this.closedRoutineKeys = const {},
   });
 
   static const String ownerProfileId = 'native_owner_gi';
@@ -79,6 +83,7 @@ class OnlineNativeTeacher {
     bool? selectableAtCheckout,
     bool? acceptsCoTeaching,
     TeacherClassBands? classBands,
+    Set<String>? closedRoutineKeys,
   }) {
     return OnlineNativeTeacher(
       id: id,
@@ -91,6 +96,7 @@ class OnlineNativeTeacher {
       selectableAtCheckout: selectableAtCheckout ?? this.selectableAtCheckout,
       acceptsCoTeaching: acceptsCoTeaching ?? this.acceptsCoTeaching,
       classBands: classBands ?? this.classBands,
+      closedRoutineKeys: closedRoutineKeys ?? this.closedRoutineKeys,
     );
   }
 

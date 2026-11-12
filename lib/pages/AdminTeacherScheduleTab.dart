@@ -1067,7 +1067,8 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   Widget _bandPicker({bool compact = false}) {
     if (widget.schoolOverview) return const SizedBox.shrink();
     const dayNames = ['월', '화', '수', '목', '금', '토', '일'];
-    final preview = _bands.keywords.join(', ');
+    final preview =
+        _bands.keywordsFor(_availability.routineKeys).join(', ');
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(compact ? 8 : 12),

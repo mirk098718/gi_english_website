@@ -44,10 +44,8 @@ void main() {
       [TeacherClassBands.am, TeacherClassBands.pm],
     );
     expect(window.keywords, [
-      '평일 오전',
-      '일요일 오전',
-      '평일 오후',
-      '일요일 오후',
+      '평일 오전, 오후',
+      '일요일 오전, 오후',
     ]);
     expect(window.allows(1, '09:30'), isTrue);
     expect(window.allows(1, '12:00'), isTrue);
@@ -55,6 +53,54 @@ void main() {
     expect(window.allows(7, '11:30'), isTrue);
     expect(TeacherClassBands.periodOf('11:30'), TeacherClassBands.am);
     expect(TeacherClassBands.periodOf('12:00'), TeacherClassBands.pm);
+  });
+
+  Set<String> closedExcept(int weekday, List<String> open) {
+    final keep = open.toSet();
+    return TeacherClassBands.timeSlots
+        .where((time) => !keep.contains(time))
+        .map((time) => '${weekday}_$time')
+        .toSet();
+  }
+
+  test('연속 3시간 이하는 아침 점심 저녁으로 줄어든다', () {
+    final monday = bands([1], [TeacherClassBands.am, TeacherClassBands.pm]);
+    expect(
+      monday.keywordsFor(closedExcept(1, ['06:00', '06:30', '07:00', '07:30', '08:00', '08:30'])),
+      ['월요일 아침'],
+    );
+    expect(
+      monday.keywordsFor(closedExcept(1, ['12:00', '12:30', '13:00', '13:30'])),
+      ['월요일 점심'],
+    );
+    expect(
+      monday.keywordsFor(closedExcept(1, ['19:00', '19:30', '20:00', '20:30'])),
+      ['월요일 저녁'],
+    );
+    expect(
+      bands([1, 2], [TeacherClassBands.pm]).keywordsFor(
+        {
+          ...closedExcept(1, ['18:00', '18:30', '19:00', '19:30', '20:00', '20:30']),
+          ...closedExcept(2, ['18:00', '18:30', '19:00', '19:30', '20:00', '20:30']),
+        },
+      ),
+      ['월화 저녁'],
+    );
+  });
+
+  test('같은 요일에 오전과 오후가 같이 열린다', () {
+    final both = bands([1, 2], [TeacherClassBands.am, TeacherClassBands.pm]);
+    expect(both.keywords, ['월화 오전, 오후']);
+    final morningAndEvening = closedExcept(1, [
+      '06:00', '06:30', '07:00', '07:30', '08:00', '08:30',
+      '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+      '19:00', '19:30', '20:00',
+    ]);
+    expect(
+      bands([1], [TeacherClassBands.am, TeacherClassBands.pm])
+          .keywordsFor(morningAndEvening),
+      ['월요일 오전, 저녁'],
+    );
   });
 
   testWidgets('강사 카드에 Class Time 키워드가 소개 아래에 붙는다', (tester) async {
@@ -69,7 +115,7 @@ void main() {
       ),
     ));
     expect(find.textContaining('Class Time :'), findsOneWidget);
-    expect(find.textContaining('평일 오후'), findsOneWidget);
-    expect(find.textContaining('일요일 오전'), findsOneWidget);
+    expect(find.textContaining('평일 오전, 오후'), findsOneWidget);
+    expect(find.textContaining('일요일 오전, 오후'), findsOneWidget);
   });
 }

@@ -62,7 +62,10 @@ class MainTeacherChange {
                           fontSize: 12,
                           color: Palette.grey600),
                     ),
-                    TeacherClassTimeLine(bands: teacher.classBands),
+                    TeacherClassTimeLine(
+                      bands: teacher.classBands,
+                      closedRoutines: teacher.closedRoutineKeys,
+                    ),
                   ],
                 ),
                 onTap: () => Navigator.pop(dialogContext, teacher),
