@@ -132,6 +132,7 @@ const Map<String, String> staffEnTranslations = {
   "시간대": "Time of day",
   "지역": "Region",
   "한국": "Korea",
+  "한국시각": "Korea time",
   "미국 동부": "US Eastern",
   "미국 중부": "US Central",
   "미국 산악": "US Mountain",

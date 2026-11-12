@@ -1,8 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/ScheduleZone.dart';
 
 void main() {
   final monday = DateTime(2026, 11, 16);
+
+  test('한국시각은 영어로 Korea time이다', () {
+    AppLanguage.instance.code = 'en';
+    expect(AppLanguage.instance.translate('한국시각'), 'Korea time');
+    AppLanguage.instance.code = 'ko';
+  });
 
   test('한국을 고르면 추가 시각이 없다', () {
     expect(ScheduleZone.korea.localTime(monday, '06:00'), isNull);

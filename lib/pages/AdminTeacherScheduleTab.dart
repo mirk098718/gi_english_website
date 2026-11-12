@@ -789,11 +789,14 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
 
   ScheduleZone get _zone => ScheduleZone.byId(_zoneId);
 
-  double get _timeColWidthNow => _zoneActive ? 108 : _timeColWidth;
+  double get _timeColWidthNow {
+    if (widget.schoolOverview) return _timeColWidth;
+    return _zoneActive ? 108 : 70;
+  }
 
-  double get _rowPitchNow => _zoneActive ? 44 : _rowPitch;
+  double get _rowPitchNow => _zoneActive ? _rowPitch + 24 : _rowPitch + 12;
 
-  double get _cellHeightNow => _zoneActive ? 40 : _cellHeight;
+  double get _cellHeightNow => _zoneActive ? _cellHeight + 22 : _cellHeight + 10;
 
   List<DateTime> get _days =>
       List.generate(7, (i) => _weekStart.add(Duration(days: i)));
@@ -1631,6 +1634,18 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (!widget.schoolOverview)
+              Text(
+                tr(context, '한국시각'),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontFamily: "Jalnan",
+                  fontSize: 9,
+                  height: 1.05,
+                  color: Palette.grey700,
+                ),
+              ),
             Text(
               EnrollmentService.formatBookingTime(time),
               maxLines: 1,
