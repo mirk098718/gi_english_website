@@ -65,6 +65,12 @@ class TeacherScheduleService {
     } catch (e) {
       print('수업 가능 시간 조회 오류: $e');
     }
+    if (!classBands.active) {
+      final cached = OnlineNativeTeacher.findAssigned(accountUid: teacherUid);
+      if (cached != null && cached.classBands.active) {
+        classBands = cached.classBands;
+      }
+    }
 
     try {
       final closed = await _firestore
@@ -93,6 +99,10 @@ class TeacherScheduleService {
       }
     } catch (e) {
       print('반복 닫기 조회 오류: $e');
+    }
+    if (routineKeys.isEmpty) {
+      final cached = OnlineNativeTeacher.findAssigned(accountUid: teacherUid);
+      if (cached != null) routineKeys.addAll(cached.closedRoutineKeys);
     }
 
     try {
@@ -144,6 +154,7 @@ class TeacherScheduleService {
         ...bands.toFirestore(),
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
+      await _mirrorOwnerClassBands(teacherUid, bands);
       return null;
     } catch (e) {
       print('수업 가능 시간 저장 오류: $e');
@@ -170,6 +181,83 @@ class TeacherScheduleService {
       existing: data['nativeProfileId']?.toString() ?? '',
     );
     return _firestore.collection('native_teacher_accounts').doc(profileId);
+  }
+
+  /// 메인 관리자 본인 스케줄은 수강생이 고르는 강사 카드와 예약에도 쓴다.
+  /// 관리자 계정은 결제 강사 목록에 없고, 수강생은 공개 강사로 예약한다.
+  static Future<void> _mirrorOwnerClassBands(
+    String sourceUid,
+    TeacherClassBands bands,
+  ) async {
+    final targets = await _selectableTeacherUids(sourceUid);
+    for (final target in targets) {
+      try {
+        await target.ref.set({
+          'teacherUid': target.uid,
+          ...bands.toFirestore(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+      } catch (e) {
+        print('수강생 강사 수업 시간 반영 오류: $e');
+      }
+    }
+  }
+
+  static Future<void> _mirrorOwnerRoutine({
+    required String sourceUid,
+    required int weekday,
+    required String time,
+    required bool closed,
+  }) async {
+    final targets = await _selectableTeacherUids(sourceUid);
+    for (final target in targets) {
+      try {
+        final ref = _firestore
+            .collection('teacher_closed_routines')
+            .doc(routineDocId(target.uid, weekday, time));
+        if (closed) {
+          await ref.set({
+            'teacherId': target.uid,
+            'weekday': weekday,
+            'time': time,
+            'routineKey': routineKey(weekday, time),
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+        } else {
+          await _deleteIfExists(ref);
+        }
+      } catch (e) {
+        print('수강생 강사 반복 스케줄 반영 오류: $e');
+      }
+    }
+  }
+
+  static Future<List<({String uid, DocumentReference<Map<String, dynamic>> ref})>>
+      _selectableTeacherUids(String sourceUid) async {
+    try {
+      final admin =
+          await _firestore.collection('admins').doc(sourceUid).get();
+      if (admin.data()?['role']?.toString() == 'teacher') return const [];
+      final profiles =
+          await _firestore.collection('native_teacher_accounts').get();
+      final targets =
+          <({String uid, DocumentReference<Map<String, dynamic>> ref})>[];
+      for (final doc in profiles.docs) {
+        final data = doc.data();
+        final uid = data['teacherUid']?.toString() ?? '';
+        if (uid.isEmpty || uid == sourceUid) continue;
+        if (data['isActive'] == false) continue;
+        final offer = data['bookingOffer']?.toString() ?? '';
+        final selectable =
+            offer == 'both' || data['selectableAtCheckout'] == true;
+        if (!selectable) continue;
+        targets.add((uid: uid, ref: doc.reference));
+      }
+      return targets;
+    } catch (e) {
+      print('수강생 강사 목록 조회 오류: $e');
+      return const [];
+    }
   }
 
   static Future<String?> setClosed({
@@ -237,6 +325,12 @@ class TeacherScheduleService {
       } else {
         await _deleteIfExists(ref);
       }
+      await _mirrorOwnerRoutine(
+        sourceUid: teacherUid,
+        weekday: weekday,
+        time: time,
+        closed: closed,
+      );
       return null;
     } catch (e) {
       print('반복 스케줄 변경 오류: $e');

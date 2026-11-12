@@ -501,6 +501,7 @@ const Map<String, String> enTranslations = {
   "레벨별로 매주 문법과 유용한 표현을 짧은 인강으로 먼저 듣습니다.": "Each week, by level, you first watch a short lesson on grammar and useful phrases.",
   "로그인하시면 나의 강의실에서 배정된 인강을 수강하실 수 있습니다.": "Log in to watch the lessons assigned in My classroom.",
   "선택할 수 있는 열린 시간이 없습니다. 다른 날짜를 골라 주세요.": "No open times on this day. Please choose another date.",
+  "선택할 수 있는 열린 날짜가 없습니다.": "No open dates in this period.",
   "업무(이메일, 회의, 프레젠테이션 등)에서 직무 영어가 필요하다.": "I need English for work: email, meetings, presentations.",
   "오후 2:30 ~ 오후 8:40\n(자세한 시간표는 커리큘럼 참조)": "2:30 p.m. – 8:40 p.m.\n(See Curriculum for the full timetable)",
   "오후 7:10 ~ 오후 8:40\n(자세한 시간표는 커리큘럼 참조)": "7:10 p.m. – 8:40 p.m.\n(See Curriculum for the full timetable)",

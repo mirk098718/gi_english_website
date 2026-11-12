@@ -1817,8 +1817,21 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       enrollmentStart: _enrollment?.createdAt,
       weekNumber: week.weekNumber,
       expiresAt: _enrollment?.expiresAt,
-    );
-    final selectedDate = _selectedDates[week.id];
+    ).where((date) {
+      return availability
+          .openTimes(
+            date,
+            EnrollmentService.remainingTimeSlots(date),
+          )
+          .isNotEmpty;
+    }).toList();
+    final pickedDate = _selectedDates[week.id];
+    final selectedDate = pickedDate != null &&
+            dates.any((date) =>
+                EnrollmentService.dateOnly(date) ==
+                EnrollmentService.dateOnly(pickedDate))
+        ? pickedDate
+        : null;
     final timeSlots = selectedDate == null
         ? const <String>[]
         : availability.openTimes(
@@ -1878,6 +1891,10 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                         fontWeight: FontWeight.w700,
                         color: Palette.secondaryDark,
                       ),
+                    ),
+                    TeacherClassTimeLine(
+                      bands: availability.classBands,
+                      closedRoutines: availability.routineKeys,
                     ),
                     if (otherTeacher) ...[
                       SizedBox(height: 2),
@@ -2082,6 +2099,15 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             Text(tr(context, "날짜 선택"),
                 style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
             SizedBox(height: 8),
+            if (dates.isEmpty)
+              Text(
+                tr(context, "선택할 수 있는 열린 날짜가 없습니다."),
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 13,
+                  color: Palette.grey500,
+                ),
+              ),
             Wrap(
               spacing: 8,
               runSpacing: 8,

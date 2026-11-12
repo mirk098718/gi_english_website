@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gi_english_website/class/TeacherClassBands.dart';
+import 'package:gi_english_website/util/TeacherScheduleService.dart';
 import 'package:gi_english_website/widget/TeacherClassTimeLine.dart';
 
 void main() {
@@ -101,6 +102,82 @@ void main() {
           .keywordsFor(morningAndEvening),
       ['월요일 오전, 저녁'],
     );
+  });
+
+  test('주말 오전 안에서 이른 시간과 늦은 오전을 닫으면 주말 아침만 남는다', () {
+    final weekendMorning = bands([6, 7], [TeacherClassBands.am]);
+    final closed = <String>{
+      '6_06:00',
+      '6_06:30',
+      '6_07:00',
+      '6_07:30',
+      '6_10:30',
+      '6_11:00',
+      '6_11:30',
+      '7_06:00',
+      '7_06:30',
+      '7_07:00',
+      '7_07:30',
+      '7_09:00',
+      '7_09:30',
+      '7_10:00',
+      '7_10:30',
+      '7_11:00',
+      '7_11:30',
+    };
+    expect(weekendMorning.keywordsFor(closed), ['주말 아침']);
+
+    final availability = TeacherAvailability(
+      teacherUid: 'teacher',
+      routineKeys: closed,
+      classBands: weekendMorning,
+    );
+    final saturday = DateTime(2026, 11, 14);
+    final sunday = DateTime(2026, 11, 15);
+    final monday = DateTime(2026, 11, 16);
+    expect(
+      availability.openTimes(saturday, TeacherClassBands.timeSlots),
+      ['08:00', '08:30', '09:00', '09:30', '10:00'],
+    );
+    expect(
+      availability.openTimes(sunday, TeacherClassBands.timeSlots),
+      ['08:00', '08:30'],
+    );
+    expect(availability.openTimes(monday, TeacherClassBands.timeSlots), isEmpty);
+  });
+
+  testWidgets('강사 카드에 주말 아침 Class Time이 붙는다', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: TeacherClassTimeLine(
+          bands: TeacherClassBands(
+            days: {6, 7},
+            periods: {TeacherClassBands.am},
+          ),
+          closedRoutines: {
+            '6_06:00',
+            '6_06:30',
+            '6_07:00',
+            '6_07:30',
+            '6_10:30',
+            '6_11:00',
+            '6_11:30',
+            '7_06:00',
+            '7_06:30',
+            '7_07:00',
+            '7_07:30',
+            '7_09:00',
+            '7_09:30',
+            '7_10:00',
+            '7_10:30',
+            '7_11:00',
+            '7_11:30',
+          },
+        ),
+      ),
+    ));
+    expect(find.textContaining('Class Time :'), findsOneWidget);
+    expect(find.textContaining('주말 아침'), findsOneWidget);
   });
 
   testWidgets('강사 카드에 Class Time 키워드가 소개 아래에 붙는다', (tester) async {
