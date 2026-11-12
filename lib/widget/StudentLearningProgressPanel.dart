@@ -192,6 +192,7 @@ class _StudentLearningProgressPanelState
               label: tr(context, '인강'),
               title: week.videoLabel,
               url: week.videoUrl,
+              userId: userId,
               done: week.videoChecked,
               asPlayer: true,
             ),
@@ -199,6 +200,7 @@ class _StudentLearningProgressPanelState
                 label: tr(context, '문제'),
                 title: link.title.trim().isEmpty ? tr(context, '문제풀이'): link.title.trim(),
                 url: link.url,
+                userId: userId,
                 done: week.problemsChecked,
               )),
           _quizSection(week, userId),
@@ -245,10 +247,21 @@ class _StudentLearningProgressPanelState
     );
   }
 
+  /// 강사·관리자가 문제를 열면 그 수강생의 최근 결과를 퀴즈 맨 위에 띄운다.
+  String _quizUrlForStudent(String url, String userId) {
+    if (userId.isEmpty || QuizResult.quizIdFromUrl(url).isEmpty) return url;
+    final uri = Uri.parse(url);
+    return uri.replace(queryParameters: {
+      ...uri.queryParameters,
+      'student': userId,
+    }).toString();
+  }
+
   Widget _line({
     required String label,
     required String title,
     required String url,
+    required String userId,
     required bool done,
     bool asPlayer = false,
   }) {
@@ -280,8 +293,9 @@ class _StudentLearningProgressPanelState
                 ),
                 if (url.trim().isNotEmpty)
                   InkWell(
-                    onTap: () =>
-                        asPlayer ? UrlUtil.openPlayer(url) : UrlUtil.open(url),
+                    onTap: () => asPlayer
+                        ? UrlUtil.openPlayer(url)
+                        : UrlUtil.open(_quizUrlForStudent(url, userId)),
                     child: Text(
                       tr(context, "열기"),
                       style: TextStyle(
