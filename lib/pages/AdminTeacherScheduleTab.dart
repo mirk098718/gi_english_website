@@ -13,6 +13,7 @@ import 'package:gi_english_website/util/LessonFeedbackService.dart';
 import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/NotificationService.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/util/ScheduleZone.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/util/TeacherScheduleService.dart';
 import 'package:gi_english_website/util/JitsiJoin.dart';
@@ -173,6 +174,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   final Set<String> _selectedKeys = {};
   TeacherClassBands _bands = TeacherClassBands.empty;
   bool _savingBands = false;
+  String _zoneId = ScheduleZone.koreaId;
 
   @override
   void initState() {
@@ -782,6 +784,17 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   static const double _cellHeight = 26;
   static const double _rowPitch = 28;
 
+  bool get _zoneActive =>
+      !widget.schoolOverview && _zoneId != ScheduleZone.koreaId;
+
+  ScheduleZone get _zone => ScheduleZone.byId(_zoneId);
+
+  double get _timeColWidthNow => _zoneActive ? 108 : _timeColWidth;
+
+  double get _rowPitchNow => _zoneActive ? 44 : _rowPitch;
+
+  double get _cellHeightNow => _zoneActive ? 40 : _cellHeight;
+
   List<DateTime> get _days =>
       List.generate(7, (i) => _weekStart.add(Duration(days: i)));
 
@@ -826,6 +839,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
           _monthSummary(compact: true),
           SizedBox(height: 6),
           _bandPicker(compact: true),
+          _zonePicker(compact: true),
           SizedBox(height: 6),
           _grid(),
         ],
@@ -886,6 +900,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         _legendRow(),
         SizedBox(height: 16),
         _bandPicker(),
+        _zonePicker(),
         SizedBox(height: 12),
         _grid(),
         if (!widget.schoolOverview) ...[
@@ -1179,6 +1194,102 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     );
   }
 
+  Widget _zonePicker({bool compact = false}) {
+    if (widget.schoolOverview) return const SizedBox.shrink();
+    final zone = _zone;
+    return Padding(
+      padding: EdgeInsets.only(top: compact ? 6 : 12),
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 8,
+        runSpacing: 4,
+        children: [
+          Text(
+            tr(context, '지역'),
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontSize: compact ? 12 : 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          SizedBox(
+            width: compact ? 168 : 200,
+            child: DropdownButton<String>(
+              value: zone.id,
+              isExpanded: true,
+              isDense: true,
+              underline: const SizedBox.shrink(),
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontSize: compact ? 12 : 13,
+                color: Palette.black,
+              ),
+              items: [
+                for (final item in ScheduleZone.choices)
+                  DropdownMenuItem(
+                    value: item.id,
+                    child: Text(
+                      tr(context, item.label),
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: 'NotoSansKR',
+                        fontSize: compact ? 12 : 13,
+                        color: Palette.black,
+                      ),
+                    ),
+                  ),
+              ],
+              onChanged: (value) {
+                if (value == null || value == _zoneId) return;
+                setState(() => _zoneId = value);
+              },
+            ),
+          ),
+          if (!zone.isKorea)
+            Text(
+              tf(context, '색으로 적힌 시각은 {p0} 시간입니다.', {
+                'p0': tr(context, zone.label),
+              }),
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontSize: compact ? 11 : 12,
+                fontWeight: FontWeight.w700,
+                color: Palette.primary,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// 한 줄의 한국 시각이 보이는 요일마다 같은 지역 시각이면 그 문장. 아니면 null.
+  String? _sharedZoneLine(String time) {
+    if (!_zoneActive) return null;
+    final days = _visibleDays;
+    if (days.isEmpty) return null;
+    final labels = <String>{};
+    for (final day in days) {
+      final line = _zoneLineFor(day, time, withWeekday: false);
+      if (line == null) return null;
+      labels.add(line);
+    }
+    if (labels.length != 1) return null;
+    return labels.first;
+  }
+
+  String? _zoneLineFor(DateTime day, String time, {required bool withWeekday}) {
+    final local = _zone.localTime(day, time);
+    if (local == null) return null;
+    const names = ['월', '화', '수', '목', '금', '토', '일'];
+    final clock = EnrollmentService.formatBookingTime(local.hhmm);
+    final weekday = tr(context, names[local.weekday - 1]);
+    if (local.dayDelta == 0) {
+      return withWeekday ? '$weekday $clock' : clock;
+    }
+    final shift = local.dayDelta < 0 ? tr(context, '전날') : tr(context, '다음날');
+    return withWeekday ? '$shift $weekday $clock' : '$shift $clock';
+  }
+
   Widget _grid() {
     if (_loading) {
       return const Padding(
@@ -1186,8 +1297,8 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         child: Center(child: CircularProgressIndicator()),
       );
     }
-    final rowH = widget.schoolOverview ? 36.0 : _rowPitch;
-    final cellH = widget.schoolOverview ? 34.0 : _cellHeight;
+    final rowH = widget.schoolOverview ? 36.0 : _rowPitchNow;
+    final cellH = widget.schoolOverview ? 34.0 : _cellHeightNow;
     return Listener(
       onPointerUp: (_) => _finishSelect(),
       onPointerCancel: (_) => _finishSelect(),
@@ -1196,7 +1307,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         children: [
           Column(
             children: [
-              SizedBox(width: _timeColWidth, height: _dayHeaderHeight),
+              SizedBox(width: _timeColWidthNow, height: _dayHeaderHeight),
               ..._visibleSlots.map((t) => _timeLabel(t, height: rowH)),
             ],
           ),
@@ -1510,20 +1621,40 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   }
 
   Widget _timeLabel(String time, {double? height}) {
+    final zoneLine = _sharedZoneLine(time);
     return SizedBox(
-      width: _timeColWidth,
-      height: height ?? _rowPitch,
+      width: _timeColWidthNow,
+      height: height ?? _rowPitchNow,
       child: Align(
         alignment: Alignment.centerLeft,
-        child: Text(
-          EnrollmentService.formatBookingTime(time),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontFamily: "Jalnan",
-            fontSize: 10,
-            color: Palette.grey700,
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              EnrollmentService.formatBookingTime(time),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: "Jalnan",
+                fontSize: 10,
+                color: Palette.grey700,
+              ),
+            ),
+            if (zoneLine != null)
+              Text(
+                zoneLine,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 9,
+                  height: 1.1,
+                  fontWeight: FontWeight.w700,
+                  color: Palette.primary,
+                ),
+              ),
+          ],
         ),
       ),
     );
@@ -1609,6 +1740,9 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       label = tr(context, '닫힘');
     }
 
+    final sharedZone = _sharedZoneLine(time);
+    final zoneLine =
+        sharedZone == null ? _zoneLineFor(date, time, withWeekday: true) : null;
     final settled = booking != null && _isBookingSettled(booking);
     final canOpenBooking =
         booking != null && booking.isConfirmed && !settled;
@@ -1634,7 +1768,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
           excludeSemantics: true,
           enabled: tappable,
           label:
-              '${EnrollmentService.formatBookingDate(date)} ${EnrollmentService.formatBookingTime(time)} ${label.isEmpty ? tr(context, '지난 시간'): label.replaceAll('\n', ' ')}${hasPersonal ? ' · $personalNote' : ''}${canOpenBooking ? tr(context, ' · 화상수업 입장'): ''}',
+              '${EnrollmentService.formatBookingDate(date)} ${EnrollmentService.formatBookingTime(time)} ${label.isEmpty ? tr(context, '지난 시간'): label.replaceAll('\n', ' ')}${zoneLine == null || zoneLine.isEmpty ? '' : ' · $zoneLine'}${hasPersonal ? ' · $personalNote' : ''}${canOpenBooking ? tr(context, ' · 화상수업 입장'): ''}',
           child: MouseRegion(
             onEnter: (_) => _hoverSelect(date, time),
             child: Listener(
@@ -1649,7 +1783,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                     : () => _onCellTap(date, time),
                 borderRadius: BorderRadius.circular(4),
                 child: _slotFace(
-                  height: height ?? _cellHeight,
+                  height: height ?? _cellHeightNow,
                   fill: fill,
                   border: border,
                   selected: selected,
@@ -1658,6 +1792,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                   emphasize: canOpenBooking || settled,
                   underline: canOpenBooking,
                   personalNote: hasPersonal ? personalNote : '',
+                  zoneLine: zoneLine ?? '',
                 ),
               ),
             ),
@@ -1902,6 +2037,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     required bool emphasize,
     required bool underline,
     required String personalNote,
+    String zoneLine = '',
   }) {
     final face = Container(
       width: double.infinity,
@@ -1919,19 +2055,39 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       child: Stack(
         children: [
           Center(
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontFamily: "NotoSansKR",
-                fontSize: 8,
-                height: 1.15,
-                fontWeight: emphasize ? FontWeight.w700 : FontWeight.w400,
-                color: textColor,
-                decoration: underline ? TextDecoration.underline : null,
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (label.isNotEmpty)
+                  Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    maxLines: zoneLine.isEmpty ? 2 : 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: "NotoSansKR",
+                      fontSize: 8,
+                      height: 1.15,
+                      fontWeight: emphasize ? FontWeight.w700 : FontWeight.w400,
+                      color: textColor,
+                      decoration: underline ? TextDecoration.underline : null,
+                    ),
+                  ),
+                if (zoneLine.isNotEmpty)
+                  Text(
+                    zoneLine,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: "NotoSansKR",
+                      fontSize: 8,
+                      height: 1.1,
+                      fontWeight: FontWeight.w700,
+                      color: Palette.primary,
+                    ),
+                  ),
+              ],
             ),
           ),
           if (personalNote.isNotEmpty)
