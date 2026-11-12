@@ -117,7 +117,7 @@ class _StudentLearningProgressPanelState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          widget.dense ? '학습 진도 · $title' : tr(context, "학습 진도"),
+          widget.dense ? tf(context, '학습 진도 · {p0}', {'p0': title}): tr(context, "학습 진도"),
           style: TextStyle(
             fontFamily: "Jalnan",
             fontSize: widget.dense ? 12 : 13,
@@ -140,7 +140,7 @@ class _StudentLearningProgressPanelState
           Text(
             widget.onlyWeekNumber == null
                 ? tr(context, "아직 체크한 학습이 없습니다.")
-                : '${widget.onlyWeekNumber}회차 학습 체크가 없습니다.',
+                : tf(context, '{p0}회차 학습 체크가 없습니다.', {'p0': widget.onlyWeekNumber}),
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 12,
@@ -148,61 +148,96 @@ class _StudentLearningProgressPanelState
             ),
           )
         else
-          ...weeks.map((week) => _weekBlock(week, enrollment.userId)),
+          ...weeks.map((week) => _weekBlock(
+                week,
+                enrollment.userId,
+                enrollment.completedSessions,
+              )),
       ],
     );
   }
 
-  Widget _weekBlock(StudentWeekProgress week, String userId) {
+  /// 체크가 끝나거나 회차 차감이 된 회차. 강사 화면의 '예약 가능'은 수강완료로 적는다.
+  bool _markedComplete(StudentWeekProgress week, int completedSessions) {
+    if (week.weekNumber > 0 && completedSessions >= week.weekNumber) {
+      return true;
+    }
+    return week.readyToBook;
+  }
+
+  Widget _weekBlock(StudentWeekProgress week, String userId, int completedSessions) {
     final problems = week.problemLinks.isEmpty
-        ? const [WeekProblemLink(title: '등록된 문제 없음', url: '')]
+        ?  [WeekProblemLink(title: tr(context, '등록된 문제 없음'), url: '')]
         : week.problemLinks;
+    final done = _markedComplete(week, completedSessions);
+    final heading = [
+      if (week.weekNumber > 0) tf(context, '{p0}회차', {'p0': week.weekNumber}),
+      if (week.weekTitle.isNotEmpty) week.weekTitle,
+      if (done) tr(context, "수강완료"),
+    ].join(' · ');
 
     return Container(
       width: double.maxFinite,
       margin: EdgeInsets.only(bottom: widget.dense ? 6 : 8),
-      padding: EdgeInsets.all(widget.dense ? 10 : 12),
       decoration: BoxDecoration(
         color: Palette.grey50,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: week.readyToBook
-              ? Palette.secondary.withValues(alpha: 0.35)
+          color: done
+              ? Palette.success.withValues(alpha: 0.45)
               : Palette.grey200,
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            [
-              if (week.weekNumber > 0) '${week.weekNumber}회차',
-              if (week.weekTitle.isNotEmpty) week.weekTitle,
-              if (week.readyToBook) tr(context, "예약 가능"),
-            ].join(' · '),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          key: ValueKey('week-${week.weekId}'),
+          initiallyExpanded: false,
+          minTileHeight: widget.dense ? 40 : 44,
+          tilePadding: EdgeInsets.symmetric(horizontal: widget.dense ? 10 : 12),
+          childrenPadding: EdgeInsets.fromLTRB(
+            widget.dense ? 10 : 12,
+            0,
+            widget.dense ? 10 : 12,
+            widget.dense ? 10 : 12,
+          ),
+          expandedAlignment: Alignment.centerLeft,
+          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+          iconColor: Palette.grey600,
+          collapsedIconColor: Palette.grey500,
+          shape: const Border(),
+          collapsedShape: const Border(),
+          title: Text(
+            heading,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 13,
               fontWeight: FontWeight.w700,
+              color: done ? Palette.success : Palette.black,
             ),
           ),
-          SizedBox(height: 8),
-          if (week.videoUrl.trim().isNotEmpty)
-            _line(
-              label: '인강',
-              title: week.videoLabel,
-              url: week.videoUrl,
-              done: week.videoChecked,
-              asPlayer: true,
-            ),
-          ...problems.map((link) => _line(
-                label: '문제',
-                title: link.title.trim().isEmpty ? '문제풀이' : link.title.trim(),
-                url: link.url,
-                done: week.problemsChecked,
-              )),
-          _quizSection(week, userId),
-        ],
+          children: [
+            if (week.videoUrl.trim().isNotEmpty)
+              _line(
+                label: tr(context, '인강'),
+                title: week.videoLabel,
+                url: week.videoUrl,
+                userId: userId,
+                done: week.videoChecked,
+                asPlayer: true,
+              ),
+            ...problems.map((link) => _line(
+                  label: tr(context, '문제'),
+                  title: link.title.trim().isEmpty ? tr(context, '문제풀이'): link.title.trim(),
+                  url: link.url,
+                  userId: userId,
+                  done: week.problemsChecked,
+                )),
+            _quizSection(week, userId),
+          ],
+        ),
       ),
     );
   }
@@ -245,10 +280,21 @@ class _StudentLearningProgressPanelState
     );
   }
 
+  /// 강사·관리자가 문제를 열면 그 수강생의 최근 결과를 퀴즈 맨 위에 띄운다.
+  String _quizUrlForStudent(String url, String userId) {
+    if (userId.isEmpty || QuizResult.quizIdFromUrl(url).isEmpty) return url;
+    final uri = Uri.parse(url);
+    return uri.replace(queryParameters: {
+      ...uri.queryParameters,
+      'student': userId,
+    }).toString();
+  }
+
   Widget _line({
     required String label,
     required String title,
     required String url,
+    required String userId,
     required bool done,
     bool asPlayer = false,
   }) {
@@ -280,8 +326,9 @@ class _StudentLearningProgressPanelState
                 ),
                 if (url.trim().isNotEmpty)
                   InkWell(
-                    onTap: () =>
-                        asPlayer ? UrlUtil.openPlayer(url) : UrlUtil.open(url),
+                    onTap: () => asPlayer
+                        ? UrlUtil.openPlayer(url)
+                        : UrlUtil.open(_quizUrlForStudent(url, userId)),
                     child: Text(
                       tr(context, "열기"),
                       style: TextStyle(

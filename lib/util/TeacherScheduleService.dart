@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
+import 'package:gi_english_website/class/TeacherClassBands.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 
 /// 원어민 강사 스케줄: 닫힌 시간 + 매주 반복 닫기 + 이미 예약된 시간.
@@ -49,6 +52,26 @@ class TeacherScheduleService {
     final routineKeys = <String>{};
     final exceptionKeys = <String>{};
     final notes = <String, String>{};
+    var classBands = TeacherClassBands.empty;
+
+    try {
+      final profiles = await _firestore
+          .collection('native_teacher_accounts')
+          .where('teacherUid', isEqualTo: teacherUid)
+          .limit(1)
+          .get();
+      if (profiles.docs.isNotEmpty) {
+        classBands = TeacherClassBands.fromMap(profiles.docs.first.data());
+      }
+    } catch (e) {
+      print('수업 가능 시간 조회 오류: $e');
+    }
+    if (!classBands.active) {
+      final cached = OnlineNativeTeacher.findAssigned(accountUid: teacherUid);
+      if (cached != null && cached.classBands.active) {
+        classBands = cached.classBands;
+      }
+    }
 
     try {
       final closed = await _firestore
@@ -77,6 +100,10 @@ class TeacherScheduleService {
       }
     } catch (e) {
       print('반복 닫기 조회 오류: $e');
+    }
+    if (routineKeys.isEmpty) {
+      final cached = OnlineNativeTeacher.findAssigned(accountUid: teacherUid);
+      if (cached != null) routineKeys.addAll(cached.closedRoutineKeys);
     }
 
     try {
@@ -112,7 +139,48 @@ class TeacherScheduleService {
       routineKeys: routineKeys,
       exceptionKeys: exceptionKeys,
       notes: notes,
+      classBands: classBands,
     );
+  }
+
+  static Future<String?> saveClassBands({
+    required String teacherUid,
+    required TeacherClassBands bands,
+  }) async {
+    if (teacherUid.isEmpty) return '강사 계정이 없습니다.';
+    try {
+      final ref = await _profileRef(teacherUid);
+      await ref.set({
+        'teacherUid': teacherUid,
+        ...bands.toFirestore(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      return null;
+    } catch (e) {
+      print('수업 가능 시간 저장 오류: $e');
+      return '수업 가능 시간을 저장하지 못했습니다.';
+    }
+  }
+
+  static Future<DocumentReference<Map<String, dynamic>>> _profileRef(
+    String teacherUid,
+  ) async {
+    final existing = await _firestore
+        .collection('native_teacher_accounts')
+        .where('teacherUid', isEqualTo: teacherUid)
+        .limit(1)
+        .get();
+    if (existing.docs.isNotEmpty) return existing.docs.first.reference;
+    final admin =
+        await _firestore.collection('admins').doc(teacherUid).get();
+    final data = admin.data() ?? {};
+    final isOwner = AuthService.docIsOwner(data);
+    final profileId = OnlineNativeTeacher.profileIdFor(
+      uid: teacherUid,
+      isOwner: isOwner,
+      existing: data['nativeProfileId']?.toString() ?? '',
+    );
+    return _firestore.collection('native_teacher_accounts').doc(profileId);
   }
 
   static Future<String?> setClosed({
@@ -300,6 +368,7 @@ class TeacherAvailability {
   final Set<String> routineKeys;
   final Set<String> exceptionKeys;
   final Map<String, String> notes;
+  final TeacherClassBands classBands;
 
   TeacherAvailability({
     required this.teacherUid,
@@ -308,11 +377,13 @@ class TeacherAvailability {
     Set<String>? routineKeys,
     Set<String>? exceptionKeys,
     Map<String, String>? notes,
+    TeacherClassBands? classBands,
   })  : closedKeys = closedKeys ?? {},
         occupiedKeys = occupiedKeys ?? {},
         routineKeys = routineKeys ?? {},
         exceptionKeys = exceptionKeys ?? {},
-        notes = notes ?? {};
+        notes = notes ?? {},
+        classBands = classBands ?? TeacherClassBands.empty;
 
   String noteFor(DateTime date, String time) =>
       notes[TeacherScheduleService.slotKey(date, time)] ?? '';
@@ -328,6 +399,7 @@ class TeacherAvailability {
       exceptionKeys.contains(TeacherScheduleService.slotKey(date, time));
 
   bool isClosed(DateTime date, String time) {
+    if (!classBands.allows(date.weekday, time)) return true;
     if (isOneOffClosed(date, time)) return true;
     return isRoutine(date, time) && !isException(date, time);
   }
@@ -343,6 +415,6 @@ class TeacherAvailability {
 
   String weekdayLabel(DateTime date) {
     const names = ['월', '화', '수', '목', '금', '토', '일'];
-    return names[date.weekday - 1];
+    return AppLanguage.instance.translate(names[date.weekday - 1]);
   }
 }

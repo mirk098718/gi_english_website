@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
+import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/class/QuizResult.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
@@ -23,7 +24,9 @@ import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:gi_english_website/widget/QuizResultSummary.dart';
+import 'package:gi_english_website/widget/MainTeacherChange.dart';
 import 'package:gi_english_website/widget/StudentJoinButton.dart';
+import 'package:gi_english_website/widget/TeacherClassTimeLine.dart';
 import 'package:gi_english_website/widget/YoutubeLessonPlayer.dart';
 
 import '../util/WidgetUtil.dart';
@@ -147,10 +150,14 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     );
     final enrollment =
         await EnrollmentService.myEnrollmentForCourse(widget.course.id);
-    final weeks = await EnrollmentService.weeks(
-      widget.course.id,
-      ensureThrough: enrollment?.unlockedSessionNumber ?? 1,
-    );
+    final speaking = widget.course.isSpeakingProduct ||
+        enrollment?.plan == OnlinePlan.speaking;
+    final weeks = speaking
+        ? _speakingWeeks(enrollment?.totalSessions ?? 8)
+        : await EnrollmentService.weeks(
+            widget.course.id,
+            ensureThrough: enrollment?.unlockedSessionNumber ?? 1,
+          );
     Map<String, List<String>> progress = {};
     List<WeekBooking> bookings = [];
     List<LessonFeedback> feedbacks = [];
@@ -236,6 +243,12 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     if (enrollment == null) return 1;
     return enrollment.unlockedSessionNumber;
   }
+
+  bool get _lectureOnly => _enrollment?.plan == OnlinePlan.lecture;
+
+  bool get _speakingOnly =>
+      widget.course.isSpeakingProduct ||
+      _enrollment?.plan == OnlinePlan.speaking;
 
   OnlineNativeTeacher? get _assignedNativeTeacher =>
       _enrollment?.nativeTeacher;
@@ -430,6 +443,10 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       OnlineCheckoutPage(
         initialCourseId: widget.course.id,
         extendEnrollment: true,
+        initialPlan: _enrollment?.plan,
+        initialSessions: _enrollment?.plan == OnlinePlan.speaking
+            ? _enrollment?.totalSessions
+            : null,
       ),
     );
   }
@@ -508,13 +525,13 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            tr(context, course.title),
+            course.localizedName(context, _enrollment?.plan ?? OnlinePlan.bundle),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),
           SizedBox(height: 20),
           Text(
-            tr(context, course.subtitle),
+            tr(context, course.subtitleFor(_enrollment?.plan ?? OnlinePlan.bundle)),
             style: TextStyle(
               fontFamily: "Jalnan",
               fontSize: 15,
@@ -724,6 +741,28 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     );
   }
 
+  Future<void> _changeMainTeacher() async {
+    final changed = await MainTeacherChange.pick(
+      context,
+      currentUid: _assignedNativeTeacher?.accountUid ??
+          _enrollment?.nativeTeacherUid ??
+          '',
+    );
+    if (!changed || !mounted) return;
+    setState(_bookingTeacher.clear);
+    await _loadData();
+  }
+
+  Future<void> _pinMainTeacher(OnlineNativeTeacher teacher) async {
+    final changed = await MainTeacherChange.pin(context, teacher);
+    if (!changed || !mounted) return;
+    setState(() {
+      _bookingTeacher.removeWhere((_, picked) =>
+          picked.accountUid == teacher.accountUid || picked.id == teacher.id);
+    });
+    await _loadData();
+  }
+
   Future<void> _pickOtherTeacher(OnlineWeek week) async {
     final teachers = await AuthService.selectableNativeTeachers(
       kind: TeacherPickKind.coteach,
@@ -771,14 +810,23 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                     style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontWeight: FontWeight.w700)),
-                subtitle: Text(
-                  teacher.nationality.isEmpty
-                      ? tr(context, "담당 선생님 시간이 안 맞을 때 이 선생님 스케줄로 예약합니다.")
-                      : teacher.nationality,
-                  style: TextStyle(
-                      fontFamily: "NotoSansKR",
-                      fontSize: 12,
-                      color: Palette.grey600),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      teacher.nationality.isEmpty
+                          ? tr(context, "담당 선생님 시간이 안 맞을 때 이 선생님 스케줄로 예약합니다.")
+                          : teacher.nationality,
+                      style: TextStyle(
+                          fontFamily: "NotoSansKR",
+                          fontSize: 12,
+                          color: Palette.grey600),
+                    ),
+                    TeacherClassTimeLine(
+                      bands: teacher.classBands,
+                      closedRoutines: teacher.closedRoutineKeys,
+                    ),
+                  ],
                 ),
                 onTap: () => Navigator.pop(dialogContext, teacher),
               );
@@ -1070,7 +1118,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
         Row(
           children: [
             Text(
-              tr(context, "회차 학습"),
+              tr(context, _speakingOnly ? "회화 예약" : "회차 학습"),
               style: TextStyle(
                 fontFamily: "Jalnan",
                 fontSize: 15,
@@ -1083,6 +1131,14 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
               onPressed: _loadData,
               icon: Icon(Icons.refresh, size: 18, color: Palette.grey600),
             ),
+            if (_enrollment != null && !_lectureOnly)
+              TextButton(
+                onPressed: _changeMainTeacher,
+                child: Text(
+                  tr(context, "메인 강사 변경"),
+                  style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13),
+                ),
+              ),
           ],
         ),
         SizedBox(height: 8),
@@ -1149,10 +1205,47 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     );
   }
 
+  List<OnlineWeek> _speakingWeeks(int total) {
+    final count = total < 1 ? 1 : total;
+    return [
+      for (var n = 1; n <= count; n++)
+        OnlineWeek(
+          id: 'native_speaking_session_$n',
+          courseId: widget.course.id,
+          weekNumber: n,
+          title: '$n회 회화',
+          description: '원어민과 1:1로 말하는 회화 수업입니다.',
+          videoUrl: '',
+        ),
+    ];
+  }
+
   String _enrollmentDeadlineCopy() {
     final enrollment = _enrollment!;
     final current = enrollment.unlockedSessionNumber;
     final done = enrollment.completedSessions;
+    if (_lectureOnly) {
+      if (EnrollmentService.isEnrollmentExpired(enrollment)) {
+        return '수강 기한이 지났습니다. 연장 결제 후 인강을 이어서 들을 수 있습니다.';
+      }
+      return '인강 ${OnlinePlan.lessonsPerLevel}편과 퀴즈를 들을 수 있습니다. '
+          '화상수업은 포함되지 않습니다. '
+          '수강 기한은 ${enrollment.remainingDeadlineWeeks}주 남았습니다.';
+    }
+    if (_speakingOnly) {
+      if (enrollment.remainingSessions <= 0) {
+        return '회화 ${enrollment.totalSessions}회를 모두 마쳤습니다.';
+      }
+      if (EnrollmentService.isEnrollmentExpired(enrollment)) {
+        return '수강 기한이 지났습니다. 연장 결제 후 회화를 이어서 예약할 수 있습니다.';
+      }
+      final deadline = enrollment.expiresAt == null
+          ? ''
+          : ' 수강 기한은 ${enrollment.remainingDeadlineWeeks}주 남았습니다.';
+      return '지금 예약할 수 있는 회화는 $current회입니다. '
+          '회화를 마치면 다음 회차가 열립니다.$deadline'
+          '${done > 0 ? ' 이수 $done/${enrollment.totalSessions}회.' : ''}';
+    }
     if (enrollment.remainingSessions <= 0) {
       return "화상수업 ${enrollment.totalSessions}회를 모두 마쳤습니다. 이전 회차는 복습할 수 있습니다.";
     }
@@ -1209,9 +1302,11 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     final enrollment = _enrollment;
     final unlocked = enrollment == null ||
         EnrollmentService.isSessionUnlocked(enrollment, week.weekNumber);
-    final isCurrent =
-        enrollment != null && week.weekNumber == _currentSessionNumber;
-    final completed = enrollment != null &&
+    final isCurrent = !_lectureOnly &&
+        enrollment != null &&
+        week.weekNumber == _currentSessionNumber;
+    final completed = !_lectureOnly &&
+        enrollment != null &&
         week.weekNumber <= enrollment.completedSessions;
     final checked = _checkedIds(week.id);
     final visibleItems = EnrollmentService.requiredChecklistItems(week);
@@ -1314,6 +1409,22 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                 ),
               ),
               ..._sessionsForWeek(week).map(sessionTile),
+            ] else if (_speakingOnly) ...[
+              if (_enrollment == null)
+                Text(
+                  tr(context, '결제 후 이 회차 회화를 예약할 수 있습니다.'),
+                  style: TextStyle(
+                    fontFamily: 'NotoSansKR',
+                    fontSize: 13,
+                    height: 1.5,
+                    color: Palette.grey600,
+                  ),
+                )
+              else ...[
+                weekBookingSection(week),
+                SizedBox(height: 16),
+                weekFeedbackSection(week),
+              ],
             ] else ...[
             if (week.description.isNotEmpty) ...[
               Align(
@@ -1399,7 +1510,12 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                tr(context, EnrollmentService.bookingChecklistHint(week)),
+                tr(
+                  context,
+                  _lectureOnly
+                      ? '인강과 문제풀이를 체크하며 진도를 남깁니다. 이 상품에는 화상수업이 없습니다.'
+                      : EnrollmentService.bookingChecklistHint(week),
+                ),
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -1449,10 +1565,12 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                   );
                 }).toList(),
               ),
-            SizedBox(height: 16),
-            weekLiveClassSection(week, checked),
-            SizedBox(height: 16),
-            weekFeedbackSection(week),
+            if (!_lectureOnly) ...[
+              SizedBox(height: 16),
+              weekLiveClassSection(week, checked),
+              SizedBox(height: 16),
+              weekFeedbackSection(week),
+            ],
             ],
           ],
         ),
@@ -1699,8 +1817,21 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       enrollmentStart: _enrollment?.createdAt,
       weekNumber: week.weekNumber,
       expiresAt: _enrollment?.expiresAt,
-    );
-    final selectedDate = _selectedDates[week.id];
+    ).where((date) {
+      return availability
+          .openTimes(
+            date,
+            EnrollmentService.remainingTimeSlots(date),
+          )
+          .isNotEmpty;
+    }).toList();
+    final pickedDate = _selectedDates[week.id];
+    final selectedDate = pickedDate != null &&
+            dates.any((date) =>
+                EnrollmentService.dateOnly(date) ==
+                EnrollmentService.dateOnly(pickedDate))
+        ? pickedDate
+        : null;
     final timeSlots = selectedDate == null
         ? const <String>[]
         : availability.openTimes(
@@ -1761,6 +1892,10 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                         color: Palette.secondaryDark,
                       ),
                     ),
+                    TeacherClassTimeLine(
+                      bands: availability.classBands,
+                      closedRoutines: availability.routineKeys,
+                    ),
                     if (otherTeacher) ...[
                       SizedBox(height: 2),
                       Text(
@@ -1771,6 +1906,24 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                           color: Palette.accent,
                         ),
                       ),
+                      if (bookingTeacher != null &&
+                          bookingTeacher.accountUid.trim().isNotEmpty)
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size(0, 32),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          onPressed: () => _pinMainTeacher(bookingTeacher),
+                          child: Text(
+                            tr(context, "이 강사를 메인 강사로 고정"),
+                            style: TextStyle(
+                              fontFamily: "NotoSansKR",
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
                     ],
                   ],
                 ),
@@ -1946,6 +2099,15 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             Text(tr(context, "날짜 선택"),
                 style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
             SizedBox(height: 8),
+            if (dates.isEmpty)
+              Text(
+                tr(context, "선택할 수 있는 열린 날짜가 없습니다."),
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 13,
+                  color: Palette.grey500,
+                ),
+              ),
             Wrap(
               spacing: 8,
               runSpacing: 8,

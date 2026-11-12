@@ -4,13 +4,16 @@ import 'package:gi_english_website/util/html_stub.dart'
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
+import 'package:gi_english_website/class/TeacherClassBands.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonFeedbackService.dart';
 import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/NotificationService.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/util/ScheduleZone.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/util/TeacherScheduleService.dart';
 import 'package:gi_english_website/util/JitsiJoin.dart';
@@ -103,13 +106,13 @@ class _AdminTeacherSchedulePageState extends State<AdminTeacherSchedulePage> {
     if (!_authorized) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('내 스케줄', style: TextStyle(fontFamily: "NotoSansKR")),
+          title: Text(tr(context, '내 스케줄'), style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Palette.navy,
           foregroundColor: Palette.white,
         ),
         body: Center(
           child: Text(
-            '강사 또는 관리자로 로그인한 뒤 다시 열어 주세요.',
+            tr(context, '강사 또는 관리자로 로그인한 뒤 다시 열어 주세요.'),
             style: TextStyle(fontFamily: "NotoSansKR"),
           ),
         ),
@@ -169,6 +172,9 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   String? _selectAnchorTime;
   bool _selecting = false;
   final Set<String> _selectedKeys = {};
+  TeacherClassBands _bands = TeacherClassBands.empty;
+  bool _savingBands = false;
+  String _zoneId = ScheduleZone.koreaId;
 
   @override
   void initState() {
@@ -199,6 +205,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       setState(() {
         _teacherUid = uid;
         _availability = availability;
+        _bands = availability.classBands;
         _bookings = bookings;
         _ratings = ratings;
         _enrollments = [];
@@ -223,6 +230,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     setState(() {
       _teacherUid = uid;
       _availability = availability;
+      _bands = availability.classBands;
       _bookings = bookings;
       _ratings = ratings;
       _enrollments = enrollments;
@@ -271,7 +279,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   void _toast(String message, {bool error = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
+        content: Text(tr(context, message), style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: error ? Palette.danger : Palette.success,
       ),
     );
@@ -280,11 +288,11 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   Future<void> _openVideoForBooking(WeekBooking booking) async {
     // 이름이 보이는 칸(=대기 아님)이면 화상으로 연결한다.
     if (booking.isPending) {
-      _toast('대기 중인 예약입니다. 아래에서 먼저 확정해 주세요.', error: true);
+      _toast(tr(context, '대기 중인 예약입니다. 아래에서 먼저 확정해 주세요.'), error: true);
       return;
     }
     if (booking.status == 'rejected') {
-      _toast('취소된 예약입니다.', error: true);
+      _toast(tr(context, '취소된 예약입니다.'), error: true);
       return;
     }
     if (_isBookingSettled(booking)) {
@@ -292,7 +300,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       return;
     }
     if (booking.courseId.trim().isEmpty || booking.id.trim().isEmpty) {
-      _toast('화상수업 정보를 찾을 수 없습니다.', error: true);
+      _toast(tr(context, '화상수업 정보를 찾을 수 없습니다.'), error: true);
       return;
     }
 
@@ -300,7 +308,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       courseId: booking.courseId,
       bookingId: booking.id,
     );
-    _toast('${booking.memberName.isEmpty ? '수강생' : booking.memberName} 화상수업을 엽니다.');
+    _toast(tf(context, '{p0} 화상수업을 엽니다.', {'p0': booking.memberName.isEmpty ? tr(context, '수강생'): booking.memberName}));
     // 팝업 차단을 피하려고 클릭 직후 바로 URL을 연다.
     await JitsiJoin.open(url, asHost: true);
 
@@ -321,12 +329,12 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     final action = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(cancelled ? '취소된 수업' : '완료된 수업',
+        title: Text(cancelled ? tr(context, '취소된 수업'): tr(context, '완료된 수업'),
             style: TextStyle(fontFamily: "Jalnan")),
         content: Text(
           [
             if (booking.memberName.isNotEmpty) booking.memberName,
-            if (booking.weekNumber > 0) '${booking.weekNumber}회차',
+            if (booking.weekNumber > 0) tf(context, '{p0}회차', {'p0': booking.weekNumber}),
             '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)}',
           ].join(' · '),
           style: TextStyle(fontFamily: "NotoSansKR", height: 1.5),
@@ -334,11 +342,11 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: Text('닫기')),
+              child: Text(tr(context, '닫기'))),
           if (!cancelled)
             ElevatedButton(
               onPressed: () => Navigator.pop(dialogContext, 'feedback'),
-              child: Text('피드백'),
+              child: Text(tr(context, '피드백')),
             ),
         ],
       ),
@@ -353,9 +361,9 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       existing: LessonFeedbackService.forBooking(existing, booking.id),
       canWrite: true,
       teacherId: _teacherUid,
-      teacherName: teacherName.isNotEmpty ? teacherName : '강사',
+      teacherName: teacherName.isNotEmpty ? teacherName : tr(context, '강사'),
     );
-    if (saved) _toast('피드백을 저장했습니다.');
+    if (saved) _toast(tr(context, '피드백을 저장했습니다.'));
   }
 
   Future<void> _onCellTap(DateTime date, String time) async {
@@ -366,7 +374,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       return;
     }
     if (_availability.isOccupied(date, time)) {
-      _toast('이미 예약이 있는 시간은 닫을 수 없습니다. 예약을 먼저 처리하세요.', error: true);
+      _toast(tr(context, '이미 예약이 있는 시간은 닫을 수 없습니다. 예약을 먼저 처리하세요.'), error: true);
       return;
     }
     final remaining =
@@ -408,14 +416,14 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
             option(
               _SlotAction.openThisDay,
               Icons.lock_open,
-              '이번만 열기',
-              '루틴은 유지하고 $dateLabel만 다시 엽니다.',
+              tr(context, '이번만 열기'),
+              tf(context, '루틴은 유지하고 {p0}만 다시 엽니다.', {'p0': dateLabel}),
             ),
             option(
               _SlotAction.unpinRoutine,
               Icons.push_pin_outlined,
-              '루틴 해제',
-              '매주 $weekday요일 $timeLabel을 다시 엽니다.',
+              tr(context, '루틴 해제'),
+              tf(context, '매주 {p0}요일 {p1}을 다시 엽니다.', {'p0': weekday, 'p1': timeLabel}),
             ),
           ]);
         } else if (exception) {
@@ -423,14 +431,14 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
             option(
               _SlotAction.closeThisWeek,
               Icons.event_busy,
-              '이번 주도 닫기',
-              '루틴대로 $dateLabel $timeLabel을 다시 닫습니다.',
+              tr(context, '이번 주도 닫기'),
+              tf(context, '루틴대로 {p0} {p1}을 다시 닫습니다.', {'p0': dateLabel, 'p1': timeLabel}),
             ),
             option(
               _SlotAction.unpinRoutine,
               Icons.push_pin_outlined,
-              '루틴 해제',
-              '매주 $weekday요일 $timeLabel 닫기를 해제합니다.',
+              tr(context, '루틴 해제'),
+              tf(context, '매주 {p0}요일 {p1} 닫기를 해제합니다.', {'p0': weekday, 'p1': timeLabel}),
             ),
           ]);
         } else if (oneOff) {
@@ -438,14 +446,14 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
             option(
               _SlotAction.openOnce,
               Icons.lock_open,
-              '다시 열기',
-              '$dateLabel $timeLabel만 다시 엽니다.',
+              tr(context, '다시 열기'),
+              tf(context, '{p0} {p1}만 다시 엽니다.', {'p0': dateLabel, 'p1': timeLabel}),
             ),
             option(
               _SlotAction.pinRoutine,
               Icons.push_pin,
-              '매주 이 시간 닫기로 고정',
-              '매주 $weekday요일 $timeLabel을 닫아 둡니다.',
+              tr(context, '매주 이 시간 닫기로 고정'),
+              tf(context, '매주 {p0}요일 {p1}을 닫아 둡니다.', {'p0': weekday, 'p1': timeLabel}),
             ),
           ]);
         } else {
@@ -453,22 +461,22 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
             option(
               _SlotAction.closeOnce,
               Icons.event_busy,
-              '이번만 닫기',
-              '$dateLabel $timeLabel만 닫습니다.',
+              tr(context, '이번만 닫기'),
+              tf(context, '{p0} {p1}만 닫습니다.', {'p0': dateLabel, 'p1': timeLabel}),
             ),
             option(
               _SlotAction.pinRoutine,
               Icons.push_pin,
-              '매주 이 시간 닫기 (루틴 고정)',
-              '매주 $weekday요일 $timeLabel을 닫아 둡니다. 언제든 해제할 수 있습니다.',
+              tr(context, '매주 이 시간 닫기 (루틴 고정)'),
+              tf(context, '매주 {p0}요일 {p1}을 닫아 둡니다. 언제든 해제할 수 있습니다.', {'p0': weekday, 'p1': timeLabel}),
             ),
           ]);
         }
         options.add(option(
           _SlotAction.savePersonal,
           Icons.circle,
-          existingNote.isEmpty ? '개인 일정으로 닫기' : '개인 일정 저장',
-          '아래 사유를 빨간 점으로 표시하고 이 시간을 닫습니다.',
+          existingNote.isEmpty ? tr(context, '개인 일정으로 닫기'): tr(context, '개인 일정 저장'),
+          tr(context, '아래 사유를 빨간 점으로 표시하고 이 시간을 닫습니다.'),
           iconColor: Palette.danger,
         ));
 
@@ -484,7 +492,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '수업은 20분입니다. 닫거나, 매주 같은 시간을 고정하거나, 사유를 적어 개인 일정을 표시할 수 있습니다.',
+                  tr(context, '수업은 20분입니다. 닫거나, 매주 같은 시간을 고정하거나, 사유를 적어 개인 일정을 표시할 수 있습니다.'),
                   style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 13,
@@ -495,9 +503,9 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                   controller: noteController,
                   maxLines: 2,
                   decoration: InputDecoration(
-                    labelText: '개인 일정 사유',
-                    hintText: '예: 병원, 출장',
-                    helperText: '사유를 적으면 빨간 점으로 표시됩니다.',
+                    labelText: tr(context, '개인 일정 사유'),
+                    hintText: tr(context, '예: 병원, 출장'),
+                    helperText: tr(context, '사유를 적으면 빨간 점으로 표시됩니다.'),
                     helperMaxLines: 2,
                     border: OutlineInputBorder(),
                   ),
@@ -510,7 +518,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: Text('취소',
+              child: Text(tr(context, '취소'),
                   style: TextStyle(
                       fontFamily: "NotoSansKR", color: Palette.grey600)),
             ),
@@ -533,7 +541,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       case _SlotAction.savePersonal:
         if (note.isEmpty) {
           setState(() => _saving = false);
-          _toast('개인 일정 사유를 입력해 주세요.', error: true);
+          _toast(tr(context, '개인 일정 사유를 입력해 주세요.'), error: true);
           return;
         }
         error = await TeacherScheduleService.setClosed(
@@ -625,7 +633,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       _toast(error, error: true);
       return;
     }
-    _toast('예약을 확인했습니다. 화상수업 회차가 자동 생성되었고 수강생에게 확정 알림을 보냅니다.');
+    _toast(tr(context, '예약을 확인했습니다. 화상수업 회차가 자동 생성되었고 수강생에게 확정 알림을 보냅니다.'));
     await _refresh();
   }
 
@@ -635,7 +643,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       _toast(error, error: true);
       return;
     }
-    _toast('예약을 거절했습니다. 해당 시간은 다시 열리고 수강생에게 알림을 보냅니다.');
+    _toast(tr(context, '예약을 거절했습니다. 해당 시간은 다시 열리고 수강생에게 알림을 보냅니다.'));
     await _refresh();
   }
 
@@ -647,13 +655,13 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       builder: (dialogContext) => AlertDialog(
         backgroundColor: Palette.white,
         surfaceTintColor: Palette.white,
-        title: Text('강사 휴대폰 번호', style: TextStyle(fontFamily: "Jalnan")),
+        title: Text(tr(context, '강사 휴대폰 번호'), style: TextStyle(fontFamily: "Jalnan")),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.phone,
           decoration: InputDecoration(
             labelText: '010-0000-0000',
-            helperText: '수강생이 수업을 신청하면 이 번호로 알림 문자를 보냅니다.',
+            helperText: tr(context, '수강생이 수업을 신청하면 이 번호로 알림 문자를 보냅니다.'),
             helperMaxLines: 2,
             border: OutlineInputBorder(),
           ),
@@ -661,11 +669,11 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text('닫기'),
+            child: Text(tr(context, '닫기')),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text('저장'),
+            child: Text(tr(context, '저장')),
           ),
         ],
       ),
@@ -678,7 +686,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       _toast(error, error: true);
       return;
     }
-    _toast('연락처를 저장했습니다.');
+    _toast(tr(context, '연락처를 저장했습니다.'));
     await _refresh();
   }
 
@@ -703,14 +711,13 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
             Expanded(
               child: Text(
                 hasPhone
-                    ? '예약 알림 수신 번호 ${PhoneUtil.display(_staffPhone)}'
-                    : '수강생 예약 알림을 받으려면 휴대폰 번호를 등록해 주세요.',
+                    ? tf(context, '예약 알림 수신 번호 {p0}', {'p0': PhoneUtil.display(_staffPhone)}): tr(context, '수강생 예약 알림을 받으려면 휴대폰 번호를 등록해 주세요.'),
                 style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13),
               ),
             ),
             TextButton(
               onPressed: _editStaffPhone,
-              child: Text(hasPhone ? '변경' : '등록',
+              child: Text(hasPhone ? tr(context, '변경'): tr(context, '등록'),
                   style: TextStyle(
                       fontFamily: "NotoSansKR", color: Palette.secondaryDark)),
             ),
@@ -761,7 +768,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                           .toList();
                     });
                   },
-                  child: Text('확인',
+                  child: Text(tr(context, '확인'),
                       style: TextStyle(
                           fontFamily: "NotoSansKR",
                           color: Palette.secondaryDark)),
@@ -777,12 +784,40 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   static const double _cellHeight = 26;
   static const double _rowPitch = 28;
 
+  bool get _zoneActive =>
+      !widget.schoolOverview && _zoneId != ScheduleZone.koreaId;
+
+  ScheduleZone get _zone => ScheduleZone.byId(_zoneId);
+
+  double get _timeColWidthNow {
+    if (widget.schoolOverview) return _timeColWidth;
+    return _zoneActive ? 108 : 76;
+  }
+
+  double get _rowPitchNow => _zoneActive ? _rowPitch + 16 : _rowPitch;
+
+  double get _cellHeightNow => _zoneActive ? _cellHeight + 14 : _cellHeight;
+
   List<DateTime> get _days =>
       List.generate(7, (i) => _weekStart.add(Duration(days: i)));
 
+  List<DateTime> get _visibleDays {
+    if (widget.schoolOverview || !_bands.active) return _days;
+    return _days.where((day) => _bands.days.contains(day.weekday)).toList();
+  }
+
+  List<String> get _visibleSlots {
+    if (widget.schoolOverview || !_bands.active) {
+      return EnrollmentService.bookingTimeSlots;
+    }
+    return EnrollmentService.bookingTimeSlots
+        .where((time) => _bands.periods.contains(TeacherClassBands.periodOf(time)))
+        .toList();
+  }
+
   String _historyLabel(WeekBooking booking) {
     final cancelled = booking.status == 'rejected';
-    final status = cancelled ? '취소' : '완료';
+    final status = cancelled ? tr(context, '취소'): tr(context, '완료');
     final raw = booking.memberName.trim().isNotEmpty
         ? booking.memberName.trim()
         : booking.email.trim();
@@ -791,7 +826,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         : (raw.length > 5 ? raw.substring(0, 5) : raw);
     if (raw.isEmpty) return status;
     if (booking.weekNumber <= 0) return '$name\n$status';
-    return '$name\n${booking.weekNumber}회·$status';
+    return tf(context, '{p0}\n{p1}회·{p2}', {'p0': name, 'p1': booking.weekNumber, 'p2': status});
   }
 
   @override
@@ -805,6 +840,9 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         children: [
           _weekBar(compact: true),
           _monthSummary(compact: true),
+          SizedBox(height: 6),
+          _bandPicker(compact: true),
+          _zonePicker(compact: true),
           SizedBox(height: 6),
           _grid(),
         ],
@@ -826,18 +864,13 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                 children: [
                   Text(
                       widget.schoolOverview
-                          ? '전체 스케줄'
-                          : (widget.teacherUid.isEmpty ? '내 스케줄' : '스케줄 · 예약'),
+                          ? tr(context, '전체 스케줄'): (widget.teacherUid.isEmpty ? tr(context, '내 스케줄'): tr(context, '스케줄 · 예약')),
                       style: TextStyle(fontFamily: "Jalnan", fontSize: 18)),
                   SizedBox(height: 8),
                   Text(
                     widget.schoolOverview
-                        ? '학원 전체 예약을 같은 시간표로 봅니다. 숫자는 그 시간 건수이고, 색은 상태입니다. 숫자를 누르면 해당 수강생이 나옵니다.'
-                        : widget.showAllBookings
-                            ? '화상수업은 20분입니다. 6:00 AM–11:00 PM 칸을 눌러 이번만 닫거나 매주 같은 시간을 루틴으로 고정하세요.\n'
-                                '학원 전체 예약이 칸과 아래 목록에 함께 보입니다. 담당이 비어 있으면 컨펌 시 내 스케줄로 연결됩니다.'
-                            : '화상수업은 20분입니다. 칸을 누르거나 드래그해서 여러 시간을 한꺼번에 닫을 수 있습니다.\n'
-                                '고정한 루틴은 언제든 해제할 수 있고, 수강생은 열린 시간만 예약합니다.',
+                        ? tr(context, '학원 전체 예약을 같은 시간표로 봅니다. 숫자는 그 시간 건수이고, 색은 상태입니다. 숫자를 누르면 해당 수강생이 나옵니다.'): widget.showAllBookings
+                            ? tr(context, '화상수업은 20분입니다. 6:00 AM–11:00 PM 칸을 눌러 이번만 닫거나 매주 같은 시간을 루틴으로 고정하세요.\n학원 전체 예약이 칸과 아래 목록에 함께 보입니다. 담당이 비어 있으면 컨펌 시 내 스케줄로 연결됩니다.'): tr(context, '화상수업은 20분입니다. 칸을 누르거나 드래그해서 여러 시간을 한꺼번에 닫을 수 있습니다.\n고정한 루틴은 언제든 해제할 수 있고, 수강생은 열린 시간만 예약합니다.'),
                     style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 13,
@@ -855,7 +888,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                   teacherUid: widget.teacherUid,
                 ),
                 icon: Icon(Icons.open_in_new, size: 18),
-                label: Text('새 화면으로 열기',
+                label: Text(tr(context, '새 화면으로 열기'),
                     style: TextStyle(fontFamily: "NotoSansKR")),
               ),
           ],
@@ -869,16 +902,24 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         SizedBox(height: 8),
         _legendRow(),
         SizedBox(height: 16),
+        _bandPicker(),
+        _zonePicker(),
+        SizedBox(height: 12),
         _grid(),
         if (!widget.schoolOverview) ...[
         SizedBox(height: 28),
-        Text('수업 예약',
+        Text(tr(context, '수업 예약'),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
         SizedBox(height: 8),
         Text(
           widget.showAllBookings
-              ? '회원이 신청한 회차 수업입니다. 날짜·시간을 확인하고 컨펌하세요.'
-              : '내 담당 수강생과, 다른 강사 담당이지만 내 시간에 신청한 타 수강생 예약이 함께 보입니다. 타 수강생은 보라색입니다.',
+              ? tr(context, '회원이 신청한 회차 수업입니다. 날짜·시간을 확인하고 컨펌하세요.')
+              : tr(
+                  context,
+                  widget.teacherUid.isEmpty
+                      ? '내 담당 수강생과, 다른 강사 담당이지만 내 시간에 신청한 타 수강생 예약이 함께 보입니다. 타 수강생은 보라색입니다.'
+                      : '담당 수강생과, 다른 강사 담당이지만 이 강사 시간에 신청한 타 수강생 예약이 함께 보입니다. 타 수강생은 보라색입니다.',
+                ),
           style: TextStyle(
               fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
         ),
@@ -908,7 +949,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     return Row(
       children: [
         IconButton(
-          tooltip: '이전 주',
+          tooltip: tr(context, '이전 주'),
           visualDensity: compact ? VisualDensity.compact : null,
           onPressed: () {
             setState(() {
@@ -929,7 +970,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
           ),
         ),
         IconButton(
-          tooltip: '다음 주',
+          tooltip: tr(context, '다음 주'),
           visualDensity: compact ? VisualDensity.compact : null,
           onPressed: () {
             setState(() {
@@ -948,14 +989,14 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
             ),
           ),
           SizedBox(width: 4),
-          Text('개인',
+          Text(tr(context, '개인'),
               style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 11,
                   color: Palette.grey600)),
           const NotificationBellButton(),
           IconButton(
-            tooltip: '새로고침',
+            tooltip: tr(context, '새로고침'),
             visualDensity: VisualDensity.compact,
             onPressed: _loading ? null : _refresh,
             icon: Icon(Icons.refresh, size: 18),
@@ -964,7 +1005,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
           OutlinedButton.icon(
             onPressed: _loading ? null : _refresh,
             icon: Icon(Icons.refresh, size: 18),
-            label: Text('새로고침', style: TextStyle(fontFamily: "NotoSansKR")),
+            label: Text(tr(context, '새로고침'), style: TextStyle(fontFamily: "NotoSansKR")),
           ),
       ],
     );
@@ -977,12 +1018,12 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         runSpacing: 6,
         children: [
           _legend(Palette.warning.withValues(alpha: 0.16), Palette.warning,
-              '예약'),
+              tr(context, '예약')),
           _legend(Palette.primary.withValues(alpha: 0.12), Palette.primary,
-              '확정'),
+              tr(context, '확정')),
           _legend(Palette.success.withValues(alpha: 0.14), Palette.success,
-              '완료'),
-          _legend(Palette.grey200, Palette.grey400, '취소'),
+              tr(context, '완료')),
+          _legend(Palette.grey200, Palette.grey400, tr(context, '취소')),
         ],
       );
     }
@@ -990,18 +1031,18 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       spacing: 12,
       runSpacing: 6,
       children: [
-        _legend(Palette.white, Palette.grey300, '열림'),
-        _legend(Palette.grey200, Palette.grey400, '이번만 닫힘'),
-        _legend(Palette.grey200, Palette.navy, '매주 닫힘'),
-        _legend(Palette.white, Palette.darkTeal, '이번만 열림'),
+        _legend(Palette.white, Palette.grey300, tr(context, '열림')),
+        _legend(Palette.grey200, Palette.grey400, tr(context, '이번만 닫힘')),
+        _legend(Palette.grey200, Palette.navy, tr(context, '매주 닫힘')),
+        _legend(Palette.white, Palette.darkTeal, tr(context, '이번만 열림')),
         _legend(Palette.warning.withValues(alpha: 0.16), Palette.warning,
-            '예약 대기'),
+            tr(context, '예약 대기')),
         _legend(Palette.primary.withValues(alpha: 0.12), Palette.primary,
-            '내 수강생 확정'),
+            tr(context, widget.teacherUid.isEmpty ? '내 수강생 확정' : '담당 수강생 확정')),
         _legend(Palette.accent.withValues(alpha: 0.16), Palette.accent,
-            '타 수강생'),
-        _legend(Palette.grey200, Palette.grey400, '완료 · 취소'),
-        _legend(Palette.grey100, Palette.grey300, '지난 시간'),
+            tr(context, '타 수강생')),
+        _legend(Palette.grey200, Palette.grey400, tr(context, '완료 · 취소')),
+        _legend(Palette.grey100, Palette.grey300, tr(context, '지난 시간')),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1014,12 +1055,242 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
               ),
             ),
             SizedBox(width: 6),
-            Text('개인 일정',
+            Text(tr(context, '개인 일정'),
                 style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
           ],
         ),
       ],
     );
+  }
+
+  Future<void> _setBands(TeacherClassBands next) async {
+    if (_teacherUid.isEmpty || _savingBands) return;
+    final previous = _bands;
+    setState(() {
+      _bands = next;
+      _savingBands = true;
+    });
+    final error = await TeacherScheduleService.saveClassBands(
+      teacherUid: _teacherUid,
+      bands: next,
+    );
+    if (!mounted) return;
+    setState(() => _savingBands = false);
+    if (error != null) {
+      setState(() => _bands = previous);
+      _toast(error);
+    }
+  }
+
+  Widget _bandPicker({bool compact = false}) {
+    if (widget.schoolOverview) return const SizedBox.shrink();
+    final dayNames = [tr(context, '월'), tr(context, '화'), tr(context, '수'), tr(context, '목'), tr(context, '금'), tr(context, '토'), tr(context, '일')];
+    final preview = _bands
+        .keywordsFor(_availability.routineKeys)
+        .map((word) => tr(context, word))
+        .join(', ');
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(compact ? 8 : 12),
+      decoration: BoxDecoration(
+        color: Palette.grey50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Palette.grey200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            tr(context, '수업 가능 시간'),
+            style: TextStyle(fontFamily: 'Jalnan', fontSize: compact ? 13 : 14),
+          ),
+          SizedBox(height: 4),
+          Text(
+            tr(context, '가능 요일과 오전·오후를 고르면 그 칸만 시간표에 나옵니다. 고르지 않으면 모든 시간이 열립니다. 고른 뒤에도 칸을 눌러 개인 일정이나 특정 시간을 막을 수 있습니다.'),
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontSize: compact ? 11 : 12,
+              height: 1.45,
+              color: Palette.grey600,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(tr(context, '가능 요일'),
+              style: TextStyle(fontFamily: 'NotoSansKR', fontSize: 12)),
+          SizedBox(height: 4),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (var i = 0; i < dayNames.length; i++)
+                FilterChip(
+                  label: Text(dayNames[i],
+                      style: TextStyle(fontFamily: 'NotoSansKR', fontSize: 12)),
+                  selected: _bands.days.contains(i + 1),
+                  onSelected: _savingBands
+                      ? null
+                      : (_) => _setBands(_bands.toggleDay(i + 1)),
+                ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text(tr(context, '시간대'),
+              style: TextStyle(fontFamily: 'NotoSansKR', fontSize: 12)),
+          SizedBox(height: 4),
+          Wrap(
+            spacing: 6,
+            children: [
+              FilterChip(
+                label: Text(tr(context, '오전'),
+                    style: TextStyle(fontFamily: 'NotoSansKR', fontSize: 12)),
+                selected: _bands.periods.contains(TeacherClassBands.am),
+                onSelected: _savingBands
+                    ? null
+                    : (_) => _setBands(_bands.togglePeriod(TeacherClassBands.am)),
+              ),
+              FilterChip(
+                label: Text(tr(context, '오후'),
+                    style: TextStyle(fontFamily: 'NotoSansKR', fontSize: 12)),
+                selected: _bands.periods.contains(TeacherClassBands.pm),
+                onSelected: _savingBands
+                    ? null
+                    : (_) => _setBands(_bands.togglePeriod(TeacherClassBands.pm)),
+              ),
+            ],
+          ),
+          if (_bands.days.isNotEmpty && _bands.periods.isEmpty) ...[
+            SizedBox(height: 8),
+            Text(
+              tr(context, '오전 또는 오후를 고르면 그 시간만 시간표에 나옵니다.'),
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontSize: 12,
+                color: Palette.accent,
+              ),
+            ),
+          ],
+          if (_bands.periods.isNotEmpty && _bands.days.isEmpty) ...[
+            SizedBox(height: 8),
+            Text(
+              tr(context, '요일을 고르면 그 요일만 시간표에 나옵니다.'),
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontSize: 12,
+                color: Palette.accent,
+              ),
+            ),
+          ],
+          if (preview.isNotEmpty) ...[
+            SizedBox(height: 8),
+            Text(
+              'Class Time : $preview',
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: Palette.darkTeal,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _zonePicker({bool compact = false}) {
+    if (widget.schoolOverview) return const SizedBox.shrink();
+    final zone = _zone;
+    return Padding(
+      padding: EdgeInsets.only(top: compact ? 6 : 12),
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 8,
+        runSpacing: 4,
+        children: [
+          Text(
+            tr(context, '지역'),
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontSize: compact ? 12 : 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          SizedBox(
+            width: compact ? 168 : 200,
+            child: DropdownButton<String>(
+              value: zone.id,
+              isExpanded: true,
+              isDense: true,
+              underline: const SizedBox.shrink(),
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontSize: compact ? 12 : 13,
+                color: Palette.black,
+              ),
+              items: [
+                for (final item in ScheduleZone.choices)
+                  DropdownMenuItem(
+                    value: item.id,
+                    child: Text(
+                      tr(context, item.label),
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: 'NotoSansKR',
+                        fontSize: compact ? 12 : 13,
+                        color: Palette.black,
+                      ),
+                    ),
+                  ),
+              ],
+              onChanged: (value) {
+                if (value == null || value == _zoneId) return;
+                setState(() => _zoneId = value);
+              },
+            ),
+          ),
+          if (!zone.isKorea)
+            Text(
+              tf(context, '색으로 적힌 시각은 {p0} 시간입니다.', {
+                'p0': tr(context, zone.label),
+              }),
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontSize: compact ? 11 : 12,
+                fontWeight: FontWeight.w700,
+                color: Palette.primary,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// 한 줄의 한국 시각이 보이는 요일마다 같은 지역 시각이면 그 문장. 아니면 null.
+  String? _sharedZoneLine(String time) {
+    if (!_zoneActive) return null;
+    final days = _visibleDays;
+    if (days.isEmpty) return null;
+    final labels = <String>{};
+    for (final day in days) {
+      final line = _zoneLineFor(day, time, withWeekday: false);
+      if (line == null) return null;
+      labels.add(line);
+    }
+    if (labels.length != 1) return null;
+    return labels.first;
+  }
+
+  String? _zoneLineFor(DateTime day, String time, {required bool withWeekday}) {
+    final local = _zone.localTime(day, time);
+    if (local == null) return null;
+    const names = ['월', '화', '수', '목', '금', '토', '일'];
+    final clock = EnrollmentService.formatBookingTime(local.hhmm);
+    final weekday = tr(context, names[local.weekday - 1]);
+    if (local.dayDelta == 0) {
+      return withWeekday ? '$weekday $clock' : clock;
+    }
+    final shift = local.dayDelta < 0 ? tr(context, '전날') : tr(context, '다음날');
+    return withWeekday ? '$shift $weekday $clock' : '$shift $clock';
   }
 
   Widget _grid() {
@@ -1029,8 +1300,8 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         child: Center(child: CircularProgressIndicator()),
       );
     }
-    final rowH = widget.schoolOverview ? 36.0 : _rowPitch;
-    final cellH = widget.schoolOverview ? 34.0 : _cellHeight;
+    final rowH = widget.schoolOverview ? 36.0 : _rowPitchNow;
+    final cellH = widget.schoolOverview ? 34.0 : _cellHeightNow;
     return Listener(
       onPointerUp: (_) => _finishSelect(),
       onPointerCancel: (_) => _finishSelect(),
@@ -1039,20 +1310,37 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         children: [
           Column(
             children: [
-              SizedBox(width: _timeColWidth, height: _dayHeaderHeight),
-              ...EnrollmentService.bookingTimeSlots
-                  .map((t) => _timeLabel(t, height: rowH)),
+              SizedBox(
+                width: _timeColWidthNow,
+                height: _dayHeaderHeight,
+                child: widget.schoolOverview
+                    ? null
+                    : Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          tr(context, '한국시각'),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontFamily: "Jalnan",
+                            fontSize: 9,
+                            color: Palette.grey700,
+                          ),
+                        ),
+                      ),
+              ),
+              ..._visibleSlots.map((t) => _timeLabel(t, height: rowH)),
             ],
           ),
           Expanded(
             child: Column(
               children: [
                 Row(
-                  children: _days
+                  children: _visibleDays
                       .map((d) => Expanded(child: _dayHeader(d)))
                       .toList(),
                 ),
-                ...EnrollmentService.bookingTimeSlots.map(
+                ..._visibleSlots.map(
                   (t) => _timeCells(t, height: cellH),
                 ),
               ],
@@ -1065,6 +1353,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
 
   bool _canToggleSlot(DateTime date, String time) {
     if (widget.schoolOverview) return false;
+    if (!_bands.allows(date.weekday, time)) return false;
     if (_isSlotPast(date, time)) return false;
     if (_bookingAt(date, time) != null) return false;
     if (_availability.isOccupied(date, time)) return false;
@@ -1107,6 +1396,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         day = day.add(const Duration(days: 1))) {
       for (var i = startTime; i <= endTime; i++) {
         final slotTime = slots[i];
+        if (!_bands.allows(day.weekday, slotTime)) continue;
         if (!_canToggleSlot(day, slotTime)) continue;
         keys.add(TeacherScheduleService.slotKey(day, slotTime));
       }
@@ -1163,7 +1453,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       builder: (dialogContext) => AlertDialog(
         backgroundColor: Palette.white,
         surfaceTintColor: Palette.white,
-        title: Text('선택한 ${slots.length}칸',
+        title: Text(tf(context, '선택한 {p0}칸', {'p0': slots.length}),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
         content: SizedBox(
           width: 420,
@@ -1172,7 +1462,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '드래그한 시간을 한꺼번에 닫거나 다시 열 수 있습니다. 사유를 적으면 빨간 점으로 개인 일정이 표시됩니다.',
+                tr(context, '드래그한 시간을 한꺼번에 닫거나 다시 열 수 있습니다. 사유를 적으면 빨간 점으로 개인 일정이 표시됩니다.'),
                 style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 13,
@@ -1183,17 +1473,17 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                 controller: noteController,
                 maxLines: 2,
                 decoration: InputDecoration(
-                  labelText: '개인 일정 사유 (선택)',
-                  hintText: '예: 병원, 출장',
+                  labelText: tr(context, '개인 일정 사유 (선택)'),
+                  hintText: tr(context, '예: 병원, 출장'),
                   border: OutlineInputBorder(),
                 ),
               ),
               SizedBox(height: 8),
               ListTile(
                 leading: Icon(Icons.event_busy, color: Palette.darkTeal),
-                title: Text('이번만 닫기',
+                title: Text(tr(context, '이번만 닫기'),
                     style: TextStyle(fontFamily: "NotoSansKR")),
-                subtitle: Text('선택한 칸만 이번 주에 닫습니다.',
+                subtitle: Text(tr(context, '선택한 칸만 이번 주에 닫습니다.'),
                     style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 12,
@@ -1203,9 +1493,9 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
               ),
               ListTile(
                 leading: Icon(Icons.circle, color: Palette.danger, size: 16),
-                title: Text('개인 일정으로 닫기',
+                title: Text(tr(context, '개인 일정으로 닫기'),
                     style: TextStyle(fontFamily: "NotoSansKR")),
-                subtitle: Text('사유를 빨간 점으로 표시하고 선택한 칸을 닫습니다.',
+                subtitle: Text(tr(context, '사유를 빨간 점으로 표시하고 선택한 칸을 닫습니다.'),
                     style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 12,
@@ -1215,9 +1505,9 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
               ),
               ListTile(
                 leading: Icon(Icons.push_pin, color: Palette.darkTeal),
-                title: Text('매주 이 시간 닫기',
+                title: Text(tr(context, '매주 이 시간 닫기'),
                     style: TextStyle(fontFamily: "NotoSansKR")),
-                subtitle: Text('각 칸의 요일·시간을 매주 반복해서 닫습니다.',
+                subtitle: Text(tr(context, '각 칸의 요일·시간을 매주 반복해서 닫습니다.'),
                     style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 12,
@@ -1227,9 +1517,9 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
               ),
               ListTile(
                 leading: Icon(Icons.lock_open, color: Palette.darkTeal),
-                title: Text('다시 열기',
+                title: Text(tr(context, '다시 열기'),
                     style: TextStyle(fontFamily: "NotoSansKR")),
-                subtitle: Text('선택한 칸의 닫기·루틴을 해제합니다.',
+                subtitle: Text(tr(context, '선택한 칸의 닫기·루틴을 해제합니다.'),
                     style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 12,
@@ -1243,7 +1533,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text('취소',
+            child: Text(tr(context, '취소'),
                 style: TextStyle(
                     fontFamily: "NotoSansKR", color: Palette.grey600)),
           ),
@@ -1254,7 +1544,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     noteController.dispose();
     if (action == null || !mounted) return;
     if (action == _SlotAction.savePersonal && note.isEmpty) {
-      _toast('개인 일정 사유를 입력해 주세요.', error: true);
+      _toast(tr(context, '개인 일정 사유를 입력해 주세요.'), error: true);
       return;
     }
 
@@ -1300,14 +1590,14 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       _toast(error, error: true);
       return;
     }
-    _toast('${slots.length}칸을 반영했습니다.');
+    _toast(tf(context, '{p0}칸을 반영했습니다.', {'p0': slots.length}));
     await _refresh();
   }
 
   Widget _bookingList() {
     if (_loading) return SizedBox.shrink();
     if (_bookings.isEmpty) {
-      return Text('아직 들어온 예약이 없습니다.',
+      return Text(tr(context, '아직 들어온 예약이 없습니다.'),
           style: TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500));
     }
     return Column(
@@ -1352,20 +1642,40 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   }
 
   Widget _timeLabel(String time, {double? height}) {
+    final zoneLine = _sharedZoneLine(time);
     return SizedBox(
-      width: _timeColWidth,
-      height: height ?? _rowPitch,
+      width: _timeColWidthNow,
+      height: height ?? _rowPitchNow,
       child: Align(
         alignment: Alignment.centerLeft,
-        child: Text(
-          EnrollmentService.formatBookingTime(time),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontFamily: "Jalnan",
-            fontSize: 10,
-            color: Palette.grey700,
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              EnrollmentService.formatBookingTime(time),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: "Jalnan",
+                fontSize: 10,
+                color: Palette.grey700,
+              ),
+            ),
+            if (zoneLine != null)
+              Text(
+                zoneLine,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 9,
+                  height: 1.1,
+                  fontWeight: FontWeight.w700,
+                  color: Palette.primary,
+                ),
+              ),
+          ],
         ),
       ),
     );
@@ -1373,7 +1683,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
 
   Widget _timeCells(String time, {double? height}) {
     return Row(
-      children: _days
+      children: _visibleDays
           .map((day) => Expanded(
                 child: _cell(day, time, height: height),
               ))
@@ -1397,7 +1707,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     Color fill = Palette.white;
     Color border = Palette.grey300;
     Color textColor = Palette.secondaryDark;
-    String label = '열림';
+    String label = tr(context, '열림');
     if (booking != null && booking.status == 'rejected') {
       fill = Palette.grey200;
       border = Palette.grey400;
@@ -1410,7 +1720,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
           : Palette.warning.withValues(alpha: 0.16);
       border = guest ? Palette.accent : Palette.warning;
       textColor = guest ? Palette.accent : Palette.warning;
-      label = guest ? '타·대기' : booking.calendarLabel;
+      label = guest ? tr(context, '타·대기'): booking.calendarLabel;
     } else if (booking != null && slotPast) {
       fill = Palette.grey200;
       border = Palette.grey400;
@@ -1433,24 +1743,27 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       fill = Palette.primary.withValues(alpha: 0.12);
       border = Palette.primary;
       textColor = Palette.primaryDark;
-      label = '예약';
+      label = tr(context, '예약');
     } else if (exception) {
       fill = Palette.white;
       border = Palette.darkTeal;
       textColor = Palette.darkTeal;
-      label = '이번 열림';
+      label = tr(context, '이번 열림');
     } else if (closed && routine) {
       fill = Palette.grey200;
       border = Palette.navy;
       textColor = Palette.navy;
-      label = '매주 닫힘';
+      label = tr(context, '매주 닫힘');
     } else if (closed) {
       fill = Palette.grey200;
       border = Palette.grey400;
       textColor = Palette.grey600;
-      label = '닫힘';
+      label = tr(context, '닫힘');
     }
 
+    final sharedZone = _sharedZoneLine(time);
+    final zoneLine =
+        sharedZone == null ? _zoneLineFor(date, time, withWeekday: true) : null;
     final settled = booking != null && _isBookingSettled(booking);
     final canOpenBooking =
         booking != null && booking.isConfirmed && !settled;
@@ -1476,7 +1789,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
           excludeSemantics: true,
           enabled: tappable,
           label:
-              '${EnrollmentService.formatBookingDate(date)} ${EnrollmentService.formatBookingTime(time)} ${label.isEmpty ? '지난 시간' : label.replaceAll('\n', ' ')}${hasPersonal ? ' · $personalNote' : ''}${canOpenBooking ? ' · 화상수업 입장' : ''}',
+              '${EnrollmentService.formatBookingDate(date)} ${EnrollmentService.formatBookingTime(time)} ${label.isEmpty ? tr(context, '지난 시간'): label.replaceAll('\n', ' ')}${zoneLine == null || zoneLine.isEmpty ? '' : ' · $zoneLine'}${hasPersonal ? ' · $personalNote' : ''}${canOpenBooking ? tr(context, ' · 화상수업 입장'): ''}',
           child: MouseRegion(
             onEnter: (_) => _hoverSelect(date, time),
             child: Listener(
@@ -1491,7 +1804,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                     : () => _onCellTap(date, time),
                 borderRadius: BorderRadius.circular(4),
                 child: _slotFace(
-                  height: height ?? _cellHeight,
+                  height: height ?? _cellHeightNow,
                   fill: fill,
                   border: border,
                   selected: selected,
@@ -1500,6 +1813,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                   emphasize: canOpenBooking || settled,
                   underline: canOpenBooking,
                   personalNote: hasPersonal ? personalNote : '',
+                  zoneLine: zoneLine ?? '',
                 ),
               ),
             ),
@@ -1543,13 +1857,13 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   String _overviewLabel(_OverviewKind kind) {
     switch (kind) {
       case _OverviewKind.pending:
-        return '예약';
+        return tr(context, '예약');
       case _OverviewKind.confirmed:
-        return '확정';
+        return tr(context, '확정');
       case _OverviewKind.completed:
-        return '완료';
+        return tr(context, '완료');
       case _OverviewKind.cancelled:
-        return '취소';
+        return tr(context, '취소');
     }
   }
 
@@ -1577,7 +1891,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       children: _OverviewKind.values.map((kind) {
         final count = counts[kind] ?? 0;
         return Text(
-          '${_overviewLabel(kind)} $count건',
+          tf(context, '{p0} {p1}건', {'p0': _overviewLabel(kind), 'p1': count}),
           style: TextStyle(
             fontFamily: "NotoSansKR",
             fontSize: 13,
@@ -1658,13 +1972,13 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(
-          '${EnrollmentService.formatBookingDate(date)} ${EnrollmentService.formatBookingTime(time)} · ${_overviewLabel(kind)} ${items.length}건',
+          tf(context, '{p0} {p1} · {p2} {p3}건', {'p0': EnrollmentService.formatBookingDate(date), 'p1': EnrollmentService.formatBookingTime(time), 'p2': _overviewLabel(kind), 'p3': items.length}),
           style: TextStyle(fontFamily: "Jalnan", fontSize: 16),
         ),
         content: SizedBox(
           width: 420,
           child: items.isEmpty
-              ? Text('해당하는 수강생이 없습니다.',
+              ? Text(tr(context, '해당하는 수강생이 없습니다.'),
                   style: TextStyle(fontFamily: "NotoSansKR"))
               : ConstrainedBox(
                   constraints: const BoxConstraints(maxHeight: 420),
@@ -1679,7 +1993,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                           ? booking.nativeTeacherName
                           : booking.assignedTeacherName;
                       final name = booking.memberName.trim().isEmpty
-                          ? (booking.email.isEmpty ? '이름 미등록' : booking.email)
+                          ? (booking.email.isEmpty ? tr(context, '이름 미등록'): booking.email)
                           : booking.memberName;
                       return ListTile(
                         contentPadding: EdgeInsets.zero,
@@ -1692,9 +2006,9 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                           [
                             if (booking.email.isNotEmpty) booking.email,
                             if (course != null) course.title,
-                            if (teacher.trim().isNotEmpty) '담당 $teacher',
+                            if (teacher.trim().isNotEmpty) tf(context, '담당 {p0}', {'p0': teacher}),
                             if (booking.weekNumber > 0)
-                              '${booking.weekNumber}회차',
+                              tf(context, '{p0}회차', {'p0': booking.weekNumber}),
                           ].join(' · '),
                           style: TextStyle(
                               fontFamily: "NotoSansKR",
@@ -1727,7 +2041,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text('닫기', style: TextStyle(fontFamily: "NotoSansKR")),
+            child: Text(tr(context, '닫기'), style: TextStyle(fontFamily: "NotoSansKR")),
           ),
         ],
       ),
@@ -1744,6 +2058,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     required bool emphasize,
     required bool underline,
     required String personalNote,
+    String zoneLine = '',
   }) {
     final face = Container(
       width: double.infinity,
@@ -1761,19 +2076,39 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       child: Stack(
         children: [
           Center(
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontFamily: "NotoSansKR",
-                fontSize: 8,
-                height: 1.15,
-                fontWeight: emphasize ? FontWeight.w700 : FontWeight.w400,
-                color: textColor,
-                decoration: underline ? TextDecoration.underline : null,
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (label.isNotEmpty)
+                  Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    maxLines: zoneLine.isEmpty ? 2 : 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: "NotoSansKR",
+                      fontSize: 8,
+                      height: 1.15,
+                      fontWeight: emphasize ? FontWeight.w700 : FontWeight.w400,
+                      color: textColor,
+                      decoration: underline ? TextDecoration.underline : null,
+                    ),
+                  ),
+                if (zoneLine.isNotEmpty)
+                  Text(
+                    zoneLine,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: "NotoSansKR",
+                      fontSize: 8,
+                      height: 1.1,
+                      fontWeight: FontWeight.w700,
+                      color: Palette.primary,
+                    ),
+                  ),
+              ],
             ),
           ),
           if (personalNote.isNotEmpty)
@@ -1834,7 +2169,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      '타 수강생',
+                      tr(context, '타 수강생'),
                       style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 11,
@@ -1846,10 +2181,8 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                 ],
                 Text(
                   cancelled
-                      ? '취소'
-                      : settled
-                          ? '완료'
-                          : booking.statusLabel,
+                      ? tr(context, '취소'): settled
+                          ? tr(context, '완료'): booking.statusLabel,
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 12,
@@ -1864,8 +2197,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
             ),
             SizedBox(height: 6),
             Text(
-              '${course?.title ?? booking.courseId} · ${booking.weekNumber}회차'
-              '${booking.weekTitle.isEmpty ? '' : ' · ${booking.weekTitle}'}',
+              tf(context, '{p0} · {p1}회차{p2}', {'p0': course?.title ?? booking.courseId, 'p1': booking.weekNumber, 'p2': booking.weekTitle.isEmpty ? '' : ' · ${booking.weekTitle}'}),
               style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 13,
@@ -1879,7 +2211,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
             if (PhoneUtil.isValid(booking.phone)) ...[
               SizedBox(height: 4),
               Text(
-                '연락처 ${PhoneUtil.display(booking.phone)}',
+                tf(context, '연락처 {p0}', {'p0': PhoneUtil.display(booking.phone)}),
                 style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 12,
@@ -1889,7 +2221,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
             if (booking.nativeTeacherName.isNotEmpty) ...[
               SizedBox(height: 4),
               Text(
-                '원어민 · ${booking.nativeTeacherName}',
+                tf(context, '원어민 · {p0}', {'p0': booking.nativeTeacherName}),
                 style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 12,
@@ -1917,12 +2249,12 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                       foregroundColor: Palette.white,
                     ),
                     onPressed: () => _confirm(booking),
-                    child: Text('컨펌', style: TextStyle(fontFamily: "Jalnan")),
+                    child: Text(tr(context, '컨펌'), style: TextStyle(fontFamily: "Jalnan")),
                   ),
                   SizedBox(width: 8),
                   OutlinedButton(
                     onPressed: () => _reject(booking),
-                    child: Text('거절',
+                    child: Text(tr(context, '거절'),
                         style: TextStyle(fontFamily: "NotoSansKR")),
                   ),
                 ],
@@ -1936,7 +2268,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                 ),
                 onPressed: () => _openVideoForBooking(booking),
                 icon: Icon(Icons.videocam, size: 18),
-                label: Text('화상수업 입장',
+                label: Text(tr(context, '화상수업 입장'),
                     style: TextStyle(fontFamily: "NotoSansKR")),
               ),
             ],

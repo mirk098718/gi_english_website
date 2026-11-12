@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -48,9 +49,7 @@ class TeacherRatingBoard extends StatelessWidget {
             SizedBox(width: 4),
             Expanded(
               child: Text(
-                '이번달 평균 ${stats.averageStarsLabel}'
-                ' · 이번달 ${stats.ratedCount}건'
-                ' · 전체 ${rated.length}건',
+                tf(context, '이번달 평균 {p0} · 이번달 {p1}건 · 전체 {p2}건', {'p0': stats.averageStarsLabel, 'p1': stats.ratedCount, 'p2': rated.length}),
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -64,7 +63,7 @@ class TeacherRatingBoard extends StatelessWidget {
         SizedBox(height: 8),
         if (shown.isEmpty)
           Text(
-            '학생 별점이 아직 없습니다.',
+            tr(context, '학생 별점이 아직 없습니다.'),
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 12,
@@ -88,7 +87,7 @@ class TeacherRatingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final who = rating.memberName.trim().isEmpty ? '수강생' : rating.memberName.trim();
+    final who = rating.memberName.trim().isEmpty ? tr(context, '수강생'): rating.memberName.trim();
     final course = rating.courseTitle.trim();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

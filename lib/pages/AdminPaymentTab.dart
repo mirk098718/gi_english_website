@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/StudentDetailPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
@@ -63,9 +64,9 @@ class _AdminPaymentTabState extends State<AdminPaymentTab> {
               unselectedLabelColor: Palette.grey500,
               labelStyle: TextStyle(
                   fontFamily: "NotoSansKR", fontWeight: FontWeight.bold),
-              tabs: const [
-                Tab(text: '수강생 정산'),
-                Tab(text: '이번 달 수업 수당'),
+              tabs:  [
+                Tab(text: tr(context, '수강생 정산')),
+                Tab(text: tr(context, '이번 달 수업 수당')),
               ],
             ),
           ),
@@ -161,7 +162,7 @@ class _StudentSettlementPaneState extends State<_StudentSettlementPane> {
         email: payment.email,
         courseTitle: payment.courseTitle,
         amount: payment.amount,
-        source: '토스',
+        source: tr(context, '토스'),
         teacherName: payment.nativeTeacherName,
         at: at,
         member: {
@@ -186,7 +187,7 @@ class _StudentSettlementPaneState extends State<_StudentSettlementPane> {
         email: record.email,
         courseTitle: record.course?.title ?? record.courseId,
         amount: record.paidAmount,
-        source: record.paymentNote.isEmpty ? '수강카드' : record.paymentNote,
+        source: record.paymentNote.isEmpty ? tr(context, '수강카드'): record.paymentNote,
         teacherName: record.nativeTeacherLabel,
         at: at,
         member: {
@@ -263,26 +264,26 @@ class _StudentSettlementPaneState extends State<_StudentSettlementPane> {
         children: [
           _MonthBar(
             month: _month,
-            title: '수강생 정산',
+            title: tr(context, '수강생 정산'),
             onShift: (delta) => setState(() {
               _month = DateTime(_month.year, _month.month + delta);
             }),
           ),
           const SizedBox(height: 8),
           Text(
-            '한 달 입금과 토스 주문, 아직 안 끝난 건을 한곳에서 봅니다. 같은 수강생·과정은 한 줄로만 나옵니다.',
+            tr(context, '한 달 입금과 토스 주문, 아직 안 끝난 건을 한곳에서 봅니다. 같은 수강생·과정은 한 줄로만 나옵니다.'),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
           const SizedBox(height: 14),
           _summaryRow([
-            _summaryCell('입금', '${items.length}건', Palette.secondaryDark),
-            _summaryCell('수강생', '${groups.length}명', Palette.navy),
-            _summaryCell('합계', _formatWon(total), Palette.success),
+            _summaryCell(tr(context, '입금'), tf(context, '{p0}건', {'p0': items.length}), Palette.secondaryDark),
+            _summaryCell(tr(context, '수강생'), tf(context, '{p0}명', {'p0': groups.length}), Palette.navy),
+            _summaryCell(tr(context, '합계'), _formatWon(total), Palette.success),
           ]),
           const SizedBox(height: 8),
           Text(
-            '토스 결제완료 ${monthPaid.length}건 ${_formatWon(monthPaidSum)} · 미완료 $openCount건',
+            tf(context, '토스 결제완료 {p0}건 {p1} · 미완료 {p2}건', {'p0': monthPaid.length, 'p1': _formatWon(monthPaidSum), 'p2': openCount}),
             style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 13,
@@ -295,10 +296,10 @@ class _StudentSettlementPaneState extends State<_StudentSettlementPane> {
           ] else ...[
             if (openCount > 0) ...[
               const SizedBox(height: 24),
-              Text('미완료', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+              Text(tr(context, '미완료'), style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
               const SizedBox(height: 8),
               Text(
-                '토스에서 아직 안 끝난 주문은 수강 배정으로, 배정만 되고 입금 표시가 없는 수강은 회원 상세에서 처리합니다.',
+                tr(context, '토스에서 아직 안 끝난 주문은 수강 배정으로, 배정만 되고 입금 표시가 없는 수강은 회원 상세에서 처리합니다.'),
                 style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 13,
@@ -309,21 +310,21 @@ class _StudentSettlementPaneState extends State<_StudentSettlementPane> {
               ...unpaidOnly.map(_unpaidTile),
             ],
             const SizedBox(height: 24),
-            Text('이 달 입금',
+            Text(tr(context, '이 달 입금'),
                 style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
             const SizedBox(height: 8),
             if (items.isEmpty)
-              Text('이 달 입금 기록이 없습니다.',
+              Text(tr(context, '이 달 입금 기록이 없습니다.'),
                   style: TextStyle(
                       fontFamily: "NotoSansKR", color: Palette.grey500))
             else
               ...groups.entries.map((entry) => _studentGroup(entry.value)),
             const SizedBox(height: 24),
-            Text('토스 결제 내역',
+            Text(tr(context, '토스 결제 내역'),
                 style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
             const SizedBox(height: 8),
             Text(
-              '이 달 결제 완료·실패 주문입니다. 아직 안 끝난 주문은 위 미완료에만 있습니다.',
+              tr(context, '이 달 결제 완료·실패 주문입니다. 아직 안 끝난 주문은 위 미완료에만 있습니다.'),
               style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 13,
@@ -331,7 +332,7 @@ class _StudentSettlementPaneState extends State<_StudentSettlementPane> {
             ),
             const SizedBox(height: 12),
             if (monthPayments.isEmpty)
-              Text('이 달 토스 주문이 없습니다.',
+              Text(tr(context, '이 달 토스 주문이 없습니다.'),
                   style: TextStyle(
                       fontFamily: "NotoSansKR", color: Palette.grey500))
             else
@@ -356,11 +357,7 @@ class _StudentSettlementPaneState extends State<_StudentSettlementPane> {
                 fontWeight: FontWeight.bold,
                 fontSize: 13)),
         subtitle: Text(
-          '${p.email}\n'
-          '${p.amountLabel} · 화상 ${p.totalSessions}회 · ${p.statusLabel}\n'
-          '주문 ${p.orderId}\n'
-          '생성 ${_formatDateTime(p.createdAt)}'
-          '${p.paidAt != null ? ' · 결제 ${_formatDateTime(p.paidAt)}' : ''}',
+          tf(context, '{p0}\n{p1} · 화상 {p2}회 · {p3}\n주문 {p4}\n생성 {p5}{p6}', {'p0': p.email, 'p1': p.amountLabel, 'p2': p.totalSessions, 'p3': p.statusLabel, 'p4': p.orderId, 'p5': _formatDateTime(p.createdAt), 'p6': p.paidAt != null ? tf(context, ' · 결제 {p0}', {'p0': _formatDateTime(p.paidAt)}): ''}),
           style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 12,
@@ -387,7 +384,8 @@ class _StudentSettlementPaneState extends State<_StudentSettlementPane> {
                     if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(error ?? '수강 배정이 완료되었습니다.',
+                        content: Text(
+                            tr(context, error ?? '수강 배정이 완료되었습니다.'),
                             style: TextStyle(fontFamily: "NotoSansKR")),
                         backgroundColor:
                             error != null ? Palette.danger : Palette.success,
@@ -395,7 +393,7 @@ class _StudentSettlementPaneState extends State<_StudentSettlementPane> {
                     );
                     await widget.onRefresh();
                   },
-                  child: Text('수강 배정',
+                  child: Text(tr(context, '수강 배정'),
                       style: TextStyle(
                           fontFamily: "NotoSansKR",
                           fontSize: 11,
@@ -425,8 +423,8 @@ class _StudentSettlementPaneState extends State<_StudentSettlementPane> {
           subtitle: Text(
             [
               if (first.email.isNotEmpty) first.email,
-              if (first.teacherName.trim().isNotEmpty) '담당 ${first.teacherName}',
-              '${rows.length}건 · ${_formatWon(sum)}',
+              if (first.teacherName.trim().isNotEmpty) tf(context, '담당 {p0}', {'p0': first.teacherName}),
+              tf(context, '{p0}건 · {p1}', {'p0': rows.length, 'p1': _formatWon(sum)}),
             ].join(' · '),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 12, color: Palette.grey600),
@@ -445,7 +443,7 @@ class _StudentSettlementPaneState extends State<_StudentSettlementPane> {
                   ),
                 ),
                 icon: const Icon(Icons.person_outline, size: 18),
-                label: Text('회원 상세',
+                label: Text(tr(context, '회원 상세'),
                     style: TextStyle(fontFamily: "NotoSansKR")),
               ),
             ),
@@ -500,13 +498,13 @@ class _StudentSettlementPaneState extends State<_StudentSettlementPane> {
           [
             if (record.email.isNotEmpty) record.email,
             if (record.nativeTeacherLabel.trim().isNotEmpty)
-              '담당 ${record.nativeTeacherLabel}',
-            '배정됨 · 입금 미확인',
+              tf(context, '담당 {p0}', {'p0': record.nativeTeacherLabel}),
+            tr(context, '배정됨 · 입금 미확인'),
           ].join(' · '),
           style: TextStyle(
               fontFamily: "NotoSansKR", fontSize: 12, color: Palette.danger),
         ),
-        trailing: Text('회원 상세',
+        trailing: Text(tr(context, '회원 상세'),
             style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 12,
@@ -579,7 +577,10 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
     if (!mounted) return;
     if (error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error), backgroundColor: Palette.danger),
+        SnackBar(
+            content: Text(tr(context, error),
+                style: TextStyle(fontFamily: "NotoSansKR")),
+            backgroundColor: Palette.danger),
       );
       return;
     }
@@ -622,39 +623,37 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
         children: [
           _MonthBar(
             month: _month,
-            title: '이번 달 수업 수당',
+            title: tr(context, '이번 달 수업 수당'),
             onShift: (delta) => setState(() {
               _month = DateTime(_month.year, _month.month + delta);
             }),
           ),
           const SizedBox(height: 8),
           Text(
-            '수강생 별점 평가가 끝난 수업만 진행으로 셉니다. '
-            '예전 수업(평가 기록 없음)은 수업 시간이 지나면 포함됩니다. '
-            '수업 ${EnrollmentService.lessonMinutes}분 · 회차 수당은 강사마다 다르고, 없으면 ${_formatWon(EnrollmentService.lessonPayWon)}입니다. 지급 완료를 누르면 그때의 횟수와 금액이 기록됩니다.',
+            tf(context, '수강생 별점 평가가 끝난 수업만 진행으로 셉니다. 예전 수업(평가 기록 없음)은 수업 시간이 지나면 포함됩니다. 수업 {p0}분 · 회차 수당은 강사마다 다르고, 없으면 {p1}입니다. 지급 완료를 누르면 그때의 횟수와 금액이 기록됩니다.', {'p0': EnrollmentService.lessonMinutes, 'p1': _formatWon(EnrollmentService.lessonPayWon)}),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
           const SizedBox(height: 16),
-          Text('모든 강사 합계',
+          Text(tr(context, '모든 강사 합계'),
               style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           const SizedBox(height: 10),
           _summaryRow([
-            _summaryCell('진행', '$completed회', Palette.secondaryDark),
-            _summaryCell('수당', _formatWon(payroll), Palette.navy),
+            _summaryCell(tr(context, '진행'), tf(context, '{p0}회', {'p0': completed}), Palette.secondaryDark),
+            _summaryCell(tr(context, '수당'), _formatWon(payroll), Palette.navy),
           ]),
           const SizedBox(height: 8),
           _summaryRow([
-            _summaryCell('평가대기', '$awaiting건', Palette.warning),
-            _summaryCell('취소', '$cancelled회', Palette.danger),
+            _summaryCell(tr(context, '평가대기'), tf(context, '{p0}건', {'p0': awaiting}), Palette.warning),
+            _summaryCell(tr(context, '취소'), tf(context, '{p0}회', {'p0': cancelled}), Palette.danger),
           ]),
           const SizedBox(height: 24),
-          Text('강사별 수당', style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+          Text(tr(context, '강사별 수당'), style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           const SizedBox(height: 10),
           if (widget.loading)
             const Center(child: CircularProgressIndicator())
           else if (rows.isEmpty)
-            Text('등록된 강사가 없습니다.',
+            Text(tr(context, '등록된 강사가 없습니다.'),
                 style:
                     TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500))
           else
@@ -667,7 +666,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
   Widget _teacherCard(_TeacherPayRow row) {
     final teacher = row.teacher;
     final stats = row.stats;
-    final isOwnerTeacher = teacher['role']?.toString() != 'teacher';
+    final isOwnerTeacher = AuthService.docIsOwner(teacher);
     final name = teacher['name']?.toString() ?? '';
     final email = teacher['email']?.toString() ?? '';
     final bank = AuthService.bankLabel(teacher);
@@ -679,7 +678,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              isOwnerTeacher ? '$name (메인 관리자 · 강사)' : name,
+              isOwnerTeacher ? tf(context, '{p0} (메인 관리자 · 강사)', {'p0': name}): name,
               style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontWeight: FontWeight.bold,
@@ -695,22 +694,22 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
             ],
             const SizedBox(height: 10),
             _summaryRow([
-              _summaryCell('진행', '${stats.completedCount}회', Palette.secondaryDark),
-              _summaryCell('수당', stats.incomeLabel, Palette.navy),
+              _summaryCell(tr(context, '진행'), tf(context, '{p0}회', {'p0': stats.completedCount}), Palette.secondaryDark),
+              _summaryCell(tr(context, '수당'), stats.incomeLabel, Palette.navy),
             ]),
             const SizedBox(height: 8),
             _summaryRow([
-              _summaryCell('평가대기', '${stats.awaitingCount}건', Palette.warning),
-              _summaryCell('평균별점', stats.averageStarsLabel, Palette.warning),
+              _summaryCell(tr(context, '평가대기'), tf(context, '{p0}건', {'p0': stats.awaitingCount}), Palette.warning),
+              _summaryCell(tr(context, '평균별점'), stats.averageStarsLabel, Palette.warning),
             ]),
             const SizedBox(height: 8),
             _summaryRow([
-              _summaryCell('취소', '${stats.cancelledCount}회', Palette.danger),
-              _summaryCell('예약대기', '${row.pending}건', Palette.grey600),
+              _summaryCell(tr(context, '취소'), tf(context, '{p0}회', {'p0': stats.cancelledCount}), Palette.danger),
+              _summaryCell(tr(context, '예약대기'), tf(context, '{p0}건', {'p0': row.pending}), Palette.grey600),
             ]),
             const SizedBox(height: 10),
             Text(
-              bank.isEmpty ? '수당 계좌 미등록' : bank,
+              bank.isEmpty ? tr(context, '수당 계좌 미등록'): bank,
               style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -718,7 +717,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
             ),
             const SizedBox(height: 8),
             Text(
-              '회차 수당 ${_formatWon(stats.lessonFeeWon)}',
+              tf(context, '회차 수당 {p0}', {'p0': _formatWon(stats.lessonFeeWon)}),
               style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -741,7 +740,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
           ? ''
           : ' · ${_formatDateTime(paidAt, dateOnly: true)}';
       return Text(
-        '지급 완료$when · ${settlement.sessionCount}회 · ${_formatWon(settlement.amount)}',
+        tf(context, '지급 완료{p0} · {p1}회 · {p2}', {'p0': when, 'p1': settlement.sessionCount, 'p2': _formatWon(settlement.amount)}),
         style: TextStyle(
             fontFamily: "NotoSansKR",
             fontSize: 13,
@@ -753,7 +752,7 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
       alignment: Alignment.centerLeft,
       child: OutlinedButton(
         onPressed: widget.loading ? null : () => _markPaid(row),
-        child: Text('지급 완료', style: TextStyle(fontFamily: "NotoSansKR")),
+        child: Text(tr(context, '지급 완료'), style: TextStyle(fontFamily: "NotoSansKR")),
       ),
     );
   }
@@ -775,7 +774,7 @@ class _MonthBar extends StatelessWidget {
     return Row(
       children: [
         IconButton(
-          tooltip: '이전 달',
+          tooltip: tr(context, '이전 달'),
           onPressed: () => onShift(-1),
           icon: Icon(Icons.chevron_left, color: Palette.navy),
         ),
@@ -785,7 +784,7 @@ class _MonthBar extends StatelessWidget {
               Text(title, style: TextStyle(fontFamily: "Jalnan", fontSize: 18)),
               const SizedBox(height: 4),
               Text(
-                '${month.year}년 ${month.month}월',
+                tf(context, '{p0}년 {p1}월', {'p0': month.year, 'p1': month.month}),
                 style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 13,
@@ -796,7 +795,7 @@ class _MonthBar extends StatelessWidget {
           ),
         ),
         IconButton(
-          tooltip: '다음 달',
+          tooltip: tr(context, '다음 달'),
           onPressed: () => onShift(1),
           icon: Icon(Icons.chevron_right, color: Palette.navy),
         ),
@@ -849,7 +848,7 @@ String _formatWon(int amount) {
     if (i > 0 && (s.length - i) % 3 == 0) buf.write(',');
     buf.write(s[i]);
   }
-  return '${buf.toString()}원';
+  return AppLanguage.instance.fill('{p0}원', {'p0': buf.toString()});
 }
 
 String _formatDateTime(DateTime? dt, {bool dateOnly = false}) {

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
+import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
 import 'package:gi_english_website/pages/OnlineCheckoutPage.dart';
 import 'package:gi_english_website/pages/OnlineCourseDetailPage.dart';
@@ -16,6 +17,7 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/NotificationService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
+import 'package:gi_english_website/widget/MainTeacherChange.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
@@ -645,6 +647,10 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
       OnlineCheckoutPage(
         initialCourseId: enrollment.courseId,
         extendEnrollment: true,
+        initialPlan: enrollment.plan,
+        initialSessions: enrollment.plan == OnlinePlan.speaking
+            ? enrollment.totalSessions
+            : null,
       ),
     );
   }
@@ -689,7 +695,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    course.title,
+                    course.localizedName(context, enrollment.plan),
                     style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 15,
@@ -699,7 +705,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    course.subtitle,
+                    tr(context, course.subtitleFor(enrollment.plan)),
                     style: TextStyle(
                       fontFamily: "NotoSansKR",
                       fontSize: 13,
@@ -749,6 +755,29 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
                       ),
                     ],
                   ],
+                  if (enrollment.plan != OnlinePlan.lecture)
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size(0, 32),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      onPressed: () async {
+                        final changed = await MainTeacherChange.pick(
+                          context,
+                          currentUid: enrollment.nativeTeacher?.accountUid ??
+                              enrollment.nativeTeacherUid,
+                        );
+                        if (changed && mounted) _loadMyCourses();
+                      },
+                      child: Text(
+                        tr(context, "메인 강사 변경"),
+                        style: TextStyle(
+                          fontFamily: "NotoSansKR",
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
                   SizedBox(height: 4),
                   Text(
                     _classroomProgressCopy(enrollment, allDone),
@@ -758,7 +787,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
                       color: Palette.grey600,
                     ),
                   ),
-                  if (sessionsConfigured) ...[
+                  if (!enrollment.includesSpeaking || sessionsConfigured) ...[
                     SizedBox(height: 8),
                     sessionBadge(enrollment, allDone),
                   ],
@@ -792,6 +821,18 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
 
   Widget _courseLeading(EnrollmentRecord enrollment, OnlineCourse course) {
     final teacher = enrollment.nativeTeacher;
+    if (course.isSpeakingProduct && teacher == null) {
+      return Container(
+        width: 40,
+        height: 40,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: course.accentColor.withValues(alpha: 0.15),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(Icons.videocam_outlined, color: course.accentColor, size: 20),
+      );
+    }
     if (teacher != null) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(12),
@@ -859,6 +900,15 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
     if (EnrollmentService.isEnrollmentExpired(enrollment)) {
       return '수강 기한이 지났습니다. 연장 결제하면 이어서 들을 수 있습니다.';
     }
+    if (!enrollment.includesSpeaking) {
+      return '인강 ${OnlinePlan.lessonsPerLevel}편 · 퀴즈 · 기한 ${enrollment.remainingDeadlineWeeks}주 · 학습 보기';
+    }
+    if (!enrollment.includesLessons) {
+      if (allDone) {
+        return '회화 ${enrollment.totalSessions}회를 모두 마쳤습니다';
+      }
+      return '회화 ${enrollment.unlockedSessionNumber}회 · 기한 ${enrollment.remainingDeadlineWeeks}주 · 예약하기';
+    }
     if (allDone) {
       return '화상수업 ${enrollment.totalSessions}회를 모두 마쳤습니다 · 회차 학습 보기';
     }
@@ -872,6 +922,13 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
   String _sessionBadgeCopy(EnrollmentRecord enrollment, bool allDone) {
     if (EnrollmentService.isEnrollmentExpired(enrollment)) {
       return '수강 기한 만료';
+    }
+    if (!enrollment.includesSpeaking) {
+      return '인강 ${OnlinePlan.lessonsPerLevel}편 · 퀴즈';
+    }
+    if (!enrollment.includesLessons) {
+      if (allDone) return '회화 ${enrollment.totalSessions}회 모두 완료';
+      return '남은 회화 ${enrollment.remainingSessions}회 / 전체 ${enrollment.totalSessions}회';
     }
     if (allDone) {
       return '화상수업 ${enrollment.totalSessions}회 모두 완료';

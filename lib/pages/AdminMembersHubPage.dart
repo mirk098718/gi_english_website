@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/AdminTeacherScheduleTab.dart';
 import 'package:gi_english_website/pages/StudentDetailPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -39,10 +40,10 @@ class AdminMembersHubPage extends StatelessWidget {
               labelStyle: TextStyle(
                   fontFamily: "NotoSansKR", fontWeight: FontWeight.bold),
               tabs: [
-                const Tab(text: '내 스케줄'),
-                const Tab(text: '내 수강생 관리'),
-                if (isOwner) const Tab(text: '전체 스케줄'),
-                if (isOwner) const Tab(text: '모든 수강생 관리'),
+                 Tab(text: tr(context, '내 스케줄')),
+                 Tab(text: tr(context, '내 수강생 관리')),
+                if (isOwner)  Tab(text: tr(context, '전체 스케줄')),
+                if (isOwner)  Tab(text: tr(context, '모든 수강생 관리')),
               ],
             ),
           ),
@@ -113,7 +114,7 @@ class _AllStudentsPanelState extends State<AllStudentsPanel> {
 
   String _teacherLabel(Map<String, dynamic> member) {
     final name = AuthService.memberTeacherName(member, teacherNames: _teacherNames);
-    return name.isEmpty ? '미배정' : name;
+    return name.isEmpty ? tr(context, '미배정'): name;
   }
 
   Future<void> _openDetail(Map<String, dynamic> member) async {
@@ -144,18 +145,17 @@ class _AllStudentsPanelState extends State<AllStudentsPanel> {
       child: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Text('모든 수강생', style: TextStyle(fontFamily: "Jalnan", fontSize: 18)),
+          Text(tr(context, '모든 수강생'), style: TextStyle(fontFamily: "Jalnan", fontSize: 18)),
           const SizedBox(height: 8),
           Text(
-            '가입한 순서대로 쌓입니다. 담당 강사를 확인하고, 수강생을 누르면 수강·결제 정보를 볼 수 있습니다.',
+            tr(context, '가입한 순서대로 쌓입니다. 담당 강사를 확인하고, 수강생을 누르면 수강·결제 정보를 볼 수 있습니다.'),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
           const SizedBox(height: 8),
           Text(
             _members.isEmpty
-                ? '가입 회원 0명'
-                : '전체 ${_members.length}명 · ${start + 1}–$end번째',
+                ? tr(context, '가입 회원 0명'): tf(context, '전체 {p0}명 · {p1}–{p2}번째', {'p0': _members.length, 'p1': start + 1, 'p2': end}),
             style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 13,
@@ -166,7 +166,7 @@ class _AllStudentsPanelState extends State<AllStudentsPanel> {
           if (_loading)
             const Center(child: CircularProgressIndicator())
           else if (_members.isEmpty)
-            Text('가입된 수강생이 없습니다.',
+            Text(tr(context, '가입된 수강생이 없습니다.'),
                 style:
                     TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500))
           else ...[
@@ -183,7 +183,7 @@ class _AllStudentsPanelState extends State<AllStudentsPanel> {
   }
 
   Widget _studentTile(Map<String, dynamic> member, int order) {
-    final name = AuthService.profileDisplayName(member, fallback: '이름 미등록 회원');
+    final name = AuthService.profileDisplayName(member, fallback: tr(context, '이름 미등록 회원'));
     final email = member['email']?.toString().trim() ?? '';
     final phone = member['phone']?.toString() ?? '';
     final joined = AuthService.memberCreatedAt(member);
@@ -206,7 +206,7 @@ class _AllStudentsPanelState extends State<AllStudentsPanel> {
           [
             if (email.isNotEmpty) email,
             if (PhoneUtil.isValid(phone)) PhoneUtil.display(phone),
-            '가입 ${_formatDate(joined)}',
+            tf(context, '가입 {p0}', {'p0': _formatDate(joined)}),
           ].join(' · '),
           style: TextStyle(
               fontFamily: "NotoSansKR", fontSize: 12, color: Palette.grey600),
@@ -220,7 +220,7 @@ class _AllStudentsPanelState extends State<AllStudentsPanel> {
               fontFamily: "NotoSansKR",
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: teacher == '미배정' ? Palette.grey500 : Palette.secondaryDark,
+              color: teacher == tr(context, '미배정')? Palette.grey500 : Palette.secondaryDark,
             ),
           ),
         ),
@@ -234,7 +234,7 @@ class _AllStudentsPanelState extends State<AllStudentsPanel> {
       children: [
         TextButton(
           onPressed: _page == 0 ? null : () => setState(() => _page -= 1),
-          child: Text('이전', style: TextStyle(fontFamily: "NotoSansKR")),
+          child: Text(tr(context, '이전'), style: TextStyle(fontFamily: "NotoSansKR")),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -246,7 +246,7 @@ class _AllStudentsPanelState extends State<AllStudentsPanel> {
         ),
         TextButton(
           onPressed: _page >= _lastPage ? null : () => setState(() => _page += 1),
-          child: Text('다음', style: TextStyle(fontFamily: "NotoSansKR")),
+          child: Text(tr(context, '다음'), style: TextStyle(fontFamily: "NotoSansKR")),
         ),
       ],
     );

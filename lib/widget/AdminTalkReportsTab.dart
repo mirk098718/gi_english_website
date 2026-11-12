@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/TalkRoom.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/TalkService.dart';
@@ -12,8 +13,8 @@ class AdminTalkReportsTab extends StatelessWidget {
       stream: TalkService.watchReports(),
       builder: (context, snap) {
         if (snap.hasError) {
-          return const Center(
-            child: Text('신고 목록을 불러오지 못했어요.',
+          return  Center(
+            child: Text(tr(context, '신고 목록을 불러오지 못했어요.'),
                 style: TextStyle(fontFamily: 'NotoSansKR')),
           );
         }
@@ -30,10 +31,10 @@ class AdminTalkReportsTab extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         if (reports.isEmpty) {
-          return const Padding(
+          return  Padding(
             padding: EdgeInsets.all(24),
             child: Text(
-              "Let's Talk 신고가 아직 없습니다.",
+              tr(context, 'Let\'s Talk 신고가 아직 없습니다.'),
               style: TextStyle(fontFamily: 'NotoSansKR', color: Palette.grey600),
             ),
           );
@@ -71,8 +72,8 @@ class AdminTalkReportsTab extends StatelessWidget {
                         ),
                         child: Text(
                           report.isAuto
-                              ? (report.isPending ? '자동 필터' : '자동 · 확인함')
-                              : (report.isPending ? '대기' : '확인함'),
+                              ? (report.isPending ? tr(context, '자동 필터'): tr(context, '자동 · 확인함'))
+                              : (report.isPending ? tr(context, '대기'): tr(context, '확인함')),
                           style: TextStyle(
                             fontFamily: 'NotoSansKR',
                             fontSize: 11,
@@ -99,8 +100,7 @@ class AdminTalkReportsTab extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     report.isAuto
-                        ? '자동 감지 · ${report.reporterName} → ${report.targetName}'
-                        : '대상 ${report.targetName}  ·  신고자 ${report.reporterName}',
+                        ? tf(context, '자동 감지 · {p0} → {p1}', {'p0': report.reporterName, 'p1': report.targetName}): tf(context, '대상 {p0}  ·  신고자 {p1}', {'p0': report.targetName, 'p1': report.reporterName}),
                     style: const TextStyle(
                       fontFamily: 'NotoSansKR',
                       fontSize: 13,
@@ -110,7 +110,7 @@ class AdminTalkReportsTab extends StatelessWidget {
                   if (report.lastTopic.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
-                      '방 제목 ${report.lastTopic}',
+                      tf(context, '방 제목 {p0}', {'p0': report.lastTopic}),
                       style: const TextStyle(
                         fontFamily: 'NotoSansKR',
                         fontSize: 12,
@@ -135,7 +135,7 @@ class AdminTalkReportsTab extends StatelessWidget {
                       child: TextButton(
                         onPressed: () =>
                             TalkService.markReportReviewed(report.id),
-                        child: const Text('확인함으로 표시'),
+                        child:  Text(tr(context, '확인함으로 표시')),
                       ),
                     ),
                 ],
