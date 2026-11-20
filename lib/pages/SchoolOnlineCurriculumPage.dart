@@ -229,7 +229,10 @@ class _SchoolOnlineCurriculumPageState
         color: Palette.white,
         child: Column(
           children: [
-            OnlineProgramSideMenu(selectedIndex: 0, isMobile: true),
+            OnlineProgramSideMenu(
+              selectedIndex: OnlineProgramSideMenu.curriculumIndex,
+              isMobile: true,
+            ),
             content(compact: true),
           ],
         ),
@@ -245,7 +248,9 @@ class _SchoolOnlineCurriculumPageState
         children: [
           SizedBox(
             width: 232,
-            child: OnlineProgramSideMenu(selectedIndex: 0),
+            child: OnlineProgramSideMenu(
+              selectedIndex: OnlineProgramSideMenu.curriculumIndex,
+            ),
           ),
           Expanded(child: content()),
         ],

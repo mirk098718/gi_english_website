@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/pages/SchoolOnlineClassroomPage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineCurriculumPage.dart';
+import 'package:gi_english_website/pages/SchoolOnlineJuniorCurriculumPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -9,6 +10,10 @@ import 'package:gi_english_website/widget/ButtonState.dart';
 /// Online Program 하위 페이지들이 공유하는 좌측(모바일에서는 상단) 메뉴.
 /// selectedIndex가 -1이면 선택된 항목 없이 표시된다.
 class OnlineProgramSideMenu extends StatefulWidget {
+  static const int curriculumIndex = 0;
+  static const int juniorIndex = 1;
+  static const int classroomIndex = 2;
+
   final int selectedIndex;
   final bool isMobile;
 
@@ -29,8 +34,21 @@ class _OnlineProgramSideMenuState extends State<OnlineProgramSideMenu> {
   void initState() {
     super.initState();
     buttonStateList = [
-      ButtonState("커리큘럼", _colorFor(0), SchoolOnlineCurriculumPage()),
-      ButtonState("내 강의실", _colorFor(1), SchoolOnlineClassroomPage()),
+      ButtonState(
+        "커리큘럼",
+        _colorFor(OnlineProgramSideMenu.curriculumIndex),
+        SchoolOnlineCurriculumPage(),
+      ),
+      ButtonState(
+        "주니어 커리큘럼",
+        _colorFor(OnlineProgramSideMenu.juniorIndex),
+        SchoolOnlineJuniorCurriculumPage(),
+      ),
+      ButtonState(
+        "내 강의실",
+        _colorFor(OnlineProgramSideMenu.classroomIndex),
+        SchoolOnlineClassroomPage(),
+      ),
     ];
   }
 

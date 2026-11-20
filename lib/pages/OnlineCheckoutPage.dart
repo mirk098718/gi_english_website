@@ -225,7 +225,7 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
         color: Palette.white,
         child: Column(
           children: [
-            OnlineProgramSideMenu(selectedIndex: 1, isMobile: true),
+            OnlineProgramSideMenu(selectedIndex: OnlineProgramSideMenu.classroomIndex, isMobile: true),
             content(),
           ],
         ),
@@ -241,7 +241,7 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
         children: [
           SizedBox(
             width: 232,
-            child: OnlineProgramSideMenu(selectedIndex: 1),
+            child: OnlineProgramSideMenu(selectedIndex: OnlineProgramSideMenu.classroomIndex),
           ),
           Expanded(child: content()),
         ],

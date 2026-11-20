@@ -489,7 +489,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
         color: Palette.white,
         child: Column(
           children: [
-            OnlineProgramSideMenu(selectedIndex: 1, isMobile: true),
+            OnlineProgramSideMenu(selectedIndex: OnlineProgramSideMenu.classroomIndex, isMobile: true),
             content(),
           ],
         ),
@@ -505,7 +505,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
         children: [
           SizedBox(
             width: 232,
-            child: OnlineProgramSideMenu(selectedIndex: 1),
+            child: OnlineProgramSideMenu(selectedIndex: OnlineProgramSideMenu.classroomIndex),
           ),
           Expanded(child: content()),
         ],
