@@ -1,0 +1,21 @@
+---
+description: 웹 배포는 운영 중인 커밋을 포함한 뒤에만 한다
+alwaysApply: true
+---
+
+# 웹 배포
+
+운영 사이트(https://gleam-island.web.app)는 마지막으로 호스팅에 올린 빌드다. 그 빌드보다 이전 브랜치에서 다시 배포하면, 수강과정 전체보기처럼 이미 반영된 화면이 지워진다.
+
+웹을 빌드하거나 Firebase Hosting에 배포할 때는 아래 스크립트만 사용한다.
+
+```bash
+tool/deploy_web.sh
+```
+
+- 스크립트는 `https://gleam-island.web.app/deploy-sha.txt` 에 적힌 커밋이 지금 커밋의 조상인지 확인한다. 아니면 빌드와 배포를 하지 않는다.
+- 다른 브랜치를 checkout 해서 빌드하지 않는다. `main`이나 커리큘럼 브랜치만 따로 배포하면, 그 브랜치에 없는 수정이 사이트에서 사라진다.
+- 지금 커밋에 운영 중인 변경이 없으면, 그 커밋을 먼저 합친 다음 스크립트를 다시 실행한다.
+- 커밋하지 않은 변경이 있으면 스크립트는 멈춘다.
+- `firebase deploy`를 스크립트 밖에서 실행하지 않는다. functions는 배포하지 않는다.
+- 사용자에게 직접 `flutter build web`이나 `firebase deploy`를 치라고 시키지 않는다.

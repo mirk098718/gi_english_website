@@ -82,7 +82,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
   void _toast(String message, {bool error = true}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
+        content: Text(tr(context, message), style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: error ? Palette.danger : Palette.success,
       ),
     );
@@ -123,7 +123,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
     return AlertDialog(
       backgroundColor: Palette.white,
       surfaceTintColor: Palette.white,
-      title: Text(widget.title, style: TextStyle(fontFamily: "Jalnan")),
+      title: Text(tr(context, widget.title), style: TextStyle(fontFamily: "Jalnan")),
       content: SizedBox(
         width: 420,
         child: SingleChildScrollView(
@@ -142,7 +142,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                 ),
               SizedBox(height: 8),
               Text(
-                widget.helperText,
+                tr(context, widget.helperText),
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 13,
@@ -179,9 +179,9 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                 controller: _nicknameCtrl,
                 onChanged: (_) => setState(() {}),
                 decoration: InputDecoration(
-                  labelText: '닉네임',
-                  hintText: '수업에서 불릴 이름',
-                  helperText: '2–16자. 비워 두면 가입 이름이 보입니다.',
+                  labelText: tr(context, '닉네임'),
+                  hintText: tr(context, '수업에서 불릴 이름'),
+                  helperText: tr(context, '2–16자. 비워 두면 가입 이름이 보입니다.'),
                   helperMaxLines: 2,
                   border: OutlineInputBorder(),
                 ),

@@ -31,15 +31,15 @@ class AcademyLmsLinks extends StatelessWidget {
   Widget build(BuildContext context) {
     final fill = centered;
     final ele = _cta(
-      title: '초등부 온라인 바로가기',
-      subtitle: 'Trophy9 학습실',
+      title: tr(context, '초등부 온라인 바로가기'),
+      subtitle: tr(context, 'Trophy9 학습실'),
       onTap: () => UrlUtil.open(_eleUrl),
       primary: true,
       fill: fill,
     );
     final middle = _cta(
-      title: '중등부 온라인 바로가기',
-      subtitle: 'CLIP 학습실',
+      title: tr(context, '중등부 온라인 바로가기'),
+      subtitle: tr(context, 'CLIP 학습실'),
       onTap: () => UrlUtil.open(_middleUrl),
       primary: false,
       fill: fill,

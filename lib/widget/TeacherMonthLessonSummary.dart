@@ -24,11 +24,11 @@ class TeacherMonthLessonSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cells = [
-      _cell('진행', loading ? '-' : '${stats.completedCount}회', Palette.secondaryDark),
-      _cell('취소', loading ? '-' : '${stats.cancelledCount}회', Palette.danger),
-      _cell('수당', loading ? '-' : stats.incomeLabel, Palette.navy),
+      _cell(tr(context, '진행'), loading ? '-' : tf(context, '{p0}회', {'p0': stats.completedCount}), Palette.secondaryDark),
+      _cell(tr(context, '취소'), loading ? '-' : tf(context, '{p0}회', {'p0': stats.cancelledCount}), Palette.danger),
+      _cell(tr(context, '수당'), loading ? '-' : stats.incomeLabel, Palette.navy),
       if (!compact)
-        _cell('평균별점', loading ? '-' : stats.averageStarsLabel, Palette.warning),
+        _cell(tr(context, '평균별점'), loading ? '-' : stats.averageStarsLabel, Palette.warning),
     ];
 
     return Container(
@@ -57,9 +57,7 @@ class TeacherMonthLessonSummary extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${EnrollmentService.lessonMinutes}분 · ${_payLabel()}'
-                      ' · 평균 ${stats.averageStarsLabel}'
-                      '${stats.awaitingCount > 0 ? ' · 평가대기 ${stats.awaitingCount}건' : ''}',
+                      tf(context, '{p0}분 · {p1} · 평균 {p2}{p3}', {'p0': EnrollmentService.lessonMinutes, 'p1': _payLabel(), 'p2': stats.averageStarsLabel, 'p3': stats.awaitingCount > 0 ? tf(context, ' · 평가대기 {p0}건', {'p0': stats.awaitingCount}): ''}),
                       style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 10,
@@ -90,8 +88,7 @@ class TeacherMonthLessonSummary extends StatelessWidget {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  '${stats.monthLabel} · 수업 ${EnrollmentService.lessonMinutes}분 · 건당 ${_payLabel()}'
-                  '${stats.awaitingCount > 0 ? ' · 평가 대기 ${stats.awaitingCount}건' : ''}',
+                  tf(context, '{p0} · 수업 {p1}분 · 건당 {p2}{p3}', {'p0': stats.monthLabel, 'p1': EnrollmentService.lessonMinutes, 'p2': _payLabel(), 'p3': stats.awaitingCount > 0 ? tf(context, ' · 평가 대기 {p0}건', {'p0': stats.awaitingCount}): ''}),
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 12,
@@ -119,7 +116,7 @@ class TeacherMonthLessonSummary extends StatelessWidget {
       if (i > 0 && (digits.length - i) % 3 == 0) buffer.write(',');
       buffer.write(digits[i]);
     }
-    return '${buffer}원';
+    return AppLanguage.instance.fill('{p0}원', {'p0': buffer});
   }
 
   Widget _cell(String label, String value, Color valueColor) {
@@ -243,19 +240,19 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
         Row(
           children: [
             IconButton(
-              tooltip: '이전 달',
+              tooltip: tr(context, '이전 달'),
               onPressed: () => _shiftMonth(-1),
               icon: Icon(Icons.chevron_left, color: Palette.navy),
             ),
             Expanded(
               child: Text(
-                '${_month.year}년 ${_month.month}월 수업 이력',
+                tf(context, '{p0}년 {p1}월 수업 이력', {'p0': _month.year, 'p1': _month.month}),
                 textAlign: TextAlign.center,
                 style: TextStyle(fontFamily: "Jalnan", fontSize: 16),
               ),
             ),
             IconButton(
-              tooltip: '다음 달',
+              tooltip: tr(context, '다음 달'),
               onPressed: () => _shiftMonth(1),
               icon: Icon(Icons.chevron_right, color: Palette.navy),
             ),
@@ -265,13 +262,13 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
         TeacherMonthLessonSummary(
           stats: _stats,
           loading: _loading,
-          title: '${_month.year}년 ${_month.month}월 수업수',
+          title: tf(context, '{p0}년 {p1}월 수업수', {'p0': _month.year, 'p1': _month.month}),
         ),
         const SizedBox(height: 16),
         Text(
           widget.teacherName.isEmpty
               ? tr(context, "이 달의 예약 · 진행 · 평가가 시간순으로 보입니다. 별점은 인사 평가에 쓰입니다.")
-              : '${widget.teacherName} 선생님의 이 달 예약 · 진행 · 학생 평가입니다.',
+              : tf(context, '{p0} 선생님의 이 달 예약 · 진행 · 학생 평가입니다.', {'p0': widget.teacherName}),
           style: TextStyle(
               fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
         ),
@@ -290,7 +287,7 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
 
   Widget _row(WeekBooking booking) {
     final student = booking.memberName.trim().isEmpty
-        ? (booking.email.isEmpty ? '수강생' : booking.email)
+        ? (booking.email.isEmpty ? tr(context, '수강생'): booking.email)
         : booking.memberName.trim();
     final when =
         '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)}';
@@ -310,7 +307,7 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '$when · ${booking.statusLabel}${done ? ' · 정산' : ''}',
+            '$when · ${booking.statusLabel}${done ? tr(context, ' · 정산'): ''}',
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontWeight: FontWeight.w700,
@@ -321,7 +318,7 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
           Text(
             [
               student,
-              if (booking.weekNumber > 0) '${booking.weekNumber}회차',
+              if (booking.weekNumber > 0) tf(context, '{p0}회차', {'p0': booking.weekNumber}),
               if (guest) tr(context, "코티칭"),
             ].join(' · '),
             style: TextStyle(

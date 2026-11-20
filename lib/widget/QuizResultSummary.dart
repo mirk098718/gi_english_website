@@ -35,6 +35,17 @@ class QuizResultSummary extends StatelessWidget {
               height: 1.4,
             ),
           ),
+          if (result.correctCount == 0 &&
+              result.essays.any((essay) => essay.hasAnswer))
+            Text(
+              tr(context, "객관식 25문제는 맞은 개수가 0입니다. 주관식 답은 따로 저장되어 있습니다."),
+              style: TextStyle(
+                fontFamily: "NotoSansKR",
+                fontSize: 11,
+                height: 1.4,
+                color: Palette.grey600,
+              ),
+            ),
           if (savedAt.isNotEmpty)
             Text(
               '${tr(context, "최근 저장")} $savedAt',

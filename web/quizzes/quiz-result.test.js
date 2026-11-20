@@ -65,6 +65,15 @@ test("퀴즈 파일 이름에서 저장 키를 만든다", () => {
   assert.equal(quiz.quizIdFromPath("/quizzes/other.html"), "");
 });
 
+test("강사가 연 주소에서 수강생 아이디를 읽는다", () => {
+  assert.equal(
+    quiz.studentIdFromSearch("?student=studentUidExample0123456789"),
+    "studentUidExample0123456789"
+  );
+  assert.equal(quiz.studentIdFromSearch("?student=bad id"), "");
+  assert.equal(quiz.studentIdFromSearch(""), "");
+});
+
 test("25문제를 모두 채점하기 전에는 저장하지 않는다", () => {
   assert.equal(quiz.shouldSave({ complete: false, total: 25, correct: 10 }), false);
   assert.equal(quiz.shouldSave({ complete: true, total: 24, correct: 10 }), false);

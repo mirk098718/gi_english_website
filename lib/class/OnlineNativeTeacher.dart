@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/class/TeacherClassBands.dart';
 
 /// 온라인 화상수업용 원어민 강사.
 /// 수강생이 고르는 프로필은 Firestore `native_teacher_accounts`에 저장한다.
@@ -23,6 +24,12 @@ class OnlineNativeTeacher {
   /// 다른 강사 담당 수강생의 코티칭(대체) 예약을 받는지.
   final bool acceptsCoTeaching;
 
+  /// 강사가 고른 큰 수업 시간. 비어 있으면 카드에 Class Time을 붙이지 않는다.
+  final TeacherClassBands classBands;
+
+  /// 매주 닫아 둔 칸. 키는 `요일_HH:mm`.
+  final Set<String> closedRoutineKeys;
+
   const OnlineNativeTeacher({
     required this.id,
     required this.name,
@@ -33,6 +40,8 @@ class OnlineNativeTeacher {
     this.accountUid = '',
     this.selectableAtCheckout = true,
     this.acceptsCoTeaching = true,
+    this.classBands = TeacherClassBands.empty,
+    this.closedRoutineKeys = const {},
   });
 
   static const String ownerProfileId = 'native_owner_gi';
@@ -73,6 +82,8 @@ class OnlineNativeTeacher {
     String? accountUid,
     bool? selectableAtCheckout,
     bool? acceptsCoTeaching,
+    TeacherClassBands? classBands,
+    Set<String>? closedRoutineKeys,
   }) {
     return OnlineNativeTeacher(
       id: id,
@@ -84,6 +95,8 @@ class OnlineNativeTeacher {
       accountUid: accountUid ?? this.accountUid,
       selectableAtCheckout: selectableAtCheckout ?? this.selectableAtCheckout,
       acceptsCoTeaching: acceptsCoTeaching ?? this.acceptsCoTeaching,
+      classBands: classBands ?? this.classBands,
+      closedRoutineKeys: closedRoutineKeys ?? this.closedRoutineKeys,
     );
   }
 
@@ -224,6 +237,7 @@ class OnlineNativeTeacher {
       accountUid: accountUid,
       selectableAtCheckout: TeacherBookingOffer.shownAtCheckout(offer),
       acceptsCoTeaching: TeacherBookingOffer.shownAsCoteach(offer),
+      classBands: TeacherClassBands.fromMap(data),
     );
   }
 }

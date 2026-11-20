@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/AdminFAQWritePage.dart';
 import 'package:gi_english_website/pages/AdminNoticeWritePage.dart';
 import 'package:gi_english_website/pages/AdminOnlineHubPage.dart';
@@ -40,7 +41,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
       child: Scaffold(
       appBar: AppBar(
         title:
-            Text("운영자 로그인", style: TextStyle(fontFamily: "NotoSansKR")),
+            Text(tr(context, '운영자 로그인'), style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: Palette.navy,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -62,7 +63,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
                 ),
                 SizedBox(height: 32),
                 Text(
-                  "운영자 로그인",
+                  tr(context, '운영자 로그인'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: "Jalnan",
@@ -72,7 +73,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
                 ),
                 SizedBox(height: 40),
                 Text(
-                  "이메일",
+                  tr(context, '이메일'),
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -88,7 +89,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
                   autofillHints: const [AutofillHints.username],
                   onSubmitted: (_) => passwordFocus.requestFocus(),
                   decoration: InputDecoration(
-                    hintText: '관리자 또는 강사 이메일',
+                    hintText: tr(context, '관리자 또는 강사 이메일'),
                     hintStyle: TextStyle(fontFamily: "NotoSansKR"),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -100,7 +101,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
                 ),
                 SizedBox(height: 20),
                 Text(
-                  "비밀번호",
+                  tr(context, '비밀번호'),
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -118,7 +119,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
                     if (!_isLoading) _login();
                   },
                   decoration: InputDecoration(
-                    hintText: '비밀번호를 입력하세요',
+                    hintText: tr(context, '비밀번호를 입력하세요'),
                     hintStyle: TextStyle(fontFamily: "NotoSansKR"),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -148,7 +149,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
                               prefillEmail: emailController.text,
                             ),
                     child: Text(
-                      '아이디 · 비밀번호 찾기',
+                      tr(context, '아이디 · 비밀번호 찾기'),
                       style: TextStyle(
                         fontFamily: 'NotoSansKR',
                         fontSize: 13,
@@ -177,7 +178,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
                           ),
                         )
                       : Text(
-                          "로그인",
+                          tr(context, '로그인'),
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -201,12 +202,12 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
     final password = passwordController.text.trim();
 
     if (email.isEmpty) {
-      _showSnackBar('이메일을 입력해주세요.', Colors.red);
+      _showSnackBar(tr(context, '이메일을 입력해주세요.'), Colors.red);
       return;
     }
 
     if (password.isEmpty) {
-      _showSnackBar('비밀번호를 입력해주세요.', Colors.red);
+      _showSnackBar(tr(context, '비밀번호를 입력해주세요.'), Colors.red);
       return;
     }
 
@@ -225,21 +226,20 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
         );
         if (cred == null || cred.user == null) {
           _showSnackBar(
-            '메인 관리자 Firebase 로그인에 실패했습니다. '
-            'Authentication에 등록된 비밀번호로 다시 시도해 주세요.',
+            tr(context, '메인 관리자 Firebase 로그인에 실패했습니다. Authentication에 등록된 비밀번호로 다시 시도해 주세요.'),
             Colors.red,
           );
           return;
         }
-        await AuthService.ensureAdminDoc(email, "관리자", role: 'owner');
+        await AuthService.ensureAdminDoc(email, tr(context, '관리자'), role: 'owner');
         await AuthService.saveAdminSession(
           email,
-          name: "관리자",
+          name: tr(context, '관리자'),
           role: AdminRole.owner,
           uid: cred.user?.uid,
         );
 
-        _showSnackBar('관리자 로그인에 성공했습니다.', Colors.green);
+        _showSnackBar(tr(context, '관리자 로그인에 성공했습니다.'), Colors.green);
         Navigator.pop(context);
         if (widget.category == 'general') {
           Navigator.push(
@@ -253,7 +253,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
       }
 
       if (widget.category != 'general') {
-        _showSnackBar('게시판 관리는 메인 관리자만 가능합니다.', Colors.red);
+        _showSnackBar(tr(context, '게시판 관리는 메인 관리자만 가능합니다.'), Colors.red);
         return;
       }
 
@@ -266,7 +266,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
 
       final role = await AuthService.getAdminRole();
       _showSnackBar(
-        role == AdminRole.teacher ? '강사 로그인에 성공했습니다.' : '관리자 로그인에 성공했습니다.',
+        role == AdminRole.teacher ? tr(context, '강사 로그인에 성공했습니다.'): tr(context, '관리자 로그인에 성공했습니다.'),
         Colors.green,
       );
       Navigator.pop(context);
@@ -275,7 +275,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
         MaterialPageRoute(builder: (context) => AdminOnlineHubPage()),
       );
     } catch (e) {
-      _showSnackBar('로그인 중 오류가 발생했습니다: $e', Colors.red);
+      _showSnackBar(tf(context, '로그인 중 오류가 발생했습니다: {p0}', {'p0': e}), Colors.red);
     } finally {
       if (mounted) {
         setState(() {
@@ -288,7 +288,7 @@ class _WorkingAdminLoginPageState extends State<WorkingAdminLoginPage> {
   void _showSnackBar(String message, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
+        content: Text(tr(context, message), style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: color,
       ),
     );

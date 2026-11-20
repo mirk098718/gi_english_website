@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -31,8 +30,6 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
   bool _isMemberLoggedIn = AuthService.currentUser != null;
   StreamSubscription<User?>? _authSub;
   _HeaderMenu _menu = _HeaderMenu.none;
-  Timer? _closeTimer;
-  Timer? _hoverOpenTimer;
 
   @override
   void initState() {
@@ -53,8 +50,6 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
 
   @override
   void dispose() {
-    _closeTimer?.cancel();
-    _hoverOpenTimer?.cancel();
     _authSub?.cancel();
     super.dispose();
   }
@@ -72,32 +67,11 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
   }
 
   void _openMenu(_HeaderMenu menu) {
-    _closeTimer?.cancel();
-    _hoverOpenTimer?.cancel();
     if (_menu == menu) return;
     setState(() => _menu = menu);
   }
 
-  void _scheduleOpen(_HeaderMenu menu, Duration delay) {
-    _closeTimer?.cancel();
-    _hoverOpenTimer?.cancel();
-    _hoverOpenTimer = Timer(delay, () {
-      if (!mounted) return;
-      _openMenu(menu);
-    });
-  }
-
-  void _scheduleClose() {
-    _hoverOpenTimer?.cancel();
-    _closeTimer?.cancel();
-    _closeTimer = Timer(const Duration(milliseconds: 160), () {
-      if (mounted) setState(() => _menu = _HeaderMenu.none);
-    });
-  }
-
   void _closeMenu() {
-    _hoverOpenTimer?.cancel();
-    _closeTimer?.cancel();
     if (_menu == _HeaderMenu.none) return;
     setState(() => _menu = _HeaderMenu.none);
   }
@@ -163,18 +137,14 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
   }
 
   Widget _header() {
-    return MouseRegion(
-      onExit: (_) => _scheduleClose(),
-      onEnter: (_) => _closeTimer?.cancel(),
-      child: Material(
-        color: Palette.white,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _bar(),
-            if (_menu != _HeaderMenu.none) _dropdown(),
-          ],
-        ),
+    return Material(
+      color: Palette.white,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _bar(),
+          if (_menu != _HeaderMenu.none) _dropdown(),
+        ],
       ),
     );
   }
@@ -217,15 +187,6 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                   ),
                   SizedBox(width: 8),
                   _navItem(
-                    label: '레벨 진단',
-                    enabled: _isMemberLoggedIn,
-                    onTap: () {
-                      _closeMenu();
-                      SiteNav.openPlacement(context);
-                    },
-                  ),
-                  SizedBox(width: 8),
-                  _navItem(
                     label: '내 강의실',
                     enabled: _isMemberLoggedIn,
                     onTap: () {
@@ -234,45 +195,34 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
                     },
                   ),
                   SizedBox(width: 10),
-                  MouseRegion(
-                    onEnter: (_) => _scheduleClose(),
-                    child: LetsTalkNavChip(
-                      onTap: () {
-                        _closeMenu();
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (!mounted) return;
-                          SiteNav.goLetsTalk(context);
-                        });
-                      },
-                    ),
+                  LetsTalkNavChip(
+                    onTap: () {
+                      _closeMenu();
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (!mounted) return;
+                        SiteNav.goLetsTalk(context);
+                      });
+                    },
                   ),
                   _navDivider(),
                   _navItem(
                     label: '글림아일랜드 어학원',
                     menu: _HeaderMenu.campus,
                     color: Palette.darkTeal,
-                    hoverDelay: const Duration(milliseconds: 220),
-                    onTap: () {
-                      _closeMenu();
-                      SiteNav.goAcademy(context);
-                    },
                   ),
                 ],
               ),
             ),
           ),
           SizedBox(width: 12),
-          MouseRegion(
-            onEnter: (_) => _scheduleClose(),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                NotificationBellButton(),
-                HeaderSocialLinks(),
-                SizedBox(width: 12),
-                ..._accountActions(),
-              ],
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              NotificationBellButton(),
+              HeaderSocialLinks(),
+              SizedBox(width: 12),
+              ..._accountActions(),
+            ],
           ),
         ],
       ),
@@ -294,30 +244,13 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
     required String label,
     VoidCallback? onTap,
     _HeaderMenu? menu,
-    Duration? hoverDelay,
     Color? color,
     bool enabled = true,
   }) {
     final selected = enabled && menu != null && _menu == menu;
     final idle = enabled ? (color ?? Palette.black) : Palette.grey400;
     final active = color ?? Palette.navy;
-    return MouseRegion(
-      onEnter: (_) {
-        if (!enabled) {
-          _scheduleClose();
-          return;
-        }
-        if (menu != null) {
-          if (hoverDelay != null) {
-            _scheduleOpen(menu, hoverDelay);
-          } else {
-            _openMenu(menu);
-          }
-        } else {
-          _scheduleClose();
-        }
-      },
-      child: InkWell(
+    return InkWell(
         onTap: enabled
             ? () {
                 if (onTap != null) {
@@ -362,7 +295,6 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
             ],
           ),
         ),
-      ),
     );
   }
 
@@ -455,59 +387,29 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
       runSpacing: 12,
       children: [
         _panelChip(
-          label: '전체 과정 보기',
-          subtitle: '수강 신청 · 강사 선택',
+          label: '온라인 과정 보기',
           onTap: () {
             _closeMenu();
             SiteNav.goCourses(context);
           },
         ),
-        ...OnlineCourse.all.map(
-          (course) => _panelChip(
-            label: course.title,
-            subtitle: course.subtitle,
-            onTap: () {
-              _closeMenu();
-              SiteNav.goCourses(context, courseId: course.id);
-            },
-          ),
+        _panelChip(
+          label: '레벨테스트',
+          onTap: () {
+            _closeMenu();
+            SiteNav.openPlacement(context);
+          },
         ),
       ],
     );
   }
 
   Widget _campusPanel() {
-    return Column(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final wide = constraints.maxWidth >= 840;
-            if (!wide) {
-              return Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  for (final group in SiteNav.academyGroups)
-                    _panelChip(
-                      label: group.title,
-                      onTap: () {
-                        _closeMenu();
-                        SiteNav.openPage(context, group.items.first);
-                      },
-                    ),
-                ],
-              );
-            }
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (final group in SiteNav.academyGroups)
-                  Expanded(child: _campusGroup(group)),
-              ],
-            );
-          },
-        ),
+        for (final group in SiteNav.academyGroups)
+          Expanded(child: _campusGroup(group)),
       ],
     );
   }

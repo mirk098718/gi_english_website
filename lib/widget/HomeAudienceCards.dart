@@ -62,7 +62,7 @@ class HomeAudienceCards extends StatelessWidget {
     return [
       _AudienceItem(
         title: '왕초보',
-        subtitle: '파닉스부터 차근차근',
+        subtitle: '기초회화부터 차근차근',
         imageAsset: 'assets/audience-beginner.png',
         onTap: () => SiteNav.goCourse(context, course('beginner_phonics')),
       ),

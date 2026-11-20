@@ -59,7 +59,7 @@ class HomeClassAlertBand extends StatelessWidget {
           SizedBox(height: compact ? 24 : 32),
           _image(
             asset: 'assets/curriculum-service-overview.jpg',
-            label: '인강 · 디지털 교재 · 실시간 화상수업 · 피드백 체크리스트가 한 화면에서 이어집니다.',
+            label: '인강 · 연습문제 · 실시간 화상수업 · 피드백 체크리스트가 한 화면에서 이어집니다.',
           ),
           SizedBox(height: compact ? 28 : 40),
           Text(

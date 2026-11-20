@@ -19,6 +19,10 @@ admin.initializeApp();
 
 const DEFAULT_TEST_SECRET = "test_sk_zXLkKEypNArWmo50nX3lmeaxYG5R";
 const DEADLINE_WEEKS_PER_SESSION = 2;
+const LECTURE_PLAN = "lecture";
+const SPEAKING_PLAN = "speaking";
+const SPEAKING_COURSE_ID = "native_speaking";
+const LECTURE_ACCESS_WEEKS = 24;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 function toJsDate(value) {
@@ -45,12 +49,30 @@ function expiresAtFromStart(start, totalSessions) {
   return addDays(startOfKstDay(start), total * DEADLINE_WEEKS_PER_SESSION * 7);
 }
 
-function extendedExpiresAt(currentExpires, addedSessions, now) {
+function enrollmentPlan(payment) {
+  const courseId = payment && payment.courseId ? String(payment.courseId) : "";
+  if (courseId === SPEAKING_COURSE_ID) return SPEAKING_PLAN;
+  const plan = payment && payment.plan ? String(payment.plan) : "";
+  if (plan === LECTURE_PLAN || plan === SPEAKING_PLAN) return plan;
+  return "bundle";
+}
+
+function enrollmentExpiresAt(start, plan, totalSessions) {
+  if (plan === LECTURE_PLAN) {
+    return addDays(startOfKstDay(start), LECTURE_ACCESS_WEEKS * 7);
+  }
+  return expiresAtFromStart(start, totalSessions);
+}
+
+function extendedExpiresAt(currentExpires, addedSessions, now, addedWeeks) {
   const clock = startOfKstDay(now || new Date());
   const current = currentExpires ? startOfKstDay(currentExpires) : null;
   const base = current && current.getTime() > clock.getTime() ? current : clock;
-  const added = Math.max(0, Number(addedSessions) || 0);
-  return addDays(base, added * DEADLINE_WEEKS_PER_SESSION * 7);
+  const weeks =
+    addedWeeks != null
+      ? Math.max(0, Number(addedWeeks) || 0)
+      : Math.max(0, Number(addedSessions) || 0) * DEADLINE_WEEKS_PER_SESSION;
+  return addDays(base, weeks * 7);
 }
 
 function isExtensionPayment(payment) {
@@ -219,7 +241,9 @@ exports.confirmTossPayment = functions
     }
 
     const courseId = payment.courseId;
-    const totalSessions = payment.totalSessions || 8;
+    const plan = enrollmentPlan(payment);
+    const totalSessions =
+      payment.totalSessions == null ? 8 : Number(payment.totalSessions);
     const userId = payment.userId;
 
     const existing = await db
@@ -241,6 +265,7 @@ exports.confirmTossPayment = functions
       email: payment.email || "",
       memberName: payment.memberName || "",
       courseId,
+      plan,
       isActive: true,
       totalSessions,
       isPaid: true,
@@ -258,7 +283,28 @@ exports.confirmTossPayment = functions
       const prev = (await enrollmentRef.get()).data() || {};
       const completed = Number(prev.completedSessions || 0);
       let payload;
-      if (isExtensionPayment(payment)) {
+      if (isExtensionPayment(payment) && plan === LECTURE_PLAN) {
+        payload = {
+          ...enrollmentPayload,
+          plan: LECTURE_PLAN,
+          totalSessions: Number(prev.totalSessions || 0),
+          completedSessions: completed,
+          remainingSessions: Math.max(
+            0,
+            Number(prev.totalSessions || 0) - completed
+          ),
+          paidAmount: Number(prev.paidAmount || 0) + amountNum,
+          paymentNote: "수강 연장 결제",
+          expiresAt: admin.firestore.Timestamp.fromDate(
+            extendedExpiresAt(
+              toJsDate(prev.expiresAt),
+              0,
+              new Date(),
+              LECTURE_ACCESS_WEEKS
+            )
+          ),
+        };
+      } else if (isExtensionPayment(payment)) {
         const added = Number(totalSessions || 0);
         const prevTotal = Number(prev.totalSessions || 0);
         const total = prevTotal + added;
@@ -287,7 +333,7 @@ exports.confirmTossPayment = functions
         if (!prev.expiresAt) {
           const start = toJsDate(prev.createdAt) || new Date();
           payload.expiresAt = admin.firestore.Timestamp.fromDate(
-            expiresAtFromStart(start, totalSessions)
+            enrollmentExpiresAt(start, plan, totalSessions)
           );
         }
       }
@@ -298,7 +344,7 @@ exports.confirmTossPayment = functions
         completedSessions: 0,
         remainingSessions: totalSessions,
         expiresAt: admin.firestore.Timestamp.fromDate(
-          expiresAtFromStart(new Date(), totalSessions)
+          enrollmentExpiresAt(new Date(), plan, totalSessions)
         ),
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
@@ -355,7 +401,7 @@ async function staffRole(context) {
   if (!snap.exists) return "";
   const data = snap.data() || {};
   if (data.isActive === false) return "";
-  if (!data.role || data.role === "owner") return "owner";
+  if (data.role === "owner") return "owner";
   if (data.role === "teacher") return "teacher";
   return "";
 }
@@ -460,8 +506,7 @@ async function assertOwner(context, deniedMessage) {
   if (data.isActive === false) {
     throw new functions.https.HttpsError("permission-denied", "권한이 없습니다.");
   }
-  const role = data.role;
-  if (role && role !== "owner") {
+  if (data.role !== "owner") {
     throw new functions.https.HttpsError(
       "permission-denied",
       deniedMessage || "메인 관리자만 할 수 있습니다."
@@ -676,7 +721,10 @@ exports.setTeacherActive = functions
 function publicTeacherProfileId(teacherUid, data) {
   const existing = String((data && data.nativeProfileId) || "");
   if (existing && existing.indexOf("native_temp_") !== 0) return existing;
-  if (!data || data.role !== "teacher") return "native_owner_gi";
+  const email = String((data && data.email) || "").trim().toLowerCase();
+  if (data && (data.role === "owner" || email === OWNER_EMAIL)) {
+    return "native_owner_gi";
+  }
   return "native_" + teacherUid;
 }
 
@@ -708,7 +756,7 @@ exports.listSelectableTeachers = functions
       const name = String(data.name || "").trim();
       if (!name) continue;
       const id = publicTeacherProfileId(doc.id, data);
-      const isOwner = data.role !== "teacher";
+      const isOwner = data.role === "owner";
       const bookingOffer = resolveBookingOffer(data, isOwner);
       teachers.push({
         id,

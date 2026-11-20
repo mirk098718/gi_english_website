@@ -278,6 +278,13 @@
     return Math.round((correct * 100) / total);
   }
 
+  function studentIdFromSearch(search) {
+    var params = new URLSearchParams(String(search || ""));
+    var id = params.get("student") || "";
+    if (!/^[A-Za-z0-9_-]{8,128}$/.test(id)) return "";
+    return id;
+  }
+
   function shouldSave(snapshot) {
     if (!snapshot || snapshot.complete !== true) return false;
     if (snapshot.total !== 25) return false;
@@ -322,6 +329,7 @@
     var timer = null;
     var lastSavedKey = "";
     var meta = null;
+    var viewedStudent = "";
 
     function snapshotKey(snapshot) {
       var answers = (snapshot.essays || []).map(function (essay) {
@@ -431,7 +439,12 @@
       }, 400);
     }
 
+    function reviewingStudent() {
+      return Boolean(viewedStudent);
+    }
+
     function save(snapshot, key, doneMessage) {
+      if (reviewingStudent()) return;
       if (!user || !meta || !shouldSave(snapshot)) {
         if (authReady && !user) {
           renderSaved(null, doneMessage
@@ -451,6 +464,7 @@
     }
 
     function commitFinish(snapshot) {
+      if (reviewingStudent()) return;
       if (!shouldSave(snapshot) || !meta) return;
       clearTimeout(timer);
       var key = snapshotKey(snapshot);
@@ -477,10 +491,24 @@
 
     function loadSaved() {
       if (!user || !meta) return;
-      window.firebase.firestore().collection("quiz_results").doc(user.uid + "_" + meta.quizId).get().then(function (snap) {
-        if (!snap.exists) return;
-        renderSaved(snap.data() || {}, "이전에 저장한 최근 결과입니다.");
-      }).catch(function () {});
+      var target = viewedStudent || user.uid;
+      var own = target === user.uid;
+      window.firebase.firestore().collection("quiz_results").doc(target + "_" + meta.quizId).get().then(function (snap) {
+        if (!snap.exists) {
+          if (!own) {
+            renderSaved(null, "이 수강생이 저장한 최근 결과가 없습니다.");
+          }
+          return;
+        }
+        renderSaved(
+          snap.data() || {},
+          own
+            ? "이전에 저장한 최근 결과입니다."
+            : "이 수강생이 저장한 최근 결과입니다. 객관식 점수는 맞은 개수이고, 주관식 답은 그 아래에 있습니다."
+        );
+      }).catch(function () {
+        if (!own) renderSaved(null, "이 수강생의 최근 결과를 불러오지 못했습니다.");
+      });
     }
 
     return {
@@ -493,6 +521,10 @@
       finish: function (snapshot) {
         queued = snapshot;
         pendingFinish = true;
+        if (reviewingStudent()) {
+          pendingFinish = false;
+          return;
+        }
         if (!meta) return;
         if (!authReady) {
           if (!notifySite(snapshot)) {
@@ -512,6 +544,7 @@
       },
       start: function (readSnapshot) {
         read = readSnapshot;
+        viewedStudent = studentIdFromSearch(window.location.search);
         meta = META[quizIdFromPath(window.location.pathname)];
         if (!meta) return;
         meta = {
@@ -555,6 +588,7 @@
     META: META,
     quizIdFromPath: quizIdFromPath,
     percentFor: percentFor,
+    studentIdFromSearch: studentIdFromSearch,
     shouldSave: shouldSave,
     buildPayload: buildPayload,
     report: function (snapshot) {

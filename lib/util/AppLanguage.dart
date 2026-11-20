@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/en_translations.dart';
+import 'package:gi_english_website/util/staff_en_translations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Site language. Korean is the source text; English comes from [enTranslations].
@@ -40,14 +41,25 @@ class AppLanguage extends ChangeNotifier {
 
   String translate(String source) {
     if (!isEnglish || source.isEmpty) return source;
-    final direct = enTranslations[source];
+    final direct = _lookup(source);
     if (direct != null) return direct;
     final trimmed = source.trim();
     if (trimmed != source) {
-      final hit = enTranslations[trimmed];
+      final hit = _lookup(trimmed);
       if (hit != null) return hit;
     }
     return source;
+  }
+
+  String? _lookup(String source) =>
+      enTranslations[source] ?? staffEnTranslations[source];
+
+  String fill(String pattern, [Map<String, Object?> values = const {}]) {
+    var text = translate(pattern);
+    values.forEach((key, value) {
+      text = text.replaceAll('{$key}', '${value ?? ''}');
+    });
+    return text;
   }
 }
 
@@ -60,6 +72,18 @@ class LangScope extends InheritedNotifier<AppLanguage> {
 String tr(BuildContext context, String source) {
   context.dependOnInheritedWidgetOfExactType<LangScope>();
   return AppLanguage.instance.translate(source);
+}
+
+/// Translates a Korean sentence that includes values.
+/// Placeholders in [pattern] look like `{name}` and are filled from [values]
+/// after the sentence is translated.
+String tf(
+  BuildContext context,
+  String pattern, [
+  Map<String, Object?> values = const {},
+]) {
+  context.dependOnInheritedWidgetOfExactType<LangScope>();
+  return AppLanguage.instance.fill(pattern, values);
 }
 
 /// Korean / English control for the current white header.

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
+import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -10,6 +11,7 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PaymentService.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/TeacherClassTimeLine.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 
@@ -19,11 +21,15 @@ import '../util/WidgetUtil.dart';
 class OnlineTeacherSelectPage extends StatefulWidget {
   final OnlineCourse course;
   final bool extendEnrollment;
+  final String plan;
+  final int sessionCount;
 
   const OnlineTeacherSelectPage({
     Key? key,
     required this.course,
     this.extendEnrollment = false,
+    this.plan = OnlinePlan.bundle,
+    this.sessionCount = 0,
   }) : super(key: key);
 
   @override
@@ -78,6 +84,11 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
       course: widget.course,
       nativeTeacher: _selected!,
       extendEnrollment: widget.extendEnrollment,
+      plan: widget.plan,
+      totalSessions: widget.course.sessionsFor(
+        widget.plan,
+        sessions: widget.sessionCount,
+      ),
     );
     if (order == null) {
       if (!mounted) return;
@@ -152,6 +163,20 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
     );
   }
 
+  String _orderSummary(OnlineCourse course) {
+    final sessions = course.sessionsFor(
+      widget.plan,
+      sessions: widget.sessionCount,
+    );
+    final amount = OnlinePlan.won(
+      course.amountFor(widget.plan, sessions: widget.sessionCount),
+    );
+    if (widget.plan == OnlinePlan.speaking) {
+      return '원어민 화상 1:1 회화 $sessions회 · $amount';
+    }
+    return '화상 $sessions회 · $amount';
+  }
+
   Widget content() {
     final course = widget.course;
     return Container(
@@ -167,7 +192,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
           WidgetUtil.myDivider(),
           SizedBox(height: 12),
           Text(
-            tr(context, "선택한 과정을 담당할 메인 원어민 강사입니다.\n이후 화상수업은 이 선생님을 중심으로 진행되며, 해당 선생님이 열어 둔 시간에만 예약할 수 있습니다.\n스케줄이 맞지 않을 때만 다른 선생님으로 변경할 수 있습니다."),
+            tr(context, "선택한 과정을 담당할 메인 원어민 강사입니다.\n이후 화상수업은 이 선생님을 중심으로 진행되며, 해당 선생님이 열어 둔 시간에만 예약할 수 있습니다.\n메인 강사는 나중에 바꿀 수 있습니다. 하루 일정이 안 맞으면 다른 선생님으로 예약하고, 마음에 들면 그 선생님을 메인 강사로 고정할 수 있습니다."),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: 13,
@@ -193,14 +218,14 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
                         fontSize: 12,
                         color: Palette.grey500)),
                 SizedBox(height: 6),
-                Text('${course.order}. ${course.title}',
+                Text('${course.order}. ${course.localizedName(context, widget.plan)}',
                     style: TextStyle(
                         fontFamily: 'NotoSansKR',
                         fontWeight: FontWeight.w700,
                         fontSize: 15)),
                 SizedBox(height: 4),
                 Text(
-                    '${course.subtitle} · 화상 ${course.defaultSessions}회 · ${course.priceLabel}',
+                    _orderSummary(course),
                     style: TextStyle(
                         fontFamily: 'NotoSansKR',
                         fontSize: 13,
@@ -229,30 +254,10 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
               ),
             )
           else
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final wide = constraints.maxWidth >= 720;
-                if (wide) {
-                  return Wrap(
-                    spacing: 16,
-                    runSpacing: 16,
-                    children: _teachers
-                        .map((t) => SizedBox(
-                              width: (constraints.maxWidth - 16) / 2,
-                              child: _teacherCard(t),
-                            ))
-                        .toList(),
-                  );
-                }
-                return Column(
-                  children: _teachers
-                      .map((t) => Padding(
-                            padding: EdgeInsets.only(bottom: 16),
-                            child: _teacherCard(t),
-                          ))
-                      .toList(),
-                );
-              },
+            OnlineTeacherCardGrid(
+              teachers: _teachers,
+              selectedId: _selected?.id,
+              onSelected: (teacher) => setState(() => _selected = teacher),
             ),
           SizedBox(height: 24),
           if (_selected != null) ...[
@@ -300,31 +305,85 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
     );
   }
 
-  Widget _teacherCard(OnlineNativeTeacher teacher) {
-    final selected = _selected?.id == teacher.id;
+}
+
+/// 결제 전 원어민 강사 카드. 웹은 한 줄에 3명, 모바일은 한 줄에 1명.
+class OnlineTeacherCardGrid extends StatelessWidget {
+  final List<OnlineNativeTeacher> teachers;
+  final String? selectedId;
+  final ValueChanged<OnlineNativeTeacher> onSelected;
+
+  const OnlineTeacherCardGrid({
+    Key? key,
+    required this.teachers,
+    required this.selectedId,
+    required this.onSelected,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final web = !useMobileSchoolLayout(context);
+        if (!web) {
+          return Column(
+            children: teachers
+                .map((t) => Padding(
+                      padding: EdgeInsets.only(bottom: 16),
+                      child: _card(context, t),
+                    ))
+                .toList(),
+          );
+        }
+        const spacing = 16.0;
+        const columns = 3;
+        final width =
+            (constraints.maxWidth - spacing * (columns - 1)) / columns;
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: teachers
+              .map((t) => SizedBox(
+                    width: width,
+                    child: _card(context, t, compact: true),
+                  ))
+              .toList(),
+        );
+      },
+    );
+  }
+
+  Widget _card(BuildContext context, OnlineNativeTeacher teacher,
+      {bool compact = false}) {
+    final selected = selectedId == teacher.id;
+    const radius = 16.0;
+    final borderWidth = selected ? 2.5 : 1.0;
     return InkWell(
-      onTap: () => setState(() => _selected = teacher),
-      borderRadius: BorderRadius.circular(16),
+      key: ValueKey('teacher-card-${teacher.id}'),
+      onTap: () => onSelected(teacher),
+      borderRadius: BorderRadius.circular(radius),
       child: Container(
         decoration: BoxDecoration(
           color: selected
               ? Palette.secondary.withValues(alpha: 0.06)
               : Palette.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(radius),
           border: Border.all(
             color: selected ? Palette.darkTeal : Palette.grey200,
-            width: selected ? 2.5 : 1,
+            width: borderWidth,
           ),
         ),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
+        padding: EdgeInsets.all(borderWidth),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(radius - borderWidth),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               children: [
                 SizedBox(
                   width: double.infinity,
-                  height: 280,
+                  height: compact ? 148 : 220,
                   child: teacher.photoFill(),
                 ),
                 Positioned(
@@ -391,10 +450,15 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
                       color: Palette.grey700,
                     ),
                   ),
+                  TeacherClassTimeLine(
+                    bands: teacher.classBands,
+                    closedRoutines: teacher.closedRoutineKeys,
+                  ),
                 ],
               ),
             ),
           ],
+        ),
         ),
       ),
     );

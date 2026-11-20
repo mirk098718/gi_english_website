@@ -38,7 +38,7 @@ class TeacherRosterPage extends StatelessWidget {
     final body = TeacherRosterView(teacher: teacher);
     if (embedded) return body;
     final uid = teacher?['uid']?.toString() ?? '';
-    final name = AuthService.profileDisplayName(teacher, fallback: '강사');
+    final name = AuthService.profileDisplayName(teacher, fallback: tr(context, '강사'));
     Widget themed(Widget child) {
       return Theme(data: Palette.adminTheme(Theme.of(context)), child: child);
     }
@@ -78,10 +78,10 @@ class TeacherRosterPage extends StatelessWidget {
             unselectedLabelColor: Palette.white.withValues(alpha: 0.7),
             labelStyle: TextStyle(
                 fontFamily: "NotoSansKR", fontWeight: FontWeight.bold),
-            tabs: const [
-              Tab(text: '프로필·회원'),
-              Tab(text: '스케줄·예약'),
-              Tab(text: '한달 이력'),
+            tabs:  [
+              Tab(text: tr(context, '프로필·회원')),
+              Tab(text: tr(context, '스케줄·예약')),
+              Tab(text: tr(context, '한달 이력')),
             ],
           ),
         ),
@@ -128,6 +128,10 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
 
   bool get _canWrite =>
       _isOwner || (_staffUid.isNotEmpty && _staffUid == _teacherUid);
+
+  /// 강사 관리에서 특정 강사를 연 화면. 로그인 주체의 수강생이 아니다.
+  bool get _viewingAssignedTeacher =>
+      widget.teacher != null && (widget.teacher!['uid']?.toString() ?? '').isNotEmpty;
 
   @override
   void initState() {
@@ -211,13 +215,13 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       lessonFeeWon: EnrollmentService.lessonFeeWonOf(_teacher),
     );
     if (stats.ratedCount <= 0) return '';
-    return ' · 이번달 평균 ${stats.averageStarsLabel} (${stats.ratedCount}건)';
+    return tf(context, ' · 이번달 평균 {p0} ({p1}건)', {'p0': stats.averageStarsLabel, 'p1': stats.ratedCount});
   }
 
   void _toast(String message, {bool error = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
+        content: Text(tr(context, message), style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: error ? Palette.danger : Palette.success,
       ),
     );
@@ -274,7 +278,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
   Future<void> _enterAsHost(WeekBooking booking) async {
     if (_busy) return;
     if (!booking.isConfirmed) {
-      _toast('확정된 예약만 화상수업으로 입장할 수 있습니다.', error: true);
+      _toast(tr(context, '확정된 예약만 화상수업으로 입장할 수 있습니다.'), error: true);
       return;
     }
     setState(() => _busy = true);
@@ -303,7 +307,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       _toast(error, error: true);
       return;
     }
-    _toast('호스트로 입장했습니다. 수강생도 입장할 수 있습니다.');
+    _toast(tr(context, '호스트로 입장했습니다. 수강생도 입장할 수 있습니다.'));
     await _load();
   }
 
@@ -341,7 +345,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       _toast(error, error: true);
       return;
     }
-    _toast('수업을 종료했습니다. 피드백을 작성해 주세요.');
+    _toast(tr(context, '수업을 종료했습니다. 피드백을 작성해 주세요.'));
     await _openFeedback(booking, afterClass: true);
   }
 
@@ -363,7 +367,10 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
         children: [
           _profileCard(),
           SizedBox(height: 24),
-          Text(tr(context, "내 수강생"), style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+          Text(
+            tr(context, _viewingAssignedTeacher ? "담당 수강생" : "내 수강생"),
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 16),
+          ),
           SizedBox(height: 8),
           Text(
             tr(context, "담당 회원의 화상수업 입장·종료와 회차별 피드백을 여기서 진행합니다. 수업을 종료하면 수강생에게 바로 별점 평가가 요청되고, 이어서 피드백을 작성합니다."),
@@ -381,7 +388,12 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
           Text(tr(context, "타 수강생"), style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           SizedBox(height: 8),
           Text(
-            tr(context, "다른 강사 담당이지만 내 스케줄로 예약한 수강생입니다. 컨펌하면 수업 횟수에 포함됩니다."),
+            tr(
+              context,
+              _viewingAssignedTeacher
+                  ? "다른 강사 담당이지만 이 강사 시간에 예약한 수강생입니다. 컨펌하면 수업 횟수에 포함됩니다."
+                  : "다른 강사 담당이지만 내 스케줄로 예약한 수강생입니다. 컨펌하면 수업 횟수에 포함됩니다.",
+            ),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
@@ -408,7 +420,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     final intro = teacher['intro']?.toString() ?? '';
     final photoUrl = teacher['photoUrl']?.toString() ?? '';
     final phone = teacher['phone']?.toString() ?? '';
-    final isOwnerTeacher = teacher['role']?.toString() != 'teacher';
+    final isOwnerTeacher = AuthService.docIsOwner(teacher);
     return Container(
       width: double.maxFinite,
       padding: EdgeInsets.all(16),
@@ -433,14 +445,14 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isOwnerTeacher ? '$name (메인 관리자 · 강사)' : name,
+                      isOwnerTeacher ? tf(context, '{p0} (메인 관리자 · 강사)', {'p0': name}): name,
                       style: TextStyle(fontFamily: "Jalnan", fontSize: 18),
                     ),
                     if (nickname.isNotEmpty &&
                         legalName.isNotEmpty &&
                         nickname != legalName) ...[
                       SizedBox(height: 4),
-                      Text('이름 $legalName',
+                      Text(tf(context, '이름 {p0}', {'p0': legalName}),
                           style: TextStyle(
                               fontFamily: "NotoSansKR",
                               fontSize: 13,
@@ -506,8 +518,18 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
           ),
           SizedBox(height: 10),
           Text(
-            '내 수강생 ${_members.length}명 · 타 수강생 ${_guestMembers.length}명 · 화상수업 ${_bookings.length}건'
-            '${_monthAverageLabel()}',
+            tf(
+              context,
+              _viewingAssignedTeacher
+                  ? '담당 수강생 {p0}명 · 타 수강생 {p1}명 · 화상수업 {p2}건{p3}'
+                  : '내 수강생 {p0}명 · 타 수강생 {p1}명 · 화상수업 {p2}건{p3}',
+              {
+                'p0': _members.length,
+                'p1': _guestMembers.length,
+                'p2': _bookings.length,
+                'p3': _monthAverageLabel(),
+              },
+            ),
             style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 12,
@@ -620,12 +642,12 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     if (uid.isEmpty) return;
     final saved = await ProfileEditDialog.show(
       context,
-      title: '닉네임·사진 수정',
+      title: tr(context, '닉네임·사진 수정'),
       email: teacher['email']?.toString() ?? '',
       nickname: teacher['nickname']?.toString() ?? '',
       photoUrl: AuthService.profilePhotoUrl(teacher),
       helperText:
-          '로그인은 이메일 그대로 두고, 수업 목록에는 닉네임과 사진이 보입니다. 수강생이 고르는 강사 이름(영문 이름 등)은 관리자 수정에서 바꿉니다.',
+          tr(context, '로그인은 이메일 그대로 두고, 수업 목록에는 닉네임과 사진이 보입니다. 수강생이 고르는 강사 이름(영문 이름 등)은 관리자 수정에서 바꿉니다.'),
       onSave: ({
         required String nickname,
         Uint8List? photoBytes,
@@ -641,7 +663,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     if (!mounted || !saved) return;
     await _load();
     if (!mounted) return;
-    _toast('프로필을 저장했습니다.');
+    _toast(tr(context, '프로필을 저장했습니다.'));
   }
 
   Future<void> _setBookingOffer(String offer) async {
@@ -664,7 +686,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       _toast(error, error: true);
       return;
     }
-    _toast('수업 받기 설정을 저장했습니다.');
+    _toast(tr(context, '수업 받기 설정을 저장했습니다.'));
   }
 
   Widget _photo(String url, double size) {
@@ -727,8 +749,8 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
             [
               if (email.isNotEmpty) email,
               if (guest && assignedTeacherName.isNotEmpty)
-                '담당 $assignedTeacherName',
-              '화상수업 ${lessons.length}건',
+                tf(context, '담당 {p0}', {'p0': assignedTeacherName}),
+              tf(context, '화상수업 {p0}건', {'p0': lessons.length}),
             ].join(' · '),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 12, color: Palette.grey600),
@@ -814,7 +836,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
         children: [
           Text(
             [
-              if (booking.weekNumber > 0) '${booking.weekNumber}회차',
+              if (booking.weekNumber > 0) tf(context, '{p0}회차', {'p0': booking.weekNumber}),
               if (course != null) course.title,
             ].join(' · '),
             style: TextStyle(
@@ -824,8 +846,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
           ),
           SizedBox(height: 4),
           Text(
-            '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)} · ${booking.statusLabel}'
-            '${live ? ' · 수업 중' : ended ? ' · 수업 종료' : ''}',
+            '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)} · ${booking.statusLabel}' '${live ? tr(context, ' · 수업 중'): ended ? tr(context, ' · 수업 종료'): ''}',
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 12, color: Palette.grey600),
           ),
@@ -876,8 +897,8 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                 onPressed: () => _openFeedback(booking),
                 child: Text(
                   written
-                      ? (_canWrite ? '피드백 확인 · 수정' : '피드백 확인')
-                      : (_canWrite ? '피드백 작성' : '확인'),
+                      ? (_canWrite ? tr(context, '피드백 확인 · 수정'): tr(context, '피드백 확인'))
+                      : (_canWrite ? tr(context, '피드백 작성'): tr(context, '확인')),
                   style: TextStyle(
                       fontFamily: "NotoSansKR", color: Palette.secondaryDark),
                 ),

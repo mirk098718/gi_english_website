@@ -55,7 +55,7 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
       final size = await _decodeSize(widget.bytes);
       if (!mounted) return;
       if (size.width <= 0 || size.height <= 0) {
-        setState(() => _loadError = '사진을 읽지 못했습니다. JPG 또는 PNG로 올려 주세요.');
+        setState(() => _loadError = tr(context, '사진을 읽지 못했습니다. JPG 또는 PNG로 올려 주세요.'));
         return;
       }
       setState(() {
@@ -66,7 +66,7 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
       });
     } catch (_) {
       if (!mounted) return;
-      setState(() => _loadError = '사진을 읽지 못했습니다. JPG 또는 PNG로 올려 주세요.');
+      setState(() => _loadError = tr(context, '사진을 읽지 못했습니다. JPG 또는 PNG로 올려 주세요.'));
     }
   }
 
@@ -121,11 +121,11 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
       cropped = await _exportJpeg();
       if (cropped.isEmpty) throw Exception('empty jpeg');
     } catch (e) {
-      print('강사 사진 자르기 실패: $e');
+      print(tf(context, '강사 사진 자르기 실패: {p0}', {'p0': e}));
       if (!mounted) return;
       setState(() {
         _saving = false;
-        _saveError = '사진을 자르지 못했습니다. 위치를 다시 맞춘 뒤 시도해 주세요.';
+        _saveError = tr(context, '사진을 자르지 못했습니다. 위치를 다시 맞춘 뒤 시도해 주세요.');
       });
       return;
     }

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
-import 'package:gi_english_website/pages/MemberLoginPage.dart';
-import 'package:gi_english_website/pages/OnlineCheckoutPage.dart';
-import 'package:gi_english_website/util/AuthService.dart';
+import 'package:gi_english_website/pages/SchoolOnlineCurriculumPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -124,14 +122,10 @@ class _SchoolOnlineProgramPageState extends State<SchoolOnlineProgramPage> {
           ),
         ),
         onPressed: () {
-          if (AuthService.currentUser == null) {
-            MenuUtil.push(context, MemberLoginPage());
-          } else {
-            MenuUtil.push(context, OnlineCheckoutPage());
-          }
+          MenuUtil.push(context, const SchoolOnlineCurriculumPage());
         },
         child: Text(
-          tr(context, "프로그램 결제하기"),
+          tr(context, "상품 구성 보기"),
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: "Jalnan",
@@ -158,7 +152,7 @@ class _SchoolOnlineProgramPageState extends State<SchoolOnlineProgramPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            tr(context, "온라인 프로그램 (인강)"),
+            tr(context, "온라인 상품"),
             style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
           ),
           WidgetUtil.myDivider(),

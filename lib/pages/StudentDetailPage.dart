@@ -82,7 +82,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
   void _toast(String message, {bool error = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
+        content: Text(tr(context, message), style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: error ? Palette.danger : Palette.success,
       ),
     );
@@ -90,7 +90,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final name = AuthService.profileDisplayName(_member, fallback: '수강생 정보');
+    final name = AuthService.profileDisplayName(_member, fallback: tr(context, '수강생 정보'));
     return Theme(
       data: Palette.adminTheme(Theme.of(context)),
       child: Scaffold(
@@ -115,7 +115,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                   children: [
                     _profileCard(),
                     const SizedBox(height: 28),
-                    _sectionTitle('수강 배정'),
+                    _sectionTitle(tr(context, '수강 배정')),
                     const SizedBox(height: 8),
                     Text(
                       tr(context, "배정된 과정, 남은 회차, 결제 여부를 한곳에서 보고 수정할 수 있습니다."),
@@ -146,7 +146,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                     else
                       ..._enrollments.map(_enrollmentCard),
                     const SizedBox(height: 28),
-                    _sectionTitle('결제 내역'),
+                    _sectionTitle(tr(context, '결제 내역')),
                     const SizedBox(height: 8),
                     Text(
                       tr(context, "토스페이먼츠로 결제한 주문과, 수강 카드에 직접 기록한 결제 정보를 함께 보여 줍니다."),
@@ -181,7 +181,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
     final legalName = _member['name']?.toString().trim() ?? '';
     final nickname = _member['nickname']?.toString().trim() ?? '';
     final displayName =
-        AuthService.profileDisplayName(_member, fallback: '이름 미등록 회원');
+        AuthService.profileDisplayName(_member, fallback: tr(context, '이름 미등록 회원'));
     final email = _member['email']?.toString().trim() ?? '';
     final phone = _member['phone']?.toString() ?? '';
     final joined = AuthService.memberCreatedAt(_member);
@@ -208,18 +208,18 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
             ],
           ),
           const SizedBox(height: 12),
-          _infoRow('닉네임', nickname.isEmpty ? '-' : nickname),
-          _infoRow('이름', legalName.isEmpty ? '-' : legalName),
-          _infoRow('이메일', email.isEmpty ? '-' : email),
+          _infoRow(tr(context, '닉네임'), nickname.isEmpty ? '-' : nickname),
+          _infoRow(tr(context, '이름'), legalName.isEmpty ? '-' : legalName),
+          _infoRow(tr(context, '이메일'), email.isEmpty ? '-' : email),
           _infoRow(
-              '연락처',
+              tr(context, '연락처'),
               PhoneUtil.isValid(phone) ? PhoneUtil.display(phone) : (phone.isEmpty ? '-' : phone)),
-          _infoRow('담당 강사', _teacherName.isEmpty ? '미배정' : _teacherName),
-          _infoRow('가입일', _formatDateTime(joined, dateOnly: true)),
-          _infoRow('상태', active ? '이용 중' : '비활성'),
+          _infoRow(tr(context, '담당 강사'), _teacherName.isEmpty ? tr(context, '미배정'): _teacherName),
+          _infoRow(tr(context, '가입일'), _formatDateTime(joined, dateOnly: true)),
+          _infoRow(tr(context, '상태'), active ? tr(context, '이용 중'): tr(context, '비활성')),
           _infoRow(
-              '수강',
-              '배정 ${_enrollments.length}건 · 결제완료 ${_enrollments.where((e) => e.isPaid).length}건'),
+              tr(context, '수강'),
+              tf(context, '배정 {p0}건 · 결제완료 {p1}건', {'p0': _enrollments.length, 'p1': _enrollments.where((e) => e.isPaid).length})),
         ],
       ),
     );
@@ -257,7 +257,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
     final tossSum = paid.fold<int>(0, (sum, p) => sum + p.amount);
     final recordedSum = recorded.fold<int>(0, (sum, e) => sum + e.paidAmount);
     return Text(
-      '토스 결제완료 ${paid.length}건 ${_formatWon(tossSum)} · 수강 카드 기록 ${_formatWon(recordedSum)}',
+      tf(context, '토스 결제완료 {p0}건 {p1} · 수강 카드 기록 {p2}', {'p0': paid.length, 'p1': _formatWon(tossSum), 'p2': _formatWon(recordedSum)}),
       style: TextStyle(
           fontFamily: "NotoSansKR",
           fontSize: 13,
@@ -300,8 +300,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
           const SizedBox(height: 8),
           Text(
             sessionsConfigured
-                ? '진행 ${record.completedSessions}회 / 전체 ${record.totalSessions}회 · 남은 ${record.remainingSessions}회'
-                : tr(context, "수업 횟수 미설정"),
+                ? tf(context, '진행 {p0}회 / 전체 {p1}회 · 남은 {p2}회', {'p0': record.completedSessions, 'p1': record.totalSessions, 'p2': record.remainingSessions}): tr(context, "수업 횟수 미설정"),
             style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 13,
@@ -311,7 +310,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
           ),
           if (record.nativeTeacherLabel.trim().isNotEmpty) ...[
             const SizedBox(height: 4),
-            Text('수업 강사 ${record.nativeTeacherLabel}',
+            Text(tf(context, '수업 강사 {p0}', {'p0': record.nativeTeacherLabel}),
                 style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 12,
@@ -319,7 +318,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
           ],
           if (record.lastSessionAt != null) ...[
             const SizedBox(height: 4),
-            Text('최근 수업 처리: ${_formatDateTime(record.lastSessionAt)}',
+            Text(tf(context, '최근 수업 처리: {p0}', {'p0': _formatDateTime(record.lastSessionAt)}),
                 style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 12,
@@ -328,9 +327,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
           const SizedBox(height: 4),
           Text(
             record.isPaid
-                ? '결제 완료${record.paidAmount > 0 ? ' · ${_formatWon(record.paidAmount)}' : ''}'
-                    '${record.paymentNote.isNotEmpty ? ' · ${record.paymentNote}' : ''}'
-                : tr(context, "미결제"),
+                ? tf(context, '결제 완료{p0}{p1}', {'p0': record.paidAmount > 0 ? ' · ${_formatWon(record.paidAmount)}' : '', 'p1': record.paymentNote.isNotEmpty ? ' · ${record.paymentNote}' : ''}): tr(context, "미결제"),
             style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 12,
@@ -339,7 +336,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
           ),
           if (record.paidAt != null) ...[
             const SizedBox(height: 2),
-            Text('결제일 ${_formatDateTime(record.paidAt)}',
+            Text(tf(context, '결제일 {p0}', {'p0': _formatDateTime(record.paidAt)}),
                 style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 12,
@@ -399,12 +396,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
               fontSize: 13),
         ),
         subtitle: Text(
-          '${payment.amountLabel} · 화상 ${payment.totalSessions}회 · ${payment.statusLabel}\n'
-          '주문 ${payment.orderId}\n'
-          '생성 ${_formatDateTime(payment.createdAt)}'
-          '${payment.paidAt != null ? ' · 결제 ${_formatDateTime(payment.paidAt)}' : ''}'
-          '${payment.nativeTeacherName.isNotEmpty ? '\n강사 ${payment.nativeTeacherName}' : ''}'
-          '${payment.method != null && payment.method!.isNotEmpty ? '\n수단 ${payment.method}' : ''}',
+          tf(context, '{p0} · 화상 {p1}회 · {p2}\n주문 {p3}\n생성 {p4}{p5}{p6}{p7}', {'p0': payment.amountLabel, 'p1': payment.totalSessions, 'p2': payment.statusLabel, 'p3': payment.orderId, 'p4': _formatDateTime(payment.createdAt), 'p5': payment.paidAt != null ? tf(context, ' · 결제 {p0}', {'p0': _formatDateTime(payment.paidAt)}): '', 'p6': payment.nativeTeacherName.isNotEmpty ? tf(context, '\n강사 {p0}', {'p0': payment.nativeTeacherName}): '', 'p7': payment.method != null && payment.method!.isNotEmpty ? tf(context, '\n수단 {p0}', {'p0': payment.method}): ''}),
           style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 12,
@@ -425,7 +417,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
   Future<void> _showAssignDialog() async {
     final email = _member['email']?.toString().trim() ?? '';
     if (email.isEmpty) {
-      _toast('이메일 없는 회원은 수동 배정할 수 없습니다.', error: true);
+      _toast(tr(context, '이메일 없는 회원은 수동 배정할 수 없습니다.'), error: true);
       return;
     }
     OnlineCourse selectedCourse = OnlineCourse.all.first;
@@ -442,8 +434,8 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
               children: [
                 DropdownButtonFormField<OnlineCourse>(
                   initialValue: selectedCourse,
-                  decoration: const InputDecoration(
-                      labelText: '과정', border: OutlineInputBorder()),
+                  decoration:  InputDecoration(
+                      labelText: tr(context, '과정'), border: OutlineInputBorder()),
                   items: OnlineCourse.all
                       .map((course) => DropdownMenuItem(
                             value: course,
@@ -461,9 +453,9 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                 TextField(
                   controller: sessionsController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: '전체 화상수업 횟수',
-                    suffixText: '회',
+                  decoration:  InputDecoration(
+                    labelText: tr(context, '전체 화상수업 횟수'),
+                    suffixText: tr(context, '회'),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -499,7 +491,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
     );
     sessionsController.dispose();
     if (saved == true) {
-      _toast('수업이 배정되었습니다.');
+      _toast(tr(context, '수업이 배정되었습니다.'));
       await _load();
     }
   }
@@ -520,8 +512,8 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
               children: [
                 DropdownButtonFormField<OnlineCourse>(
                   initialValue: selectedCourse,
-                  decoration: const InputDecoration(
-                      labelText: '과정', border: OutlineInputBorder()),
+                  decoration:  InputDecoration(
+                      labelText: tr(context, '과정'), border: OutlineInputBorder()),
                   items: OnlineCourse.all
                       .map((course) => DropdownMenuItem(
                             value: course,
@@ -540,11 +532,10 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                   controller: sessionsController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: '전체 화상수업 횟수',
-                    suffixText: '회',
+                    labelText: tr(context, '전체 화상수업 횟수'),
+                    suffixText: tr(context, '회'),
                     helperText: selectedCourse.id == record.courseId
-                        ? '같은 과정이면 현재 진행 횟수를 유지합니다.'
-                        : '과정을 변경하면 진행 횟수가 0회로 초기화됩니다.',
+                        ? tr(context, '같은 과정이면 현재 진행 횟수를 유지합니다.'): tr(context, '과정을 변경하면 진행 횟수가 0회로 초기화됩니다.'),
                     border: const OutlineInputBorder(),
                   ),
                 ),
@@ -582,7 +573,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
     );
     sessionsController.dispose();
     if (saved == true) {
-      _toast('배정 정보가 변경되었습니다.');
+      _toast(tr(context, '배정 정보가 변경되었습니다.'));
       await _load();
     }
   }
@@ -613,9 +604,9 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                 TextField(
                   controller: amountController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: '결제 금액',
-                    suffixText: '원',
+                  decoration:  InputDecoration(
+                    labelText: tr(context, '결제 금액'),
+                    suffixText: tr(context, '원'),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -623,8 +614,8 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                 TextField(
                   controller: noteController,
                   maxLines: 2,
-                  decoration: const InputDecoration(
-                    labelText: '메모 (예: 계좌이체 / 카드)',
+                  decoration:  InputDecoration(
+                    labelText: tr(context, '메모 (예: 계좌이체 / 카드)'),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -662,7 +653,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
     amountController.dispose();
     noteController.dispose();
     if (saved == true) {
-      _toast('결제 정보가 저장되었습니다.');
+      _toast(tr(context, '결제 정보가 저장되었습니다.'));
       await _load();
     }
   }
@@ -692,7 +683,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
       _toast(error, error: true);
       return;
     }
-    _toast(record.isActive ? '배정이 취소되었습니다.' : '배정이 복구되었습니다.');
+    _toast(record.isActive ? tr(context, '배정이 취소되었습니다.'): tr(context, '배정이 복구되었습니다.'));
     await _load();
   }
 
@@ -711,7 +702,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
       if (i > 0 && (s.length - i) % 3 == 0) buf.write(',');
       buf.write(s[i]);
     }
-    return '${buf.toString()}원';
+    return tf(context, '{p0}원', {'p0': buf.toString()});
   }
 }
 

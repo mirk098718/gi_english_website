@@ -6,6 +6,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
+import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 // ignore: avoid_web_libraries_in_flutter, deprecated_member_use
@@ -28,13 +29,15 @@ class PaymentService {
     OnlineNativeTeacher? nativeTeacher,
     int? totalSessions,
     bool extendEnrollment = false,
+    String plan = OnlinePlan.bundle,
   }) async {
     final user = AuthService.currentUser;
     if (user == null) return null;
 
-    final sessions = totalSessions ?? course.defaultSessions;
+    final kind = OnlinePlan.resolve(stored: plan, courseId: course.id);
+    final sessions = course.sessionsFor(kind, sessions: totalSessions);
     final orderId = _generateOrderId();
-    final amount = course.price;
+    final amount = course.amountFor(kind, sessions: sessions);
     var teacherUid = nativeTeacher?.accountUid ?? '';
     if (teacherUid.isEmpty && nativeTeacher != null) {
       teacherUid = await AuthService.uidForNativeProfile(nativeTeacher.id);
@@ -50,7 +53,7 @@ class PaymentService {
         fallback: user.displayName ?? '',
       ),
       courseId: course.id,
-      courseTitle: course.title,
+      courseTitle: course.nameFor(kind),
       amount: amount,
       totalSessions: sessions,
       status: 'pending',
@@ -58,6 +61,7 @@ class PaymentService {
       nativeTeacherName: nativeTeacher?.name ?? '',
       nativeTeacherUid: teacherUid,
       purpose: extendEnrollment ? 'extension' : 'new',
+      plan: kind,
     );
 
     await _firestore.collection('payments').doc(orderId).set({
@@ -74,6 +78,7 @@ class PaymentService {
       'nativeTeacherName': order.nativeTeacherName,
       'nativeTeacherUid': order.nativeTeacherUid,
       'purpose': order.purpose,
+      'plan': order.plan,
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
@@ -99,9 +104,7 @@ class PaymentService {
           'customerKey': customerKey,
           'amount': order.amount,
           'orderId': order.orderId,
-          'orderName': order.purpose == 'extension'
-              ? '${order.courseTitle} 수강 연장 (${order.totalSessions}회)'
-              : '${order.courseTitle} (${order.totalSessions}회)',
+          'orderName': _orderName(order),
           'customerEmail': order.email,
           'customerName': order.memberName.isEmpty ? '온라인회원' : order.memberName,
           'successUrl': '$origin/payment/success',
@@ -225,11 +228,16 @@ class PaymentService {
         }
       }
 
+      final plan = OnlinePlan.resolve(
+        stored: payment['plan']?.toString(),
+        courseId: courseId,
+      );
       final enrollmentPayload = <String, dynamic>{
         'userId': userId,
         'email': email,
         'memberName': memberName,
         'courseId': courseId,
+        'plan': plan,
         'isActive': true,
         'totalSessions': totalSessions,
         'isPaid': true,
@@ -254,6 +262,7 @@ class PaymentService {
             previous: prev,
             addedSessions: totalSessions,
             amount: amount,
+            plan: plan,
           );
           await enrollmentRef.update({
             ...enrollmentPayload,
@@ -281,7 +290,7 @@ class PaymentService {
         };
         if (prev['expiresAt'] == null) {
           payload['expiresAt'] = Timestamp.fromDate(
-            EnrollmentService.expiresAtFromStart(start, totalSessions),
+            EnrollmentService.expiresAtForPlan(start, plan, totalSessions),
           );
         }
         await enrollmentRef.update(payload);
@@ -292,8 +301,9 @@ class PaymentService {
           'completedSessions': 0,
           'remainingSessions': totalSessions,
           'expiresAt': Timestamp.fromDate(
-            EnrollmentService.expiresAtFromStart(
+            EnrollmentService.expiresAtForPlan(
               DateTime.now(),
+              plan,
               totalSessions,
             ),
           ),
@@ -395,6 +405,23 @@ class PaymentService {
     }
   }
 
+  static String _orderName(PaymentOrder order) {
+    if (order.plan == OnlinePlan.lecture) {
+      return order.purpose == 'extension'
+          ? '${order.courseTitle} 인강 연장'
+          : '${order.courseTitle} 인강+퀴즈';
+    }
+    if (order.plan == OnlinePlan.speaking) {
+      final label = '화상 ${order.totalSessions}회';
+      return order.purpose == 'extension'
+          ? '${order.courseTitle} 연장 ($label)'
+          : '${order.courseTitle} ($label)';
+    }
+    return order.purpose == 'extension'
+        ? '${order.courseTitle} 수강 연장 (${order.totalSessions}회)'
+        : '${order.courseTitle} (${order.totalSessions}회)';
+  }
+
   static String _generateOrderId() {
     final rand = Random.secure();
     final bytes = List<int>.generate(12, (_) => rand.nextInt(256));
@@ -421,6 +448,7 @@ class PaymentOrder {
   final String nativeTeacherName;
   final String nativeTeacherUid;
   final String purpose;
+  final String plan;
 
   PaymentOrder({
     required this.orderId,
@@ -440,6 +468,7 @@ class PaymentOrder {
     this.nativeTeacherName = '',
     this.nativeTeacherUid = '',
     this.purpose = 'new',
+    this.plan = OnlinePlan.bundle,
   });
 
   OnlineCourse? get course => OnlineCourse.findById(courseId);
@@ -493,6 +522,10 @@ class PaymentOrder {
       nativeTeacherName: data['nativeTeacherName']?.toString() ?? '',
       nativeTeacherUid: data['nativeTeacherUid']?.toString() ?? '',
       purpose: data['purpose']?.toString() ?? 'new',
+      plan: OnlinePlan.resolve(
+        stored: data['plan']?.toString(),
+        courseId: data['courseId']?.toString() ?? '',
+      ),
     );
   }
 }
