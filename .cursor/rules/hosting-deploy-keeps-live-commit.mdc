@@ -1,0 +1,17 @@
+---
+description: 호스팅 배포는 운영 중인 커밋을 포함할 때만 올라간다
+alwaysApply: true
+---
+
+# 웹 배포
+
+운영 사이트(https://gleam-island.web.app)에 이미 올라간 화면을 예전 브랜치로 다시 덮지 않는다.
+
+`firebase deploy`로 호스팅을 올리면 `firebase.json`의 hosting `predeploy`가 `tool/assert_hosting_deploy.sh`를 먼저 실행한다. 지금 커밋이 `https://gleam-island.web.app/deploy-sha.txt`의 커밋을 포함하지 않으면 업로드는 중단된다.
+
+- 이 `predeploy` 줄을 지우거나 검사를 건너뛰지 않는다.
+- 배포는 `tool/deploy_web.sh`만 사용한다. 스크립트가 빌드한 커밋을 `build/web/deploy-sha.txt`에 적고, 그 다음 호스팅을 올린다.
+- 다른 브랜치를 checkout해서 그 브랜치만 배포하지 않는다. 그 브랜치에 없는 수정이 사이트에서 사라진다.
+- 검사가 실패하면 운영 중인 커밋을 현재 브랜치에 합친 뒤 스크립트를 다시 실행한다.
+- functions는 배포하지 않는다.
+- 사용자에게 `flutter build web`이나 `firebase deploy`를 직접 치라고 시키지 않는다.

@@ -19,6 +19,9 @@
     }
   ],
   "hosting": {
+    "predeploy": [
+      "bash \"$PROJECT_DIR/tool/assert_hosting_deploy.sh\""
+    ],
     "public": "build/web",
     "ignore": [
       "firebase.json",
@@ -69,9 +72,9 @@
         ]
       },
       {
-        "source": "/main.dart.js",
+        "source": "/deploy-sha.txt",
         "headers": [
-          { "key": "Cache-Control", "value": "no-cache" }
+          { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
         ]
       }
     ],
