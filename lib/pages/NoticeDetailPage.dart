@@ -79,7 +79,9 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
     if (!useMobileSchoolLayout(context)) {
       return WebSchoolLayout(content: _buildScrollView(includeFooter: true));
     } else {
-      return MobileSchoolLayout(content: _buildScrollView(includeFooter: false));
+      return MobileSchoolLayout(
+        content: _buildScrollView(includeFooter: false),
+      );
     }
   }
 
@@ -110,9 +112,10 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
                 Text(
                   "Notice Detail",
                   style: TextStyle(
-                      color: Palette.white,
-                      fontSize: 30,
-                      fontFamily: "LucidaCalligraphy"),
+                    color: Palette.white,
+                    fontSize: 30,
+                    fontFamily: "LucidaCalligraphy",
+                  ),
                 ),
                 SizedBox(height: 20),
                 Container(
@@ -126,17 +129,19 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text(tr(context, "뒤로가기"),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: "Jalnan",
-                          color: Palette.white,
-                        )),
+                    child: Text(
+                      tr(context, "뒤로가기"),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: "Jalnan",
+                        color: Palette.white,
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -165,11 +170,7 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.error_outline,
-                size: 64,
-                color: Palette.grey400,
-              ),
+              Icon(Icons.error_outline, size: 64, color: Palette.grey400),
               SizedBox(height: 16),
               Text(
                 tr(context, "공지사항을 찾을 수 없습니다."),
@@ -274,11 +275,7 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
         SizedBox(height: 16),
 
         // 구분선
-        Container(
-          height: 2,
-          width: double.infinity,
-          color: Palette.primary,
-        ),
+        Container(height: 2, width: double.infinity, color: Palette.primary),
 
         SizedBox(height: 16),
 
@@ -287,12 +284,16 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
           children: [
             _buildMetaInfo("작성자", _notice!.author),
             SizedBox(width: 24),
-            _buildMetaInfo("작성일",
-                DateFormat('yyyy.MM.dd HH:mm').format(_notice!.createdAt)),
+            _buildMetaInfo(
+              "작성일",
+              DateFormat('yyyy.MM.dd HH:mm').format(_notice!.createdAt),
+            ),
             if (_notice!.updatedAt != null) ...[
               SizedBox(width: 24),
-              _buildMetaInfo("수정일",
-                  DateFormat('yyyy.MM.dd HH:mm').format(_notice!.updatedAt!)),
+              _buildMetaInfo(
+                "수정일",
+                DateFormat('yyyy.MM.dd HH:mm').format(_notice!.updatedAt!),
+              ),
             ],
           ],
         ),
@@ -325,6 +326,8 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
   }
 
   Widget _buildContentSection() {
+    final content = _notice!.content.trim();
+    final images = _notice!.imageUrls;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(24),
@@ -333,15 +336,117 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Palette.grey200),
       ),
-      child: Text(
-        _notice!.content,
-        style: TextStyle(
-          fontSize: 16,
-          height: 1.6,
-          fontFamily: "NotoSansKR",
-          color: Palette.black,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (content.isNotEmpty)
+            SelectableText(
+              _notice!.content,
+              style: TextStyle(
+                fontSize: 16,
+                height: 1.6,
+                fontFamily: "NotoSansKR",
+                color: Palette.black,
+              ),
+            ),
+          for (final url in images) ...[
+            if (content.isNotEmpty || url != images.first) SizedBox(height: 16),
+            _buildNoticeImage(url),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoticeImage(String url) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => _openImage(url),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.network(
+            url,
+            width: double.infinity,
+            fit: BoxFit.fitWidth,
+            loadingBuilder: (context, child, progress) {
+              if (progress == null) return child;
+              return SizedBox(
+                height: 180,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    value: progress.expectedTotalBytes == null
+                        ? null
+                        : progress.cumulativeBytesLoaded /
+                              progress.expectedTotalBytes!,
+                    valueColor: AlwaysStoppedAnimation<Color>(Palette.primary),
+                  ),
+                ),
+              );
+            },
+            errorBuilder: (context, error, stackTrace) => Text(
+              tr(context, "이미지를 불러올 수 없습니다"),
+              style: TextStyle(
+                fontFamily: "NotoSansKR",
+                color: Palette.grey600,
+              ),
+            ),
+          ),
         ),
       ),
+    );
+  }
+
+  void _openImage(String url) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        final size = MediaQuery.sizeOf(dialogContext);
+        final width = size.width - 48;
+        final height = size.height - 48;
+        return Dialog(
+          backgroundColor: Palette.black,
+          insetPadding: EdgeInsets.all(16),
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: InteractiveViewer(
+                    minScale: 0.8,
+                    maxScale: 4,
+                    child: Image.network(
+                      url,
+                      fit: BoxFit.contain,
+                      width: width,
+                      height: height,
+                      errorBuilder: (context, error, stackTrace) => Center(
+                        child: Text(
+                          tr(context, "이미지를 불러올 수 없습니다"),
+                          style: TextStyle(
+                            fontFamily: "NotoSansKR",
+                            color: Palette.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: IconButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    tooltip: tr(dialogContext, "닫기"),
+                    icon: Icon(Icons.close, color: Palette.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

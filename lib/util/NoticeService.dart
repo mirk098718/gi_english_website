@@ -1,4 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:gi_english_website/util/AuthService.dart';
+import 'package:gi_english_website/util/NoticeImages.dart';
+
 import '../class/Notice.dart';
 
 class NoticeService {
@@ -38,8 +44,10 @@ class NoticeService {
         .collection(_collectionName)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Notice.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Notice.fromFirestore(doc)).toList(),
+        );
   }
 
   // 중요 노티스 먼저, 그 다음 최신순으로 정렬된 노티스 가져오기
@@ -52,56 +60,58 @@ class NoticeService {
         .snapshots(includeMetadataChanges: false)
         .timeout(Duration(seconds: 15))
         .handleError((error) {
-      print('❌ Notice 스트림 오류: $error');
-      return <QuerySnapshot>[];
-    }).map((snapshot) {
-      print('📊 NoticeService: 데이터 수신 - ${snapshot.docs.length}개 문서');
+          print('❌ Notice 스트림 오류: $error');
+          return <QuerySnapshot>[];
+        })
+        .map((snapshot) {
+          print('📊 NoticeService: 데이터 수신 - ${snapshot.docs.length}개 문서');
 
-      List<Notice> notices = snapshot.docs
-          .map((doc) {
-            try {
-              return Notice.fromFirestore(doc);
-            } catch (e) {
-              print('❌ 문서 파싱 오류 (${doc.id}): $e');
-              return null;
+          List<Notice> notices = snapshot.docs
+              .map((doc) {
+                try {
+                  return Notice.fromFirestore(doc);
+                } catch (e) {
+                  print('❌ 문서 파싱 오류 (${doc.id}): $e');
+                  return null;
+                }
+              })
+              .where((notice) => notice != null)
+              .cast<Notice>()
+              .toList();
+
+          print('✅ NoticeService: 파싱된 공지사항 ${notices.length}개');
+
+          // 클라이언트 사이드에서 중요도 먼저, 그 다음 최신순으로 정렬
+          notices.sort((a, b) {
+            // 먼저 중요도로 정렬 (중요한 것이 먼저)
+            if (a.isImportant != b.isImportant) {
+              return b.isImportant ? 1 : -1;
             }
-          })
-          .where((notice) => notice != null)
-          .cast<Notice>()
-          .toList();
+            // 그 다음 생성일로 정렬 (최신이 먼저)
+            return b.createdAt.compareTo(a.createdAt);
+          });
 
-      print('✅ NoticeService: 파싱된 공지사항 ${notices.length}개');
+          // 과거 앱 시작 시마다 더미 데이터가 반복 추가되어 같은 제목이 여러 문서로 남은 경우, 표시는 제목당 하나만
+          List<Notice> deduped = [];
+          Set<String> seenTitles = {};
+          for (Notice n in notices) {
+            if (!seenTitles.contains(n.title)) {
+              seenTitles.add(n.title);
+              deduped.add(n);
+            }
+          }
 
-      // 클라이언트 사이드에서 중요도 먼저, 그 다음 최신순으로 정렬
-      notices.sort((a, b) {
-        // 먼저 중요도로 정렬 (중요한 것이 먼저)
-        if (a.isImportant != b.isImportant) {
-          return b.isImportant ? 1 : -1;
-        }
-        // 그 다음 생성일로 정렬 (최신이 먼저)
-        return b.createdAt.compareTo(a.createdAt);
-      });
-
-      // 과거 앱 시작 시마다 더미 데이터가 반복 추가되어 같은 제목이 여러 문서로 남은 경우, 표시는 제목당 하나만
-      List<Notice> deduped = [];
-      Set<String> seenTitles = {};
-      for (Notice n in notices) {
-        if (!seenTitles.contains(n.title)) {
-          seenTitles.add(n.title);
-          deduped.add(n);
-        }
-      }
-
-      print('🎯 NoticeService: 정렬 완료 - ${deduped.length}개');
-      return deduped;
-    });
+          print('🎯 NoticeService: 정렬 완료 - ${deduped.length}개');
+          return deduped;
+        });
   }
 
   // 임시: 중복 게시글 정리 (한번만 사용)
   static Future<int> cleanupTestData() async {
     try {
-      QuerySnapshot snapshot =
-          await _firestore.collection(_collectionName).get();
+      QuerySnapshot snapshot = await _firestore
+          .collection(_collectionName)
+          .get();
 
       Map<String, List<QueryDocumentSnapshot>> groups = {};
 
@@ -126,10 +136,10 @@ class NoticeService {
           docs.sort((a, b) {
             Timestamp aTime =
                 (a.data() as Map<String, dynamic>)['createdAt'] as Timestamp? ??
-                    Timestamp.now();
+                Timestamp.now();
             Timestamp bTime =
                 (b.data() as Map<String, dynamic>)['createdAt'] as Timestamp? ??
-                    Timestamp.now();
+                Timestamp.now();
             return bTime.compareTo(aTime);
           });
 
@@ -192,8 +202,10 @@ class NoticeService {
   // 특정 노티스 가져오기
   static Future<Notice?> getNotice(String id) async {
     try {
-      DocumentSnapshot doc =
-          await _firestore.collection(_collectionName).doc(id).get();
+      DocumentSnapshot doc = await _firestore
+          .collection(_collectionName)
+          .doc(id)
+          .get();
 
       if (doc.exists) {
         return Notice.fromFirestore(doc);
@@ -222,10 +234,7 @@ class NoticeService {
   // 노티스 수정
   static Future<bool> updateNotice(String id, Notice notice) async {
     try {
-      Notice updatedNotice = notice.copyWith(
-        id: id,
-        updatedAt: DateTime.now(),
-      );
+      Notice updatedNotice = notice.copyWith(id: id, updatedAt: DateTime.now());
 
       await _firestore
           .collection(_collectionName)
@@ -242,12 +251,57 @@ class NoticeService {
   // 노티스 삭제
   static Future<bool> deleteNotice(String id) async {
     try {
+      final existing = await getNotice(id);
       await _firestore.collection(_collectionName).doc(id).delete();
-
+      if (existing != null) {
+        await deleteNoticeImages(existing.imageUrls);
+      }
       return true;
     } catch (e) {
       print('노티스 삭제 오류: $e');
       return false;
+    }
+  }
+
+  static int _uploadSeq = 0;
+
+  static Future<String> uploadNoticeImage({
+    required Uint8List bytes,
+    required String fileName,
+  }) async {
+    final reason = NoticeImages.rejectionReason(
+      fileName: fileName,
+      byteLength: bytes.length,
+    );
+    if (reason != null) {
+      throw Exception(reason);
+    }
+    if (!await AuthService.isAdmin()) {
+      throw Exception('관리자 권한이 필요합니다. 다시 로그인해주세요.');
+    }
+
+    final path = NoticeImages.storagePath(
+      fileName,
+      '${DateTime.now().microsecondsSinceEpoch}_${_uploadSeq++}',
+    );
+    final ref = FirebaseStorage.instance.ref().child(path);
+    await ref
+        .putData(
+          bytes,
+          SettableMetadata(contentType: NoticeImages.contentTypeOf(fileName)),
+        )
+        .timeout(const Duration(seconds: 45));
+    return ref.getDownloadURL();
+  }
+
+  static Future<void> deleteNoticeImages(List<String> urls) async {
+    for (final url in urls) {
+      if (!NoticeImages.isStorageUrl(url)) continue;
+      try {
+        await FirebaseStorage.instance.refFromURL(url.trim()).delete();
+      } catch (e) {
+        print('공지 이미지 삭제 생략: $e');
+      }
     }
   }
 
@@ -267,8 +321,9 @@ class NoticeService {
       }
 
       QuerySnapshot snapshot = await query.get();
-      List<Notice> notices =
-          snapshot.docs.map((doc) => Notice.fromFirestore(doc)).toList();
+      List<Notice> notices = snapshot.docs
+          .map((doc) => Notice.fromFirestore(doc))
+          .toList();
 
       // 클라이언트 사이드에서 중요도 먼저, 그 다음 최신순으로 정렬
       notices.sort((a, b) {
@@ -295,14 +350,17 @@ class NoticeService {
           .orderBy('createdAt', descending: true)
           .get();
 
-      List<Notice> allNotices =
-          snapshot.docs.map((doc) => Notice.fromFirestore(doc)).toList();
+      List<Notice> allNotices = snapshot.docs
+          .map((doc) => Notice.fromFirestore(doc))
+          .toList();
 
       // 클라이언트 사이드에서 제목과 내용 검색
       return allNotices
-          .where((notice) =>
-              notice.title.toLowerCase().contains(searchTerm.toLowerCase()) ||
-              notice.content.toLowerCase().contains(searchTerm.toLowerCase()))
+          .where(
+            (notice) =>
+                notice.title.toLowerCase().contains(searchTerm.toLowerCase()) ||
+                notice.content.toLowerCase().contains(searchTerm.toLowerCase()),
+          )
           .toList();
     } catch (e) {
       print('노티스 검색 오류: $e');
@@ -313,8 +371,9 @@ class NoticeService {
   // 노티스 개수 가져오기
   static Future<int> getNoticeCount() async {
     try {
-      QuerySnapshot snapshot =
-          await _firestore.collection(_collectionName).get();
+      QuerySnapshot snapshot = await _firestore
+          .collection(_collectionName)
+          .get();
 
       return snapshot.docs.length;
     } catch (e) {

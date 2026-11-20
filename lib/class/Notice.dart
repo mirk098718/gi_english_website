@@ -8,6 +8,7 @@ class Notice {
   DateTime createdAt;
   DateTime? updatedAt;
   bool isImportant;
+  List<String> imageUrls;
 
   Notice({
     this.id,
@@ -17,26 +18,51 @@ class Notice {
     required this.createdAt,
     this.updatedAt,
     this.isImportant = false,
+    this.imageUrls = const [],
   });
 
-  // Firestore에서 데이터를 가져올 때 사용
   factory Notice.fromFirestore(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    final data = doc.data() as Map<String, dynamic>;
+    return Notice.fromMap(doc.id, data);
+  }
 
+  factory Notice.fromMap(String? id, Map<String, dynamic> data) {
     return Notice(
-      id: doc.id,
+      id: id,
       title: data['title'] ?? '',
       content: data['content'] ?? '',
       author: data['author'] ?? '',
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: data['updatedAt'] != null
-          ? (data['updatedAt'] as Timestamp).toDate()
-          : null,
+      createdAt: _requireDate(data['createdAt']),
+      updatedAt: _readDate(data['updatedAt']),
       isImportant: data['isImportant'] ?? false,
+      imageUrls: imageUrlsFrom(data['imageUrls']),
     );
   }
 
-  // Firestore에 저장할 때 사용
+  static List<String> imageUrlsFrom(dynamic value) {
+    if (value is! List) return <String>[];
+    final urls = <String>[];
+    for (final item in value) {
+      final url = item?.toString().trim() ?? '';
+      if (url.isNotEmpty) urls.add(url);
+    }
+    return urls;
+  }
+
+  static DateTime _requireDate(dynamic value) {
+    final date = _readDate(value);
+    if (date == null) {
+      throw StateError('날짜 값이 없습니다.');
+    }
+    return date;
+  }
+
+  static DateTime? _readDate(dynamic value) {
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    return null;
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
       'title': title,
@@ -45,10 +71,10 @@ class Notice {
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
       'isImportant': isImportant,
+      'imageUrls': imageUrls,
     };
   }
 
-  // 복사본 생성 (수정 시 사용)
   Notice copyWith({
     String? id,
     String? title,
@@ -57,6 +83,7 @@ class Notice {
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isImportant,
+    List<String>? imageUrls,
   }) {
     return Notice(
       id: id ?? this.id,
@@ -66,6 +93,7 @@ class Notice {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isImportant: isImportant ?? this.isImportant,
+      imageUrls: imageUrls ?? this.imageUrls,
     );
   }
 }
