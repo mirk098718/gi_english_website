@@ -9,6 +9,14 @@ void main() {
     return TeacherClassBands(days: days.toSet(), periods: periods.toSet());
   }
 
+  test('예약 칸은 7시 30분부터 밤 11시까지다', () {
+    expect(TeacherClassBands.timeSlots.first, '07:30');
+    expect(TeacherClassBands.timeSlots.last, '23:00');
+    expect(TeacherClassBands.timeSlots.contains('06:00'), isFalse);
+    expect(TeacherClassBands.timeSlots.contains('07:00'), isFalse);
+    expect(TeacherClassBands.timeSlots.contains('07:30'), isTrue);
+  });
+
   test('요일이나 시간대가 없으면 시간표를 줄이지 않는다', () {
     expect(TeacherClassBands.empty.active, isFalse);
     expect(TeacherClassBands.empty.allows(1, '15:00'), isTrue);

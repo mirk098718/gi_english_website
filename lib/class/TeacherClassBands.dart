@@ -94,14 +94,16 @@ class TeacherClassBands {
     };
   }
 
-  /// 30분 칸. 오전 6시부터 밤 11시까지. 예약 칸과 같다.
+  /// 30분 칸. 오전 7시 30분부터 밤 11시까지. 예약 칸과 같다.
   static final List<String> timeSlots = _buildTimeSlots();
 
   static List<String> _buildTimeSlots() {
     final slots = <String>[];
-    for (var hour = 6; hour <= 23; hour++) {
-      slots.add('${hour.toString().padLeft(2, '0')}:00');
-      if (hour < 23) slots.add('${hour.toString().padLeft(2, '0')}:30');
+    for (var minutes = 7 * 60 + 30; minutes <= 23 * 60; minutes += 30) {
+      final hour = minutes ~/ 60;
+      final minute = minutes % 60;
+      slots.add(
+          '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}');
     }
     return slots;
   }

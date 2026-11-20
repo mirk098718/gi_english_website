@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
+import 'package:gi_english_website/class/TeacherClassBands.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
@@ -2256,9 +2257,9 @@ class EnrollmentService {
     }
   }
 
-  /// 예약 칸은 30분 간격. 오전 6시부터 밤 11:00까지. 마지막 11:30은 두지 않는다.
+  /// 예약 칸은 30분 간격. 오전 7시 30분부터 밤 11:00까지. 마지막 11:30은 두지 않는다.
   /// 실제 수업은 [lessonMinutes]분, 강사 정산은 [lessonPayWon]원/건.
-  static final List<String> bookingTimeSlots = _buildBookingTimeSlots();
+  static List<String> get bookingTimeSlots => TeacherClassBands.timeSlots;
 
   static const int lessonMinutes = 20;
   static const int lessonPayWon = 10000;
@@ -2274,17 +2275,6 @@ class EnrollmentService {
     final parsed = int.tryParse('${raw ?? ''}'.replaceAll(',', '').trim());
     if (parsed != null && parsed >= 0) return parsed;
     return lessonPayWon;
-  }
-
-  static List<String> _buildBookingTimeSlots() {
-    final slots = <String>[];
-    for (var hour = 6; hour <= 23; hour++) {
-      slots.add('${hour.toString().padLeft(2, '0')}:00');
-      if (hour < 23) {
-        slots.add('${hour.toString().padLeft(2, '0')}:30');
-      }
-    }
-    return slots;
   }
 
   static DateTime dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);

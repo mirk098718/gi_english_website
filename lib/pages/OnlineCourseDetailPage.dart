@@ -2055,7 +2055,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             Text(
               otherTeacher
                   ? tr(context, "수업은 20분입니다. 선택한 원어민 선생님이 열어 둔 시간만 예약할 수 있습니다. 담당 선생님이 아니어도 강사가 확인하면 확정됩니다.")
-                  : tr(context, "수업은 20분입니다. 담당 원어민 선생님이 열어 둔 시간만 6:00 AM부터 11:00 PM까지 30분 단위로 선택할 수 있습니다. 강사가 확인하면 예약이 확정됩니다."),
+                  : tr(context, "수업은 20분입니다. 담당 원어민 선생님이 열어 둔 시간만 7:30 AM부터 11:00 PM까지 30분 단위로 선택할 수 있습니다. 강사가 확인하면 예약이 확정됩니다."),
               style: TextStyle(
                 fontFamily: "NotoSansKR",
                 fontSize: 13,

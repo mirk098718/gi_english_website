@@ -870,7 +870,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                   Text(
                     widget.schoolOverview
                         ? tr(context, '학원 전체 예약을 같은 시간표로 봅니다. 숫자는 그 시간 건수이고, 색은 상태입니다. 숫자를 누르면 해당 수강생이 나옵니다.'): widget.showAllBookings
-                            ? tr(context, '화상수업은 20분입니다. 6:00 AM–11:00 PM 칸을 눌러 이번만 닫거나 매주 같은 시간을 루틴으로 고정하세요.\n학원 전체 예약이 칸과 아래 목록에 함께 보입니다. 담당이 비어 있으면 컨펌 시 내 스케줄로 연결됩니다.'): tr(context, '화상수업은 20분입니다. 칸을 누르거나 드래그해서 여러 시간을 한꺼번에 닫을 수 있습니다.\n고정한 루틴은 언제든 해제할 수 있고, 수강생은 열린 시간만 예약합니다.'),
+                            ? tr(context, '화상수업은 20분입니다. 7:30 AM–11:00 PM 칸을 눌러 이번만 닫거나 매주 같은 시간을 루틴으로 고정하세요.\n학원 전체 예약이 칸과 아래 목록에 함께 보입니다. 담당이 비어 있으면 컨펌 시 내 스케줄로 연결됩니다.'): tr(context, '화상수업은 20분입니다. 칸을 누르거나 드래그해서 여러 시간을 한꺼번에 닫을 수 있습니다.\n고정한 루틴은 언제든 해제할 수 있고, 수강생은 열린 시간만 예약합니다.'),
                     style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 13,
