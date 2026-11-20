@@ -19,6 +19,9 @@
     }
   ],
   "hosting": {
+    "predeploy": [
+      "bash \"$PROJECT_DIR/tool/assert_hosting_deploy.sh\""
+    ],
     "public": "build/web",
     "ignore": [
       "firebase.json",

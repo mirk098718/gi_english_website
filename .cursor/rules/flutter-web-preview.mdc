@@ -18,3 +18,4 @@ tool/flutter_hot_restart.sh
 
 - Firestore rules는 핫 리스타트와 무관하다. 규칙 변경은 배포해야 반영된다.
 - 배포된 호스팅 URL을 새로고침하는 것으로는 로컬 코드가 절대 안 보인다.
+- 호스팅 배포는 `tool/deploy_web.sh`만 사용한다. `firebase.json`의 hosting `predeploy`가 운영 중인 커밋을 포함하지 않으면 업로드를 멈춘다. 이 검사를 빼지 않는다.
