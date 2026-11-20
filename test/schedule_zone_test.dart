@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gi_english_website/pages/AdminTeacherScheduleTab.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/ScheduleZone.dart';
 
@@ -9,6 +10,21 @@ void main() {
     AppLanguage.instance.code = 'en';
     expect(AppLanguage.instance.translate('한국시각'), 'Korea time');
     AppLanguage.instance.code = 'ko';
+  });
+
+  test('다른 나라 시각이 붙어도 시간 라벨과 칸의 바깥 높이가 같다', () {
+    for (final otherZone in [false, true]) {
+      final row = AdminTeacherScheduleTab.timeRowHeight(otherZone: otherZone);
+      final slot = AdminTeacherScheduleTab.slotHeight(otherZone: otherZone);
+      expect(
+        slot + AdminTeacherScheduleTab.slotPadding * 2,
+        row,
+      );
+    }
+    expect(
+      AdminTeacherScheduleTab.timeRowHeight(otherZone: true),
+      greaterThan(AdminTeacherScheduleTab.timeRowHeight(otherZone: false)),
+    );
   });
 
   test('한국을 고르면 추가 시각이 없다', () {

@@ -150,6 +150,17 @@ class AdminTeacherScheduleTab extends StatefulWidget {
     this.schoolOverview = false,
   }) : super(key: key);
 
+  /// 칸을 감싸는 여백. 왼쪽 시간 라벨에는 이 여백이 없다.
+  static const double slotPadding = 1;
+
+  /// 다른 나라 시각이 붙으면 시간 라벨이 두 줄이 된다.
+  static double timeRowHeight({required bool otherZone}) =>
+      otherZone ? 44 : 28;
+
+  /// 칸 테두리 높이. 위아래 여백을 더하면 [timeRowHeight]와 같다.
+  static double slotHeight({required bool otherZone}) =>
+      timeRowHeight(otherZone: otherZone) - slotPadding * 2;
+
   @override
   _AdminTeacherScheduleTabState createState() =>
       _AdminTeacherScheduleTabState();
@@ -781,8 +792,6 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
 
   static const double _timeColWidth = 62;
   static const double _dayHeaderHeight = 32;
-  static const double _cellHeight = 26;
-  static const double _rowPitch = 28;
 
   bool get _zoneActive =>
       !widget.schoolOverview && _zoneId != ScheduleZone.koreaId;
@@ -794,9 +803,11 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     return _zoneActive ? 108 : 76;
   }
 
-  double get _rowPitchNow => _zoneActive ? _rowPitch + 16 : _rowPitch;
+  double get _rowPitchNow =>
+      AdminTeacherScheduleTab.timeRowHeight(otherZone: _zoneActive);
 
-  double get _cellHeightNow => _zoneActive ? _cellHeight + 14 : _cellHeight;
+  double get _cellHeightNow =>
+      AdminTeacherScheduleTab.slotHeight(otherZone: _zoneActive);
 
   List<DateTime> get _days =>
       List.generate(7, (i) => _weekStart.add(Duration(days: i)));
@@ -1301,7 +1312,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       );
     }
     final rowH = widget.schoolOverview ? 36.0 : _rowPitchNow;
-    final cellH = widget.schoolOverview ? 34.0 : _cellHeightNow;
+    final cellH = rowH - AdminTeacherScheduleTab.slotPadding * 2;
     return Listener(
       onPointerUp: (_) => _finishSelect(),
       onPointerCancel: (_) => _finishSelect(),
@@ -1781,7 +1792,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     }
 
     return Padding(
-      padding: EdgeInsets.all(1),
+      padding: const EdgeInsets.all(AdminTeacherScheduleTab.slotPadding),
       child: Material(
         color: Colors.transparent,
         child: Semantics(
@@ -1907,9 +1918,10 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     final items = _bookingsAtSlot(date, time);
     final counts = _overviewCounts(items);
     final past = _isSlotPast(date, time);
-    final h = height ?? 34;
+    final h = height ??
+        (36 - AdminTeacherScheduleTab.slotPadding * 2);
     return Padding(
-      padding: const EdgeInsets.all(1),
+      padding: const EdgeInsets.all(AdminTeacherScheduleTab.slotPadding),
       child: Container(
         width: double.infinity,
         height: h,
