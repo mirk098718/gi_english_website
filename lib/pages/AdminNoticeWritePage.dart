@@ -10,6 +10,7 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
+import 'package:gi_english_website/widget/NoticeAttachedImage.dart';
 import 'package:gi_english_website/widget/NoticeBodyField.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
@@ -342,7 +343,7 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
                     )
                   : Icon(Icons.image_outlined, size: 18),
               label: Text(
-                _isUploadingImage ? "이미지 올리는 중..." : "이미지 첨부",
+                _isUploadingImage ? "사진 저장 중..." : "이미지 첨부",
                 style: TextStyle(fontFamily: "NotoSansKR"),
               ),
               style: OutlinedButton.styleFrom(
@@ -354,7 +355,7 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
         ),
         SizedBox(height: 8),
         Text(
-          "jpg, png, gif, webp · 최대 8MB · ${NoticeImages.maxCount}장\n첨부한 이미지는 본문 아래에 표시됩니다.",
+          "휴대폰 사진도 자동으로 줄여 저장합니다. jpg, png, gif, webp · ${NoticeImages.maxCount}장\n첨부한 이미지는 본문 아래에 표시됩니다.",
           style: TextStyle(
             fontSize: 13,
             height: 1.4,
@@ -386,17 +387,11 @@ class _AdminNoticeWritePageState extends State<AdminNoticeWritePage> {
           Positioned.fill(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                url,
+              child: NoticeAttachedImage(
+                source: url,
+                width: 120,
+                height: 120,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: Palette.grey100,
-                  alignment: Alignment.center,
-                  child: Icon(
-                    Icons.broken_image_outlined,
-                    color: Palette.grey500,
-                  ),
-                ),
               ),
             ),
           ),

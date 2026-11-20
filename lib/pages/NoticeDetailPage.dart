@@ -12,6 +12,7 @@ import 'package:gi_english_website/widget/WebSchoolLayout.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/pages/AdminNoticeWritePage.dart';
+import 'package:gi_english_website/widget/NoticeAttachedImage.dart';
 import 'package:intl/intl.dart';
 
 class NoticeDetailPage extends StatefulWidget {
@@ -365,32 +366,10 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
         onTap: () => _openImage(url),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: Image.network(
-            url,
+          child: NoticeAttachedImage(
+            source: url,
             width: double.infinity,
             fit: BoxFit.fitWidth,
-            loadingBuilder: (context, child, progress) {
-              if (progress == null) return child;
-              return SizedBox(
-                height: 180,
-                child: Center(
-                  child: CircularProgressIndicator(
-                    value: progress.expectedTotalBytes == null
-                        ? null
-                        : progress.cumulativeBytesLoaded /
-                              progress.expectedTotalBytes!,
-                    valueColor: AlwaysStoppedAnimation<Color>(Palette.primary),
-                  ),
-                ),
-              );
-            },
-            errorBuilder: (context, error, stackTrace) => Text(
-              tr(context, "이미지를 불러올 수 없습니다"),
-              style: TextStyle(
-                fontFamily: "NotoSansKR",
-                color: Palette.grey600,
-              ),
-            ),
           ),
         ),
       ),
@@ -416,20 +395,13 @@ class _NoticeDetailPageState extends State<NoticeDetailPage> {
                   child: InteractiveViewer(
                     minScale: 0.8,
                     maxScale: 4,
-                    child: Image.network(
-                      url,
+                    child: NoticeAttachedImage(
+                      source: url,
                       fit: BoxFit.contain,
                       width: width,
                       height: height,
-                      errorBuilder: (context, error, stackTrace) => Center(
-                        child: Text(
-                          tr(context, "이미지를 불러올 수 없습니다"),
-                          style: TextStyle(
-                            fontFamily: "NotoSansKR",
-                            color: Palette.white,
-                          ),
-                        ),
-                      ),
+                      progressColor: Palette.white,
+                      errorColor: Palette.white,
                     ),
                   ),
                 ),

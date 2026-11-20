@@ -50,8 +50,11 @@ void main() {
         fileName: 'photo.jpg',
         byteLength: NoticeImages.maxBytes + 1,
       ),
-      '이미지가 너무 큽니다. 8MB 이하 파일로 올려 주세요.',
+      '사진이 너무 큽니다. 20MB 이하 파일로 올려 주세요.',
     );
+    expect(NoticeImages.refFor('abc'), 'notice-image:abc');
+    expect(NoticeImages.idFromRef(' notice-image:abc '), 'abc');
+    expect(NoticeImages.idFromRef('https://cdn.example/a.jpg'), isNull);
     expect(NoticeImages.contentTypeOf('photo.webp'), 'image/webp');
     expect(
       NoticeImages.storagePath('사진.GIF', '123_0'),
@@ -122,8 +125,8 @@ void main() {
       );
       await tester.pump();
 
-    expect(bodyScroll.offset, inInclusiveRange(1, 200));
-    expect(pageScroll.offset, 0);
+      expect(bodyScroll.offset, inInclusiveRange(1, 200));
+      expect(pageScroll.offset, 0);
     },
   );
 }

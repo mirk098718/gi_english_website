@@ -1,7 +1,9 @@
 /// 공지 첨부 이미지의 형식, 크기, 저장 경로.
 class NoticeImages {
-  static const int maxBytes = 8 * 1024 * 1024;
+  static const int maxBytes = 20 * 1024 * 1024;
+  static const int maxStoredBytes = 500 * 1024;
   static const int maxCount = 10;
+  static const String imageRefPrefix = 'notice-image:';
   static const List<String> extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
   static String extensionOf(String fileName) {
@@ -24,7 +26,7 @@ class NoticeImages {
       return '이미지 파일이 비어 있습니다.';
     }
     if (byteLength > maxBytes) {
-      return '이미지가 너무 큽니다. 8MB 이하 파일로 올려 주세요.';
+      return '사진이 너무 큽니다. 20MB 이하 파일로 올려 주세요.';
     }
     return null;
   }
@@ -52,5 +54,20 @@ class NoticeImages {
     final trimmed = url.trim();
     return trimmed.contains('firebasestorage.googleapis.com') ||
         trimmed.contains('.firebasestorage.app');
+  }
+
+  static String refFor(String id) => '$imageRefPrefix$id';
+
+  static String? idFromRef(String ref) {
+    final trimmed = ref.trim();
+    if (!trimmed.startsWith(imageRefPrefix)) return null;
+    final id = trimmed.substring(imageRefPrefix.length).trim();
+    if (id.isEmpty) return null;
+    return id;
+  }
+
+  static bool isNetworkUrl(String ref) {
+    final trimmed = ref.trim();
+    return trimmed.startsWith('https://') || trimmed.startsWith('http://');
   }
 }

@@ -1,9 +1,12 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/NoticeImages.dart';
+import 'package:gi_english_website/util/notice_image_prepare.dart';
 
 import '../class/Notice.dart';
 
@@ -264,6 +267,10 @@ class NoticeService {
   }
 
   static int _uploadSeq = 0;
+  static const String _imageCollection = 'notice_images';
+  static final Map<String, Uint8List> _imageBytes = {};
+
+  static Uint8List? cachedNoticeImage(String ref) => _imageBytes[ref];
 
   static Future<String> uploadNoticeImage({
     required Uint8List bytes,
@@ -280,22 +287,69 @@ class NoticeService {
       throw Exception('관리자 권한이 필요합니다. 다시 로그인해주세요.');
     }
 
-    final path = NoticeImages.storagePath(
-      fileName,
-      '${DateTime.now().microsecondsSinceEpoch}_${_uploadSeq++}',
-    );
-    final ref = FirebaseStorage.instance.ref().child(path);
-    await ref
-        .putData(
-          bytes,
-          SettableMetadata(contentType: NoticeImages.contentTypeOf(fileName)),
-        )
-        .timeout(const Duration(seconds: 45));
-    return ref.getDownloadURL();
+    final prepared = await prepareNoticeImage(bytes, fileName);
+    if (prepared.bytes.length > 700 * 1024) {
+      throw Exception('사진을 줄여도 용량이 큽니다. 더 작은 사진으로 다시 올려 주세요.');
+    }
+
+    final id = '${DateTime.now().microsecondsSinceEpoch}_${_uploadSeq++}';
+    try {
+      await _firestore
+          .collection(_imageCollection)
+          .doc(id)
+          .set({
+            'imageData': base64Encode(prepared.bytes),
+            'mimeType': prepared.mimeType,
+            'byteSize': prepared.bytes.length,
+            'createdAt': FieldValue.serverTimestamp(),
+          })
+          .timeout(const Duration(seconds: 25));
+    } on TimeoutException {
+      throw Exception('사진 저장 시간이 초과되었습니다. 다시 시도해 주세요.');
+    } catch (e) {
+      final text = e.toString();
+      if (text.contains('permission') || text.contains('PERMISSION_DENIED')) {
+        throw Exception('업로드 권한이 없습니다. 메인 관리자로 다시 로그인해 주세요.');
+      }
+      if (e is Exception) rethrow;
+      throw Exception('사진을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    }
+
+    final ref = NoticeImages.refFor(id);
+    _imageBytes[ref] = prepared.bytes;
+    return ref;
+  }
+
+  static Future<Uint8List?> loadNoticeImageBytes(String ref) async {
+    final cached = _imageBytes[ref];
+    if (cached != null) return cached;
+    final id = NoticeImages.idFromRef(ref);
+    if (id == null) return null;
+    try {
+      final doc = await _firestore.collection(_imageCollection).doc(id).get();
+      final encoded = doc.data()?['imageData']?.toString() ?? '';
+      if (!doc.exists || encoded.isEmpty) return null;
+      final bytes = base64Decode(encoded);
+      _imageBytes[ref] = bytes;
+      return bytes;
+    } catch (e) {
+      print('공지 이미지 읽기 오류: $e');
+      return null;
+    }
   }
 
   static Future<void> deleteNoticeImages(List<String> urls) async {
     for (final url in urls) {
+      final id = NoticeImages.idFromRef(url);
+      _imageBytes.remove(url);
+      if (id != null) {
+        try {
+          await _firestore.collection(_imageCollection).doc(id).delete();
+        } catch (e) {
+          print('공지 이미지 삭제 생략: $e');
+        }
+        continue;
+      }
       if (!NoticeImages.isStorageUrl(url)) continue;
       try {
         await FirebaseStorage.instance.refFromURL(url.trim()).delete();

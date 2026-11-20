@@ -83,6 +83,12 @@ service cloud.firestore {
       allow create, update, delete: if isOwner();
     }
 
+    // 공지 첨부 사진. 웹에서 Storage 업로드가 멈추는 경우가 있어 문서에 저장한다.
+    match /notice_images/{imageId} {
+      allow read: if true;
+      allow create, update, delete: if isOwner();
+    }
+
     // FAQ: 누구나 읽기, 쓰기는 메인 관리자만
     match /faqs/{faqId} {
       allow read: if true;
