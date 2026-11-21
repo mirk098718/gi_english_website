@@ -437,6 +437,46 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     if (error == null) await _loadData();
   }
 
+  Future<void> _replaceFixedBooking(WeekBooking booking) async {
+    if (_submittingBooking) return;
+    final date = _selectedDates[booking.weekId];
+    final time = _selectedTimes[booking.weekId];
+    if (date == null || time == null || time.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            tr(context, "대체 시간을 고르지 않으면 취소할 수 없습니다."),
+            style: TextStyle(fontFamily: "NotoSansKR"),
+          ),
+          backgroundColor: Palette.danger,
+        ),
+      );
+      return;
+    }
+    setState(() => _submittingBooking = true);
+    final error = await EnrollmentService.replaceFixedBooking(
+      current: booking,
+      date: date,
+      time: time,
+      expiresAt: _enrollment?.expiresAt,
+    );
+    if (!mounted) return;
+    setState(() {
+      _submittingBooking = false;
+      if (error == null) _movingWeekId = null;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          error ?? tr(context, "대체 시간을 골랐습니다. 그 회차만 옮겼습니다."),
+          style: TextStyle(fontFamily: "NotoSansKR"),
+        ),
+        backgroundColor: error == null ? Palette.success : Palette.danger,
+      ),
+    );
+    if (error == null) await _loadData();
+  }
+
   void _openExtension() {
     MenuUtil.push(
       context,
@@ -1813,10 +1853,13 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             : (_enrollment?.nativeTeacherLabel.isNotEmpty == true
                 ? _enrollment!.nativeTeacherLabel
                 : '원어민'));
+    final fixed =
+        widget.course.fixedSpeakingPrice || (existing?.fixedSchedule ?? false);
     final dates = EnrollmentService.remainingBookingDates(
       enrollmentStart: _enrollment?.createdAt,
       weekNumber: week.weekNumber,
       expiresAt: _enrollment?.expiresAt,
+      horizonDays: fixed ? 84 : 13,
     ).where((date) {
       return availability
           .openTimes(
@@ -1979,7 +2022,12 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             SizedBox(height: 12),
             if (EnrollmentService.canStudentChangeBooking(existing)) ...[
               Text(
-                tr(context, "수업 3시간 전까지 취소하거나 시간을 옮길 수 있습니다. 취소하면 강사 시간이 바로 비워집니다."),
+                tr(
+                  context,
+                  fixed
+                      ? "수업 하루 전까지 대체 시간을 고르면 그 회차만 옮깁니다. 대체 시간을 고르지 않으면 취소되지 않습니다."
+                      : "수업 3시간 전까지 취소하거나 시간을 옮길 수 있습니다. 취소하면 강사 시간이 바로 비워집니다.",
+                ),
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -1992,13 +2040,14 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  OutlinedButton(
-                    onPressed: _submittingBooking
-                        ? null
-                        : () => _cancelBooking(existing),
-                    child: Text(tr(context, "예약 취소"),
-                        style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
-                  ),
+                  if (!fixed)
+                    OutlinedButton(
+                      onPressed: _submittingBooking
+                          ? null
+                          : () => _cancelBooking(existing),
+                      child: Text(tr(context, "예약 취소"),
+                          style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
+                    ),
                   OutlinedButton(
                     onPressed: _submittingBooking
                         ? null
@@ -2011,7 +2060,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                     child: Text(
                       _movingWeekId == week.id
                           ? tr(context, "옮기기 취소")
-                          : tr(context, "시간 옮기기"),
+                          : tr(context, fixed ? "대체 시간 고르기" : "시간 옮기기"),
                       style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12),
                     ),
                   ),
@@ -2019,7 +2068,12 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
               ),
             ] else
               Text(
-                tr(context, "취소 가능 시각이 지나 예약이 그대로 남습니다. 수업 3시간 전까지만 강사 시간을 비울 수 있습니다."),
+                tr(
+                  context,
+                  fixed
+                      ? "수업 하루 전이 지나 이 시간은 그대로 진행됩니다."
+                      : "취소 가능 시각이 지나 예약이 그대로 남습니다. 수업 3시간 전까지만 강사 시간을 비울 수 있습니다.",
+                ),
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
@@ -2050,7 +2104,19 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
               child: Text(tr(context, "연장 결제"),
                   style: TextStyle(fontFamily: "Jalnan")),
             ),
-          ] else if (existing == null || _movingWeekId == week.id) ...[
+          ] else if (fixed && existing == null) ...[
+            Text(
+              tr(context, "결제할 때 정한 시간이 이 회차에 표시됩니다."),
+              style: TextStyle(
+                fontFamily: "NotoSansKR",
+                fontSize: 13,
+                height: 1.5,
+                color: Palette.grey600,
+              ),
+            ),
+          ] else if ((!fixed &&
+                  (existing == null || _movingWeekId == week.id)) ||
+              (fixed && existing != null && _movingWeekId == week.id)) ...[
             if (existing == null) ...[
             Text(
               otherTeacher
@@ -2166,14 +2232,18 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                     backgroundColor: Palette.secondaryDark,
                     foregroundColor: Palette.white,
                   ),
-                  onPressed: _submittingBooking
+                  onPressed: _submittingBooking ||
+                          (fixed &&
+                              (selectedTime == null || selectedTime.isEmpty))
                       ? null
                       : () => existing != null && _movingWeekId == week.id
-                          ? _moveBooking(week, existing)
+                          ? (fixed
+                              ? _replaceFixedBooking(existing)
+                              : _moveBooking(week, existing))
                           : _submitBooking(week),
                   child: Text(
                     existing != null && _movingWeekId == week.id
-                        ? tr(context, "이 시간으로 옮기기")
+                        ? tr(context, fixed ? "이 시간으로 바꾸기" : "이 시간으로 옮기기")
                         : tr(context, "예약 신청"),
                     style: TextStyle(fontFamily: "Jalnan"),
                   ),

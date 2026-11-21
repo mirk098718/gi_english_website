@@ -86,7 +86,7 @@ void main() {
     await tester.pump();
     expect(find.text('선택한 금액 940,500원'), findsOneWidget);
     expect(find.text('940,500원 결제하기'), findsOneWidget);
-    expect(find.text('원어민 강사를 고른 뒤 결제합니다.'), findsOneWidget);
+    expect(find.text('원어민 강사와 매주 시간을 고른 뒤 결제합니다.'), findsOneWidget);
     expect(find.text('정가 990,000원에서 5% 할인'), findsOneWidget);
     expect(find.text('3개월 동안 36회 수업입니다.'), findsOneWidget);
 
@@ -144,7 +144,7 @@ void main() {
     expect(find.text('2. 원어민 화상 프리토킹 (재원생 대상)'), findsOneWidget);
     expect(find.text('주 1회 · 20분 · 4회 70,000원'), findsOneWidget);
     expect(find.text('70,000원 결제하기'), findsOneWidget);
-    expect(find.text('원어민 강사를 고른 뒤 결제합니다.'), findsWidgets);
+    expect(find.text('원어민 강사와 매주 시간을 고른 뒤 결제합니다.'), findsWidgets);
     expect(
       find.text(
         '재원생만 들을 수 있는 수업입니다. 원서와 문제 없이, 원어민 선생님과 이야기만 합니다.',

@@ -6,7 +6,10 @@ import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
+import 'package:gi_english_website/util/EnrollmentService.dart';
+import 'package:gi_english_website/util/FixedWeeklySchedule.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
+import 'package:gi_english_website/util/TeacherScheduleService.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PaymentService.dart';
@@ -42,6 +45,10 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
   OnlineNativeTeacher? _selected;
   bool _paying = false;
   bool _loading = true;
+  bool _loadingSchedule = false;
+  List<WeeklySlot> _openSlots = [];
+  List<WeeklySlot> _pickedSlots = [];
+  DateTime? _extensionStart;
 
   @override
   void initState() {
@@ -67,6 +74,53 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
         orElse: () => teachers.first,
       );
     });
+    await _loadFixedSchedule();
+  }
+
+  bool get _needsFixedTime => widget.course.fixedSpeakingPrice;
+
+  FixedScheduleShape? get _shape =>
+      FixedWeeklySchedule.shapeFor(widget.course);
+
+  Future<void> _loadFixedSchedule() async {
+    if (!_needsFixedTime) return;
+    final teacher = _selected;
+    final shape = _shape;
+    if (teacher == null || shape == null) {
+      if (!mounted) return;
+      setState(() {
+        _openSlots = [];
+        _pickedSlots = [];
+        _loadingSchedule = false;
+      });
+      return;
+    }
+    setState(() => _loadingSchedule = true);
+    var uid = teacher.accountUid;
+    if (uid.isEmpty) {
+      uid = await AuthService.uidForNativeProfile(teacher.id);
+    }
+    await EnrollmentService.sweepExpiredFixedHolds(uid);
+    final availability = await TeacherScheduleService.load(uid);
+    final notBefore = widget.extendEnrollment
+        ? await EnrollmentService.fixedExtensionStart(widget.course.id)
+        : null;
+    final open = FixedWeeklySchedule.openSlots(
+      availability: availability,
+      weeks: shape.weeks,
+      now: DateTime.now(),
+      times: EnrollmentService.bookingTimeSlots,
+      notBefore: notBefore,
+    );
+    if (!mounted) return;
+    setState(() {
+      _loadingSchedule = false;
+      _extensionStart = notBefore;
+      _openSlots = open;
+      _pickedSlots = _pickedSlots
+          .where((slot) => open.any((item) => item.key == slot.key))
+          .toList();
+    });
   }
 
   Future<void> _startPayment() async {
@@ -76,6 +130,12 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
     }
     if (_selected == null) {
       _toast('원어민 강사를 선택해주세요.', error: true);
+      return;
+    }
+    final shape = _shape;
+    if (_needsFixedTime &&
+        (shape == null || _pickedSlots.length != shape.slotsPerWeek)) {
+      _toast('매주 시간을 모두 고른 뒤에 결제할 수 있습니다.', error: true);
       return;
     }
 
@@ -89,6 +149,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
         widget.plan,
         sessions: widget.sessionCount,
       ),
+      fixedSlots: _needsFixedTime ? _pickedSlots : const [],
     );
     if (order == null) {
       if (!mounted) return;
@@ -96,11 +157,30 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
       _toast('주문을 생성하지 못했습니다. 로그인 상태를 확인해주세요.', error: true);
       return;
     }
+    if (_needsFixedTime) {
+      final holdError = await EnrollmentService.holdFixedSchedule(
+        orderId: order.orderId,
+        course: widget.course,
+        teacher: _selected!,
+        slots: _pickedSlots,
+        extension: widget.extendEnrollment,
+      );
+      if (holdError != null) {
+        if (!mounted) return;
+        setState(() => _paying = false);
+        _toast(holdError, error: true);
+        await _loadFixedSchedule();
+        return;
+      }
+    }
 
     final error = await PaymentService.requestTossPayment(order);
     if (!mounted) return;
     setState(() => _paying = false);
     if (error != null) {
+      if (_needsFixedTime) {
+        await EnrollmentService.releaseUnpaidFixedHold(order.orderId);
+      }
       _toast(error, error: true);
     }
   }
@@ -163,6 +243,152 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
     );
   }
 
+  bool get _fixedTimeReady {
+    if (!_needsFixedTime) return true;
+    final shape = _shape;
+    return shape != null && _pickedSlots.length == shape.slotsPerWeek;
+  }
+
+  void _toggleSlot(WeeklySlot slot) {
+    final shape = _shape;
+    if (shape == null) return;
+    setState(() {
+      final index = _pickedSlots.indexWhere((item) => item.key == slot.key);
+      if (index >= 0) {
+        _pickedSlots.removeAt(index);
+        return;
+      }
+      if (_pickedSlots.length >= shape.slotsPerWeek) return;
+      _pickedSlots = [..._pickedSlots, slot];
+    });
+  }
+
+  Widget _fixedTimeSection() {
+    final shape = _shape;
+    if (shape == null) return const SizedBox.shrink();
+    const names = ['월', '화', '수', '목', '금', '토', '일'];
+    final lessons = _pickedSlots.length == shape.slotsPerWeek
+        ? FixedWeeklySchedule.lessons(
+            slots: _pickedSlots,
+            weeks: shape.weeks,
+            now: DateTime.now(),
+            notBefore: _extensionStart,
+          )
+        : const <ScheduledLesson>[];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          tr(context, '매주 고정 시간'),
+          style: TextStyle(fontFamily: 'Jalnan', fontSize: 15),
+        ),
+        SizedBox(height: 8),
+        Text(
+          tf(context, '매주 {p0}개 시간을 고르세요. 고른 시간은 {p1}주 동안 같은 요일에 반복되어 선생님 스케줄에 들어갑니다.', {
+            'p0': shape.slotsPerWeek,
+            'p1': shape.weeks,
+          }),
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: 13,
+            height: 1.5,
+            color: Palette.grey600,
+          ),
+        ),
+        SizedBox(height: 12),
+        if (_loadingSchedule)
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: Center(child: CircularProgressIndicator()),
+          )
+        else if (_openSlots.isEmpty)
+          Text(
+            tr(context, '이 선생님이 열어 둔 시간 중, 결제한 기간 동안 모두 비어 있는 시간이 없습니다.'),
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontSize: 13,
+              height: 1.5,
+              color: Palette.grey600,
+            ),
+          )
+        else
+          ...List.generate(7, (index) {
+            final weekday = index + 1;
+            final times = _openSlots
+                .where((slot) => slot.weekday == weekday)
+                .toList();
+            if (times.isEmpty) return const SizedBox.shrink();
+            return Padding(
+              padding: EdgeInsets.only(bottom: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    tr(context, names[index]),
+                    style: TextStyle(
+                      fontFamily: 'NotoSansKR',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                    ),
+                  ),
+                  SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: times.map((slot) {
+                      final selected =
+                          _pickedSlots.any((item) => item.key == slot.key);
+                      return ChoiceChip(
+                        label: Text(
+                          EnrollmentService.formatBookingTime(slot.time),
+                          style: TextStyle(fontFamily: 'NotoSansKR'),
+                        ),
+                        selected: selected,
+                        onSelected: (_) => _toggleSlot(slot),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            );
+          }),
+        if (lessons.isNotEmpty) ...[
+          SizedBox(height: 4),
+          Text(
+            tf(context, '이렇게 {p0}회가 미리 들어갑니다.', {'p0': lessons.length}),
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+              color: Palette.secondaryDark,
+            ),
+          ),
+          SizedBox(height: 6),
+          ...lessons.take(8).map(
+                (lesson) => Text(
+                  '${EnrollmentService.formatBookingDate(lesson.date)} ${EnrollmentService.formatBookingTime(lesson.time)}',
+                  style: TextStyle(
+                    fontFamily: 'NotoSansKR',
+                    fontSize: 12,
+                    height: 1.5,
+                    color: Palette.grey700,
+                  ),
+                ),
+              ),
+          if (lessons.length > 8)
+            Text(
+              tf(context, '외 {p0}회', {'p0': lessons.length - 8}),
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontSize: 12,
+                color: Palette.grey600,
+              ),
+            ),
+        ],
+      ],
+    );
+  }
+
   String _orderSummary(OnlineCourse course) {
     final sessions = course.sessionsFor(
       widget.plan,
@@ -199,7 +425,12 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
           WidgetUtil.myDivider(),
           SizedBox(height: 12),
           Text(
-            tr(context, "선택한 과정을 담당할 메인 원어민 강사입니다.\n이후 화상수업은 이 선생님을 중심으로 진행되며, 해당 선생님이 열어 둔 시간에만 예약할 수 있습니다.\n메인 강사는 나중에 바꿀 수 있습니다. 하루 일정이 안 맞으면 다른 선생님으로 예약하고, 마음에 들면 그 선생님을 메인 강사로 고정할 수 있습니다."),
+            tr(
+              context,
+              _needsFixedTime
+                  ? "주니어와 재원생 화상은 결제 전에 원어민과 매주 시간을 정합니다.\n결제한 기간 동안 그 시간이 이 선생님 스케줄에 미리 들어갑니다.\n하루 전에 수업을 못 하면, 대체 시간을 골라야만 그 회차를 옮길 수 있습니다."
+                  : "선택한 과정을 담당할 메인 원어민 강사입니다.\n이후 화상수업은 이 선생님을 중심으로 진행되며, 해당 선생님이 열어 둔 시간에만 예약할 수 있습니다.\n메인 강사는 나중에 바꿀 수 있습니다. 하루 일정이 안 맞으면 다른 선생님으로 예약하고, 마음에 들면 그 선생님을 메인 강사로 고정할 수 있습니다.",
+            ),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: 13,
@@ -264,7 +495,13 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
             OnlineTeacherCardGrid(
               teachers: _teachers,
               selectedId: _selected?.id,
-              onSelected: (teacher) => setState(() => _selected = teacher),
+              onSelected: (teacher) {
+                setState(() {
+                  _selected = teacher;
+                  _pickedSlots = [];
+                });
+                _loadFixedSchedule();
+              },
             ),
           SizedBox(height: 24),
           if (_selected != null) ...[
@@ -281,6 +518,10 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
             ),
             SizedBox(height: 16),
           ],
+          if (_needsFixedTime) ...[
+            _fixedTimeSection(),
+            SizedBox(height: 20),
+          ],
           SizedBox(
             width: double.maxFinite,
             height: 52,
@@ -291,7 +532,9 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8)),
               ),
-              onPressed: (_paying || _selected == null) ? null : _startPayment,
+              onPressed: (_paying || _selected == null || !_fixedTimeReady)
+                  ? null
+                  : _startPayment,
               icon: Icon(Icons.payment, color: Palette.white),
               label: Text(
                 _paying

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
@@ -7,6 +8,7 @@ import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
+import 'package:gi_english_website/util/FixedWeeklySchedule.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/util/TeacherScheduleService.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
@@ -2267,6 +2269,9 @@ class EnrollmentService {
   /// 수업 시작 이 시간 전까지는 수강생이 예약을 취소하거나 옮길 수 있다.
   static const Duration bookingChangeLead = Duration(hours: 3);
 
+  /// 고정 수업은 하루 전까지만 대체 시간을 고를 수 있다.
+  static const Duration fixedBookingChangeLead = FixedWeeklySchedule.changeLead;
+
   /// 강사 문서의 회차 수당. 없으면 기본 10,000원.
   static int lessonFeeWonOf(Map<String, dynamic>? data) {
     final raw = data?['lessonFeeWon'];
@@ -2308,7 +2313,15 @@ class EnrollmentService {
     final start = bookingDateTime(booking.date, booking.time);
     if (start == null) return false;
     final clock = now ?? DateTime.now();
-    return !clock.isAfter(start.subtract(bookingChangeLead));
+    final lead =
+        booking.fixedSchedule ? fixedBookingChangeLead : bookingChangeLead;
+    return !clock.isAfter(start.subtract(lead));
+  }
+
+  /// 고정 수업은 대체 시간 없이 취소하지 못한다. 다른 수업은 이 제한이 없다.
+  static String? fixedCancelWithoutReplacement(WeekBooking booking) {
+    if (!booking.fixedSchedule) return null;
+    return '대체 시간을 고르지 않으면 취소할 수 없습니다.';
   }
 
   static DateTime? bookingDateTime(DateTime date, String time) {
@@ -2350,6 +2363,7 @@ class EnrollmentService {
     required int weekNumber,
     DateTime? now,
     DateTime? expiresAt,
+    int horizonDays = 13,
   }) {
     if (weekNumber < 1) return [];
     final today = dateOnly(now ?? DateTime.now());
@@ -2358,7 +2372,8 @@ class EnrollmentService {
       final start = dateOnly(enrollmentStart);
       if (start.isAfter(first)) first = start;
     }
-    var last = today.add(const Duration(days: 13));
+    final span = horizonDays < 0 ? 0 : horizonDays;
+    var last = today.add(Duration(days: span));
     if (expiresAt != null) {
       final exp = dateOnly(expiresAt);
       if (exp.isBefore(last)) last = exp;
@@ -2505,6 +2520,443 @@ class EnrollmentService {
     }
   }
 
+  static Future<void> sweepExpiredFixedHolds(String teacherUid) async {
+    if (teacherUid.isEmpty) return;
+    try {
+      final callable = FirebaseFunctions.instanceFor(region: 'asia-northeast3')
+          .httpsCallable('sweepExpiredFixedHolds');
+      await callable.call({'teacherUid': teacherUid});
+    } catch (e) {
+      print('만료된 고정 시간 정리 생략: $e');
+    }
+  }
+
+  /// 연장 결제 때 새 4주(또는 12주)가 시작되는 날. 마지막 수업 다음 날.
+  static Future<DateTime?> fixedExtensionStart(String courseId) async {
+    final existing = await myWeekBookings(courseId: courseId);
+    DateTime? latest;
+    for (final booking in existing) {
+      if (booking.isCancelled || booking.status == 'rejected') continue;
+      final day = dateOnly(booking.date);
+      if (latest == null || day.isAfter(latest)) latest = day;
+    }
+    if (latest == null) return null;
+    return latest.add(const Duration(days: 1));
+  }
+
+  static Future<int> _nextFixedWeekNumber(String courseId) async {
+    final existing = await myWeekBookings(courseId: courseId);
+    var maxWeek = 0;
+    for (final booking in existing) {
+      if (booking.isCancelled || booking.status == 'rejected') continue;
+      if (booking.weekNumber > maxWeek) maxWeek = booking.weekNumber;
+    }
+    return maxWeek + 1;
+  }
+
+  static Future<String?> confirmFixedSchedule(String orderId) async {
+    if (orderId.isEmpty) return '주문을 찾을 수 없습니다.';
+    try {
+      final snap = await _firestore
+          .collection('week_bookings')
+          .where('orderId', isEqualTo: orderId)
+          .get();
+      for (final doc in snap.docs) {
+        final data = doc.data();
+        if (data['fixedSchedule'] != true) continue;
+        if (data['status']?.toString() != 'pending') continue;
+        await doc.reference.update({
+          'status': 'confirmed',
+          'confirmedAt': FieldValue.serverTimestamp(),
+          'confirmedBy': '결제',
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      }
+      return null;
+    } catch (e) {
+      print('고정 스케줄 확정 오류: $e');
+      return '고정 시간을 확정하지 못했습니다.';
+    }
+  }
+
+  /// 결제되지 않은 고정 시간 점유를 다시 연다.
+  static Future<String?> releaseUnpaidFixedHold(String orderId) async {
+    final user = AuthService.currentUser;
+    if (user == null) return '로그인이 필요합니다.';
+    if (orderId.isEmpty) return null;
+    try {
+      final payment =
+          await _firestore.collection('payments').doc(orderId).get();
+      final status = payment.data()?['status']?.toString() ?? '';
+      if (status == 'paid' || status == 'authorized') return null;
+      final bookings = await myAllWeekBookings();
+      for (final booking in bookings) {
+        if (booking.orderId != orderId || !booking.fixedSchedule) continue;
+        if (!booking.isPending) continue;
+        await _releaseOneFixedHold(booking);
+      }
+      return null;
+    } catch (e) {
+      print('고정 시간 점유 해제 오류: $e');
+      return '잡아 둔 시간을 비우지 못했습니다.';
+    }
+  }
+
+  static Future<void> _releaseOneFixedHold(WeekBooking booking) async {
+    final ref = _firestore.collection('week_bookings').doc(booking.id);
+    await _firestore.runTransaction((transaction) async {
+      final snap = await transaction.get(ref);
+      if (!snap.exists) return;
+      final data = snap.data() ?? {};
+      if (data['status']?.toString() != 'pending') return;
+      if (data['fixedSchedule'] != true) return;
+      final teacherUid = data['teacherId']?.toString() ??
+          data['nativeTeacherUid']?.toString() ??
+          '';
+      final time = data['time']?.toString() ?? '';
+      DateTime? day;
+      final dateRaw = data['date'];
+      if (dateRaw is Timestamp) day = dateOnly(dateRaw.toDate());
+      DocumentReference<Map<String, dynamic>>? occRef;
+      DocumentSnapshot<Map<String, dynamic>>? occ;
+      if (teacherUid.isNotEmpty && day != null && time.isNotEmpty) {
+        occRef = TeacherScheduleService.occupiedRef(teacherUid, day, time);
+        occ = await transaction.get(occRef);
+      }
+      transaction.update(ref, {
+        'status': 'cancelled',
+        'cancelledAt': FieldValue.serverTimestamp(),
+        'cancelledBy': 'student',
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      if (occRef != null && occ != null && occ.exists) {
+        final occBooking = occ.data()?['bookingId']?.toString() ?? '';
+        if (occBooking.isEmpty || occBooking == ref.id) {
+          transaction.delete(occRef);
+        }
+      }
+    });
+  }
+
+  /// 결제 전에 고른 매주 시간을, 결제한 주 수만큼 선생님 스케줄에 넣어 둔다.
+  static Future<String?> holdFixedSchedule({
+    required String orderId,
+    required OnlineCourse course,
+    required OnlineNativeTeacher teacher,
+    required List<WeeklySlot> slots,
+    required bool extension,
+  }) async {
+    final user = AuthService.currentUser;
+    if (user == null) return '로그인이 필요합니다.';
+    final shape = FixedWeeklySchedule.shapeFor(course);
+    if (shape == null) return '고정 시간을 정하는 수업이 아닙니다.';
+    if (slots.length != shape.slotsPerWeek) {
+      return '매주 시간을 ${shape.slotsPerWeek}개 고른 뒤에 결제할 수 있습니다.';
+    }
+    final member = await AuthService.currentMemberDoc();
+    final phone = member?['phone']?.toString() ?? '';
+    if (!PhoneUtil.isValid(phone)) {
+      return '예약 확정 문자를 받으려면 내 강의실에서 휴대폰 번호를 먼저 등록해 주세요.';
+    }
+    final teacherUid = await TeacherScheduleService.resolveTeacherUid(
+      nativeTeacherUid: teacher.accountUid,
+      nativeTeacherId: teacher.id,
+    );
+    if (teacherUid.isEmpty) return '선택한 강사 계정으로 예약할 수 없습니다.';
+
+    await sweepExpiredFixedHolds(teacherUid);
+    final previous = await myWeekBookings(courseId: course.id);
+    for (final booking in previous) {
+      if (!booking.fixedSchedule || !booking.isPending) continue;
+      if (booking.orderId.isEmpty || booking.orderId == orderId) continue;
+      final payment = await _firestore
+          .collection('payments')
+          .doc(booking.orderId)
+          .get();
+      final status = payment.data()?['status']?.toString() ?? '';
+      if (status == 'paid' || status == 'authorized') continue;
+      await _releaseOneFixedHold(booking);
+    }
+
+    final notBefore =
+        extension ? await fixedExtensionStart(course.id) : null;
+    final weekNumber = extension ? await _nextFixedWeekNumber(course.id) : 1;
+    final now = DateTime.now();
+    final availability = await TeacherScheduleService.load(teacherUid);
+    if (!FixedWeeklySchedule.patternFits(
+      availability: availability,
+      slots: slots,
+      weeks: shape.weeks,
+      now: now,
+      notBefore: notBefore,
+    )) {
+      return '고른 시간 중 이미 예약되었거나 선생님이 닫아 둔 날이 있습니다. 다른 시간을 선택해 주세요.';
+    }
+    final lessons = FixedWeeklySchedule.lessons(
+      slots: slots,
+      weeks: shape.weeks,
+      now: now,
+      notBefore: notBefore,
+    );
+    if (lessons.length != shape.sessions) {
+      return '고정 시간을 만들지 못했습니다. 다시 선택해 주세요.';
+    }
+
+    try {
+      final bookingRefs = [
+        for (var i = 0; i < lessons.length; i++)
+          _firestore.collection('week_bookings').doc(),
+      ];
+      final occRefs = [
+        for (final lesson in lessons)
+          TeacherScheduleService.occupiedRef(
+            teacherUid,
+            lesson.date,
+            lesson.time,
+          ),
+      ];
+      final closedRefs = [
+        for (final lesson in lessons)
+          _firestore.collection('teacher_closed_slots').doc(
+                TeacherScheduleService.docId(
+                  teacherUid,
+                  lesson.date,
+                  lesson.time,
+                ),
+              ),
+      ];
+      final holdUntil = Timestamp.fromDate(now.add(FixedWeeklySchedule.holdFor));
+      final displayName = AuthService.profileDisplayName(
+        member,
+        fallback: user.displayName ?? '',
+      );
+      await _firestore.runTransaction((transaction) async {
+        final occSnaps = <DocumentSnapshot<Map<String, dynamic>>>[];
+        final closedSnaps = <DocumentSnapshot<Map<String, dynamic>>>[];
+        for (var i = 0; i < lessons.length; i++) {
+          occSnaps.add(await transaction.get(occRefs[i]));
+          closedSnaps.add(await transaction.get(closedRefs[i]));
+        }
+        for (var i = 0; i < lessons.length; i++) {
+          if (closedSnaps[i].exists) {
+            throw StateError(
+              '선생님이 닫아 둔 시간입니다. 다른 시간을 선택해 주세요.',
+            );
+          }
+          if (occSnaps[i].exists) {
+            throw StateError('이미 예약된 시간입니다. 다른 시간을 선택해 주세요.');
+          }
+        }
+        for (var i = 0; i < lessons.length; i++) {
+          final lesson = lessons[i];
+          final number = weekNumber + i;
+          final scheduled = bookingDateTime(lesson.date, lesson.time);
+          transaction.set(bookingRefs[i], {
+            'userId': user.uid,
+            'memberName': displayName,
+            'email': user.email ?? '',
+            'phone': PhoneUtil.normalize(phone),
+            'courseId': course.id,
+            'weekId': 'native_speaking_session_$number',
+            'weekNumber': number,
+            'weekTitle': '$number회 회화',
+            'date': Timestamp.fromDate(dateOnly(lesson.date)),
+            'time': lesson.time,
+            'dateKey': TeacherScheduleService.dateKey(lesson.date),
+            if (scheduled != null)
+              'scheduledAt': Timestamp.fromDate(scheduled),
+            'status': 'pending',
+            'teacherId': teacherUid,
+            'nativeTeacherId': teacher.id,
+            'nativeTeacherName': teacher.name,
+            'nativeTeacherUid': teacherUid,
+            'assignedTeacherUid': teacherUid,
+            'assignedTeacherName': teacher.name,
+            'isSubstitute': false,
+            'fixedSchedule': true,
+            'orderId': orderId,
+            'holdUntil': holdUntil,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+          transaction.set(occRefs[i], {
+            ...TeacherScheduleService.occupiedPayload(
+              teacherUid: teacherUid,
+              date: lesson.date,
+              time: lesson.time,
+              bookingId: bookingRefs[i].id,
+              userId: user.uid,
+            ),
+            'holdUntil': holdUntil,
+          });
+        }
+      });
+      return null;
+    } on StateError catch (e) {
+      return e.message;
+    } catch (e) {
+      print('고정 시간 반영 오류: $e');
+      return '선생님 스케줄에 시간을 넣지 못했습니다. 다른 시간을 선택해 주세요.';
+    }
+  }
+
+  /// 하루 전 취소는 대체 시간을 같은 선생님 빈 칸으로 고를 때만 된다.
+  static Future<String?> replaceFixedBooking({
+    required WeekBooking current,
+    required DateTime date,
+    required String time,
+    DateTime? expiresAt,
+  }) async {
+    final user = AuthService.currentUser;
+    if (user == null) return '로그인이 필요합니다.';
+    if (current.userId != user.uid) return '본인 예약만 바꿀 수 있습니다.';
+    if (!current.fixedSchedule) {
+      return '이 예약은 고정 수업이 아닙니다.';
+    }
+    if (time.trim().isEmpty) {
+      return '대체 시간을 고르지 않으면 취소할 수 없습니다.';
+    }
+    if (!canStudentChangeBooking(current)) {
+      return '수업 하루 전까지만 대체 시간을 고를 수 있습니다.';
+    }
+    final day = dateOnly(date);
+    if (dateOnly(current.date) == day && current.time == time) {
+      return '같은 시간입니다. 다른 시간을 선택해 주세요.';
+    }
+    if (!bookingTimeSlots.contains(time)) {
+      return '선택할 수 없는 시간입니다.';
+    }
+    if (!remainingTimeSlots(day).contains(time)) {
+      return '선택할 수 없는 시간입니다.';
+    }
+    final horizon = remainingBookingDates(
+      enrollmentStart: DateTime.now(),
+      weekNumber: current.weekNumber,
+      expiresAt: expiresAt,
+      horizonDays: 84,
+    );
+    if (!horizon.any((item) => item == day)) {
+      return '수강 기간 안의 날짜만 고를 수 있습니다.';
+    }
+    final teacherUid = current.teacherId.isNotEmpty
+        ? current.teacherId
+        : current.nativeTeacherUid;
+    if (teacherUid.isEmpty) return '선택한 강사 계정으로 예약할 수 없습니다.';
+    try {
+      final availability = await TeacherScheduleService.load(teacherUid);
+      if (availability.isClosed(day, time)) {
+        return '선생님이 닫아 둔 시간입니다. 다른 시간을 선택해 주세요.';
+      }
+      if (availability.isOccupied(day, time)) {
+        return '이미 예약된 시간입니다. 다른 시간을 선택해 주세요.';
+      }
+      final currentRef = _firestore.collection('week_bookings').doc(current.id);
+      final bookingRef = _firestore.collection('week_bookings').doc();
+      await _firestore.runTransaction((transaction) async {
+        final snap = await transaction.get(currentRef);
+        if (!snap.exists) throw StateError('예약을 찾을 수 없습니다.');
+        final data = snap.data() ?? {};
+        if (data['userId']?.toString() != user.uid) {
+          throw StateError('본인 예약만 바꿀 수 있습니다.');
+        }
+        if (data['fixedSchedule'] != true) {
+          throw StateError('이 예약은 고정 수업이 아닙니다.');
+        }
+        final booking = WeekBooking.fromMap(currentRef.id, data);
+        if (!canStudentChangeBooking(booking)) {
+          throw StateError('수업 하루 전까지만 대체 시간을 고를 수 있습니다.');
+        }
+        final oldTeacher = data['teacherId']?.toString() ??
+            data['nativeTeacherUid']?.toString() ??
+            '';
+        final oldTime = data['time']?.toString() ?? '';
+        DateTime? oldDay;
+        final oldDateRaw = data['date'];
+        if (oldDateRaw is Timestamp) oldDay = dateOnly(oldDateRaw.toDate());
+        final newOcc = TeacherScheduleService.occupiedRef(teacherUid, day, time);
+        final occ = await transaction.get(newOcc);
+        if (occ.exists) {
+          throw StateError('이미 예약된 시간입니다. 다른 시간을 선택해 주세요.');
+        }
+        final closedRef = _firestore
+            .collection('teacher_closed_slots')
+            .doc(TeacherScheduleService.docId(teacherUid, day, time));
+        final closed = await transaction.get(closedRef);
+        if (closed.exists) {
+          throw StateError('선생님이 닫아 둔 시간입니다. 다른 시간을 선택해 주세요.');
+        }
+        DocumentReference<Map<String, dynamic>>? oldOccRef;
+        DocumentSnapshot<Map<String, dynamic>>? oldOcc;
+        if (oldTeacher.isNotEmpty && oldDay != null && oldTime.isNotEmpty) {
+          oldOccRef =
+              TeacherScheduleService.occupiedRef(oldTeacher, oldDay, oldTime);
+          oldOcc = await transaction.get(oldOccRef);
+        }
+        final scheduled = bookingDateTime(day, time);
+        transaction.set(bookingRef, {
+          'userId': user.uid,
+          'memberName': data['memberName']?.toString() ?? current.memberName,
+          'email': data['email']?.toString() ?? current.email,
+          'phone': data['phone']?.toString() ?? current.phone,
+          'courseId': data['courseId']?.toString() ?? current.courseId,
+          'weekId': data['weekId']?.toString() ?? current.weekId,
+          'weekNumber': data['weekNumber'] ?? current.weekNumber,
+          'weekTitle': data['weekTitle']?.toString() ?? current.weekTitle,
+          'date': Timestamp.fromDate(day),
+          'time': time,
+          'dateKey': TeacherScheduleService.dateKey(day),
+          if (scheduled != null) 'scheduledAt': Timestamp.fromDate(scheduled),
+          'status': 'confirmed',
+          'teacherId': teacherUid,
+          'nativeTeacherId':
+              data['nativeTeacherId']?.toString() ?? current.nativeTeacherId,
+          'nativeTeacherName': data['nativeTeacherName']?.toString() ??
+              current.nativeTeacherName,
+          'nativeTeacherUid': teacherUid,
+          'assignedTeacherUid': data['assignedTeacherUid']?.toString() ??
+              current.assignedTeacherUid,
+          'assignedTeacherName': data['assignedTeacherName']?.toString() ??
+              current.assignedTeacherName,
+          'isSubstitute': false,
+          'fixedSchedule': true,
+          'orderId': data['orderId']?.toString() ?? current.orderId,
+          'replacesBookingId': currentRef.id,
+          'confirmedAt': FieldValue.serverTimestamp(),
+          'confirmedBy': '대체',
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+        transaction.update(currentRef, {
+          'status': 'cancelled',
+          'cancelledAt': FieldValue.serverTimestamp(),
+          'cancelledBy': 'student',
+          'updatedAt': FieldValue.serverTimestamp(),
+          'replacedBy': bookingRef.id,
+        });
+        if (oldOccRef != null && oldOcc != null && oldOcc.exists) {
+          final occBooking = oldOcc.data()?['bookingId']?.toString() ?? '';
+          if (occBooking.isEmpty || occBooking == currentRef.id) {
+            transaction.delete(oldOccRef);
+          }
+        }
+        transaction.set(
+          newOcc,
+          TeacherScheduleService.occupiedPayload(
+            teacherUid: teacherUid,
+            date: day,
+            time: time,
+            bookingId: bookingRef.id,
+            userId: user.uid,
+          ),
+        );
+      });
+      return null;
+    } on StateError catch (e) {
+      return e.message;
+    } catch (e) {
+      print('대체 시간 반영 오류: $e');
+      return '대체 시간을 반영하지 못했습니다.';
+    }
+  }
+
   static Future<String?> requestWeekBooking({
     required EnrollmentRecord enrollment,
     required OnlineWeek week,
@@ -2514,6 +2966,10 @@ class EnrollmentService {
   }) async {
     final user = AuthService.currentUser;
     if (user == null) return '로그인이 필요합니다.';
+    if (OnlineCourse.findById(enrollment.courseId)?.fixedSpeakingPrice ==
+        true) {
+      return '이 수업은 결제할 때 정한 시간으로 진행됩니다. 바꾸려면 하루 전까지 대체 시간을 고르세요.';
+    }
     final day = dateOnly(date);
     final allowed = remainingBookingDates(
       enrollmentStart: enrollment.createdAt,
@@ -2748,6 +3204,9 @@ class EnrollmentService {
       throw StateError('이미 취소되었거나 변경할 수 없는 예약입니다.');
     }
     final booking = WeekBooking.fromMap(ref.id, data);
+    if (booking.fixedSchedule) {
+      throw StateError('대체 시간을 고르지 않으면 취소할 수 없습니다.');
+    }
     if (!canStudentChangeBooking(booking)) {
       throw StateError('수업 3시간 전까지만 취소하거나 옮길 수 있습니다.');
     }
@@ -2784,6 +3243,8 @@ class EnrollmentService {
     final user = AuthService.currentUser;
     if (user == null) return '로그인이 필요합니다.';
     if (current.userId != user.uid) return '본인 예약만 취소할 수 있습니다.';
+    final fixedBlock = fixedCancelWithoutReplacement(current);
+    if (fixedBlock != null) return fixedBlock;
     if (!canStudentChangeBooking(current)) {
       return '수업 3시간 전까지만 취소하거나 옮길 수 있습니다.';
     }
@@ -2823,6 +3284,9 @@ class EnrollmentService {
     final user = AuthService.currentUser;
     if (user == null) return '로그인이 필요합니다.';
     if (current.userId != user.uid) return '본인 예약만 옮길 수 있습니다.';
+    if (current.fixedSchedule) {
+      return '대체 시간을 고르지 않으면 취소할 수 없습니다.';
+    }
     if (!canStudentChangeBooking(current)) {
       return '수업 3시간 전까지만 취소하거나 옮길 수 있습니다.';
     }
@@ -3309,6 +3773,8 @@ class WeekBooking {
   final DateTime createdAt;
   final DateTime? confirmedAt;
   final String confirmedBy;
+  final bool fixedSchedule;
+  final String orderId;
 
   WeekBooking({
     required this.id,
@@ -3334,6 +3800,8 @@ class WeekBooking {
     required this.createdAt,
     this.confirmedAt,
     this.confirmedBy = '',
+    this.fixedSchedule = false,
+    this.orderId = '',
   });
 
   bool get isPending => status == 'pending';
@@ -3399,6 +3867,8 @@ class WeekBooking {
       createdAt: toDateTime(data['createdAt']) ?? DateTime.now(),
       confirmedAt: toDateTime(data['confirmedAt']),
       confirmedBy: data['confirmedBy']?.toString() ?? '',
+      fixedSchedule: data['fixedSchedule'] == true,
+      orderId: data['orderId']?.toString() ?? '',
     );
   }
 }

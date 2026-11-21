@@ -333,7 +333,7 @@ class TeacherScheduleService {
     return null;
   }
 
-  static DocumentReference occupiedRef(
+  static DocumentReference<Map<String, dynamic>> occupiedRef(
       String teacherUid, DateTime date, String time) {
     final day = dateOnly(date);
     return _firestore

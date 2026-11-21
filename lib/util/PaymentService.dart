@@ -9,6 +9,7 @@ import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
+import 'package:gi_english_website/util/FixedWeeklySchedule.dart';
 // ignore: avoid_web_libraries_in_flutter, deprecated_member_use
 import 'package:gi_english_website/util/js_stub.dart'
     if (dart.library.js) 'dart:js' as js;
@@ -30,6 +31,7 @@ class PaymentService {
     int? totalSessions,
     bool extendEnrollment = false,
     String plan = OnlinePlan.bundle,
+    List<WeeklySlot> fixedSlots = const [],
   }) async {
     final user = AuthService.currentUser;
     if (user == null) return null;
@@ -79,6 +81,8 @@ class PaymentService {
       'nativeTeacherUid': order.nativeTeacherUid,
       'purpose': order.purpose,
       'plan': order.plan,
+      if (fixedSlots.isNotEmpty)
+        'fixedSlots': fixedSlots.map((slot) => slot.toMap()).toList(),
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
@@ -318,6 +322,7 @@ class PaymentService {
         'paidAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
+      await EnrollmentService.confirmFixedSchedule(orderId);
 
       final nativeTeacherId = payment['nativeTeacherId']?.toString() ?? '';
       final nativeTeacherName = payment['nativeTeacherName']?.toString() ?? '';

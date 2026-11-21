@@ -322,7 +322,7 @@ class EnrolledFreeTalkSection extends StatelessWidget {
             ),
             SizedBox(height: 16),
             Text(
-              tr(context, '원어민 강사를 고른 뒤 결제합니다.'),
+              tr(context, '원어민 강사와 매주 시간을 고른 뒤 결제합니다.'),
               style: TextStyle(
                 fontFamily: 'NotoSansKR',
                 fontSize: 13,

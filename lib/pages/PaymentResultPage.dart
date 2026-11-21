@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/OnlineCheckoutPage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineClassroomPage.dart';
+import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PaymentService.dart';
@@ -52,9 +53,20 @@ class _PaymentResultPageState extends State<PaymentResultPage> {
     if (widget.success) {
       _confirm();
     } else {
+      _releaseFailedHold();
+    }
+  }
+
+  Future<void> _releaseFailedHold() async {
+    final orderId = widget.orderId;
+    if (orderId != null && orderId.isNotEmpty) {
+      await EnrollmentService.releaseUnpaidFixedHold(orderId);
+    }
+    if (!mounted) return;
+    setState(() {
       _loading = false;
       _error = widget.message ?? '결제가 취소되었거나 실패했습니다.';
-    }
+    });
   }
 
   Future<void> _confirm() async {
@@ -81,6 +93,12 @@ class _PaymentResultPageState extends State<PaymentResultPage> {
     );
 
     if (!mounted) return;
+    final failed = error != null &&
+        !error.startsWith('CLOUD_FUNCTIONS_UNAVAILABLE:');
+    if (failed && orderId.isNotEmpty) {
+      await EnrollmentService.releaseUnpaidFixedHold(orderId);
+      if (!mounted) return;
+    }
     setState(() {
       _loading = false;
       if (error == null) {

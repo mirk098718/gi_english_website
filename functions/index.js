@@ -153,6 +153,114 @@ function tossConfirm({ secret, paymentKey, orderId, amount }) {
   });
 }
 
+function occupiedDocId(teacherUid, dateKey, time) {
+  return `${teacherUid}_${dateKey}_${String(time).replace(/:/g, "")}`;
+}
+
+async function confirmFixedSchedule(db, orderId) {
+  const snap = await db
+    .collection("week_bookings")
+    .where("orderId", "==", orderId)
+    .get();
+  if (snap.empty) return;
+  let batch = db.batch();
+  let writes = 0;
+  async function flush() {
+    if (writes === 0) return;
+    await batch.commit();
+    batch = db.batch();
+    writes = 0;
+  }
+  for (const doc of snap.docs) {
+    const data = doc.data() || {};
+    if (data.fixedSchedule !== true) continue;
+    if (data.status !== "pending" && data.status !== "confirmed") continue;
+    batch.update(doc.ref, {
+      status: "confirmed",
+      confirmedAt: admin.firestore.FieldValue.serverTimestamp(),
+      confirmedBy: "결제",
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    writes += 1;
+    const teacherUid = String(data.teacherId || data.nativeTeacherUid || "");
+    const dateKey = String(data.dateKey || "");
+    const time = String(data.time || "");
+    if (teacherUid && dateKey && time) {
+      batch.set(
+        db.collection("teacher_occupied_slots").doc(
+          occupiedDocId(teacherUid, dateKey, time)
+        ),
+        { holdUntil: admin.firestore.FieldValue.delete() },
+        { merge: true }
+      );
+      writes += 1;
+    }
+    if (writes >= 400) await flush();
+  }
+  await flush();
+}
+
+exports.sweepExpiredFixedHolds = functions
+  .region("asia-northeast3")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError(
+        "unauthenticated",
+        "로그인이 필요합니다."
+      );
+    }
+    const teacherUid = String((data && data.teacherUid) || "");
+    if (!teacherUid) return { ok: true, released: 0 };
+    const db = admin.firestore();
+    const nowMs = Date.now();
+    const occSnap = await db
+      .collection("teacher_occupied_slots")
+      .where("teacherId", "==", teacherUid)
+      .get();
+    let released = 0;
+    for (const doc of occSnap.docs) {
+      const occ = doc.data() || {};
+      const holdUntil = occ.holdUntil;
+      if (!holdUntil || typeof holdUntil.toMillis !== "function") continue;
+      if (holdUntil.toMillis() > nowMs) continue;
+      const bookingId = String(occ.bookingId || "");
+      if (!bookingId) {
+        await doc.ref.delete();
+        released += 1;
+        continue;
+      }
+      const bookingRef = db.collection("week_bookings").doc(bookingId);
+      const bookingSnap = await bookingRef.get();
+      if (!bookingSnap.exists) {
+        await doc.ref.delete();
+        released += 1;
+        continue;
+      }
+      const booking = bookingSnap.data() || {};
+      if (booking.fixedSchedule !== true || booking.status !== "pending") {
+        continue;
+      }
+      const orderId = String(booking.orderId || "");
+      let paymentStatus = "pending";
+      if (orderId) {
+        const payment = await db.collection("payments").doc(orderId).get();
+        paymentStatus = payment.exists
+          ? String((payment.data() || {}).status || "")
+          : "failed";
+      }
+      if (paymentStatus === "paid" || paymentStatus === "authorized") continue;
+      await bookingRef.update({
+        status: "cancelled",
+        cancelledAt: admin.firestore.FieldValue.serverTimestamp(),
+        cancelledBy: "hold-expired",
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      await doc.ref.delete();
+      released += 1;
+    }
+    return { ok: true, released };
+  });
+
 exports.confirmTossPayment = functions
   .region("asia-northeast3")
   .https.onCall(async (data, context) => {
@@ -374,6 +482,8 @@ exports.confirmTossPayment = functions
         { merge: true }
       );
     }
+
+    await confirmFixedSchedule(db, orderId);
 
     return {
       ok: true,

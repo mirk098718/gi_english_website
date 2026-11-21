@@ -166,7 +166,7 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
       }
     }
     final teacher = record?.nativeTeacher;
-    if (teacher == null) {
+    if (course.fixedSpeakingPrice || teacher == null) {
       if (!mounted) return;
       MenuUtil.push(
         context,
@@ -354,22 +354,27 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
                 ),
                 onPressed: _paying
                     ? null
-                    : (widget.extendEnrollment
-                        ? (_plan == OnlinePlan.lecture
-                            ? _paySelected
-                            : _payExtension)
-                        : _goTeacherSelect),
+                    : (widget.extendEnrollment &&
+                            _plan == OnlinePlan.lecture
+                        ? _paySelected
+                        : (widget.extendEnrollment &&
+                                !(_selected?.fixedSpeakingPrice ?? false) &&
+                                _plan != OnlinePlan.lecture
+                            ? _payExtension
+                            : _goTeacherSelect)),
                 icon: Icon(Icons.arrow_forward, color: Palette.white),
                 label: Text(
                   tr(
                     context,
                     _paying
                         ? "결제창 여는 중..."
-                    : (widget.extendEnrollment
-                        ? "연장 결제하기"
-                        : (_plan == OnlinePlan.lecture
-                            ? "인강 결제하기"
-                            : "다음 · 원어민 강사 선택")),
+                        : (widget.extendEnrollment &&
+                                !(_selected?.fixedSpeakingPrice ?? false)
+                            ? "연장 결제하기"
+                            : (!widget.extendEnrollment &&
+                                    _plan == OnlinePlan.lecture
+                                ? "인강 결제하기"
+                                : "다음 · 원어민 강사 선택")),
                   ),
                   style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
                 ),
