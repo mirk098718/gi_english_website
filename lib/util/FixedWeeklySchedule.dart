@@ -145,6 +145,58 @@ class FixedWeeklySchedule {
     return true;
   }
 
+  /// 고른 요일마다 같은 시각. 결제한 회차는 이 시각으로만 만든다.
+  static bool sameClockTime(List<WeeklySlot> slots) {
+    if (slots.isEmpty) return false;
+    final time = slots.first.time;
+    final days = <int>{};
+    for (final slot in slots) {
+      if (slot.time != time || !days.add(slot.weekday)) return false;
+    }
+    return true;
+  }
+
+  static List<WeeklySlot> slotsOnWeekdays({
+    required List<int> weekdays,
+    required String time,
+  }) {
+    final days = [...weekdays]..sort();
+    return [
+      for (final day in days)
+        if (day >= 1 && day <= 7) WeeklySlot(weekday: day, time: time),
+    ];
+  }
+
+  /// 결제한 기간 동안 빈 시간이 하나라도 있는 요일.
+  static List<int> weekdaysWithOpenTime(List<WeeklySlot> open) {
+    final days = <int>{for (final slot in open) slot.weekday};
+    final list = days.toList()..sort();
+    return list;
+  }
+
+  /// 고른 요일 모두, 결제한 주 수 동안 비어 있는 시각.
+  static List<String> timesOpenOnEveryWeekday({
+    required List<WeeklySlot> open,
+    required List<int> weekdays,
+  }) {
+    if (weekdays.isEmpty) return const [];
+    final byDay = <int, Set<String>>{};
+    for (final slot in open) {
+      byDay.putIfAbsent(slot.weekday, () => <String>{}).add(slot.time);
+    }
+    Set<String>? shared;
+    for (final day in weekdays) {
+      final times = byDay[day];
+      if (times == null || times.isEmpty) return const [];
+      shared = shared == null
+          ? Set<String>.of(times)
+          : shared.intersection(times);
+    }
+    final list = shared?.toList() ?? <String>[];
+    list.sort();
+    return list;
+  }
+
   /// 그 요일·시간이 앞으로 [weeks]주 동안 모두 비어 있는 칸.
   static List<WeeklySlot> openSlots({
     required TeacherAvailability availability,

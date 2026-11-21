@@ -47,7 +47,8 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
   bool _loading = true;
   bool _loadingSchedule = false;
   List<WeeklySlot> _openSlots = [];
-  List<WeeklySlot> _pickedSlots = [];
+  List<int> _weekdays = [];
+  String? _clockTime;
   DateTime? _extensionStart;
   final GlobalKey _fixedTimeKey = GlobalKey();
 
@@ -86,7 +87,8 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
   void _selectTeacher(OnlineNativeTeacher teacher) {
     setState(() {
       _selected = teacher;
-      _pickedSlots = [];
+      _weekdays = [];
+      _clockTime = null;
     });
     _loadFixedSchedule();
     if (!_needsFixedTime) return;
@@ -114,7 +116,8 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
       if (!mounted) return;
       setState(() {
         _openSlots = [];
-        _pickedSlots = [];
+        _weekdays = [];
+        _clockTime = null;
         _loadingSchedule = false;
       });
       return;
@@ -141,10 +144,28 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
       _loadingSchedule = false;
       _extensionStart = notBefore;
       _openSlots = open;
-      _pickedSlots = _pickedSlots
-          .where((slot) => open.any((item) => item.key == slot.key))
+      _weekdays = _weekdays
+          .where((day) => open.any((slot) => slot.weekday == day))
           .toList();
+      final shared = _weekdays.length == shape.slotsPerWeek
+          ? FixedWeeklySchedule.timesOpenOnEveryWeekday(
+              open: open,
+              weekdays: _weekdays,
+            )
+          : const <String>[];
+      if (_clockTime != null && !shared.contains(_clockTime)) {
+        _clockTime = null;
+      }
     });
+  }
+
+  List<WeeklySlot> get _pickedSlots {
+    final time = _clockTime;
+    if (time == null) return const [];
+    return FixedWeeklySchedule.slotsOnWeekdays(
+      weekdays: _weekdays,
+      time: time,
+    );
   }
 
   Future<void> _startPayment() async {
@@ -158,8 +179,11 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
     }
     final shape = _shape;
     if (_needsFixedTime &&
-        (shape == null || _pickedSlots.length != shape.slotsPerWeek)) {
-      _toast('매주 시간을 모두 고른 뒤에 결제할 수 있습니다.', error: true);
+        (shape == null ||
+            _pickedSlots.length != shape.slotsPerWeek ||
+            !FixedWeeklySchedule.sameClockTime(_pickedSlots))) {
+      _toast('요일을 고른 뒤, 남은 시간 하나를 고르세요. 그 시간은 결제한 회차 모두에 같습니다.',
+          error: true);
       return;
     }
 
@@ -270,28 +294,41 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
   bool get _fixedTimeReady {
     if (!_needsFixedTime) return true;
     final shape = _shape;
-    return shape != null && _pickedSlots.length == shape.slotsPerWeek;
+    return shape != null &&
+        _pickedSlots.length == shape.slotsPerWeek &&
+        FixedWeeklySchedule.sameClockTime(_pickedSlots);
   }
 
-  void _toggleSlot(WeeklySlot slot) {
+  void _toggleWeekday(int weekday) {
     final shape = _shape;
     if (shape == null) return;
     setState(() {
-      final index = _pickedSlots.indexWhere((item) => item.key == slot.key);
-      if (index >= 0) {
-        _pickedSlots.removeAt(index);
-        return;
+      if (_weekdays.contains(weekday)) {
+        _weekdays.remove(weekday);
+      } else if (_weekdays.length < shape.slotsPerWeek) {
+        _weekdays = [..._weekdays, weekday]..sort();
       }
-      if (_pickedSlots.length >= shape.slotsPerWeek) return;
-      _pickedSlots = [..._pickedSlots, slot];
+      _clockTime = null;
     });
+  }
+
+  void _selectClockTime(String time) {
+    setState(() => _clockTime = _clockTime == time ? null : time);
   }
 
   Widget _fixedTimeSection() {
     final shape = _shape;
     if (shape == null) return const SizedBox.shrink();
     const names = ['월', '화', '수', '목', '금', '토', '일'];
-    final lessons = _pickedSlots.length == shape.slotsPerWeek
+    final openDays = FixedWeeklySchedule.weekdaysWithOpenTime(_openSlots);
+    final daysReady = _weekdays.length == shape.slotsPerWeek;
+    final sharedTimes = daysReady
+        ? FixedWeeklySchedule.timesOpenOnEveryWeekday(
+            open: _openSlots,
+            weekdays: _weekdays,
+          )
+        : const <String>[];
+    final lessons = _fixedTimeReady
         ? FixedWeeklySchedule.lessons(
             slots: _pickedSlots,
             weeks: shape.weeks,
@@ -308,9 +345,9 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
         ),
         SizedBox(height: 8),
         Text(
-          tf(context, '매주 {p0}개 시간을 고르세요. 고른 시간은 {p1}주 동안 같은 요일에 반복되어 선생님 스케줄에 들어갑니다.', {
+          tf(context, '먼저 요일을 {p0}개 고르세요. 요일을 다 고르면 이 선생님에게 남은 시간이 열립니다. 그 시간은 결제한 {p1}회 모두 같습니다.', {
             'p0': shape.slotsPerWeek,
-            'p1': shape.weeks,
+            'p1': shape.sessions,
           }),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
@@ -325,7 +362,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
             padding: EdgeInsets.symmetric(vertical: 24),
             child: Center(child: CircularProgressIndicator()),
           )
-        else if (_openSlots.isEmpty)
+        else if (openDays.isEmpty)
           Text(
             tr(context, '이 선생님이 열어 둔 시간 중, 결제한 기간 동안 모두 비어 있는 시간이 없습니다.'),
             style: TextStyle(
@@ -335,47 +372,70 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
               color: Palette.grey600,
             ),
           )
-        else
-          ...List.generate(7, (index) {
-            final weekday = index + 1;
-            final times = _openSlots
-                .where((slot) => slot.weekday == weekday)
-                .toList();
-            if (times.isEmpty) return const SizedBox.shrink();
-            return Padding(
-              padding: EdgeInsets.only(bottom: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    tr(context, names[index]),
-                    style: TextStyle(
-                      fontFamily: 'NotoSansKR',
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
-                    ),
-                  ),
-                  SizedBox(height: 6),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: times.map((slot) {
-                      final selected =
-                          _pickedSlots.any((item) => item.key == slot.key);
-                      return ChoiceChip(
-                        label: Text(
-                          EnrollmentService.formatBookingTime(slot.time),
-                          style: TextStyle(fontFamily: 'NotoSansKR'),
-                        ),
-                        selected: selected,
-                        onSelected: (_) => _toggleSlot(slot),
-                      );
-                    }).toList(),
-                  ),
-                ],
+        else ...[
+          Text(
+            tr(context, '요일'),
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+            ),
+          ),
+          SizedBox(height: 6),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: openDays.map((day) {
+              final selected = _weekdays.contains(day);
+              final full = _weekdays.length >= shape.slotsPerWeek;
+              return ChoiceChip(
+                label: Text(
+                  tr(context, names[day - 1]),
+                  style: TextStyle(fontFamily: 'NotoSansKR'),
+                ),
+                selected: selected,
+                onSelected: (!selected && full) ? null : (_) => _toggleWeekday(day),
+              );
+            }).toList(),
+          ),
+          if (daysReady) ...[
+            SizedBox(height: 16),
+            Text(
+              tr(context, '시간'),
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
               ),
-            );
-          }),
+            ),
+            SizedBox(height: 6),
+            if (sharedTimes.isEmpty)
+              Text(
+                tr(context, '고른 요일에 공통으로 남은 시간이 없습니다. 요일을 다시 고르세요.'),
+                style: TextStyle(
+                  fontFamily: 'NotoSansKR',
+                  fontSize: 13,
+                  height: 1.5,
+                  color: Palette.grey600,
+                ),
+              )
+            else
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: sharedTimes.map((time) {
+                  return ChoiceChip(
+                    label: Text(
+                      EnrollmentService.formatBookingTime(time),
+                      style: TextStyle(fontFamily: 'NotoSansKR'),
+                    ),
+                    selected: _clockTime == time,
+                    onSelected: (_) => _selectClockTime(time),
+                  );
+                }).toList(),
+              ),
+          ],
+        ],
         if (lessons.isNotEmpty) ...[
           SizedBox(height: 4),
           Text(
@@ -452,7 +512,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
             tr(
               context,
               _needsFixedTime
-                  ? "주니어와 재원생 화상은 결제 전에 원어민과 매주 시간을 정합니다.\n결제한 기간 동안 그 시간이 이 선생님 스케줄에 미리 들어갑니다.\n하루 전에 수업을 못 하면, 대체 시간을 골라야만 그 회차를 옮길 수 있습니다."
+                  ? "주니어와 재원생 화상은 결제 전에 요일을 고르고, 그 선생님 스케줄에 남은 시간 하나를 고릅니다.\n고른 시간은 결제한 회차 모두에 같고, 그 기간 동안 선생님 스케줄에 미리 들어갑니다.\n하루 전에 한 회차만 못 하면, 고정 시간이 아니어도 선생님이 되는 빈 시간을 골라야만 그 회차를 옮길 수 있습니다."
                   : "선택한 과정을 담당할 메인 원어민 강사입니다.\n이후 화상수업은 이 선생님을 중심으로 진행되며, 해당 선생님이 열어 둔 시간에만 예약할 수 있습니다.\n메인 강사는 나중에 바꿀 수 있습니다. 하루 일정이 안 맞으면 다른 선생님으로 예약하고, 마음에 들면 그 선생님을 메인 강사로 고정할 수 있습니다.",
             ),
             style: TextStyle(
@@ -538,7 +598,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
           ],
           if (_needsFixedTime && _selected == null && !_loading) ...[
             Text(
-              tr(context, '원어민 강사를 고르면 바로 매주 시간을 정합니다.'),
+              tr(context, '원어민 강사를 고르면 요일을 먼저 고르고, 그 다음에 시간이 열립니다.'),
               style: TextStyle(
                 fontFamily: 'NotoSansKR',
                 fontSize: 13,

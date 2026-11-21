@@ -120,6 +120,64 @@ void main() {
     );
   });
 
+  test('요일을 고른 뒤에만 공통으로 남은 시간이 열리고, 결제한 회차는 그 시간이다', () {
+    final now = DateTime(2026, 11, 21, 9); // Saturday
+    final open = FixedWeeklySchedule.openSlots(
+      availability: TeacherAvailability(teacherUid: 't1'),
+      weeks: 4,
+      now: now,
+      times: const ['16:00', '17:00'],
+    );
+    final days = FixedWeeklySchedule.weekdaysWithOpenTime(open);
+    expect(days, containsAll([DateTime.tuesday, DateTime.thursday]));
+
+    final both = FixedWeeklySchedule.timesOpenOnEveryWeekday(
+      open: open,
+      weekdays: const [DateTime.tuesday, DateTime.thursday],
+    );
+    expect(both, ['16:00', '17:00']);
+
+    final thursdayBlocked = TeacherAvailability(
+      teacherUid: 't1',
+      occupiedKeys: {
+        TeacherScheduleService.slotKey(DateTime(2026, 12, 3), '16:00'),
+      },
+    );
+    final openAfterBlock = FixedWeeklySchedule.openSlots(
+      availability: thursdayBlocked,
+      weeks: 4,
+      now: now,
+      times: const ['16:00', '17:00'],
+    );
+    expect(
+      FixedWeeklySchedule.timesOpenOnEveryWeekday(
+        open: openAfterBlock,
+        weekdays: const [DateTime.tuesday, DateTime.thursday],
+      ),
+      ['17:00'],
+    );
+
+    final slots = FixedWeeklySchedule.slotsOnWeekdays(
+      weekdays: const [DateTime.thursday, DateTime.tuesday],
+      time: '17:00',
+    );
+    expect(FixedWeeklySchedule.sameClockTime(slots), isTrue);
+    expect(
+      FixedWeeklySchedule.sameClockTime(const [
+        WeeklySlot(weekday: DateTime.tuesday, time: '16:00'),
+        WeeklySlot(weekday: DateTime.thursday, time: '17:00'),
+      ]),
+      isFalse,
+    );
+    final lessons = FixedWeeklySchedule.lessons(
+      slots: slots,
+      weeks: 4,
+      now: now,
+    );
+    expect(lessons, hasLength(8));
+    expect(lessons.map((lesson) => lesson.time).toSet(), {'17:00'});
+  });
+
   test('고정 수업은 하루 전까지만 옮기고, 그 전에는 취소만으로 비우지 않는다', () {
     final booking = _booking(
       date: DateTime(2026, 11, 24),

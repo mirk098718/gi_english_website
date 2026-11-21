@@ -1467,7 +1467,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                 fixedWeek
                     ? tr(
                         context,
-                        '이 회차 시간은 결제할 때 정해져 있습니다. 하루 전까지 대체 시간을 고르면 그 회차만 옮기고, 고르지 않으면 취소되지 않습니다.',
+                        '이 회차 시간은 결제할 때 정해져 있습니다. 하루 전까지는 선생님이 되는 빈 시간 중 아무 시간이나 골라 그 회차만 옮기고, 고르지 않으면 취소되지 않습니다.',
                       )
                     : _lockMessage(week),
                 style: TextStyle(
@@ -2054,7 +2054,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                 tr(
                   context,
                   fixed
-                      ? "수업 하루 전까지 대체 시간을 고르면 그 회차만 옮깁니다. 대체 시간을 고르지 않으면 취소되지 않습니다."
+                      ? "수업 하루 전까지는 고정 시간이 아니어도, 이 선생님이 되는 빈 시간 중 아무 시간이나 골라 그 회차만 옮길 수 있습니다. 시간을 고르지 않으면 취소되지 않습니다."
                       : "수업 3시간 전까지 취소하거나 시간을 옮길 수 있습니다. 취소하면 강사 시간이 바로 비워집니다.",
                 ),
                 style: TextStyle(
@@ -2146,6 +2146,18 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
           ] else if ((!fixed &&
                   (existing == null || _movingWeekId == week.id)) ||
               (fixed && existing != null && _movingWeekId == week.id)) ...[
+            if (fixed) ...[
+              Text(
+                tr(context, '고정 시간과 달라도 됩니다. 이 선생님이 되는 시간 중 비어 있는 시간만 고를 수 있고, 그 회차만 바뀝니다.'),
+                style: TextStyle(
+                  fontFamily: 'NotoSansKR',
+                  fontSize: 13,
+                  height: 1.5,
+                  color: Palette.grey600,
+                ),
+              ),
+              SizedBox(height: 10),
+            ],
             if (existing == null) ...[
             Text(
               otherTeacher

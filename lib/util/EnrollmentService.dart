@@ -2653,6 +2653,9 @@ class EnrollmentService {
     if (slots.length != shape.slotsPerWeek) {
       return '매주 시간을 ${shape.slotsPerWeek}개 고른 뒤에 결제할 수 있습니다.';
     }
+    if (!FixedWeeklySchedule.sameClockTime(slots)) {
+      return '결제한 회차는 모두 같은 시간이어야 합니다.';
+    }
     final member = await AuthService.currentMemberDoc();
     final phone = member?['phone']?.toString() ?? '';
     if (!PhoneUtil.isValid(phone)) {
@@ -2799,7 +2802,9 @@ class EnrollmentService {
     }
   }
 
-  /// 하루 전 취소는 대체 시간을 같은 선생님 빈 칸으로 고를 때만 된다.
+  /// 하루 전 변경은 그 회차만 옮긴다.
+  /// 고정 시각이 아니어도 되고, 그 선생님 스케줄에 남은 시간이면 요일과 시각을 가리지 않는다.
+  /// 대체 시간을 고르지 않으면 취소되지 않는다.
   static Future<String?> replaceFixedBooking({
     required WeekBooking current,
     required DateTime date,
