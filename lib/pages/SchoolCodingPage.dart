@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/class/JuniorCurriculum.dart';
+import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
-import 'package:gi_english_website/pages/SchoolConsultationPage.dart';
+import 'package:gi_english_website/pages/SchoolOnlineJuniorCurriculumPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
 import 'package:gi_english_website/util/MenuUtil.dart';
@@ -9,10 +11,7 @@ import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/widget/ButtonState.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
-import 'package:gi_english_website/widget/AcademyHeroBanner.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
-
-import '../util/WidgetUtil.dart';
 
 class SchoolCodingPage extends StatefulWidget {
   const SchoolCodingPage({Key? key}) : super(key: key);
@@ -115,57 +114,13 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
   }
 
   Widget content() {
-    return Container(
-      alignment: Alignment.topLeft,
-      padding: EdgeInsets.all(20),
-      color: Palette.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            tr(context, "선택 프로그램"),
-            style: TextStyle(fontFamily: "Jalnan", fontSize: 20),
-          ),
-          WidgetUtil.myDivider(),
-          SizedBox(
-            height: 20,
-          ),
-          Text(
-            tr(context, "대상"),
-            style: TextStyle(
-                fontFamily: "Jalnan", fontSize: 15, color: const Color.fromRGBO(4, 120, 87, 1)),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Text(
-              style: TextStyle(
-                  color: Palette.black,
-                  fontFamily: "NotoSansKR",
-                  fontWeight: FontWeight.normal,
-                  fontSize: 14),
-              tr(context, "1) 선택/특강 프로그램 : 이공계 / 예체능 적성의 본원 정규 초등영어 과정 수강생\n2) 방학특강 프로그램 : 이공계 적성의 본원 정규 중등영어 과정 수강생 또는 유학준비생")),
-          SizedBox(
-            height: 20,
-          ),
-          WidgetUtil.pageImage("assets/optionalPrograms.png"),
-          SizedBox(
-            height: 60,
-          ),
-          WidgetUtil.pageImage("assets/middleSchoolOptionalProgram.png"),
-          SizedBox(
-            height: 50,
-          ),
-        ],
-      ),
-    );
+    return OptionalProgramBody(compact: useMobileSchoolLayout(context));
   }
 
   Widget scrollView() {
     return SingleChildScrollView(
       child: Column(
         children: [
-          mainImage(),
           contentGroup(),
           MyWidget.footer(),
         ],
@@ -173,64 +128,12 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
     );
   }
 
-  Widget mainImage() {
-    return Container(
-      child: Stack(
-        alignment: Alignment.bottomLeft,
-        children: [
-          AcademyHeroBanner.photo(AcademyHeroBanner.coding),
-          Container(
-            padding: EdgeInsets.only(left: 40, bottom: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  "Program",
-                  style: TextStyle(
-                      color: Palette.white,
-                      fontSize: 30,
-                      fontFamily: "LucidaCalligraphy"),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Container(
-                  width: 150,
-                  height: 40,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.black,
-                      foregroundColor: Palette.black,
-                    ),
-                    onPressed: () {
-                      MenuUtil.push(context, SchoolConsultationPage());
-                    },
-                    child: Text(tr(context, "상담신청"),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: "Jalnan",
-                          color: Palette.white,
-                        )),
-                  ),
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  //mobile
-
   Widget mobileScrollView() {
     return SingleChildScrollView(
       child: Container(
         color: Colors.white,
         child: Column(
           children: [
-            // mobileMainImage(),
             mobileLeftMenu(),
             content(),
           ],
@@ -306,50 +209,119 @@ class _SchoolCodingPageState extends State<SchoolCodingPage> {
     ));
   }
 
-  Widget mobileMainImage() {
+}
+
+/// 글림아일랜드 선택 프로그램. 온라인 주니어 수업과 재원생 프리토킹.
+class OptionalProgramBody extends StatelessWidget {
+  final bool compact;
+
+  const OptionalProgramBody({Key? key, this.compact = false}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      child: Stack(
-        alignment: Alignment.centerLeft,
+      color: Palette.white,
+      width: double.maxFinite,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AcademyHeroBanner.photo(AcademyHeroBanner.coding),
-          Container(
-            padding: EdgeInsets.only(left: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Program",
-                  style: TextStyle(
-                      color: Palette.white,
-                      fontSize: 20,
-                      fontFamily: "LucidaCalligraphy"),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  width: 150,
-                  height: 40,
-                  child: ElevatedButton(
-                    child: Text(
-                      tr(context, "상담신청"),
-                      style:
-                          TextStyle(fontFamily: "Jalnan", color: Palette.white),
-                    ),
-                    onPressed: () {
-                      MenuUtil.push(context, SchoolConsultationPage());
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromRGBO(139, 92, 246, 1),
-                      foregroundColor: Palette.black,
-                    ),
-                  ),
-                ),
-              ],
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              compact ? 20 : 28,
+              20,
+              compact ? 20 : 28,
+              0,
             ),
-          )
+            child: Text(
+              tr(context, '선택 프로그램'),
+              style: TextStyle(fontFamily: 'Jalnan', fontSize: 20),
+            ),
+          ),
+          JuniorCurriculumContent(
+            compact: compact,
+            title: '1. 주니어 커리큘럼',
+          ),
+          EnrolledFreeTalkSection(compact: compact),
         ],
+      ),
+    );
+  }
+}
+
+class EnrolledFreeTalkSection extends StatelessWidget {
+  final bool compact;
+
+  const EnrolledFreeTalkSection({Key? key, this.compact = false})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        compact ? 20 : 28,
+        0,
+        compact ? 20 : 28,
+        28,
+      ),
+      child: Container(
+        width: double.maxFinite,
+        padding: EdgeInsets.fromLTRB(16, 16, 16, 18),
+        decoration: BoxDecoration(
+          color: Palette.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Palette.grey200),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: SizedBox(
+                height: compact ? 180 : 240,
+                width: double.infinity,
+                child: Image.asset(
+                  'assets/plan-card-speaking.jpg',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              tr(context, '2. 원어민 화상 프리토킹 (재원생 대상)'),
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontWeight: FontWeight.w800,
+                fontSize: compact ? 20 : 24,
+                height: 1.35,
+                color: Palette.grey900,
+              ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              tr(
+                context,
+                '재원생만 들을 수 있는 수업입니다. 원서와 문제 없이, 원어민 선생님과 이야기만 합니다.',
+              ),
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontSize: 15,
+                height: 1.55,
+                color: Palette.grey700,
+              ),
+            ),
+            SizedBox(height: 12),
+            Text(
+              tf(context, '주 1회 · 20분 · 4회 {p0}', {
+                'p0': EnrolledFreeTalk.priceLabel(),
+              }),
+              style: TextStyle(
+                fontFamily: 'Jalnan',
+                fontSize: compact ? 16 : 20,
+                color: Color(0xFFEA7A1A),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

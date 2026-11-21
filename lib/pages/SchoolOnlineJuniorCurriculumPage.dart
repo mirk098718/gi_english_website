@@ -63,10 +63,17 @@ class SchoolOnlineJuniorCurriculumPage extends StatelessWidget {
 }
 
 class JuniorCurriculumContent extends StatefulWidget {
-  final bool compact;
+  static const description =
+      'Trophy9 영어 원서를 읽고, 문제를 풀고, 원어민 선생님과 1대1 화상으로 이야기를 나눕니다.';
 
-  const JuniorCurriculumContent({Key? key, this.compact = false})
-      : super(key: key);
+  final bool compact;
+  final String title;
+
+  const JuniorCurriculumContent({
+    Key? key,
+    this.compact = false,
+    this.title = '주니어 커리큘럼',
+  }) : super(key: key);
 
   @override
   State<JuniorCurriculumContent> createState() =>
@@ -102,7 +109,7 @@ class _JuniorCurriculumContentState extends State<JuniorCurriculumContent> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            tr(context, '주니어 커리큘럼'),
+            tr(context, widget.title),
             style: TextStyle(fontFamily: 'Jalnan', fontSize: 20),
           ),
           SizedBox(height: 8),
@@ -239,10 +246,7 @@ class _JuniorCurriculumContentState extends State<JuniorCurriculumContent> {
           ),
           SizedBox(height: 10),
           Text(
-            tr(
-              context,
-              'Trophy 9 영어 원서를 읽고, 원어민 선생님과 1:1 화상으로 이야기 나눕니다.',
-            ),
+            tr(context, JuniorCurriculumContent.description),
             style: TextStyle(
               fontFamily: 'NotoSansKR',
               fontSize: 15,
@@ -347,10 +351,7 @@ class _JuniorCurriculumContentState extends State<JuniorCurriculumContent> {
         ),
         SizedBox(height: 8),
         Text(
-          tr(
-            context,
-            '영어 원서를 읽고 나서, 그 이야기로 원어민 선생님과 1:1 화상 수업을 합니다.',
-          ),
+          tr(context, JuniorCurriculumContent.description),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: 14,

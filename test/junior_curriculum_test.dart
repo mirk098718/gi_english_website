@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gi_english_website/class/JuniorCurriculum.dart';
+import 'package:gi_english_website/pages/SchoolCodingPage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineJuniorCurriculumPage.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
 
@@ -65,6 +66,10 @@ void main() {
     );
 
     expect(find.text('초중등 1:1 화상 영어 수업'), findsOneWidget);
+    expect(
+      find.text(JuniorCurriculumContent.description),
+      findsWidgets,
+    );
     expect(find.text('원서'), findsOneWidget);
     expect(find.text('화상'), findsOneWidget);
     expect(find.text('선택한 금액 260,000원'), findsOneWidget);
@@ -85,5 +90,62 @@ void main() {
     await tester.tap(find.text('내용 보기'));
     await tester.pumpAndSettle();
     expect(find.text('세부 프로그램'), findsOneWidget);
+  });
+
+  test('재원생 프리토킹은 주 1회 20분, 4회에 7만 원이다', () {
+    expect(EnrolledFreeTalk.sessions, 4);
+    expect(EnrolledFreeTalk.minutes, 20);
+    expect(EnrolledFreeTalk.price, 70000);
+    expect(EnrolledFreeTalk.priceLabel(), '70,000원');
+  });
+
+  testWidgets('선택 프로그램은 주니어 수업과 원어민 사진만 있는 프리토킹을 보여 준다',
+      (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1200, 2200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(child: OptionalProgramBody()),
+        ),
+      ),
+    );
+
+    expect(find.text('선택 프로그램'), findsOneWidget);
+    expect(find.text('1. 주니어 커리큘럼'), findsOneWidget);
+    expect(find.text(JuniorCurriculumContent.description), findsWidgets);
+    expect(find.text('2. 원어민 화상 프리토킹 (재원생 대상)'), findsOneWidget);
+    expect(find.text('주 1회 · 20분 · 4회 70,000원'), findsOneWidget);
+    expect(
+      find.text(
+        '재원생만 들을 수 있는 수업입니다. 원서와 문제 없이, 원어민 선생님과 이야기만 합니다.',
+      ),
+      findsOneWidget,
+    );
+
+    final assets = tester
+        .widgetList<Image>(find.byType(Image))
+        .map((image) => (image.image as AssetImage).assetName)
+        .toList();
+    expect(assets, contains('assets/junior-reader-spread.jpg'));
+    expect(
+      assets.where((name) => name == 'assets/plan-card-speaking.jpg').length,
+      2,
+    );
+    expect(assets, isNot(contains('assets/optionalPrograms.png')));
+    expect(assets, isNot(contains('assets/middleSchoolOptionalProgram.png')));
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: EnrolledFreeTalkSection()),
+      ),
+    );
+    final freeTalkAssets = tester
+        .widgetList<Image>(find.byType(Image))
+        .map((image) => (image.image as AssetImage).assetName)
+        .toList();
+    expect(freeTalkAssets, ['assets/plan-card-speaking.jpg']);
+    expect(find.text('원서'), findsNothing);
   });
 }

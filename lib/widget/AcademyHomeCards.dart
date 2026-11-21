@@ -104,7 +104,7 @@ class AcademyHomeCards extends StatelessWidget {
       ),
       _AcademyItem(
         title: '선택 프로그램',
-        subtitle: '코딩 · 액티비티',
+        subtitle: '주니어 화상 · 프리토킹',
         imageAsset: AcademyHeroBanner.coding,
         onTap: () => MenuUtil.push(context, SchoolCodingPage()),
       ),
