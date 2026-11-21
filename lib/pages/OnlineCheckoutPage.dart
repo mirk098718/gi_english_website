@@ -56,7 +56,8 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
     if (widget.initialCourseId != null) {
       _selected = OnlineCourse.findById(widget.initialCourseId!);
     }
-    if (_plan == OnlinePlan.speaking) {
+    if (_plan == OnlinePlan.speaking &&
+        !(_selected?.fixedSpeakingPrice ?? false)) {
       _selected = OnlineCourse.speaking;
     }
     _selected ??= OnlineCourse.all.first;
@@ -89,17 +90,25 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
       _paySelected();
       return;
     }
+    final course = _courseForPlan(_selected!);
     MenuUtil.push(
       context,
       OnlineTeacherSelectPage(
-        course: _plan == OnlinePlan.speaking
-            ? OnlineCourse.speaking
-            : _selected!,
+        course: course,
         extendEnrollment: widget.extendEnrollment,
         plan: _plan,
-        sessionCount: _speakingSessions,
+        sessionCount: course.sessionsFor(_plan, sessions: _speakingSessions),
       ),
     );
+  }
+
+  /// 화상만 상품은 레벨 과정 대신 회화 상품으로 결제한다.
+  /// 주니어·프리토킹은 고른 금액 그대로 둔다.
+  OnlineCourse _courseForPlan(OnlineCourse selected) {
+    if (_plan == OnlinePlan.speaking && !selected.fixedSpeakingPrice) {
+      return OnlineCourse.speaking;
+    }
+    return selected;
   }
 
   Future<void> _paySelected() async {
@@ -107,9 +116,7 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
       MenuUtil.push(context, MemberLoginPage());
       return;
     }
-    final course = _plan == OnlinePlan.speaking
-        ? OnlineCourse.speaking
-        : _selected;
+    final course = _selected == null ? null : _courseForPlan(_selected!);
     if (course == null || _paying) return;
     setState(() => _paying = true);
     final order = await PaymentService.createOrder(
@@ -321,7 +328,8 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
               _planSwitcher(),
               SizedBox(height: 24),
             ],
-            if (_plan == OnlinePlan.speaking) ...[
+            if (_plan == OnlinePlan.speaking &&
+                !(_selected?.fixedSpeakingPrice ?? false)) ...[
               Text('화상 횟수', style: TextStyle(fontFamily: "Jalnan", fontSize: 15)),
               SizedBox(height: 12),
               _sessionPicker(),
@@ -461,6 +469,9 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
   }
 
   String _courseDetail(OnlineCourse course) {
+    if (course.fixedSpeakingPrice) {
+      return '${course.subtitle} · 화상 ${course.defaultSessions}회';
+    }
     if (_plan == OnlinePlan.lecture) {
       return '인강 ${OnlinePlan.lessonsPerLevel}편 · 퀴즈';
     }
@@ -471,6 +482,9 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
   }
 
   String _includedLine(OnlineCourse course) {
+    if (course.fixedSpeakingPrice) {
+      return '${course.subtitle} · 화상 ${course.defaultSessions}회 · 인강 없음';
+    }
     if (_plan == OnlinePlan.lecture) {
       return '인강 ${OnlinePlan.lessonsPerLevel}편 + 퀴즈 · 수강 ${OnlinePlan.lectureAccessWeeks}주 · 화상 없음';
     }
@@ -548,7 +562,8 @@ class _OnlineCheckoutPageState extends State<OnlineCheckoutPage> {
         children: [
           Text(tr(context, "주문 요약"), style: TextStyle(fontFamily: "Jalnan", fontSize: 14)),
           SizedBox(height: 10),
-          Text('상품: ${_planTitle(_plan)}',
+          Text(
+              '상품: ${course.fixedSpeakingPrice ? course.title : _planTitle(_plan)}',
               style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),
           Text('과정: ${course.localizedName(context, _plan)}',
               style: TextStyle(fontFamily: "NotoSansKR", fontSize: 13)),

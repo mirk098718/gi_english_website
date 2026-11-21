@@ -51,11 +51,21 @@ class JuniorOffer {
 
   String priceLabel({required bool quarter}) =>
       OnlinePlan.money(price(quarter: quarter));
+
+  /// 결제·수강 기록에 쓰는 과정 id. 횟수와 기간마다 다르다.
+  String courseId({required bool quarter}) =>
+      'junior_${id}_${quarter ? 'quarter' : 'month'}';
+
+  String termLabel({required bool quarter}) =>
+      '$frequencyLabel · ${quarter ? '3개월' : '1개월'}';
 }
 
 /// 재원생만 듣는 원어민 화상 프리토킹. 원서와 문제 없이 이야기만 한다.
 /// 주 1회, 20분, 4회에 7만 원.
 class EnrolledFreeTalk {
+  static const courseId = 'enrolled_free_talk';
+  static const title = '원어민 화상 프리토킹';
+  static const subtitle = '주 1회 · 20분 · 4회';
   static const sessions = 4;
   static const minutes = 20;
   static const price = 70000;

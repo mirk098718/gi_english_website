@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/JuniorCurriculum.dart';
+import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlinePlan.dart';
+import 'package:gi_english_website/pages/MemberLoginPage.dart';
+import 'package:gi_english_website/pages/OnlineTeacherSelectPage.dart';
+import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineJuniorCurriculumPage.dart';
@@ -319,6 +323,38 @@ class EnrolledFreeTalkSection extends StatelessWidget {
                 fontSize: compact ? 16 : 20,
                 color: Color(0xFFEA7A1A),
               ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              tr(context, '원어민 강사를 고른 뒤 결제합니다.'),
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontSize: 13,
+                height: 1.5,
+                color: Palette.grey600,
+              ),
+            ),
+            SizedBox(height: 12),
+            PackagePayButton(
+              label: tf(context, '{p0} 결제하기', {
+                'p0': EnrolledFreeTalk.priceLabel(),
+              }),
+              color: const Color(0xFFEA7A1A),
+              onPressed: () {
+                final course = OnlineCourse.enrolledFreeTalk;
+                if (AuthService.currentUser == null) {
+                  MenuUtil.push(context, const MemberLoginPage());
+                  return;
+                }
+                MenuUtil.push(
+                  context,
+                  OnlineTeacherSelectPage(
+                    course: course,
+                    plan: OnlinePlan.speaking,
+                    sessionCount: course.defaultSessions,
+                  ),
+                );
+              },
             ),
           ],
         ),

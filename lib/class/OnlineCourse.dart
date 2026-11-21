@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/class/JuniorCurriculum.dart';
 import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -25,6 +26,10 @@ class OnlineCourse {
   /// 기본 포함 화상수업 횟수. 묶음 상품 기준.
   final int defaultSessions;
 
+  /// 회당 금액이 아니라 [price]와 [defaultSessions]를 그대로 받는 화상 상품.
+  /// 주니어 커리큘럼과 재원생 프리토킹이 여기 해당한다.
+  final bool fixedSpeakingPrice;
+
   const OnlineCourse({
     required this.id,
     required this.order,
@@ -37,6 +42,7 @@ class OnlineCourse {
     required this.price,
     required this.lecturePrice,
     this.defaultSessions = 8,
+    this.fixedSpeakingPrice = false,
   });
 
   static const List<OnlineCourse> all = [
@@ -151,10 +157,63 @@ class OnlineCourse {
     defaultSessions: 8,
   );
 
-  /// 레벨 과정과 화상만 상품. 관리자 배정 목록용.
-  static List<OnlineCourse> get catalog => [...all, speaking];
+  static const _juniorOrange = Color(0xFFEA7A1A);
 
-  bool get isSpeakingProduct => id == speaking.id;
+  /// 주 2회·주 3회, 1개월·3개월. 금액과 회차는 상품에 고정된다.
+  static final List<OnlineCourse> juniorCourses = [
+    for (final offer in JuniorOffer.all)
+      for (final quarter in [false, true])
+        OnlineCourse(
+          id: offer.courseId(quarter: quarter),
+          order: 6,
+          title: '초중등 1:1 화상 영어 수업',
+          subtitle: offer.termLabel(quarter: quarter),
+          description:
+              'Trophy9 영어 원서를 읽고, 문제를 풀고, 원어민 선생님과 1대1 화상으로 이야기를 나눕니다.',
+          imageAsset: 'assets/junior-reader-spread.jpg',
+          highlights: const [
+            '영어 원서를 읽고 문제를 풉니다',
+            '원어민 선생님과 1:1 화상으로 이야기합니다',
+            '교재가 포함됩니다',
+          ],
+          accentColor: _juniorOrange,
+          price: offer.price(quarter: quarter),
+          lecturePrice: 0,
+          defaultSessions: offer.sessions(quarter: quarter),
+          fixedSpeakingPrice: true,
+        ),
+  ];
+
+  static final enrolledFreeTalk = OnlineCourse(
+    id: EnrolledFreeTalk.courseId,
+    order: 7,
+    title: EnrolledFreeTalk.title,
+    subtitle: EnrolledFreeTalk.subtitle,
+    description:
+        '재원생만 들을 수 있는 수업입니다. 원서와 문제 없이, 원어민 선생님과 이야기만 합니다.',
+    imageAsset: 'assets/plan-card-speaking.jpg',
+    highlights: const [
+      '재원생만 듣는 원어민 화상 수업',
+      '원서와 문제 없이 이야기만 합니다',
+      '주 1회, 20분, 4회',
+    ],
+    accentColor: _juniorOrange,
+    price: EnrolledFreeTalk.price,
+    lecturePrice: 0,
+    defaultSessions: EnrolledFreeTalk.sessions,
+    fixedSpeakingPrice: true,
+  );
+
+  static OnlineCourse junior(JuniorOffer offer, {required bool quarter}) {
+    final id = offer.courseId(quarter: quarter);
+    return juniorCourses.firstWhere((course) => course.id == id);
+  }
+
+  /// 레벨 과정, 화상만 상품, 주니어, 재원생 프리토킹. 관리자 배정 목록용.
+  static List<OnlineCourse> get catalog =>
+      [...all, speaking, ...juniorCourses, enrolledFreeTalk];
+
+  bool get isSpeakingProduct => id == speaking.id || fixedSpeakingPrice;
 
   /// 2번 묶음 설명의 마지막 줄. 1번 인강 설명에는 넣지 않는다.
   static const nativePracticeHighlight =
@@ -170,11 +229,15 @@ class OnlineCourse {
 
   /// 상품 제목과 레벨 이름을 잇는다. 예: 단계별 영문법 인강 : 왕초보 영어.
   String nameFor(String plan) {
+    if (fixedSpeakingPrice) return '$title · $subtitle';
     if (isSpeakingProduct || plan == OnlinePlan.speaking) return title;
     return '${OnlinePlan.label(plan)} : $title';
   }
 
   String localizedName(BuildContext context, String plan) {
+    if (fixedSpeakingPrice) {
+      return '${tr(context, title)} · ${tr(context, subtitle)}';
+    }
     if (isSpeakingProduct || plan == OnlinePlan.speaking) {
       return tr(context, title);
     }
@@ -194,6 +257,7 @@ class OnlineCourse {
   String get lecturePriceLabel => OnlinePlan.money(lecturePrice);
 
   int amountFor(String plan, {int? sessions}) {
+    if (fixedSpeakingPrice) return price;
     final kind = OnlinePlan.normalize(plan);
     if (kind == OnlinePlan.lecture) return lecturePrice;
     if (kind == OnlinePlan.speaking) {
@@ -204,6 +268,7 @@ class OnlineCourse {
   }
 
   int sessionsFor(String plan, {int? sessions}) {
+    if (fixedSpeakingPrice) return defaultSessions;
     final kind = OnlinePlan.normalize(plan);
     if (kind == OnlinePlan.lecture) return 0;
     if (kind == OnlinePlan.speaking) {
@@ -215,6 +280,10 @@ class OnlineCourse {
 
   static OnlineCourse? findById(String id) {
     if (id == speaking.id) return speaking;
+    if (id == enrolledFreeTalk.id) return enrolledFreeTalk;
+    for (final course in juniorCourses) {
+      if (course.id == id) return course;
+    }
     for (final course in all) {
       if (course.id == id) return course;
     }

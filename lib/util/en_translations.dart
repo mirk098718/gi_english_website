@@ -720,4 +720,12 @@ const Map<String, String> enTranslations = {
   "3개월 동안 {p0}회 수업입니다.": "{p0} classes over 3 months.",
   "정가 {p0}에서 5% 할인": "5% off the list price of {p0}",
   "선택한 금액 {p0}": "Selected price {p0}",
+  "원어민 강사를 고른 뒤 결제합니다.": "Choose a native teacher, then pay.",
+  "원어민 화상 프리토킹": "Native-speaker free talk on video",
+  "주 2회 · 1개월": "Twice a week · 1 month",
+  "주 2회 · 3개월": "Twice a week · 3 months",
+  "주 3회 · 1개월": "Three times a week · 1 month",
+  "주 3회 · 3개월": "Three times a week · 3 months",
+  "주 1회 · 20분 · 4회": "Once a week · 20 minutes · 4 classes",
+  "{p0} · 화상 {p1}회 · {p2}": "{p0} · {p1} live classes · {p2}",
 };

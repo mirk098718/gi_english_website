@@ -171,6 +171,13 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
     final amount = OnlinePlan.won(
       course.amountFor(widget.plan, sessions: widget.sessionCount),
     );
+    if (course.fixedSpeakingPrice) {
+      return tf(context, '{p0} · 화상 {p1}회 · {p2}', {
+        'p0': tr(context, course.subtitle),
+        'p1': sessions,
+        'p2': amount,
+      });
+    }
     if (widget.plan == OnlinePlan.speaking) {
       return '원어민 화상 1:1 회화 $sessions회 · $amount';
     }

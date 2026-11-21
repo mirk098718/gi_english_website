@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/JuniorCurriculum.dart';
+import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlinePlan.dart';
+import 'package:gi_english_website/pages/MemberLoginPage.dart';
+import 'package:gi_english_website/pages/OnlineTeacherSelectPage.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
+import 'package:gi_english_website/util/AuthService.dart';
+import 'package:gi_english_website/util/MenuUtil.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/SiteLayout.dart';
@@ -88,6 +93,22 @@ class _JuniorCurriculumContentState extends State<JuniorCurriculumContent> {
   JuniorOffer _offer = JuniorOffer.twiceAWeek;
   bool _quarter = false;
 
+  void _pay() {
+    final course = OnlineCourse.junior(_offer, quarter: _quarter);
+    if (AuthService.currentUser == null) {
+      MenuUtil.push(context, const MemberLoginPage());
+      return;
+    }
+    MenuUtil.push(
+      context,
+      OnlineTeacherSelectPage(
+        course: course,
+        plan: OnlinePlan.speaking,
+        sessionCount: course.defaultSessions,
+      ),
+    );
+  }
+
   void _openPrograms() {
     final target = _programsKey.currentContext;
     if (target == null) return;
@@ -147,6 +168,22 @@ class _JuniorCurriculumContentState extends State<JuniorCurriculumContent> {
               height: 1.5,
               color: Palette.grey600,
             ),
+          ),
+          SizedBox(height: 16),
+          Text(
+            tr(context, '원어민 강사를 고른 뒤 결제합니다.'),
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontSize: 13,
+              height: 1.5,
+              color: Palette.grey600,
+            ),
+          ),
+          SizedBox(height: 12),
+          PackagePayButton(
+            label: tf(context, '{p0} 결제하기', {'p0': selected}),
+            color: _orange,
+            onPressed: _pay,
           ),
           SizedBox(height: 20),
         ],
@@ -487,6 +524,43 @@ class _JuniorCurriculumContentState extends State<JuniorCurriculumContent> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 선택한 금액으로 결제를 시작하는 버튼.
+class PackagePayButton extends StatelessWidget {
+  final String label;
+  final Color color;
+  final VoidCallback onPressed;
+
+  const PackagePayButton({
+    Key? key,
+    required this.label,
+    required this.color,
+    required this.onPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.maxFinite,
+      height: 52,
+      child: ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          foregroundColor: Palette.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        onPressed: onPressed,
+        icon: Icon(Icons.payment, color: Palette.white),
+        label: Text(
+          label,
+          style: TextStyle(fontFamily: 'Jalnan', fontSize: 15),
         ),
       ),
     );

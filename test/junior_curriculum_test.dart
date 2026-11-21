@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gi_english_website/class/JuniorCurriculum.dart';
+import 'package:gi_english_website/class/OnlineCourse.dart';
+import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/pages/SchoolCodingPage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineJuniorCurriculumPage.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
@@ -83,6 +85,8 @@ void main() {
     await tester.tap(find.text('3개월'));
     await tester.pump();
     expect(find.text('선택한 금액 940,500원'), findsOneWidget);
+    expect(find.text('940,500원 결제하기'), findsOneWidget);
+    expect(find.text('원어민 강사를 고른 뒤 결제합니다.'), findsOneWidget);
     expect(find.text('정가 990,000원에서 5% 할인'), findsOneWidget);
     expect(find.text('3개월 동안 36회 수업입니다.'), findsOneWidget);
 
@@ -90,6 +94,28 @@ void main() {
     await tester.tap(find.text('내용 보기'));
     await tester.pumpAndSettle();
     expect(find.text('세부 프로그램'), findsOneWidget);
+  });
+
+  test('주니어와 프리토킹은 회당 금액이 아니라 고른 금액으로 결제된다', () {
+    final month = OnlineCourse.junior(JuniorOffer.twiceAWeek, quarter: false);
+    expect(month.amountFor(OnlinePlan.speaking), 260000);
+    expect(month.sessionsFor(OnlinePlan.speaking, sessions: 4), 8);
+    expect(month.fixedSpeakingPrice, isTrue);
+    expect(OnlineCourse.findById(month.id), same(month));
+    expect(OnlineCourse.all.contains(month), isFalse);
+
+    final quarter =
+        OnlineCourse.junior(JuniorOffer.threeTimesAWeek, quarter: true);
+    expect(quarter.amountFor(OnlinePlan.speaking, sessions: 8), 940500);
+    expect(quarter.sessionsFor(OnlinePlan.speaking, sessions: 8), 36);
+    expect(quarter.nameFor(OnlinePlan.speaking), '초중등 1:1 화상 영어 수업 · 주 3회 · 3개월');
+
+    final talk = OnlineCourse.enrolledFreeTalk;
+    expect(talk.amountFor(OnlinePlan.speaking, sessions: 12), 70000);
+    expect(talk.sessionsFor(OnlinePlan.speaking, sessions: 12), 4);
+    expect(OnlineCourse.findById(talk.id), same(talk));
+    expect(OnlineCourse.catalog.contains(talk), isTrue);
+    expect(OnlineCourse.catalog.contains(quarter), isTrue);
   });
 
   test('재원생 프리토킹은 주 1회 20분, 4회에 7만 원이다', () {
@@ -117,6 +143,8 @@ void main() {
     expect(find.text(JuniorCurriculumContent.description), findsWidgets);
     expect(find.text('2. 원어민 화상 프리토킹 (재원생 대상)'), findsOneWidget);
     expect(find.text('주 1회 · 20분 · 4회 70,000원'), findsOneWidget);
+    expect(find.text('70,000원 결제하기'), findsOneWidget);
+    expect(find.text('원어민 강사를 고른 뒤 결제합니다.'), findsWidgets);
     expect(
       find.text(
         '재원생만 들을 수 있는 수업입니다. 원서와 문제 없이, 원어민 선생님과 이야기만 합니다.',
