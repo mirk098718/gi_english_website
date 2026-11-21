@@ -49,6 +49,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
   List<WeeklySlot> _openSlots = [];
   List<WeeklySlot> _pickedSlots = [];
   DateTime? _extensionStart;
+  final GlobalKey _fixedTimeKey = GlobalKey();
 
   @override
   void initState() {
@@ -69,12 +70,35 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
         return;
       }
       final currentId = _selected?.id;
-      _selected = teachers.firstWhere(
-        (t) => t.id == currentId,
-        orElse: () => teachers.first,
-      );
+      // 주니어·재원생은 강사를 고른 뒤에만 매주 시간을 연다.
+      if (_needsFixedTime && (currentId == null || currentId.isEmpty)) {
+        _selected = null;
+      } else {
+        _selected = teachers.firstWhere(
+          (t) => t.id == currentId,
+          orElse: () => teachers.first,
+        );
+      }
     });
     await _loadFixedSchedule();
+  }
+
+  void _selectTeacher(OnlineNativeTeacher teacher) {
+    setState(() {
+      _selected = teacher;
+      _pickedSlots = [];
+    });
+    _loadFixedSchedule();
+    if (!_needsFixedTime) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final target = _fixedTimeKey.currentContext;
+      if (target == null || !mounted) return;
+      Scrollable.ensureVisible(
+        target,
+        duration: const Duration(milliseconds: 320),
+        alignment: 0.05,
+      );
+    });
   }
 
   bool get _needsFixedTime => widget.course.fixedSpeakingPrice;
@@ -495,13 +519,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
             OnlineTeacherCardGrid(
               teachers: _teachers,
               selectedId: _selected?.id,
-              onSelected: (teacher) {
-                setState(() {
-                  _selected = teacher;
-                  _pickedSlots = [];
-                });
-                _loadFixedSchedule();
-              },
+              onSelected: _selectTeacher,
             ),
           SizedBox(height: 24),
           if (_selected != null) ...[
@@ -518,8 +536,20 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
             ),
             SizedBox(height: 16),
           ],
-          if (_needsFixedTime) ...[
-            _fixedTimeSection(),
+          if (_needsFixedTime && _selected == null && !_loading) ...[
+            Text(
+              tr(context, '원어민 강사를 고르면 바로 매주 시간을 정합니다.'),
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontSize: 13,
+                height: 1.5,
+                color: Palette.grey600,
+              ),
+            ),
+            SizedBox(height: 20),
+          ],
+          if (_needsFixedTime && _selected != null) ...[
+            KeyedSubtree(key: _fixedTimeKey, child: _fixedTimeSection()),
             SizedBox(height: 20),
           ],
           SizedBox(

@@ -9,6 +9,7 @@ import 'package:gi_english_website/class/QuizResult.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
+import 'package:gi_english_website/util/FixedWeeklySchedule.dart';
 import 'package:gi_english_website/util/LessonFeedbackService.dart';
 import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/TeacherScheduleService.dart';
@@ -1272,6 +1273,20 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
           '화상수업은 포함되지 않습니다. '
           '수강 기한은 ${enrollment.remainingDeadlineWeeks}주 남았습니다.';
     }
+    if (_speakingOnly && widget.course.fixedSpeakingPrice) {
+      if (enrollment.remainingSessions <= 0) {
+        return '회화 ${enrollment.totalSessions}회를 모두 마쳤습니다.';
+      }
+      if (EnrollmentService.isEnrollmentExpired(enrollment)) {
+        return '수강 기한이 지났습니다. 연장 결제 후 회화를 이어서 예약할 수 있습니다.';
+      }
+      final weeks = FixedWeeklySchedule.shapeFor(widget.course)?.weeks ?? 4;
+      return tf(
+        context,
+        '결제할 때 정한 매주 시간이 {p0}주 동안 선생님 스케줄에 들어 있습니다. 수업 하루 전까지 대체 시간을 고르면 그 회차만 옮기고, 대체 시간을 고르지 않으면 취소되지 않습니다.',
+        {'p0': weeks},
+      );
+    }
     if (_speakingOnly) {
       if (enrollment.remainingSessions <= 0) {
         return '회화 ${enrollment.totalSessions}회를 모두 마쳤습니다.';
@@ -1348,6 +1363,9 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     final completed = !_lectureOnly &&
         enrollment != null &&
         week.weekNumber <= enrollment.completedSessions;
+    final booking = _bookingFor(week.id);
+    final fixedWeek =
+        widget.course.fixedSpeakingPrice || (booking?.fixedSchedule ?? false);
     final checked = _checkedIds(week.id);
     final visibleItems = EnrollmentService.requiredChecklistItems(week);
     final done = visibleItems.where((item) => checked.contains(item.id)).length;
@@ -1428,6 +1446,8 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             child: Text(
               [
                 week.title,
+                if (booking != null)
+                  '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)}',
                 if (total > 0) '체크 $done/$total',
               ].where((e) => e.isNotEmpty).join(' · '),
               style: TextStyle(
@@ -1439,8 +1459,17 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
           ),
           children: [
             if (!unlocked) ...[
+              if (fixedWeek) ...[
+                weekBookingSection(week),
+                SizedBox(height: 12),
+              ],
               Text(
-                _lockMessage(week),
+                fixedWeek
+                    ? tr(
+                        context,
+                        '이 회차 시간은 결제할 때 정해져 있습니다. 하루 전까지 대체 시간을 고르면 그 회차만 옮기고, 고르지 않으면 취소되지 않습니다.',
+                      )
+                    : _lockMessage(week),
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 13,
