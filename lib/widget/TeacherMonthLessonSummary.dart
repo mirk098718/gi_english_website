@@ -4,18 +4,19 @@ import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/util/TeacherPayroll.dart';
 import 'package:gi_english_website/widget/LessonRatingPromptHost.dart';
 
-/// 스케줄 옆에서 보는 이번 달 진행·취소 수업 수와 수당.
+/// 스케줄 옆에서 보는 이번 달 지급·마감 후 수업 수와 수당.
 class TeacherMonthLessonSummary extends StatelessWidget {
-  final TeacherMonthStats stats;
+  final TeacherPayroll payroll;
   final bool compact;
   final bool loading;
   final String? title;
 
   const TeacherMonthLessonSummary({
     Key? key,
-    required this.stats,
+    required this.payroll,
     this.compact = false,
     this.loading = false,
     this.title,
@@ -23,12 +24,15 @@ class TeacherMonthLessonSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final english = AppLanguage.instance.isEnglish;
+    final payoutLabel = tr(context, payroll.isEstimate ? '예상 입금' : '이번 입금');
+    final amountLabel = tr(context, payroll.isEstimate ? '예상 수당' : '수당');
     final cells = [
-      _cell(tr(context, '진행'), loading ? '-' : tf(context, '{p0}회', {'p0': stats.completedCount}), Palette.secondaryDark),
-      _cell(tr(context, '취소'), loading ? '-' : tf(context, '{p0}회', {'p0': stats.cancelledCount}), Palette.danger),
-      _cell(tr(context, '수당'), loading ? '-' : stats.incomeLabel, Palette.navy),
+      _cell(payoutLabel, loading ? '-' : tf(context, '{p0}회', {'p0': payroll.shownPayoutCount}), Palette.secondaryDark),
+      _cell(tr(context, '마감 후'), loading ? '-' : tf(context, '{p0}회', {'p0': payroll.lateCount}), Palette.warning),
+      _cell(amountLabel, loading ? '-' : TeacherPayroll.won(payroll.shownAmount), Palette.navy),
       if (!compact)
-        _cell(tr(context, '평균별점'), loading ? '-' : stats.averageStarsLabel, Palette.warning),
+        _cell(tr(context, '평균별점'), loading ? '-' : payroll.averageStarsLabel, Palette.warning),
     ];
 
     return Container(
@@ -57,7 +61,7 @@ class TeacherMonthLessonSummary extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      tf(context, '{p0}분 · {p1} · 평균 {p2}{p3}', {'p0': EnrollmentService.lessonMinutes, 'p1': _payLabel(), 'p2': stats.averageStarsLabel, 'p3': stats.awaitingCount > 0 ? tf(context, ' · 평가대기 {p0}건', {'p0': stats.awaitingCount}): ''}),
+                      _caption(context, english, compact: true),
                       style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 10,
@@ -88,7 +92,7 @@ class TeacherMonthLessonSummary extends StatelessWidget {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  tf(context, '{p0} · 수업 {p1}분 · 건당 {p2}{p3}', {'p0': stats.monthLabel, 'p1': EnrollmentService.lessonMinutes, 'p2': _payLabel(), 'p3': stats.awaitingCount > 0 ? tf(context, ' · 평가 대기 {p0}건', {'p0': stats.awaitingCount}): ''}),
+                  _caption(context, english, compact: false),
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 12,
@@ -109,14 +113,23 @@ class TeacherMonthLessonSummary extends StatelessWidget {
     );
   }
 
-  String _payLabel() {
-    final digits = stats.lessonFeeWon.toString();
-    final buffer = StringBuffer();
-    for (var i = 0; i < digits.length; i++) {
-      if (i > 0 && (digits.length - i) % 3 == 0) buffer.write(',');
-      buffer.write(digits[i]);
-    }
-    return AppLanguage.instance.fill('{p0}원', {'p0': buffer});
+  String _caption(BuildContext context, bool english, {required bool compact}) {
+    final due = payroll.dueLabel(english: english);
+    final phase = payroll.isEstimate
+        ? tr(context, '예상')
+        : payroll.canMarkPaid || payroll.paid
+            ? tr(context, '지급일')
+            : tr(context, '마감');
+    final carry = payroll.shownCarry > 0
+        ? ' · ${tr(context, '지난 마감 후')} ${tf(context, '{p0}회', {'p0': payroll.shownCarry})}'
+        : '';
+    final waiting = payroll.awaitingCount > 0
+        ? ' · ${tr(context, '평가 대기')} ${tf(context, '{p0}건', {'p0': payroll.awaitingCount})}'
+        : '';
+    if (compact) return '$phase · $due$carry$waiting';
+    return '${payroll.monthLabel} · ${tr(context, '월마감은 말일')} · $phase $due'
+        ' · ${tr(context, '건당')} ${TeacherPayroll.won(payroll.lessonFeeWon)}'
+        '$carry$waiting';
   }
 
   Widget _cell(String label, String value, Color valueColor) {
@@ -178,6 +191,7 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
   DateTime _month = DateTime(DateTime.now().year, DateTime.now().month);
   List<WeekBooking> _bookings = [];
   List<LessonRating> _ratings = [];
+  List<TeacherSettlement> _settlements = [];
   int _lessonFeeWon = EnrollmentService.lessonPayWon;
   bool _loading = true;
 
@@ -194,10 +208,13 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
     final ratings =
         await LessonRatingService.listForTeacher(widget.teacherUid);
     final profile = await AuthService.staffProfile(widget.teacherUid);
+    final settlements =
+        await AuthService.listLessonSettlementsFor(widget.teacherUid);
     if (!mounted) return;
     setState(() {
       _bookings = bookings;
       _ratings = ratings;
+      _settlements = settlements;
       _lessonFeeWon = EnrollmentService.lessonFeeWonOf(profile);
       _loading = false;
     });
@@ -217,12 +234,14 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
     return items;
   }
 
-  TeacherMonthStats get _stats => LessonRatingService.monthStats(
+  TeacherPayroll get _payroll => TeacherPayroll.forTeacher(
         bookings: _bookings,
-        teacherUid: widget.teacherUid,
         ratings: _ratings,
-        now: _month,
+        teacherUid: widget.teacherUid,
+        year: _month.year,
+        month: _month.month,
         lessonFeeWon: _lessonFeeWon,
+        settlements: _settlements,
       );
 
   void _shiftMonth(int delta) {
@@ -260,7 +279,7 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
         ),
         const SizedBox(height: 8),
         TeacherMonthLessonSummary(
-          stats: _stats,
+          payroll: _payroll,
           loading: _loading,
           title: tf(context, '{p0}년 {p1}월 수업수', {'p0': _month.year, 'p1': _month.month}),
         ),

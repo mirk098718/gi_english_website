@@ -6,6 +6,7 @@ import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PaymentService.dart';
+import 'package:gi_english_website/util/TeacherPayroll.dart';
 
 /// 메인 관리자용 결제 내역 + 월별 수강생·강사 정산.
 class AdminPaymentTab extends StatefulWidget {
@@ -537,12 +538,12 @@ class _TeacherPayrollPane extends StatefulWidget {
 
 class _TeacherPayRow {
   final Map<String, dynamic> teacher;
-  final TeacherMonthStats stats;
+  final TeacherPayroll payroll;
   final int pending;
 
   const _TeacherPayRow({
     required this.teacher,
-    required this.stats,
+    required this.payroll,
     required this.pending,
   });
 }
@@ -550,29 +551,72 @@ class _TeacherPayRow {
 class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
   DateTime _month = DateTime(DateTime.now().year, DateTime.now().month);
 
-  TeacherMonthStats _statsFor(Map<String, dynamic> teacher) {
+  TeacherPayroll _payrollFor(Map<String, dynamic> teacher) {
     final uid = teacher['uid']?.toString() ?? '';
-    return LessonRatingService.monthStats(
+    return TeacherPayroll.forTeacher(
       bookings: widget.bookings,
-      teacherUid: uid,
       ratings: widget.ratings,
-      now: _month,
+      teacherUid: uid,
+      year: _month.year,
+      month: _month.month,
       lessonFeeWon: EnrollmentService.lessonFeeWonOf(teacher),
+      settlements: widget.settlements.values
+          .where((item) => item.teacherUid == uid)
+          .toList(),
     );
   }
 
-  TeacherSettlement? _settlementFor(String uid) {
-    return widget.settlements['${uid}_${AuthService.yearMonthKey(_month)}'];
-  }
-
   Future<void> _markPaid(_TeacherPayRow row) async {
+    final payroll = row.payroll;
+    final english = AppLanguage.instance.isEnglish;
+    final due = payroll.dueLabel(english: english);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(tf(dialogContext, '{p0} 지급 기록', {'p0': due}),
+            style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
+        content: Text(
+          tf(
+            dialogContext,
+            '{p0} 1일–말일 완료 {p1}회\n지난 마감 후 {p2}회\n합계 {p3}회 · {p4}\n\n통장 이체는 없습니다. 이 횟수와 금액을 지급 기록으로 남깁니다.',
+            {
+              'p0': payroll.monthLabel,
+              'p1': payroll.closedCount,
+              'p2': payroll.carryInCount,
+              'p3': payroll.shownPayoutCount,
+              'p4': TeacherPayroll.won(payroll.shownAmount),
+            },
+          ),
+          style: TextStyle(fontFamily: "NotoSansKR", height: 1.45),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(tr(dialogContext, '취소'),
+                style: TextStyle(fontFamily: "NotoSansKR")),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(tr(dialogContext, '기록'),
+                style: TextStyle(fontFamily: "NotoSansKR")),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
     final uid = row.teacher['uid']?.toString() ?? '';
     final error = await AuthService.markLessonSettlementPaid(
       teacherUid: uid,
       month: _month,
-      sessionCount: row.stats.completedCount,
-      amount: row.stats.incomeWon,
-      lessonFeeWon: row.stats.lessonFeeWon,
+      sessionCount: payroll.shownPayoutCount,
+      amount: payroll.shownAmount,
+      lessonFeeWon: payroll.lessonFeeWon,
+      closedCount: payroll.closedCount,
+      carryInCount: payroll.carryInCount,
+      bookingIds: payroll.payoutBookingIds,
+      payDue: payroll.deposit,
+      monthEndedAt:
+          TeacherPayroll.seoulMidnightUtc(payroll.year, payroll.month + 1, 1),
     );
     if (!mounted) return;
     if (error != null) {
@@ -606,15 +650,23 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
       final uid = teacher['uid']?.toString() ?? '';
       return _TeacherPayRow(
         teacher: teacher,
-        stats: _statsFor(teacher),
+        payroll: _payrollFor(teacher),
         pending: _pendingFor(uid),
       );
     }).toList();
 
-    final completed = rows.fold<int>(0, (sum, row) => sum + row.stats.completedCount);
-    final cancelled = rows.fold<int>(0, (sum, row) => sum + row.stats.cancelledCount);
-    final awaiting = rows.fold<int>(0, (sum, row) => sum + row.stats.awaitingCount);
-    final payroll = rows.fold<int>(0, (sum, row) => sum + row.stats.incomeWon);
+    final payoutCount =
+        rows.fold<int>(0, (sum, row) => sum + row.payroll.shownPayoutCount);
+    final cancelled =
+        rows.fold<int>(0, (sum, row) => sum + row.payroll.cancelledCount);
+    final awaiting =
+        rows.fold<int>(0, (sum, row) => sum + row.payroll.awaitingCount);
+    final late = rows.fold<int>(0, (sum, row) => sum + row.payroll.lateCount);
+    final payroll =
+        rows.fold<int>(0, (sum, row) => sum + row.payroll.shownAmount);
+    final dueDate = TeacherPayroll.seoulDate(
+        TeacherPayroll.seoulMidnightUtc(_month.year, _month.month + 1, 10));
+    final due = '${dueDate.month}월 ${dueDate.day}일';
 
     return RefreshIndicator(
       onRefresh: widget.onRefresh,
@@ -630,7 +682,12 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
           ),
           const SizedBox(height: 8),
           Text(
-            tf(context, '수강생 별점 평가가 끝난 수업만 진행으로 셉니다. 예전 수업(평가 기록 없음)은 수업 시간이 지나면 포함됩니다. 수업 {p0}분 · 회차 수당은 강사마다 다르고, 없으면 {p1}입니다. 지급 완료를 누르면 그때의 횟수와 금액이 기록됩니다.', {'p0': EnrollmentService.lessonMinutes, 'p1': _formatWon(EnrollmentService.lessonPayWon)}),
+            tf(context, '{p0}월 수업분 · 지급일 {p1}. 월마감은 말일입니다. 1일부터 말일까지 별점이 끝난 확정 수업이 이 지급분입니다. 말일 이후 별점은 마감 후로 남고, 별점이 끝난 달의 다음 10일에 지급합니다. 수업 {p2}분 · 회차 수당은 강사마다 다르고, 없으면 {p3}입니다. 지급 완료는 횟수와 금액만 남기며 통장 이체는 없습니다.', {
+              'p0': _month.month,
+              'p1': due,
+              'p2': EnrollmentService.lessonMinutes,
+              'p3': _formatWon(EnrollmentService.lessonPayWon),
+            }),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
@@ -639,12 +696,16 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
               style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           const SizedBox(height: 10),
           _summaryRow([
-            _summaryCell(tr(context, '진행'), tf(context, '{p0}회', {'p0': completed}), Palette.secondaryDark),
+            _summaryCell(tr(context, '이번 지급'), tf(context, '{p0}회', {'p0': payoutCount}), Palette.secondaryDark),
             _summaryCell(tr(context, '수당'), _formatWon(payroll), Palette.navy),
           ]),
           const SizedBox(height: 8),
           _summaryRow([
+            _summaryCell(tr(context, '마감 후'), tf(context, '{p0}회', {'p0': late}), Palette.warning),
             _summaryCell(tr(context, '평가대기'), tf(context, '{p0}건', {'p0': awaiting}), Palette.warning),
+          ]),
+          const SizedBox(height: 8),
+          _summaryRow([
             _summaryCell(tr(context, '취소'), tf(context, '{p0}회', {'p0': cancelled}), Palette.danger),
           ]),
           const SizedBox(height: 24),
@@ -665,11 +726,15 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
 
   Widget _teacherCard(_TeacherPayRow row) {
     final teacher = row.teacher;
-    final stats = row.stats;
+    final payroll = row.payroll;
     final isOwnerTeacher = AuthService.docIsOwner(teacher);
     final name = teacher['name']?.toString() ?? '';
     final email = teacher['email']?.toString() ?? '';
     final bank = AuthService.bankLabel(teacher);
+    final english = AppLanguage.instance.isEnglish;
+    final payoutLabel =
+        tr(context, payroll.isEstimate ? '예상 지급' : '이번 지급');
+    final amountLabel = tr(context, payroll.isEstimate ? '예상 수당' : '수당');
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       child: Padding(
@@ -694,17 +759,22 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
             ],
             const SizedBox(height: 10),
             _summaryRow([
-              _summaryCell(tr(context, '진행'), tf(context, '{p0}회', {'p0': stats.completedCount}), Palette.secondaryDark),
-              _summaryCell(tr(context, '수당'), stats.incomeLabel, Palette.navy),
+              _summaryCell(payoutLabel, tf(context, '{p0}회', {'p0': payroll.shownClosed}), Palette.secondaryDark),
+              _summaryCell(tr(context, '지난 마감 후'), tf(context, '{p0}회', {'p0': payroll.shownCarry}), Palette.secondaryDark),
             ]),
             const SizedBox(height: 8),
             _summaryRow([
-              _summaryCell(tr(context, '평가대기'), tf(context, '{p0}건', {'p0': stats.awaitingCount}), Palette.warning),
-              _summaryCell(tr(context, '평균별점'), stats.averageStarsLabel, Palette.warning),
+              _summaryCell(tr(context, '마감 후'), tf(context, '{p0}회', {'p0': payroll.lateCount}), Palette.warning),
+              _summaryCell(amountLabel, TeacherPayroll.won(payroll.shownAmount), Palette.navy),
             ]),
             const SizedBox(height: 8),
             _summaryRow([
-              _summaryCell(tr(context, '취소'), tf(context, '{p0}회', {'p0': stats.cancelledCount}), Palette.danger),
+              _summaryCell(tr(context, '평가대기'), tf(context, '{p0}건', {'p0': payroll.awaitingCount}), Palette.warning),
+              _summaryCell(tr(context, '평균별점'), payroll.averageStarsLabel, Palette.warning),
+            ]),
+            const SizedBox(height: 8),
+            _summaryRow([
+              _summaryCell(tr(context, '취소'), tf(context, '{p0}회', {'p0': payroll.cancelledCount}), Palette.danger),
               _summaryCell(tr(context, '예약대기'), tf(context, '{p0}건', {'p0': row.pending}), Palette.grey600),
             ]),
             const SizedBox(height: 10),
@@ -717,12 +787,25 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
             ),
             const SizedBox(height: 8),
             Text(
-              tf(context, '회차 수당 {p0}', {'p0': _formatWon(stats.lessonFeeWon)}),
+              tf(context, '회차 수당 {p0} · 지급일 {p1}', {
+                'p0': _formatWon(payroll.lessonFeeWon),
+                'p1': payroll.dueLabel(english: english),
+              }),
               style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 12,
                   color: Palette.grey600),
             ),
+            if (payroll.legacyNote != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                payroll.legacyNote!,
+                style: TextStyle(
+                    fontFamily: "NotoSansKR",
+                    fontSize: 12,
+                    color: Palette.grey700),
+              ),
+            ],
             const SizedBox(height: 8),
             _payButton(row),
           ],
@@ -732,20 +815,33 @@ class _TeacherPayrollPaneState extends State<_TeacherPayrollPane> {
   }
 
   Widget _payButton(_TeacherPayRow row) {
-    final uid = row.teacher['uid']?.toString() ?? '';
-    final settlement = _settlementFor(uid);
-    if (settlement != null && settlement.paid) {
-      final paidAt = settlement.paidAt;
-      final when = paidAt == null
+    final payroll = row.payroll;
+    if (payroll.paid) {
+      final when = payroll.paidAt == null
           ? ''
-          : ' · ${_formatDateTime(paidAt, dateOnly: true)}';
+          : ' · ${TeacherPayroll.formatSeoulDay(payroll.paidAt!)}';
       return Text(
-        tf(context, '지급 완료{p0} · {p1}회 · {p2}', {'p0': when, 'p1': settlement.sessionCount, 'p2': _formatWon(settlement.amount)}),
+        tf(context, '지급 완료{p0} · {p1}회 · {p2}', {
+          'p0': when,
+          'p1': payroll.shownPayoutCount,
+          'p2': TeacherPayroll.won(payroll.shownAmount),
+        }),
         style: TextStyle(
             fontFamily: "NotoSansKR",
             fontSize: 13,
             fontWeight: FontWeight.bold,
             color: Palette.secondaryDark),
+      );
+    }
+    if (!payroll.canMarkPaid) {
+      final due = payroll.dueLabel(english: AppLanguage.instance.isEnglish);
+      final note = payroll.isEstimate
+          ? tf(context, '말일까지는 예상입니다. {p0}부터 기록할 수 있습니다.', {'p0': due})
+          : tf(context, '{p0}부터 기록할 수 있습니다.', {'p0': due});
+      return Text(
+        note,
+        style: TextStyle(
+            fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
       );
     }
     return Align(
