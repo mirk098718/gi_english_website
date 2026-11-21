@@ -3,6 +3,7 @@ import 'package:gi_english_website/class/JuniorCurriculum.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
+import 'package:gi_english_website/pages/MemberRegisterPage.dart';
 import 'package:gi_english_website/pages/OnlineTeacherSelectPage.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/AuthService.dart';
@@ -95,18 +96,7 @@ class _JuniorCurriculumContentState extends State<JuniorCurriculumContent> {
 
   void _pay() {
     final course = OnlineCourse.junior(_offer, quarter: _quarter);
-    if (AuthService.currentUser == null) {
-      MenuUtil.push(context, const MemberLoginPage());
-      return;
-    }
-    MenuUtil.push(
-      context,
-      OnlineTeacherSelectPage(
-        course: course,
-        plan: OnlinePlan.speaking,
-        sessionCount: course.defaultSessions,
-      ),
-    );
+    startPackagePayment(context, course);
   }
 
   void _openPrograms() {
@@ -528,6 +518,69 @@ class _JuniorCurriculumContentState extends State<JuniorCurriculumContent> {
       ),
     );
   }
+}
+
+/// 결제 전에 로그인 또는 회원가입을 고르게 한다.
+void showMemberRequiredForPayment(BuildContext context) {
+  showDialog<void>(
+    context: context,
+    builder: (dialogContext) {
+      return AlertDialog(
+        backgroundColor: Palette.white,
+        title: Text(
+          tr(dialogContext, '결제하기'),
+          style: TextStyle(fontFamily: 'Jalnan'),
+        ),
+        content: Text(
+          tr(dialogContext, '결제 전 회원 로그인 또는 회원가입을 진행해주세요.'),
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: 14,
+            height: 1.5,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              MenuUtil.push(context, const MemberRegisterPage());
+            },
+            child: Text(
+              tr(dialogContext, '회원가입'),
+              style: TextStyle(fontFamily: 'NotoSansKR'),
+            ),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              MenuUtil.push(context, const MemberLoginPage());
+            },
+            style: FilledButton.styleFrom(backgroundColor: Palette.darkTeal),
+            child: Text(
+              tr(dialogContext, '로그인'),
+              style: TextStyle(fontFamily: 'NotoSansKR'),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+/// 로그인 전이면 로그인·회원가입 안내를 띄우고, 회원이면 강사 선택으로 간다.
+void startPackagePayment(BuildContext context, OnlineCourse course) {
+  if (AuthService.currentUser == null) {
+    showMemberRequiredForPayment(context);
+    return;
+  }
+  MenuUtil.push(
+    context,
+    OnlineTeacherSelectPage(
+      course: course,
+      plan: OnlinePlan.speaking,
+      sessionCount: course.defaultSessions,
+    ),
+  );
 }
 
 /// 선택한 금액으로 결제를 시작하는 버튼.

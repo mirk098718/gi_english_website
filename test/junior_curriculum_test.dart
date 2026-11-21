@@ -176,4 +176,29 @@ void main() {
     expect(freeTalkAssets, ['assets/plan-card-speaking.jpg']);
     expect(find.text('원서'), findsNothing);
   });
+
+  testWidgets('로그인 전에는 결제 버튼이 로그인·회원가입 안내를 띄운다', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: TextButton(
+              onPressed: () => showMemberRequiredForPayment(context),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('결제 전 회원 로그인 또는 회원가입을 진행해주세요.'),
+      findsOneWidget,
+    );
+    expect(find.text('로그인'), findsOneWidget);
+    expect(find.text('회원가입'), findsOneWidget);
+  });
 }

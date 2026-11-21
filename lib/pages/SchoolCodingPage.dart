@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/JuniorCurriculum.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
-import 'package:gi_english_website/class/OnlinePlan.dart';
-import 'package:gi_english_website/pages/MemberLoginPage.dart';
-import 'package:gi_english_website/pages/OnlineTeacherSelectPage.dart';
-import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineJuniorCurriculumPage.dart';
@@ -340,21 +336,8 @@ class EnrolledFreeTalkSection extends StatelessWidget {
                 'p0': EnrolledFreeTalk.priceLabel(),
               }),
               color: const Color(0xFFEA7A1A),
-              onPressed: () {
-                final course = OnlineCourse.enrolledFreeTalk;
-                if (AuthService.currentUser == null) {
-                  MenuUtil.push(context, const MemberLoginPage());
-                  return;
-                }
-                MenuUtil.push(
-                  context,
-                  OnlineTeacherSelectPage(
-                    course: course,
-                    plan: OnlinePlan.speaking,
-                    sessionCount: course.defaultSessions,
-                  ),
-                );
-              },
+              onPressed: () =>
+                  startPackagePayment(context, OnlineCourse.enrolledFreeTalk),
             ),
           ],
         ),
