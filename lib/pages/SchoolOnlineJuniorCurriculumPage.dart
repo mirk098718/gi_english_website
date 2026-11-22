@@ -78,7 +78,7 @@ class JuniorCurriculumContent extends StatefulWidget {
   const JuniorCurriculumContent({
     Key? key,
     this.compact = false,
-    this.title = '주니어 커리큘럼',
+    this.title = '글리머 주니어',
   }) : super(key: key);
 
   @override

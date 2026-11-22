@@ -239,7 +239,7 @@ class OptionalProgramBody extends StatelessWidget {
           ),
           JuniorCurriculumContent(
             compact: compact,
-            title: '1. 주니어 커리큘럼',
+            title: '1. 글리머 주니어 온라인',
           ),
           EnrolledFreeTalkSection(compact: compact),
         ],

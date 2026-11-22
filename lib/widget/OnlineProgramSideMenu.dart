@@ -35,12 +35,12 @@ class _OnlineProgramSideMenuState extends State<OnlineProgramSideMenu> {
     super.initState();
     buttonStateList = [
       ButtonState(
-        "커리큘럼",
+        "글리머 온라인",
         _colorFor(OnlineProgramSideMenu.curriculumIndex),
         SchoolOnlineCurriculumPage(),
       ),
       ButtonState(
-        "주니어 커리큘럼",
+        "글리머 주니어",
         _colorFor(OnlineProgramSideMenu.juniorIndex),
         SchoolOnlineJuniorCurriculumPage(),
       ),

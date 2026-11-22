@@ -28,7 +28,7 @@ void main() {
     expect(offer.quarterPrice, 940500);
   });
 
-  testWidgets('왼쪽 메뉴에서 커리큘럼 다음에 주니어 커리큘럼이 있다', (tester) async {
+  testWidgets('왼쪽 메뉴에서 글리머 온라인 다음에 글리머 주니어가 있다', (tester) async {
     await tester.binding.setSurfaceSize(const Size(390, 800));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -43,11 +43,11 @@ void main() {
       ),
     );
 
-    expect(find.text('커리큘럼'), findsOneWidget);
-    expect(find.text('주니어 커리큘럼'), findsOneWidget);
+    expect(find.text('글리머 온라인'), findsOneWidget);
+    expect(find.text('글리머 주니어'), findsOneWidget);
     expect(find.text('내 강의실'), findsOneWidget);
-    final curriculum = tester.getTopLeft(find.text('커리큘럼')).dx;
-    final junior = tester.getTopLeft(find.text('주니어 커리큘럼')).dx;
+    final curriculum = tester.getTopLeft(find.text('글리머 온라인')).dx;
+    final junior = tester.getTopLeft(find.text('글리머 주니어')).dx;
     final classroom = tester.getTopLeft(find.text('내 강의실')).dx;
     expect(curriculum, lessThan(junior));
     expect(junior, lessThan(classroom));
@@ -139,7 +139,7 @@ void main() {
     );
 
     expect(find.text('선택 프로그램'), findsOneWidget);
-    expect(find.text('1. 주니어 커리큘럼'), findsOneWidget);
+    expect(find.text('1. 글리머 주니어 온라인'), findsOneWidget);
     expect(find.text(JuniorCurriculumContent.description), findsWidgets);
     expect(find.text('2. 원어민 화상 프리토킹 (재원생 대상)'), findsOneWidget);
     expect(find.text('주 1회 · 20분 · 4회 70,000원'), findsOneWidget);
