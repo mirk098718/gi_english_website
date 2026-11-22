@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/SiteLayout.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
+import 'package:gi_english_website/class/JuniorLevel.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
@@ -26,6 +27,7 @@ class OnlineTeacherSelectPage extends StatefulWidget {
   final bool extendEnrollment;
   final String plan;
   final int sessionCount;
+  final JuniorLevel? juniorLevel;
 
   const OnlineTeacherSelectPage({
     Key? key,
@@ -33,6 +35,7 @@ class OnlineTeacherSelectPage extends StatefulWidget {
     this.extendEnrollment = false,
     this.plan = OnlinePlan.bundle,
     this.sessionCount = 0,
+    this.juniorLevel,
   }) : super(key: key);
 
   @override
@@ -192,11 +195,19 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
     }
 
     setState(() => _paying = true);
+    final level = widget.course.id.startsWith('junior_') ? widget.juniorLevel : null;
+    if (level != null) {
+      final userId = AuthService.currentUser?.uid ?? '';
+      if (userId.isNotEmpty) {
+        await EnrollmentService.saveJuniorLevel(userId: userId, level: level);
+      }
+    }
     final order = await PaymentService.createOrder(
       course: widget.course,
       nativeTeacher: _selected!,
       extendEnrollment: widget.extendEnrollment,
       plan: widget.plan,
+      juniorLevel: level,
       totalSessions: widget.course.sessionsFor(
         widget.plan,
         sessions: widget.sessionCount,

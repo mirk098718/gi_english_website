@@ -345,6 +345,10 @@ class TeacherPayroll {
     DateTime now,
   ) {
     if (!booking.isConfirmed) return null;
+    if (rating == null &&
+        EnrollmentService.requiresStudentRating(booking.courseId)) {
+      return null;
+    }
     if (rating != null) {
       if (!rating.isRated) return null;
       if (rating.ratedAt != null) return rating.ratedAt;

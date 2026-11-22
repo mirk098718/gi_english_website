@@ -6,6 +6,7 @@ import 'package:gi_english_website/util/LessonRatingService.dart';
 WeekBooking _booking({
   String id = 'b1',
   String teacherId = 't1',
+  String courseId = 'c1',
   DateTime? date,
   String time = '10:00',
   String status = 'confirmed',
@@ -15,7 +16,7 @@ WeekBooking _booking({
     userId: 'u1',
     memberName: '학생',
     email: 'a@b.com',
-    courseId: 'c1',
+    courseId: courseId,
     weekId: 'w1',
     weekNumber: 1,
     weekTitle: '1회차',
@@ -74,6 +75,32 @@ void main() {
         ),
         isFalse,
       );
+      expect(
+        LessonRatingService.isPayable(
+          booking,
+          _rating(status: LessonRating.statusPending),
+          now: now,
+        ),
+        isFalse,
+      );
+      expect(
+        LessonRatingService.isPayable(
+          booking,
+          _rating(status: LessonRating.statusRated, stars: 5),
+          now: now,
+        ),
+        isTrue,
+      );
+    });
+
+    test('재원생 화상은 별점이 없으면 시간이 지나도 수당에 넣지 않는다', () {
+      final booking = _booking(
+        date: DateTime(2026, 9, 1),
+        time: '10:00',
+        courseId: 'enrolled_free_talk',
+      );
+      final now = DateTime(2026, 9, 1, 12);
+      expect(LessonRatingService.isPayable(booking, null, now: now), isFalse);
       expect(
         LessonRatingService.isPayable(
           booking,

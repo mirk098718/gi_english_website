@@ -157,6 +157,9 @@ class LessonRatingService {
   static bool isPayable(WeekBooking booking, LessonRating? rating,
       {DateTime? now}) {
     if (!booking.isConfirmed) return false;
+    if (EnrollmentService.requiresStudentRating(booking.courseId)) {
+      return rating != null && rating.isRated;
+    }
     if (rating != null) return rating.isRated;
     return isLessonTimePassed(booking, now: now);
   }

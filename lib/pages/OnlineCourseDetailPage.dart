@@ -1195,7 +1195,12 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       );
     }
     return Text(
-      tr(context, "강사가 수업을 종료하면 이 자리에서 별점을 남길 수 있습니다."),
+      tr(
+        context,
+        EnrollmentService.requiresStudentRating(widget.course.id)
+            ? "강사가 수업을 종료하면 별점을 남겨 주세요. 별점을 남겨야 수업이 인정되고 다음 회차가 열립니다."
+            : "강사가 수업을 종료하면 이 자리에서 별점을 남길 수 있습니다.",
+      ),
       style: TextStyle(
         fontFamily: "NotoSansKR",
         fontSize: 12,
@@ -1377,6 +1382,16 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     return null;
   }
 
+  String _lockedWeekCopy(OnlineWeek week, bool fixedWeek) {
+    const schedule =
+        '이 회차 시간은 결제할 때 정해져 있습니다. 하루 전까지는 선생님이 되는 빈 시간 중 아무 시간이나 골라 그 회차만 옮기고, 고르지 않으면 취소되지 않습니다.';
+    if (!fixedWeek) return _lockMessage(week);
+    if (!EnrollmentService.requiresStudentRating(widget.course.id)) {
+      return tr(context, schedule);
+    }
+    return '${tr(context, schedule)}\n${_lockMessage(week)}';
+  }
+
   String _lockMessage(OnlineWeek week) {
     final previous = week.weekNumber - 1;
     if (previous > 0) {
@@ -1516,16 +1531,14 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             ],
             if (!unlocked) ...[
               if (fixedWeek) ...[
-                weekBookingSection(week),
+                weekBookingSection(
+                  week,
+                  allowJoin: !EnrollmentService.requiresStudentRating(widget.course.id),
+                ),
                 SizedBox(height: 12),
               ],
               Text(
-                fixedWeek
-                    ? tr(
-                        context,
-                        '이 회차 시간은 결제할 때 정해져 있습니다. 하루 전까지는 선생님이 되는 빈 시간 중 아무 시간이나 골라 그 회차만 옮기고, 고르지 않으면 취소되지 않습니다.',
-                      )
-                    : _lockMessage(week),
+                _lockedWeekCopy(week, fixedWeek),
                 style: TextStyle(
                   fontFamily: "NotoSansKR",
                   fontSize: 13,
@@ -1533,7 +1546,9 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                   color: Palette.grey600,
                 ),
               ),
-              ..._sessionsForWeek(week).map(sessionTile),
+              if (!fixedWeek ||
+                  !EnrollmentService.requiresStudentRating(widget.course.id))
+                ..._sessionsForWeek(week).map(sessionTile),
             ] else if (_speakingOnly) ...[
               if (_enrollment == null)
                 Text(
@@ -1913,7 +1928,8 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                 Text(
                   tr(
                     context,
-                    widget.course.fixedSpeakingPrice
+                    widget.course.fixedSpeakingPrice &&
+                            !EnrollmentService.requiresStudentRating(widget.course.id)
                         ? "화상수업을 마치면 이 자리에서 강사 별점을 남길 수 있습니다."
                         : "화상수업을 마치면 이 자리에서 강사 별점을 남길 수 있습니다. 평가를 마치면 다음 회차가 열립니다.",
                   ),
@@ -1931,7 +1947,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     );
   }
 
-  Widget weekBookingSection(OnlineWeek week) {
+  Widget weekBookingSection(OnlineWeek week, {bool allowJoin = true}) {
     final existing = _bookingFor(week.id);
     final bookingTeacher = existing != null
         ? _teacherForBooking(existing)
@@ -2097,10 +2113,11 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                 ),
               ),
             ],
-            if (_canJoinBooking(existing)) ...[
+            if (allowJoin && _canJoinBooking(existing)) ...[
               SizedBox(height: 12),
               _joinButton(_joinUrlForBooking(existing), enabled: true),
-            ] else if (_showLockedJoin(existing)) ...[
+            ] else if (_showLockedJoin(existing) ||
+                (!allowJoin && existing.isConfirmed)) ...[
               SizedBox(height: 8),
               Text(
                 tr(context, "수업 일정이 확정되었습니다."),

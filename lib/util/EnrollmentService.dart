@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gi_english_website/util/NoticeImages.dart';
 import 'package:gi_english_website/util/notice_image_prepare.dart';
+import 'package:gi_english_website/class/JuniorLevel.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/TeacherClassBands.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
@@ -1519,6 +1520,10 @@ class EnrollmentService {
 
       payload['createdAt'] = FieldValue.serverTimestamp();
       _applyAssignedTeacher(payload, member);
+      final level = JuniorLevel.fromMap(member);
+      if (level != null && isJuniorCourse(courseId)) {
+        payload.addAll(level.toMap());
+      }
       await _firestore.collection('enrollments').add(payload);
 
       return null;
@@ -2531,6 +2536,47 @@ class EnrollmentService {
 
   static bool isJuniorCourse(String courseId) =>
       courseId.startsWith('junior_');
+
+  /// 주니어·재원생 화상은 수강생 별점이 있어야 수강 완료와 강사 수당이 확정된다.
+  static bool requiresStudentRating(String courseId) =>
+      isJuniorCourse(courseId) || courseId == OnlineCourse.enrolledFreeTalk.id;
+
+  /// 수강생이 고르거나 레벨테스트로 받은 주니어 레벨을 회원 정보에 남긴다.
+  /// 메인 관리자는 그 수강생의 주니어 배정에도 같은 레벨을 적는다.
+  static Future<String?> saveJuniorLevel({
+    required String userId,
+    required JuniorLevel level,
+  }) async {
+    if (userId.isEmpty) return '회원 정보가 올바르지 않습니다.';
+    final user = AuthService.currentUser;
+    if (user == null) return '로그인이 필요합니다.';
+    final owner = await AuthService.isAdmin();
+    if (user.uid != userId && !owner) return '본인 레벨만 저장할 수 있습니다.';
+    try {
+      await _firestore.collection('members').doc(userId).set({
+        ...level.toMap(),
+        'juniorLevelUpdatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      if (owner) {
+        final docs = await _firestore
+            .collection('enrollments')
+            .where('userId', isEqualTo: userId)
+            .get();
+        for (final doc in docs.docs) {
+          final courseId = doc.data()['courseId']?.toString() ?? '';
+          if (!isJuniorCourse(courseId)) continue;
+          await doc.reference.set({
+            ...level.toMap(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
+        }
+      }
+      return null;
+    } catch (e) {
+      print('주니어 레벨 저장 오류: $e');
+      return '레벨을 저장하지 못했습니다.';
+    }
+  }
 
   static int lessonMinutesForCourse(String courseId) =>
       isJuniorCourse(courseId) ? juniorLessonMinutes : lessonMinutes;
@@ -4808,6 +4854,8 @@ class EnrollmentRecord {
   final int adminUnlockedThrough;
   final String plan;
   final List<FixedSession> sessionPlan;
+  final int juniorLevel;
+  final String juniorLevelBand;
 
   EnrollmentRecord({
     required this.id,
@@ -4832,7 +4880,14 @@ class EnrollmentRecord {
     this.adminUnlockedThrough = 0,
     this.plan = OnlinePlan.bundle,
     this.sessionPlan = const [],
+    this.juniorLevel = 0,
+    this.juniorLevelBand = '',
   });
+
+  JuniorLevel? get juniorLevelInfo => JuniorLevel.parse(
+        band: juniorLevelBand,
+        level: juniorLevel,
+      );
 
   FixedSession? sessionAt(int weekNumber) {
     for (final session in sessionPlan) {
@@ -4931,6 +4986,8 @@ class EnrollmentRecord {
           EnrollmentService._intValue(data['adminUnlockedThrough']),
       plan: plan,
       sessionPlan: sessionPlan,
+      juniorLevel: EnrollmentService._intValue(data['juniorLevel']),
+      juniorLevelBand: data['juniorLevelBand']?.toString() ?? '',
     );
   }
 }

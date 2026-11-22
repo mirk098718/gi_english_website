@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/class/JuniorLevel.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
@@ -708,6 +709,19 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     );
   }
 
+  String _levelLabel(
+    Map<String, dynamic> member,
+    List<EnrollmentRecord> records,
+  ) {
+    final fromMember = JuniorLevel.fromMap(member);
+    if (fromMember != null) return fromMember.label;
+    for (final record in records) {
+      final level = record.juniorLevelInfo;
+      if (level != null) return level.label;
+    }
+    return '';
+  }
+
   Widget _memberCard(Map<String, dynamic> member, {bool guest = false}) {
     final memberId = member['uid']?.toString() ?? '';
     final name = AuthService.profileDisplayName(member, fallback: '');
@@ -755,6 +769,8 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
           subtitle: Text(
             [
               if (email.isNotEmpty) email,
+              if (_levelLabel(member, records).isNotEmpty)
+                tf(context, '현재 레벨 {p0}', {'p0': _levelLabel(member, records)}),
               if (guest && assignedTeacherName.isNotEmpty)
                 tf(context, '담당 {p0}', {'p0': assignedTeacherName}),
               tf(context, '화상수업 {p0}건', {'p0': lessons.length}),

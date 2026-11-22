@@ -482,7 +482,15 @@ service cloud.firestore {
               .hasOnly(['nickname', 'photoUrl', 'phone', 'updatedAt']))
         || (isLoggedIn()
           && request.auth.uid == memberId
-          && mainTeacherFieldsOnly());
+          && mainTeacherFieldsOnly())
+        || (isLoggedIn()
+          && request.auth.uid == memberId
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['juniorLevel', 'juniorLevelBand', 'juniorLevelUpdatedAt'])
+          && request.resource.data.juniorLevel is int
+          && request.resource.data.juniorLevel >= 1
+          && request.resource.data.juniorLevel <= 6
+          && request.resource.data.juniorLevelBand in ['elementary', 'middle']);
 
       allow delete: if isOwner();
     }

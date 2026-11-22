@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/class/JuniorCurriculum.dart';
+import 'package:gi_english_website/class/JuniorLevel.dart';
+import 'package:gi_english_website/widget/JuniorLevelTestDialog.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/pages/MemberLoginPage.dart';
@@ -93,10 +95,25 @@ class _JuniorCurriculumContentState extends State<JuniorCurriculumContent> {
   final GlobalKey _programsKey = GlobalKey();
   JuniorOffer _offer = JuniorOffer.twiceAWeek;
   bool _quarter = false;
+  String _levelBand = JuniorLevel.elementary;
+  int? _level;
+
+  JuniorLevel? get _juniorLevel => _level == null
+      ? null
+      : JuniorLevel.parse(band: _levelBand, level: _level!);
+
+  Future<void> _openLevelTest(String band) async {
+    final result = await JuniorLevelTestDialog.open(context, band: band);
+    if (result == null || !mounted) return;
+    setState(() {
+      _levelBand = result.band;
+      _level = result.level;
+    });
+  }
 
   void _pay() {
     final course = OnlineCourse.junior(_offer, quarter: _quarter);
-    startPackagePayment(context, course);
+    startPackagePayment(context, course, juniorLevel: _juniorLevel);
   }
 
   void _openPrograms() {
@@ -169,6 +186,8 @@ class _JuniorCurriculumContentState extends State<JuniorCurriculumContent> {
               color: Palette.grey600,
             ),
           ),
+          SizedBox(height: 16),
+          _levelSection(),
           SizedBox(height: 12),
           PackagePayButton(
             label: tf(context, '{p0} 결제하기', {'p0': selected}),
@@ -178,6 +197,86 @@ class _JuniorCurriculumContentState extends State<JuniorCurriculumContent> {
           SizedBox(height: 20),
         ],
       ),
+    );
+  }
+
+  Widget _levelSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          tr(context, '내 레벨'),
+          style: TextStyle(fontFamily: 'Jalnan', fontSize: 15),
+        ),
+        SizedBox(height: 6),
+        Text(
+          tr(context, '초등부 또는 중등부 레벨테스트를 보거나, 알고 있는 레벨 1~6을 직접 고르세요. 고른 레벨은 강사와 매니저에게 보입니다.'),
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: 13,
+            height: 1.5,
+            color: Palette.grey600,
+          ),
+        ),
+        SizedBox(height: 10),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            OutlinedButton(
+              onPressed: () => _openLevelTest(JuniorLevel.elementary),
+              child: Text(tr(context, '초등부 레벨테스트'),
+                  style: TextStyle(fontFamily: 'NotoSansKR')),
+            ),
+            OutlinedButton(
+              onPressed: () => _openLevelTest(JuniorLevel.middle),
+              child: Text(tr(context, '중등부 레벨테스트'),
+                  style: TextStyle(fontFamily: 'NotoSansKR')),
+            ),
+          ],
+        ),
+        SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          children: [
+            ChoiceChip(
+              label: Text(tr(context, '초등부'),
+                  style: TextStyle(fontFamily: 'NotoSansKR')),
+              selected: _levelBand == JuniorLevel.elementary,
+              onSelected: (_) => setState(() => _levelBand = JuniorLevel.elementary),
+            ),
+            ChoiceChip(
+              label: Text(tr(context, '중등부'),
+                  style: TextStyle(fontFamily: 'NotoSansKR')),
+              selected: _levelBand == JuniorLevel.middle,
+              onSelected: (_) => setState(() => _levelBand = JuniorLevel.middle),
+            ),
+          ],
+        ),
+        SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          children: [
+            for (var level = JuniorLevel.minLevel; level <= JuniorLevel.maxLevel; level++)
+              ChoiceChip(
+                label: Text('$level', style: TextStyle(fontFamily: 'NotoSansKR')),
+                selected: _level == level,
+                onSelected: (_) => setState(() => _level = level),
+              ),
+          ],
+        ),
+        if (_juniorLevel != null) ...[
+          SizedBox(height: 8),
+          Text(
+            tf(context, '현재 레벨 {p0}', {'p0': _juniorLevel!.label}),
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontWeight: FontWeight.w700,
+              color: _orange,
+            ),
+          ),
+        ],
+      ],
     );
   }
 
@@ -568,7 +667,11 @@ void showMemberRequiredForPayment(BuildContext context) {
 }
 
 /// 로그인 전이면 로그인·회원가입 안내를 띄우고, 회원이면 강사 선택으로 간다.
-void startPackagePayment(BuildContext context, OnlineCourse course) {
+void startPackagePayment(
+  BuildContext context,
+  OnlineCourse course, {
+  JuniorLevel? juniorLevel,
+}) {
   if (AuthService.currentUser == null) {
     showMemberRequiredForPayment(context);
     return;
@@ -579,6 +682,7 @@ void startPackagePayment(BuildContext context, OnlineCourse course) {
       course: course,
       plan: OnlinePlan.speaking,
       sessionCount: course.defaultSessions,
+      juniorLevel: course.id.startsWith('junior_') ? juniorLevel : null,
     ),
   );
 }

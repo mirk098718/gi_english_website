@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
+import 'package:gi_english_website/class/JuniorLevel.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
@@ -35,6 +36,9 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
   String _teacherName = '';
   bool _loading = true;
   bool _isOwner = false;
+  bool _savingLevel = false;
+  String _editBand = JuniorLevel.elementary;
+  int _editLevel = JuniorLevel.minLevel;
 
   String get _uid => _member['uid']?.toString() ?? '';
 
@@ -70,8 +74,13 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
         uid.isEmpty ? <PaymentOrder>[] : await PaymentService.paymentsForUser(uid);
     if (!mounted) return;
     final member = fresh ?? _member;
+    final currentLevel = JuniorLevel.fromMap(member);
     setState(() {
       _member = member;
+      if (currentLevel != null) {
+        _editBand = currentLevel.band;
+        _editLevel = currentLevel.level;
+      }
       _teacherName = AuthService.memberTeacherName(member,
               teacherNames: teacherNames)
           .ifEmpty(_teacherName);
@@ -222,8 +231,109 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
           _infoRow(tr(context, '가입일'), _formatDateTime(joined, dateOnly: true)),
           _infoRow(tr(context, '상태'), active ? tr(context, '이용 중'): tr(context, '비활성')),
           _infoRow(
+            tr(context, '현재 레벨'),
+            _shownLevel?.label ?? tr(context, '아직 없음'),
+          ),
+          if (_isOwner) _levelEditor(),
+          _infoRow(
               tr(context, '수강'),
               tf(context, '배정 {p0}건 · 결제완료 {p1}건', {'p0': _enrollments.length, 'p1': _enrollments.where((e) => e.isPaid).length})),
+        ],
+      ),
+    );
+  }
+
+  JuniorLevel? get _shownLevel {
+    final fromMember = JuniorLevel.fromMap(_member);
+    if (fromMember != null) return fromMember;
+    for (final record in _enrollments) {
+      final level = record.juniorLevelInfo;
+      if (level != null) return level;
+    }
+    return null;
+  }
+
+  Future<void> _saveLevel() async {
+    final level = JuniorLevel.parse(band: _editBand, level: _editLevel);
+    if (level == null || _uid.isEmpty) return;
+    setState(() => _savingLevel = true);
+    final error = await EnrollmentService.saveJuniorLevel(
+      userId: _uid,
+      level: level,
+    );
+    if (!mounted) return;
+    setState(() {
+      _savingLevel = false;
+      if (error == null) {
+        _member = {
+          ..._member,
+          ...level.toMap(),
+        };
+      }
+    });
+    _toast(error ?? '현재 레벨을 저장했습니다.', error: error != null);
+  }
+
+  Widget _levelEditor() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            tr(context, '레벨 수정'),
+            style: TextStyle(
+              fontFamily: "NotoSansKR",
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 8,
+            children: [
+              ChoiceChip(
+                label: Text(tr(context, '초등부'),
+                    style: TextStyle(fontFamily: "NotoSansKR")),
+                selected: _editBand == JuniorLevel.elementary,
+                onSelected: _savingLevel
+                    ? null
+                    : (_) => setState(() => _editBand = JuniorLevel.elementary),
+              ),
+              ChoiceChip(
+                label: Text(tr(context, '중등부'),
+                    style: TextStyle(fontFamily: "NotoSansKR")),
+                selected: _editBand == JuniorLevel.middle,
+                onSelected: _savingLevel
+                    ? null
+                    : (_) => setState(() => _editBand = JuniorLevel.middle),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 8,
+            children: [
+              for (var level = JuniorLevel.minLevel;
+                  level <= JuniorLevel.maxLevel;
+                  level++)
+                ChoiceChip(
+                  label: Text('$level',
+                      style: TextStyle(fontFamily: "NotoSansKR")),
+                  selected: _editLevel == level,
+                  onSelected: _savingLevel
+                      ? null
+                      : (_) => setState(() => _editLevel = level),
+                ),
+            ],
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: _savingLevel ? null : _saveLevel,
+              child: Text(tr(context, _savingLevel ? '저장 중' : '레벨 저장')),
+            ),
+          ),
         ],
       ),
     );

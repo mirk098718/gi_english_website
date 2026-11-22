@@ -8,6 +8,7 @@ import 'package:gi_english_website/util/html_stub.dart'
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/class/JuniorLevel.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlinePlan.dart';
@@ -592,6 +593,19 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
     );
   }
 
+  String _levelLabel(
+    Map<String, dynamic> member,
+    List<EnrollmentRecord> records,
+  ) {
+    final fromMember = JuniorLevel.fromMap(member);
+    if (fromMember != null) return fromMember.label;
+    for (final record in records) {
+      final level = record.juniorLevelInfo;
+      if (level != null) return level.label;
+    }
+    return '';
+  }
+
   Widget _memberCard(Map<String, dynamic> member) {
     final uid = member['uid']?.toString() ?? '';
     final name = AuthService.profileDisplayName(member, fallback: tr(context, '이름 미등록 회원'));
@@ -633,6 +647,8 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
         subtitle: Text(
           [
             if (email.isNotEmpty) email,
+            if (_levelLabel(member, records).isNotEmpty)
+              tf(context, '현재 레벨 {p0}', {'p0': _levelLabel(member, records)}),
             if (guest && assignedTeacherName.isNotEmpty)
               tf(context, '담당 {p0}', {'p0': assignedTeacherName}),
             tf(context, '배정 {p0}개', {'p0': records.length}),

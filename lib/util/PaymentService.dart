@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
+import 'package:gi_english_website/class/JuniorLevel.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/class/OnlinePlan.dart';
@@ -32,6 +33,7 @@ class PaymentService {
     bool extendEnrollment = false,
     String plan = OnlinePlan.bundle,
     List<WeeklySlot> fixedSlots = const [],
+    JuniorLevel? juniorLevel,
   }) async {
     final user = AuthService.currentUser;
     if (user == null) return null;
@@ -83,6 +85,7 @@ class PaymentService {
       'plan': order.plan,
       if (fixedSlots.isNotEmpty)
         'fixedSlots': fixedSlots.map((slot) => slot.toMap()).toList(),
+      if (juniorLevel != null) ...juniorLevel.toMap(),
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
