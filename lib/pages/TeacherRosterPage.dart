@@ -796,7 +796,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
               ),
             ),
             SizedBox(height: 16),
-            if (lessons.isEmpty && !hasPlan)
+            if (TeacherBookingBoard.from(lessons).isEmpty && !hasPlan)
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -808,14 +808,35 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                 ),
               )
             else
-              ...lessons.map((booking) => _lessonRow(booking)),
+              ..._lessonSections(lessons),
           ],
         ),
       ),
     );
   }
 
-  Widget _lessonRow(WeekBooking booking) {
+  List<Widget> _lessonSections(List<WeekBooking> lessons) {
+    final board = TeacherBookingBoard.from(lessons);
+    return [
+      ...board.upcoming.map(_lessonRow),
+      if (board.finished.isNotEmpty)
+        Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            tilePadding: EdgeInsets.zero,
+            title: Text(
+              tf(context, '완료된 수업 {p0}', {'p0': board.finished.length}),
+              style: TextStyle(fontFamily: "NotoSansKR", fontWeight: FontWeight.w700),
+            ),
+            children: board.finished
+                .map((booking) => _lessonRow(booking, archive: true))
+                .toList(),
+          ),
+        ),
+    ];
+  }
+
+  Widget _lessonRow(WeekBooking booking, {bool archive = false}) {
     final feedback = LessonFeedbackService.forBooking(_feedbacks, booking.id);
     final rating = LessonRatingService.forBooking(_ratings, booking.id);
     final written = feedback != null && feedback.hasContent;
@@ -823,8 +844,10 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     final session = _sessionFor(booking);
     final live = session?.isLiveNow == true;
     final ended = session?.isFinished == true || session?.isStale == true;
-    final canHost = _canWrite && booking.isConfirmed && !ended;
-    final canEnd = _canWrite &&
+    final canHost =
+        !archive && _canWrite && booking.isConfirmed && !ended;
+    final canEnd = !archive &&
+        _canWrite &&
         booking.isConfirmed &&
         (live || (session?.isLive == true) || !ended);
 

@@ -79,6 +79,26 @@ class FixedWeeklySchedule {
     return DateTime(day.year, day.month, day.day, hour, minute);
   }
 
+  /// 수업이 시작될 수 있는 가장 이른 시각.
+  ///
+  /// [startsOn]이 오늘보다 뒤면 그 날의 수업부터 넣는다.
+  /// 오늘이면 [now]를 유지해서, 이미 지난 시각은 첫 수업이 되지 않는다.
+  static DateTime scheduleEarliest({
+    required DateTime now,
+    DateTime? notBefore,
+    DateTime? startsOn,
+  }) {
+    var earliest = now;
+    if (notBefore != null && notBefore.isAfter(earliest)) {
+      earliest = notBefore;
+    }
+    if (startsOn != null) {
+      final day = dateOnly(startsOn);
+      if (day.isAfter(dateOnly(earliest))) earliest = day;
+    }
+    return earliest;
+  }
+
   /// [earliest] 이후에 오는 첫 수업일. 오늘 시간이 이미 지났으면 다음 주다.
   static DateTime nextDate(WeeklySlot slot, DateTime earliest) {
     final start = dateOnly(earliest);
@@ -96,9 +116,14 @@ class FixedWeeklySchedule {
     required int weeks,
     required DateTime now,
     DateTime? notBefore,
+    DateTime? startsOn,
   }) {
     if (weeks <= 0 || slots.isEmpty) return const [];
-    final earliest = notBefore ?? now;
+    final earliest = scheduleEarliest(
+      now: now,
+      notBefore: notBefore,
+      startsOn: startsOn,
+    );
     final items = <ScheduledLesson>[];
     for (final slot in slots) {
       final first = nextDate(slot, earliest);
@@ -125,6 +150,7 @@ class FixedWeeklySchedule {
     required int weeks,
     required DateTime now,
     DateTime? notBefore,
+    DateTime? startsOn,
   }) {
     if (slots.isEmpty || weeks <= 0) return false;
     final seen = <String>{};
@@ -136,6 +162,7 @@ class FixedWeeklySchedule {
       weeks: weeks,
       now: now,
       notBefore: notBefore,
+      startsOn: startsOn,
     );
     if (items.length != slots.length * weeks) return false;
     for (final item in items) {
@@ -204,6 +231,7 @@ class FixedWeeklySchedule {
     required DateTime now,
     required List<String> times,
     DateTime? notBefore,
+    DateTime? startsOn,
   }) {
     final open = <WeeklySlot>[];
     for (var weekday = 1; weekday <= 7; weekday++) {
@@ -215,6 +243,7 @@ class FixedWeeklySchedule {
           weeks: weeks,
           now: now,
           notBefore: notBefore,
+          startsOn: startsOn,
         )) {
           open.add(slot);
         }

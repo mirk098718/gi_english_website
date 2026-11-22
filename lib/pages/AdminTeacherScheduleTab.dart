@@ -400,6 +400,10 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     if (_saving) return;
     final existing = _bookingAt(date, time);
     if (existing != null) {
+      if (existing.isConfirmed && !_board.isOnDeck(existing)) {
+        _toast(tr(context, '이전 회차가 끝나면 이 수업이 열립니다.'), error: true);
+        return;
+      }
       await _openVideoForBooking(existing);
       return;
     }
@@ -1000,6 +1004,12 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                       ? '내 담당 수강생과, 다른 강사 담당이지만 내 시간에 신청한 타 수강생 예약이 함께 보입니다. 타 수강생은 보라색입니다.'
                       : '담당 수강생과, 다른 강사 담당이지만 이 강사 시간에 신청한 타 수강생 예약이 함께 보입니다. 타 수강생은 보라색입니다.',
                 ),
+          style: TextStyle(
+              fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
+        ),
+        SizedBox(height: 4),
+        Text(
+          tr(context, '가까운 수업만 보여 줍니다. 미리 잡힌 주니어 수업은 직전 회차가 끝난 뒤에 다음 회차가 열리고, 완료된 수업은 아래에 모입니다.'),
           style: TextStyle(
               fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
         ),
@@ -1682,14 +1692,40 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     await _refresh();
   }
 
+  TeacherBookingBoard get _board => TeacherBookingBoard.from(_bookings);
+
   Widget _bookingList() {
     if (_loading) return SizedBox.shrink();
-    if (_bookings.isEmpty) {
+    final board = _board;
+    if (board.isEmpty) {
       return Text(tr(context, '아직 들어온 예약이 없습니다.'),
           style: TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500));
     }
     return Column(
-      children: _bookings.map(_bookingCard).toList(),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (board.upcoming.isEmpty)
+          Text(tr(context, '다가오는 수업이 없습니다.'),
+              style: TextStyle(fontFamily: "NotoSansKR", color: Palette.grey500))
+        else
+          ...board.upcoming.map(_bookingCard),
+        if (board.finished.isNotEmpty) ...[
+          SizedBox(height: 8),
+          Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              title: Text(
+                tf(context, '완료된 수업 {p0}', {'p0': board.finished.length}),
+                style: TextStyle(fontFamily: "Jalnan", fontSize: 15),
+              ),
+              children: board.finished
+                  .map((booking) => _bookingCard(booking, archive: true))
+                  .toList(),
+            ),
+          ),
+        ],
+      ],
     );
   }
 
@@ -1870,8 +1906,10 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     final zoneLine =
         sharedZone == null ? _zoneLineFor(date, time, withWeekday: true) : null;
     final settled = booking != null && _isBookingSettled(booking);
-    final canOpenBooking =
-        booking != null && booking.isConfirmed && !settled;
+    final canOpenBooking = booking != null &&
+        booking.isConfirmed &&
+        !settled &&
+        _board.isOnDeck(booking);
     final canToggleSlot = _canToggleSlot(date, time);
     final selected =
         _selectedKeys.contains(TeacherScheduleService.slotKey(date, time));
@@ -2243,7 +2281,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     );
   }
 
-  Widget _bookingCard(WeekBooking booking) {
+  Widget _bookingCard(WeekBooking booking, {bool archive = false}) {
     final course = OnlineCourse.findById(booking.courseId);
     final settled = _isBookingSettled(booking);
     final cancelled = booking.status == 'rejected';
@@ -2347,7 +2385,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
               onlyWeekNumber: booking.weekNumber,
               dense: true,
             ),
-            if (booking.isPending) ...[
+            if (!archive && booking.isPending) ...[
               SizedBox(height: 12),
               Row(
                 children: [
@@ -2367,7 +2405,9 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                   ),
                 ],
               ),
-            ] else ...[
+            ] else if (!archive &&
+                booking.isConfirmed &&
+                _board.isOnDeck(booking)) ...[
               SizedBox(height: 12),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
@@ -2378,6 +2418,15 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
                 icon: Icon(Icons.videocam, size: 18),
                 label: Text(tr(context, '화상수업 입장'),
                     style: TextStyle(fontFamily: "NotoSansKR")),
+              ),
+            ] else if (archive) ...[
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  onPressed: () => _openPastBookingActions(booking),
+                  child: Text(tr(context, '기록 보기'),
+                      style: TextStyle(fontFamily: "NotoSansKR")),
+                ),
               ),
             ],
           ],

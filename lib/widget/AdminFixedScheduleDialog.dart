@@ -66,6 +66,7 @@ class _AdminFixedScheduleDialogState extends State<AdminFixedScheduleDialog> {
   OnlineNativeTeacher? _teacher;
   final Set<int> _days = {};
   String? _time;
+  DateTime _startDate = FixedWeeklySchedule.dateOnly(DateTime.now());
   bool _loading = true;
   bool _saving = false;
   String? _error;
@@ -122,6 +123,7 @@ class _AdminFixedScheduleDialogState extends State<AdminFixedScheduleDialog> {
       slots: _slots,
       weeks: weeks,
       now: DateTime.now(),
+      startsOn: _startDate,
     );
     if (lessons.isEmpty) return '';
     final first = lessons.first;
@@ -157,6 +159,7 @@ class _AdminFixedScheduleDialogState extends State<AdminFixedScheduleDialog> {
       totalSessions: widget.totalSessions,
       teacher: teacher,
       slots: _slots,
+      startsOn: _startDate,
     );
     if (!mounted) return;
     if (error != null) {
@@ -191,12 +194,23 @@ class _AdminFixedScheduleDialogState extends State<AdminFixedScheduleDialog> {
                   children: [
                     Text(
                       tr(context,
-                          '이 수강생의 매주 수업 요일과 시간을 정합니다. 다음 해당 요일부터 전체 회차만큼 들어갑니다.'),
+                          '이 수강생의 매주 수업 요일과 시간을 정합니다. 고른 시작일부터 전체 회차만큼 들어갑니다.'),
                       style: TextStyle(
                         fontFamily: "NotoSansKR",
                         fontSize: 13,
                         height: 1.45,
                         color: Palette.grey600,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    OutlinedButton.icon(
+                      onPressed: _saving ? null : _pickStartDate,
+                      icon: const Icon(Icons.event, size: 18),
+                      label: Text(
+                        tf(context, '시작일 {p0}', {
+                          'p0': EnrollmentService.formatBookingDate(_startDate),
+                        }),
+                        style: TextStyle(fontFamily: "NotoSansKR"),
                       ),
                     ),
                     const SizedBox(height: 14),
@@ -331,6 +345,23 @@ class _AdminFixedScheduleDialogState extends State<AdminFixedScheduleDialog> {
         ),
       ],
     );
+  }
+
+  Future<void> _pickStartDate() async {
+    final today = FixedWeeklySchedule.dateOnly(DateTime.now());
+    final initial = _startDate.isBefore(today) ? today : _startDate;
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: today,
+      lastDate: today.add(const Duration(days: 180)),
+      helpText: tr(context, '시작일'),
+    );
+    if (picked == null || !mounted) return;
+    setState(() {
+      _startDate = FixedWeeklySchedule.dateOnly(picked);
+      _error = null;
+    });
   }
 
   String _dayLabel(int day) {

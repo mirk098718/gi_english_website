@@ -74,6 +74,41 @@ void main() {
     expect(lessons.last.date, DateTime(2026, 12, 22));
   });
 
+  test('고른 시작일 이전 수업은 넣지 않고, 그 전의 예약은 막지 않는다', () {
+    final now = DateTime(2026, 11, 24, 10); // Tuesday
+    final start = DateTime(2026, 12, 1);
+    final lessons = FixedWeeklySchedule.lessons(
+      slots: const [
+        WeeklySlot(weekday: DateTime.tuesday, time: '16:00'),
+      ],
+      weeks: 4,
+      now: now,
+      startsOn: start,
+    );
+
+    expect(lessons.first.date, DateTime(2026, 12, 1));
+    expect(lessons.last.date, DateTime(2026, 12, 22));
+
+    final blockedBeforeStart = TeacherAvailability(
+      teacherUid: 't1',
+      occupiedKeys: {
+        TeacherScheduleService.slotKey(DateTime(2026, 11, 24), '16:00'),
+      },
+    );
+    expect(
+      FixedWeeklySchedule.patternFits(
+        availability: blockedBeforeStart,
+        slots: const [
+          WeeklySlot(weekday: DateTime.tuesday, time: '16:00'),
+        ],
+        weeks: 4,
+        now: now,
+        startsOn: start,
+      ),
+      isTrue,
+    );
+  });
+
   test('오늘 남은 시간은 이번 주 첫 수업으로 넣는다', () {
     final now = DateTime(2026, 11, 24, 10);
     final lessons = FixedWeeklySchedule.lessons(

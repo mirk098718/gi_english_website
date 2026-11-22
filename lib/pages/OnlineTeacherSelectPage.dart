@@ -50,6 +50,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
   List<int> _weekdays = [];
   String? _clockTime;
   DateTime? _extensionStart;
+  DateTime _startDate = FixedWeeklySchedule.dateOnly(DateTime.now());
   final GlobalKey _fixedTimeKey = GlobalKey();
 
   @override
@@ -132,17 +133,20 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
     final notBefore = widget.extendEnrollment
         ? await EnrollmentService.fixedExtensionStart(widget.course.id)
         : null;
+    final start = _clampedStart(notBefore);
     final open = FixedWeeklySchedule.openSlots(
       availability: availability,
       weeks: shape.weeks,
       now: DateTime.now(),
       times: EnrollmentService.bookingTimeSlots,
       notBefore: notBefore,
+      startsOn: start,
     );
     if (!mounted) return;
     setState(() {
       _loadingSchedule = false;
       _extensionStart = notBefore;
+      _startDate = start;
       _openSlots = open;
       _weekdays = _weekdays
           .where((day) => open.any((slot) => slot.weekday == day))
@@ -212,6 +216,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
         teacher: _selected!,
         slots: _pickedSlots,
         extension: widget.extendEnrollment,
+        startsOn: _startDate,
       );
       if (holdError != null) {
         if (!mounted) return;
@@ -316,6 +321,38 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
     setState(() => _clockTime = _clockTime == time ? null : time);
   }
 
+  DateTime _clampedStart(DateTime? notBefore) {
+    final today = FixedWeeklySchedule.dateOnly(DateTime.now());
+    var start = FixedWeeklySchedule.dateOnly(_startDate);
+    if (start.isBefore(today)) start = today;
+    if (notBefore != null) {
+      final floor = FixedWeeklySchedule.dateOnly(notBefore);
+      if (start.isBefore(floor)) start = floor;
+    }
+    return start;
+  }
+
+  Future<void> _pickStartDate() async {
+    final today = FixedWeeklySchedule.dateOnly(DateTime.now());
+    var first = today;
+    final extension = _extensionStart;
+    if (extension != null) {
+      final floor = FixedWeeklySchedule.dateOnly(extension);
+      if (floor.isAfter(first)) first = floor;
+    }
+    final initial = _startDate.isBefore(first) ? first : _startDate;
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: first,
+      lastDate: today.add(const Duration(days: 180)),
+      helpText: tr(context, '시작일'),
+    );
+    if (picked == null || !mounted) return;
+    setState(() => _startDate = FixedWeeklySchedule.dateOnly(picked));
+    await _loadFixedSchedule();
+  }
+
   Widget _fixedTimeSection() {
     final shape = _shape;
     if (shape == null) return const SizedBox.shrink();
@@ -334,6 +371,7 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
             weeks: shape.weeks,
             now: DateTime.now(),
             notBefore: _extensionStart,
+            startsOn: _startDate,
           )
         : const <ScheduledLesson>[];
     return Column(
@@ -352,6 +390,27 @@ class _OnlineTeacherSelectPageState extends State<OnlineTeacherSelectPage> {
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: 13,
+            height: 1.5,
+            color: Palette.grey600,
+          ),
+        ),
+        SizedBox(height: 12),
+        OutlinedButton.icon(
+          onPressed: _paying ? null : _pickStartDate,
+          icon: const Icon(Icons.event, size: 18),
+          label: Text(
+            tf(context, '시작일 {p0}', {
+              'p0': EnrollmentService.formatBookingDate(_startDate),
+            }),
+            style: TextStyle(fontFamily: 'NotoSansKR'),
+          ),
+        ),
+        SizedBox(height: 6),
+        Text(
+          tr(context, '이 날부터 매주 수업이 들어갑니다. 오늘보다 뒤로 미룰 수 있습니다.'),
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: 12,
             height: 1.5,
             color: Palette.grey600,
           ),

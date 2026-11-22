@@ -6,17 +6,20 @@ import 'package:gi_english_website/util/SessionGate.dart';
 
 WeekBooking _booking({
   String id = 'b1',
+  String userId = 'u1',
+  String courseId = 'beginner_phonics',
   int weekNumber = 1,
   DateTime? date,
   String time = '10:00',
   String status = 'confirmed',
+  bool fixedSchedule = false,
 }) {
   return WeekBooking(
     id: id,
-    userId: 'u1',
+    userId: userId,
     memberName: '학생',
     email: 'a@b.com',
-    courseId: 'beginner_phonics',
+    courseId: courseId,
     weekId: 'w$weekNumber',
     weekNumber: weekNumber,
     weekTitle: '$weekNumber회차',
@@ -25,6 +28,7 @@ WeekBooking _booking({
     status: status,
     teacherId: 't1',
     createdAt: DateTime(2026, 11, 1),
+    fixedSchedule: fixedSchedule,
   );
 }
 
@@ -291,5 +295,73 @@ void main() {
       ),
       isFalse,
     );
+  });
+
+  test('주니어는 가까운 회차만 열리고 끝난 회차는 따로 모인다', () {
+    final now = DateTime(2026, 11, 22, 12);
+    final board = TeacherBookingBoard.from([
+      _booking(
+        id: 'done',
+        courseId: 'junior_twice_month',
+        weekNumber: 1,
+        date: DateTime(2026, 11, 20),
+        time: '10:00',
+        fixedSchedule: true,
+      ),
+      _booking(
+        id: 'next',
+        courseId: 'junior_twice_month',
+        weekNumber: 2,
+        date: DateTime(2026, 11, 24),
+        time: '10:00',
+        fixedSchedule: true,
+      ),
+      _booking(
+        id: 'later',
+        courseId: 'junior_twice_month',
+        weekNumber: 3,
+        date: DateTime(2026, 11, 27),
+        time: '10:00',
+        fixedSchedule: true,
+      ),
+    ], now: now);
+
+    expect(board.upcoming.map((item) => item.id), ['next']);
+    expect(board.finished.map((item) => item.id), ['done']);
+    expect(board.isOnDeck(board.upcoming.single), isTrue);
+  });
+
+  test('일반 화상도 완료는 빼고 가까운 수업만 메인에 남긴다', () {
+    final now = DateTime(2026, 11, 22, 12);
+    final board = TeacherBookingBoard.from([
+      _booking(
+        id: 'past',
+        weekNumber: 1,
+        date: DateTime(2026, 11, 21),
+        time: '10:00',
+      ),
+      _booking(
+        id: 'soon',
+        weekNumber: 2,
+        date: DateTime(2026, 11, 23),
+        time: '10:00',
+      ),
+      _booking(
+        id: 'far',
+        weekNumber: 3,
+        date: DateTime(2026, 12, 7),
+        time: '10:00',
+      ),
+      _booking(
+        id: 'wait',
+        userId: 'u2',
+        weekNumber: 1,
+        date: DateTime(2026, 11, 25),
+        status: 'pending',
+      ),
+    ], now: now);
+
+    expect(board.upcoming.map((item) => item.id), ['soon', 'wait']);
+    expect(board.finished.map((item) => item.id), ['past']);
   });
 }

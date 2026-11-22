@@ -2576,6 +2576,29 @@ class EnrollmentService {
     return '$hour12:$minute $period';
   }
 
+  static DateTime? bookingStart(WeekBooking booking) =>
+      bookingDateTime(booking.date, booking.time);
+
+  static int compareBookingStart(WeekBooking a, WeekBooking b) {
+    final as = bookingStart(a) ?? a.date;
+    final bs = bookingStart(b) ?? b.date;
+    final byTime = as.compareTo(bs);
+    if (byTime != 0) return byTime;
+    final byWeek = a.weekNumber.compareTo(b.weekNumber);
+    if (byWeek != 0) return byWeek;
+    return a.id.compareTo(b.id);
+  }
+
+  /// 수업 시간이 지났거나 취소된 예약. 강사 목록에서는 완료 묶음으로 내린다.
+  static bool bookingHasEnded(WeekBooking booking, {DateTime? now}) {
+    if (booking.status == 'rejected' || booking.isCancelled) return true;
+    if (!booking.isConfirmed) return false;
+    final start = bookingStart(booking);
+    if (start == null) return false;
+    final clock = now ?? DateTime.now();
+    return clock.isAfter(start.add(Duration(minutes: booking.lessonMinutes)));
+  }
+
   static bool canStudentChangeBooking(WeekBooking booking, {DateTime? now}) {
     if (booking.status != 'pending' && booking.status != 'confirmed') {
       return false;
@@ -2956,6 +2979,7 @@ class EnrollmentService {
     required OnlineNativeTeacher teacher,
     required List<WeeklySlot> slots,
     required bool extension,
+    DateTime? startsOn,
   }) async {
     final user = AuthService.currentUser;
     if (user == null) return '로그인이 필요합니다.';
@@ -2996,6 +3020,11 @@ class EnrollmentService {
         extension ? await fixedExtensionStart(course.id) : null;
     final weekNumber = extension ? await _nextFixedWeekNumber(course.id) : 1;
     final now = DateTime.now();
+    if (startsOn != null &&
+        FixedWeeklySchedule.dateOnly(startsOn)
+            .isBefore(FixedWeeklySchedule.dateOnly(now))) {
+      return '시작일은 오늘 이후로 정해 주세요.';
+    }
     final availability = await TeacherScheduleService.load(teacherUid);
     if (!FixedWeeklySchedule.patternFits(
       availability: availability,
@@ -3003,6 +3032,7 @@ class EnrollmentService {
       weeks: shape.weeks,
       now: now,
       notBefore: notBefore,
+      startsOn: startsOn,
     )) {
       return '고른 시간 중 이미 예약되었거나 선생님이 닫아 둔 날이 있습니다. 다른 시간을 선택해 주세요.';
     }
@@ -3011,6 +3041,7 @@ class EnrollmentService {
       weeks: shape.weeks,
       now: now,
       notBefore: notBefore,
+      startsOn: startsOn,
     );
     if (lessons.length != shape.sessions) {
       return '고정 시간을 만들지 못했습니다. 다시 선택해 주세요.';
@@ -3126,6 +3157,7 @@ class EnrollmentService {
     required int totalSessions,
     required OnlineNativeTeacher teacher,
     required List<WeeklySlot> slots,
+    DateTime? startsOn,
   }) async {
     if (!await AuthService.isAdmin()) {
       return '메인 관리자만 수업 시간을 정할 수 있습니다.';
@@ -3174,11 +3206,17 @@ class EnrollmentService {
     }
 
     final now = DateTime.now();
+    if (startsOn != null &&
+        FixedWeeklySchedule.dateOnly(startsOn)
+            .isBefore(FixedWeeklySchedule.dateOnly(now))) {
+      return '시작일은 오늘 이후로 정해 주세요.';
+    }
     final availability = await TeacherScheduleService.load(teacherUid);
     final lessons = FixedWeeklySchedule.lessons(
       slots: slots,
       weeks: weeks,
       now: now,
+      startsOn: startsOn,
     );
     if (lessons.length != totalSessions) {
       return '수업 시간을 만들지 못했습니다. 요일과 시간을 다시 선택해 주세요.';
@@ -4310,6 +4348,74 @@ class WeekChecklistItem {
   final String label;
 
   const WeekChecklistItem({required this.id, required this.label});
+}
+
+/// 강사 메인 목록에 올릴 가까운 수업과, 따로 모아 둘 완료 수업.
+///
+/// 미리 시간이 잡힌 수업은 수강생·과정마다 가장 가까운 회차만 올라온다.
+/// 그 회차가 끝나면 다음 회차가 나타난다.
+class TeacherBookingBoard {
+  final List<WeekBooking> upcoming;
+  final List<WeekBooking> finished;
+
+  const TeacherBookingBoard({
+    required this.upcoming,
+    required this.finished,
+  });
+
+  bool get isEmpty => upcoming.isEmpty && finished.isEmpty;
+
+  bool isOnDeck(WeekBooking booking) {
+    for (final item in upcoming) {
+      if (item.id == booking.id) return true;
+    }
+    return false;
+  }
+
+  static TeacherBookingBoard from(
+    List<WeekBooking> bookings, {
+    DateTime? now,
+  }) {
+    final finished = <WeekBooking>[];
+    final open = <WeekBooking>[];
+    for (final booking in bookings) {
+      if (EnrollmentService.bookingHasEnded(booking, now: now)) {
+        finished.add(booking);
+      } else {
+        open.add(booking);
+      }
+    }
+    finished.sort((a, b) => EnrollmentService.compareBookingStart(b, a));
+
+    final nextByStudent = <String, WeekBooking>{};
+    for (final booking in open) {
+      if (booking.isPending) continue;
+      final key = '${booking.userId}|${booking.courseId}';
+      final current = nextByStudent[key];
+      if (current == null ||
+          EnrollmentService.compareBookingStart(booking, current) < 0) {
+        nextByStudent[key] = booking;
+      }
+    }
+
+    final upcoming = <WeekBooking>[];
+    for (final booking in open) {
+      if (booking.isPending) {
+        upcoming.add(booking);
+        continue;
+      }
+      final fixed = booking.fixedSchedule || booking.isJunior;
+      final key = '${booking.userId}|${booking.courseId}';
+      final next = nextByStudent[key];
+      if (fixed) {
+        if (next != null && next.id == booking.id) upcoming.add(booking);
+        continue;
+      }
+      if (next != null && next.id == booking.id) upcoming.add(booking);
+    }
+    upcoming.sort(EnrollmentService.compareBookingStart);
+    return TeacherBookingBoard(upcoming: upcoming, finished: finished);
+  }
 }
 
 class WeekBooking {
