@@ -5,6 +5,8 @@ import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlinePlan.dart';
 import 'package:gi_english_website/pages/SchoolCodingPage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineJuniorCurriculumPage.dart';
+import 'package:gi_english_website/util/EnrollmentService.dart';
+import 'package:gi_english_website/widget/AssignmentWorkSection.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
 
 void main() {
@@ -200,5 +202,49 @@ void main() {
     );
     expect(find.text('로그인'), findsOneWidget);
     expect(find.text('회원가입'), findsOneWidget);
+  });
+
+  test('주니어와 재원생 화상 과제 체크는 예약을 막지 않는다', () {
+    final junior = OnlineCourse.junior(JuniorOffer.twiceAWeek, quarter: false);
+    final freeTalk = OnlineCourse.enrolledFreeTalk;
+    for (final course in [junior, freeTalk]) {
+      final weeks = EnrollmentService.speakingSessionWeeks(course, 2);
+      expect(weeks, hasLength(2));
+      expect(weeks.first.videoUrl, isEmpty);
+      expect(weeks.first.problemLinks, isEmpty);
+      expect(
+        weeks.first.checklistItems.map((item) => item.id),
+        [
+          EnrollmentService.onlineProblemChecklist.id,
+          EnrollmentService.workbookChecklist.id,
+        ],
+      );
+      expect(EnrollmentService.requiredChecklistItems(weeks.first), isEmpty);
+      expect(EnrollmentService.isWeekReadyToBook(weeks.first, const []), isTrue);
+    }
+  });
+
+  testWidgets('과제 체크는 온라인 문제풀이와 교재 풀이로 나뉜다', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: AssignmentWorkSection(
+            checkedIds: const ['online_problem_done'],
+            photoUrls: const [],
+            enabled: true,
+            onToggle: (_, __) {},
+            onUpload: (_, __) async => null,
+            onRemove: (_) async => null,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('온라인 문제풀이'), findsOneWidget);
+    expect(find.text('교재 풀이'), findsOneWidget);
+    expect(find.text('카메라로 찍기'), findsOneWidget);
+    expect(find.text('사진 올리기'), findsOneWidget);
+    expect(tester.widget<CheckboxListTile>(find.byType(CheckboxListTile).at(0)).value, isTrue);
+    expect(tester.widget<CheckboxListTile>(find.byType(CheckboxListTile).at(1)).value, isFalse);
   });
 }

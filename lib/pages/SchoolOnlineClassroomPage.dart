@@ -907,6 +907,9 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
       if (allDone) {
         return '회화 ${enrollment.totalSessions}회를 모두 마쳤습니다';
       }
+      if (enrollment.course?.fixedSpeakingPrice == true) {
+        return '정해진 수업 ${enrollment.totalSessions}회 · 시간 변경';
+      }
       return '회화 ${enrollment.unlockedSessionNumber}회 · 기한 ${enrollment.remainingDeadlineWeeks}주 · 예약하기';
     }
     if (allDone) {
@@ -928,6 +931,9 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
     }
     if (!enrollment.includesLessons) {
       if (allDone) return '회화 ${enrollment.totalSessions}회 모두 완료';
+      if (enrollment.course?.fixedSpeakingPrice == true) {
+        return '정해진 수업 ${enrollment.remainingSessions}회 남음';
+      }
       return '남은 회화 ${enrollment.remainingSessions}회 / 전체 ${enrollment.totalSessions}회';
     }
     if (allDone) {

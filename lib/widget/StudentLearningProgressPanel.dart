@@ -6,6 +6,7 @@ import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/QuizResultService.dart';
 import 'package:gi_english_website/util/UrlIUtil.dart';
+import 'package:gi_english_website/widget/AssignmentWorkSection.dart';
 import 'package:gi_english_website/widget/QuizResultSummary.dart';
 
 /// 강사/관리자가 수강생 카드에서 보는 회차별 인강·문제 체크와 최근 퀴즈 결과.
@@ -159,6 +160,9 @@ class _StudentLearningProgressPanelState
 
   /// 체크가 끝나거나 회차 차감이 된 회차. 강사 화면의 '예약 가능'은 수강완료로 적는다.
   bool _markedComplete(StudentWeekProgress week, int completedSessions) {
+    if (week.tracksAssignment) {
+      return week.weekNumber > 0 && completedSessions >= week.weekNumber;
+    }
     if (week.weekNumber > 0 && completedSessions >= week.weekNumber) {
       return true;
     }
@@ -219,6 +223,13 @@ class _StudentLearningProgressPanelState
             ),
           ),
           children: [
+            if (week.tracksAssignment)
+              AssignmentStatusView(
+                onlineProblemChecked: week.onlineProblemChecked,
+                workbookChecked: week.workbookChecked,
+                photoUrls: week.photoUrls,
+              )
+            else ...[
             if (week.videoUrl.trim().isNotEmpty)
               _line(
                 label: tr(context, '인강'),
@@ -236,6 +247,7 @@ class _StudentLearningProgressPanelState
                   done: week.problemsChecked,
                 )),
             _quizSection(week, userId),
+            ],
           ],
         ),
       ),

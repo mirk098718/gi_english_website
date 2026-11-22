@@ -525,6 +525,24 @@ class EnrollmentService {
     WeekChecklistItem(id: 'solve_problems', label: '문제풀이 하기'),
   ];
 
+  /// 글리머 주니어·재원생 화상의 과제 체크. 화상 예약과는 상관없다.
+  static const WeekChecklistItem onlineProblemChecklist = WeekChecklistItem(
+    id: 'online_problem_done',
+    label: '온라인 문제풀이',
+  );
+
+  static const WeekChecklistItem workbookChecklist = WeekChecklistItem(
+    id: 'workbook_done',
+    label: '교재 풀이',
+  );
+
+  static const List<WeekChecklistItem> assignmentChecklists = [
+    onlineProblemChecklist,
+    workbookChecklist,
+  ];
+
+  static const int maxAssignmentPhotos = 8;
+
   static List<WeekChecklistItem> checklistForVideo(String videoUrl) {
     if (videoUrl.trim().isEmpty) return problemOnlyChecklist;
     return videoAndProblemChecklist;
@@ -534,8 +552,10 @@ class EnrollmentService {
 
   /// 예약 전에 체크해야 하는 항목. 영상 주소가 없으면 인강 시청은 빼 둔다.
   static List<WeekChecklistItem> requiredChecklistItems(OnlineWeek week) {
-    if (weekHasVideo(week)) return week.checklistItems;
-    return week.checklistItems.where((item) => !isVideoChecklistItem(item)).toList();
+    final source = weekHasVideo(week)
+        ? week.checklistItems
+        : week.checklistItems.where((item) => !isVideoChecklistItem(item));
+    return source.where((item) => !isAssignmentChecklistItem(item)).toList();
   }
 
   static String bookingChecklistHint(OnlineWeek week) {
@@ -566,7 +586,33 @@ class EnrollmentService {
   }
 
   static bool isProblemChecklistItem(WeekChecklistItem item) {
+    if (isAssignmentChecklistItem(item)) return false;
     return item.id == 'solve_problems' || item.label.contains('문제풀이');
+  }
+
+  static bool isAssignmentChecklistItem(WeekChecklistItem item) {
+    return item.id == onlineProblemChecklist.id ||
+        item.id == workbookChecklist.id;
+  }
+
+  /// 결제할 때 시간이 고정된 수업의 회차. 인강·퀴즈는 없고 과제 체크만 있다.
+  static List<OnlineWeek> speakingSessionWeeks(OnlineCourse course, int total) {
+    final count = total < 1 ? 1 : total;
+    final items = course.fixedSpeakingPrice
+        ? assignmentChecklists
+        : const <WeekChecklistItem>[];
+    return [
+      for (var n = 1; n <= count; n++)
+        OnlineWeek(
+          id: 'native_speaking_session_$n',
+          courseId: course.id,
+          weekNumber: n,
+          title: '$n회 회화',
+          description: '원어민과 1:1로 말하는 회화 수업입니다.',
+          videoUrl: '',
+          checklistItems: items,
+        ),
+    ];
   }
 
   /// 예약에 필요한 체크가 끝났는지.
@@ -2011,18 +2057,28 @@ class EnrollmentService {
     final list = unique.values.toList();
     final throughByCourse = <String, int>{};
     for (final enrollment in list) {
+      final fixed = enrollment.course?.fixedSpeakingPrice == true;
       final current = throughByCourse[enrollment.courseId] ?? 1;
-      final opened = enrollment.plan == OnlinePlan.lecture
-          ? catalogLessons(enrollment.courseId).length
-          : enrollment.unlockedSessionNumber;
-      final next = opened > enrollment.unlockedSessionNumber
+      final opened = fixed
+          ? enrollment.totalSessions
+          : enrollment.plan == OnlinePlan.lecture
+              ? catalogLessons(enrollment.courseId).length
+              : enrollment.unlockedSessionNumber;
+      final next = fixed
           ? opened
-          : enrollment.unlockedSessionNumber;
+          : (opened > enrollment.unlockedSessionNumber
+              ? opened
+              : enrollment.unlockedSessionNumber);
       throughByCourse[enrollment.courseId] = next > current ? next : current;
     }
 
     final weeksByCourse = <String, List<OnlineWeek>>{};
     await Future.wait(throughByCourse.entries.map((entry) async {
+      final course = OnlineCourse.findById(entry.key);
+      if (course != null && course.fixedSpeakingPrice) {
+        weeksByCourse[entry.key] = speakingSessionWeeks(course, entry.value);
+        return;
+      }
       weeksByCourse[entry.key] = await weeks(
         entry.key,
         ensureThrough: entry.value,
@@ -2032,10 +2088,13 @@ class EnrollmentService {
     final result = <String, List<StudentWeekProgress>>{};
     await Future.wait(list.map((enrollment) async {
       final records = await weekProgressRecords(enrollment.id);
+      final fixed = enrollment.course?.fixedSpeakingPrice == true;
       result[enrollment.id] = mergeLearningWeeks(
         weeks: weeksByCourse[enrollment.courseId] ?? const [],
         records: records,
-        through: enrollment.unlockedSessionNumber,
+        through: fixed
+            ? enrollment.totalSessions
+            : enrollment.unlockedSessionNumber,
       );
     }));
     return result;
@@ -2127,6 +2186,96 @@ class EnrollmentService {
       print('체크리스트 저장 오류: $e');
       return '체크리스트 저장에 실패했습니다.';
     }
+  }
+
+  static Future<String?> saveAssignmentPhotos({
+    required String enrollmentId,
+    required String weekId,
+    required List<String> photoUrls,
+    OnlineWeek? week,
+  }) async {
+    try {
+      final payload = <String, dynamic>{
+        'photoUrls': photoUrls,
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+      if (week != null) {
+        payload['weekNumber'] = week.weekNumber;
+        payload['weekTitle'] = week.title;
+      }
+      await _firestore
+          .collection('enrollments')
+          .doc(enrollmentId)
+          .collection('week_progress')
+          .doc(weekId)
+          .set(payload, SetOptions(merge: true));
+      return null;
+    } catch (e) {
+      print('과제 사진 저장 오류: $e');
+      return '과제 사진을 저장하지 못했습니다.';
+    }
+  }
+
+  static Future<String?> uploadAssignmentPhoto({
+    required EnrollmentRecord enrollment,
+    required OnlineWeek week,
+    required Uint8List bytes,
+    required String fileName,
+    required List<String> currentUrls,
+  }) async {
+    final user = AuthService.currentUser;
+    if (user == null || user.uid != enrollment.userId) {
+      return '본인 수강에서만 사진을 올릴 수 있습니다.';
+    }
+    if (currentUrls.length >= maxAssignmentPhotos) {
+      return '사진은 회차마다 $maxAssignmentPhotos장까지 올릴 수 있습니다.';
+    }
+    if (bytes.isEmpty || bytes.length > 4 * 1024 * 1024) {
+      return '4MB 이하의 사진을 올려 주세요.';
+    }
+    try {
+      final safeName = fileName.replaceAll(RegExp(r'[^\w\.\-]'), '_');
+      final path =
+          'assignment_photos/${user.uid}/${enrollment.id}/${week.id}/${DateTime.now().millisecondsSinceEpoch}_$safeName';
+      final ref = _storage.ref().child(path);
+      final lower = safeName.toLowerCase();
+      final type = lower.endsWith('.png')
+          ? 'image/png'
+          : lower.endsWith('.webp')
+              ? 'image/webp'
+              : 'image/jpeg';
+      await ref.putData(bytes, SettableMetadata(contentType: type));
+      final url = await ref.getDownloadURL();
+      return saveAssignmentPhotos(
+        enrollmentId: enrollment.id,
+        weekId: week.id,
+        photoUrls: [...currentUrls, url],
+        week: week,
+      );
+    } catch (e) {
+      print('과제 사진 업로드 오류: $e');
+      return '과제 사진을 올리지 못했습니다.';
+    }
+  }
+
+  /// 강사가 회차를 열 때 과제 체크와 사진을 읽는다.
+  static Future<WeekProgressRecord?> progressForBooking(WeekBooking booking) async {
+    if (booking.userId.isEmpty || booking.courseId.isEmpty) return null;
+    final teacherUid = booking.nativeTeacherUid.trim().isNotEmpty
+        ? booking.nativeTeacherUid.trim()
+        : booking.teacherId.trim();
+    if (teacherUid.isEmpty || booking.weekId.isEmpty) return null;
+    final enrollments = await listEnrollments(teacherUid: teacherUid);
+    EnrollmentRecord? match;
+    for (final item in enrollments) {
+      if (item.userId == booking.userId && item.courseId == booking.courseId) {
+        match = item;
+        break;
+      }
+    }
+    if (match == null) return null;
+    final records = await weekProgressRecords(match.id);
+    return records[booking.weekId];
   }
 
   static Map<String, dynamic> _weekPayload({
@@ -3633,6 +3782,7 @@ class WeekProgressRecord {
   final String weekTitle;
   final String videoUrl;
   final List<WeekProblemLink> problemLinks;
+  final List<String> photoUrls;
 
   WeekProgressRecord({
     required this.weekId,
@@ -3641,6 +3791,7 @@ class WeekProgressRecord {
     this.weekTitle = '',
     this.videoUrl = '',
     this.problemLinks = const [],
+    this.photoUrls = const [],
   });
 
   factory WeekProgressRecord.fromMap(String id, Map<String, dynamic> data) {
@@ -3660,6 +3811,10 @@ class WeekProgressRecord {
         }
       }
     }
+    final rawPhotos = data['photoUrls'];
+    final photos = rawPhotos is List
+        ? rawPhotos.map((e) => e.toString()).where((e) => e.isNotEmpty).toList()
+        : <String>[];
     return WeekProgressRecord(
       weekId: id,
       checkedItemIds: checked,
@@ -3667,6 +3822,7 @@ class WeekProgressRecord {
       weekTitle: data['weekTitle']?.toString() ?? '',
       videoUrl: data['videoUrl']?.toString() ?? '',
       problemLinks: links,
+      photoUrls: photos,
     );
   }
 }
@@ -3681,6 +3837,10 @@ class StudentWeekProgress {
   final bool videoChecked;
   final bool problemsChecked;
   final bool readyToBook;
+  final bool tracksAssignment;
+  final bool onlineProblemChecked;
+  final bool workbookChecked;
+  final List<String> photoUrls;
 
   StudentWeekProgress({
     required this.weekId,
@@ -3691,6 +3851,10 @@ class StudentWeekProgress {
     required this.videoChecked,
     required this.problemsChecked,
     required this.readyToBook,
+    this.tracksAssignment = false,
+    this.onlineProblemChecked = false,
+    this.workbookChecked = false,
+    this.photoUrls = const [],
   });
 
   String get videoLabel {
@@ -3719,6 +3883,8 @@ class StudentWeekProgress {
     final problemItems = week.checklistItems
         .where(EnrollmentService.isProblemChecklistItem)
         .toList();
+    final tracksAssignment =
+        week.checklistItems.any(EnrollmentService.isAssignmentChecklistItem);
     return StudentWeekProgress(
       weekId: week.id,
       weekNumber: week.weekNumber > 0
@@ -3736,6 +3902,11 @@ class StudentWeekProgress {
           ? checked.contains('solve_problems')
           : problemItems.every((item) => checked.contains(item.id)),
       readyToBook: EnrollmentService.isWeekReadyToBook(week, checked),
+      tracksAssignment: tracksAssignment,
+      onlineProblemChecked:
+          checked.contains(EnrollmentService.onlineProblemChecklist.id),
+      workbookChecked: checked.contains(EnrollmentService.workbookChecklist.id),
+      photoUrls: record?.photoUrls ?? const [],
     );
   }
 }
@@ -4179,12 +4350,21 @@ class EnrollmentRecord {
     final paidRaw = data['paidAt'];
     if (paidRaw is Timestamp) paidAt = paidRaw.toDate();
 
+    final courseId = data['courseId']?.toString() ?? '';
+    final storedPlan = OnlinePlan.resolve(
+      stored: data['plan']?.toString(),
+      courseId: courseId,
+    );
+    final plan = OnlineCourse.findById(courseId)?.fixedSpeakingPrice == true
+        ? OnlinePlan.speaking
+        : storedPlan;
+
     return EnrollmentRecord(
       id: id,
       userId: data['userId']?.toString() ?? '',
       email: data['email']?.toString() ?? '',
       memberName: data['memberName']?.toString() ?? '',
-      courseId: data['courseId']?.toString() ?? '',
+      courseId: courseId,
       isActive: data['isActive'] != false,
       totalSessions: EnrollmentService._intValue(data['totalSessions']),
       completedSessions: EnrollmentService._intValue(data['completedSessions']),
@@ -4206,10 +4386,7 @@ class EnrollmentRecord {
       lastSessionAt: lastSessionAt,
       adminUnlockedThrough:
           EnrollmentService._intValue(data['adminUnlockedThrough']),
-      plan: OnlinePlan.resolve(
-        stored: data['plan']?.toString(),
-        courseId: data['courseId']?.toString() ?? '',
-      ),
+      plan: plan,
     );
   }
 }

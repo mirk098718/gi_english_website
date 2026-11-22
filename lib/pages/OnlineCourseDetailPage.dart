@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/SiteLayout.dart';
@@ -28,6 +29,7 @@ import 'package:gi_english_website/widget/QuizResultSummary.dart';
 import 'package:gi_english_website/widget/MainTeacherChange.dart';
 import 'package:gi_english_website/widget/StudentJoinButton.dart';
 import 'package:gi_english_website/widget/TeacherClassTimeLine.dart';
+import 'package:gi_english_website/widget/AssignmentWorkSection.dart';
 import 'package:gi_english_website/widget/YoutubeLessonPlayer.dart';
 
 import '../util/WidgetUtil.dart';
@@ -49,6 +51,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
   List<OnlineWeek> _weeks = [];
   EnrollmentRecord? _enrollment;
   Map<String, List<String>> _weekProgress = {};
+  Map<String, List<String>> _assignmentPhotos = {};
   Map<String, QuizResult> _quizResults = {};
   List<WeekBooking> _bookings = [];
   List<LessonFeedback> _feedbacks = [];
@@ -154,12 +157,16 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     final speaking = widget.course.isSpeakingProduct ||
         enrollment?.plan == OnlinePlan.speaking;
     final weeks = speaking
-        ? _speakingWeeks(enrollment?.totalSessions ?? 8)
+        ? EnrollmentService.speakingSessionWeeks(
+            widget.course,
+            enrollment?.totalSessions ?? widget.course.defaultSessions,
+          )
         : await EnrollmentService.weeks(
             widget.course.id,
             ensureThrough: enrollment?.unlockedSessionNumber ?? 1,
           );
     Map<String, List<String>> progress = {};
+    Map<String, List<String>> photos = {};
     List<WeekBooking> bookings = [];
     List<LessonFeedback> feedbacks = [];
     List<LessonRating> ratings = [];
@@ -181,7 +188,15 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       quizResults = lookup.results;
     }
     if (enrollment != null) {
-      progress = await EnrollmentService.weekProgress(enrollment.id);
+      final records =
+          await EnrollmentService.weekProgressRecords(enrollment.id);
+      progress = {
+        for (final entry in records.entries)
+          entry.key: entry.value.checkedItemIds,
+      };
+      photos = {
+        for (final entry in records.entries) entry.key: entry.value.photoUrls,
+      };
       bookings =
           await EnrollmentService.myWeekBookings(courseId: widget.course.id);
       feedbacks = await LessonFeedbackService.listForStudent(
@@ -204,6 +219,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       _weeks = weeks;
       _enrollment = enrollment;
       _weekProgress = progress;
+      _assignmentPhotos = photos;
       _quizResults = quizResults;
       _bookings = bookings;
       _feedbacks = feedbacks;
@@ -292,6 +308,49 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       );
       await _loadData();
     }
+  }
+
+  Future<void> _refreshAssignmentPhotos(String enrollmentId) async {
+    final records = await EnrollmentService.weekProgressRecords(enrollmentId);
+    if (!mounted) return;
+    setState(() {
+      _assignmentPhotos = {
+        for (final entry in records.entries) entry.key: entry.value.photoUrls,
+      };
+    });
+  }
+
+  Future<String?> _uploadAssignmentPhoto(
+    OnlineWeek week,
+    Uint8List bytes,
+    String fileName,
+  ) async {
+    final enrollment = _enrollment;
+    if (enrollment == null) return '결제 후 사진을 올릴 수 있습니다.';
+    final error = await EnrollmentService.uploadAssignmentPhoto(
+      enrollment: enrollment,
+      week: week,
+      bytes: bytes,
+      fileName: fileName,
+      currentUrls: List<String>.from(_assignmentPhotos[week.id] ?? const []),
+    );
+    if (error == null) await _refreshAssignmentPhotos(enrollment.id);
+    return error;
+  }
+
+  Future<String?> _removeAssignmentPhoto(OnlineWeek week, String url) async {
+    final enrollment = _enrollment;
+    if (enrollment == null) return '결제 후 사진을 지울 수 있습니다.';
+    final next = List<String>.from(_assignmentPhotos[week.id] ?? const [])
+      ..remove(url);
+    final error = await EnrollmentService.saveAssignmentPhotos(
+      enrollmentId: enrollment.id,
+      weekId: week.id,
+      photoUrls: next,
+      week: week,
+    );
+    if (error == null) await _refreshAssignmentPhotos(enrollment.id);
+    return error;
   }
 
   bool _readyToBook(OnlineWeek week, List<String> checked) {
@@ -1246,21 +1305,6 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     );
   }
 
-  List<OnlineWeek> _speakingWeeks(int total) {
-    final count = total < 1 ? 1 : total;
-    return [
-      for (var n = 1; n <= count; n++)
-        OnlineWeek(
-          id: 'native_speaking_session_$n',
-          courseId: widget.course.id,
-          weekNumber: n,
-          title: '$n회 회화',
-          description: '원어민과 1:1로 말하는 회화 수업입니다.',
-          videoUrl: '',
-        ),
-    ];
-  }
-
   String _enrollmentDeadlineCopy() {
     final enrollment = _enrollment!;
     final current = enrollment.unlockedSessionNumber;
@@ -1458,6 +1502,19 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             ),
           ),
           children: [
+            if (widget.course.fixedSpeakingPrice) ...[
+              AssignmentWorkSection(
+                checkedIds: checked,
+                photoUrls: _assignmentPhotos[week.id] ?? const [],
+                enabled: _enrollment != null && !_savingChecklist,
+                onToggle: (itemId, value) =>
+                    _toggleChecklist(week, itemId, value),
+                onUpload: (bytes, name) =>
+                    _uploadAssignmentPhoto(week, bytes, name),
+                onRemove: (url) => _removeAssignmentPhoto(week, url),
+              ),
+              SizedBox(height: 16),
+            ],
             if (!unlocked) ...[
               if (fixedWeek) ...[
                 weekBookingSection(week),
@@ -1481,7 +1538,12 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             ] else if (_speakingOnly) ...[
               if (_enrollment == null)
                 Text(
-                  tr(context, '결제 후 이 회차 회화를 예약할 수 있습니다.'),
+                  tr(
+                    context,
+                    widget.course.fixedSpeakingPrice
+                        ? '결제하면 정해진 수업 시간이 이 회차에 표시됩니다.'
+                        : '결제 후 이 회차 회화를 예약할 수 있습니다.',
+                  ),
                   style: TextStyle(
                     fontFamily: 'NotoSansKR',
                     fontSize: 13,
@@ -1951,7 +2013,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      tr(context, "화상수업 예약하기"),
+                      tr(context, fixed ? "수업 시간" : "화상수업 예약하기"),
                       style: TextStyle(fontFamily: "Jalnan", fontSize: 13),
                     ),
                     SizedBox(height: 2),
@@ -2089,7 +2151,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                     child: Text(
                       _movingWeekId == week.id
                           ? tr(context, "옮기기 취소")
-                          : tr(context, fixed ? "대체 시간 고르기" : "시간 옮기기"),
+                          : tr(context, fixed ? "변경" : "시간 옮기기"),
                       style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12),
                     ),
                   ),

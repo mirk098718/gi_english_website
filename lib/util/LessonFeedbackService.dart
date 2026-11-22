@@ -7,6 +7,7 @@ import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/NotificationService.dart';
 import 'package:gi_english_website/util/Palette.dart';
+import 'package:gi_english_website/widget/AssignmentWorkSection.dart';
 
 int _intValue(dynamic value) {
   if (value is int) return value;
@@ -343,12 +344,14 @@ class LessonFeedbackDialog extends StatefulWidget {
 
 class _LessonFeedbackDialogState extends State<LessonFeedbackDialog> {
   late final TextEditingController _controller;
+  late final Future<WeekProgressRecord?> _assignment;
   bool _saving = false;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.existing?.content ?? '');
+    _assignment = EnrollmentService.progressForBooking(widget.booking);
   }
 
   @override
@@ -407,6 +410,22 @@ class _LessonFeedbackDialogState extends State<LessonFeedbackDialog> {
                     color: Palette.grey600),
               ),
               SizedBox(height: 16),
+              if (course?.fixedSpeakingPrice == true) ...[
+                FutureBuilder<WeekProgressRecord?>(
+                  future: _assignment,
+                  builder: (context, snapshot) {
+                    final ids = snapshot.data?.checkedItemIds ?? const <String>[];
+                    return AssignmentStatusView(
+                      onlineProblemChecked: ids.contains(
+                          EnrollmentService.onlineProblemChecklist.id),
+                      workbookChecked:
+                          ids.contains(EnrollmentService.workbookChecklist.id),
+                      photoUrls: snapshot.data?.photoUrls ?? const [],
+                    );
+                  },
+                ),
+                SizedBox(height: 16),
+              ],
               if (widget.canWrite)
                 TextField(
                   controller: _controller,

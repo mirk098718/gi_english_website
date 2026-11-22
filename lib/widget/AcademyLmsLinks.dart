@@ -24,8 +24,11 @@ class AcademyLmsLinks extends StatelessWidget {
         super(key: key);
 
   static const String _middleUrl = 'http://gienglish.theclip.net/';
-  static const String _eleUrl =
+
+  /// Trophy9 학습실. 회차별 온라인 과제 버튼도 이 주소로 연다.
+  static const String trophy9Url =
       'https://www.trophy9.com/account/account.do?stdcmd=sign&url=%2Fdefault%2Edo%3F';
+  static const String _eleUrl = trophy9Url;
 
   @override
   Widget build(BuildContext context) {

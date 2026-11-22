@@ -52,6 +52,9 @@ function expiresAtFromStart(start, totalSessions) {
 function enrollmentPlan(payment) {
   const courseId = payment && payment.courseId ? String(payment.courseId) : "";
   if (courseId === SPEAKING_COURSE_ID) return SPEAKING_PLAN;
+  if (courseId.indexOf("junior_") === 0 || courseId === "enrolled_free_talk") {
+    return SPEAKING_PLAN;
+  }
   const plan = payment && payment.plan ? String(payment.plan) : "";
   if (plan === LECTURE_PLAN || plan === SPEAKING_PLAN) return plan;
   return "bundle";
