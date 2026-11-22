@@ -547,6 +547,7 @@ class EnrollmentService {
   ];
 
   static const int maxAssignmentPhotos = 8;
+  static const int assignmentPhotoRetentionDays = 30;
   static const String assignmentPhotoPrefix = 'assignment-photo:';
   static final Map<String, Uint8List> _assignmentPhotoBytes = {};
 
@@ -2267,6 +2268,11 @@ class EnrollmentService {
         'dataUrl': dataUrl,
         'mimeType': prepared.mimeType,
         'createdAt': FieldValue.serverTimestamp(),
+        'expireAt': Timestamp.fromDate(
+          DateTime.now().add(
+            const Duration(days: assignmentPhotoRetentionDays),
+          ),
+        ),
       }).timeout(const Duration(seconds: 20));
       final ref = assignmentPhotoRef(enrollment.id, doc.id);
       _assignmentPhotoBytes[ref] = prepared.bytes;

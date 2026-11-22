@@ -1932,3 +1932,63 @@ exports.talkConversationTopics = functions
     const items = await collectTalkTopics();
     return { items };
   });
+
+const ASSIGNMENT_PHOTO_RETENTION_MS = 30 * MS_PER_DAY;
+
+function assignmentPhotoExpireMs(data) {
+  const expire = toJsDate(data && data.expireAt);
+  if (expire) return expire.getTime();
+  const created = toJsDate(data && data.createdAt);
+  if (!created) return null;
+  return created.getTime() + ASSIGNMENT_PHOTO_RETENTION_MS;
+}
+
+async function commitInChunks(ops) {
+  const db = admin.firestore();
+  for (let i = 0; i < ops.length; i += 400) {
+    const batch = db.batch();
+    ops.slice(i, i + 400).forEach((op) => op(batch));
+    await batch.commit();
+  }
+}
+
+// 과제 사진은 올린 뒤 30일이 지나면 매일 새벽 3시 15분에 지운다.
+exports.purgeExpiredAssignmentPhotos = functions
+  .region("asia-northeast3")
+  .pubsub.schedule("15 3 * * *")
+  .timeZone("Asia/Seoul")
+  .onRun(async () => {
+    const db = admin.firestore();
+    const now = Date.now();
+    const enrollments = await db.collection("enrollments").get();
+    let removed = 0;
+    for (const enrollment of enrollments.docs) {
+      const photos = await enrollment.ref.collection("assignment_photos").get();
+      const expired = photos.docs.filter((photo) => {
+        const at = assignmentPhotoExpireMs(photo.data() || {});
+        return at != null && at <= now;
+      });
+      if (expired.length === 0) continue;
+      const refs = new Set(
+        expired.map((photo) => `assignment-photo:${enrollment.id}/${photo.id}`)
+      );
+      const progress = await enrollment.ref.collection("week_progress").get();
+      const ops = [];
+      for (const week of progress.docs) {
+        const urls = (week.data() || {}).photoUrls;
+        if (!Array.isArray(urls)) continue;
+        const next = urls
+          .map((url) => String(url))
+          .filter((url) => !refs.has(url));
+        if (next.length === urls.length) continue;
+        ops.push((batch) => batch.update(week.ref, { photoUrls: next }));
+      }
+      expired.forEach((photo) => {
+        ops.push((batch) => batch.delete(photo.ref));
+      });
+      await commitInChunks(ops);
+      removed += expired.length;
+    }
+    console.log("만료된 과제 사진 삭제", removed);
+    return null;
+  });
