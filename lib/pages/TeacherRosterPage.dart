@@ -155,6 +155,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     final members = teacherUid.isEmpty
         ? <Map<String, dynamic>>[]
         : await AuthService.listMembers(teacherId: teacherUid);
+    await EnrollmentService.publishFixedSessionPlans(teacherUid);
     final bookings = await EnrollmentService.weekBookingsForTeacher(teacherUid);
     if (teacherUid.isNotEmpty) {
       await EnrollmentService.backfillSessionsForTeacher(teacherUid);
@@ -712,9 +713,15 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     final name = AuthService.profileDisplayName(member, fallback: '');
     final email = member['email']?.toString() ?? '';
     final assignedTeacherName = member['assignedTeacherName']?.toString() ?? '';
-    final lessons = _bookingsFor(memberId);
+    final lessons = _bookingsFor(memberId)
+      ..sort((a, b) {
+        final byWeek = a.weekNumber.compareTo(b.weekNumber);
+        if (byWeek != 0) return byWeek;
+        return a.date.compareTo(b.date);
+      });
     final records =
         _enrollments.where((item) => item.userId == memberId).toList();
+    final hasPlan = records.any((item) => item.sessionPlan.isNotEmpty);
     return Card(
       margin: EdgeInsets.only(bottom: 12),
       child: Theme(
@@ -785,10 +792,11 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
               child: StudentLearningProgressPanel(
                 enrollments: records,
                 progressByEnrollment: _learning,
+                bookings: lessons,
               ),
             ),
             SizedBox(height: 16),
-            if (lessons.isEmpty)
+            if (lessons.isEmpty && !hasPlan)
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(

@@ -2525,6 +2525,15 @@ class EnrollmentService {
   static List<String> get bookingTimeSlots => TeacherClassBands.timeSlots;
 
   static const int lessonMinutes = 20;
+
+  /// 주니어 화상은 30분. 다른 화상수업은 20분.
+  static const int juniorLessonMinutes = 30;
+
+  static bool isJuniorCourse(String courseId) =>
+      courseId.startsWith('junior_');
+
+  static int lessonMinutesForCourse(String courseId) =>
+      isJuniorCourse(courseId) ? juniorLessonMinutes : lessonMinutes;
   static const int lessonPayWon = 10000;
 
   /// 수업 시작 이 시간 전까지는 수강생이 예약을 취소하거나 옮길 수 있다.
@@ -2723,10 +2732,35 @@ class EnrollmentService {
         snapshot = await _firestore.collection('week_bookings').get();
       } else {
         if (uid.isEmpty) return [];
-        snapshot = await _firestore
+        final byId = <String, QueryDocumentSnapshot>{};
+        void add(QuerySnapshot snap) {
+          for (final doc in snap.docs) {
+            byId[doc.id] = doc;
+          }
+        }
+
+        add(await _firestore
             .collection('week_bookings')
             .where('teacherId', isEqualTo: uid)
-            .get();
+            .get());
+        add(await _firestore
+            .collection('week_bookings')
+            .where('nativeTeacherUid', isEqualTo: uid)
+            .get());
+        add(await _firestore
+            .collection('week_bookings')
+            .where('rosterTeacherId', isEqualTo: uid)
+            .get());
+        final list = byId.values
+            .map((doc) => WeekBooking.fromMap(
+                doc.id, doc.data() as Map<String, dynamic>))
+            .toList();
+        list.sort((a, b) {
+          if (a.status == 'pending' && b.status != 'pending') return -1;
+          if (a.status != 'pending' && b.status == 'pending') return 1;
+          return b.createdAt.compareTo(a.createdAt);
+        });
+        return list;
       }
       final list = snapshot.docs
           .map((doc) =>
@@ -2754,7 +2788,8 @@ class EnrollmentService {
           final booking = WeekBooking.fromMap(
               doc.id, doc.data() as Map<String, dynamic>);
           if (booking.teacherId == teacherUid ||
-              booking.nativeTeacherUid == teacherUid) {
+              booking.nativeTeacherUid == teacherUid ||
+              booking.rosterTeacherId == teacherUid) {
             byId[booking.id] = booking;
           }
         }
@@ -2771,6 +2806,10 @@ class EnrollmentService {
             .collection('week_bookings')
             .where('nativeTeacherUid', isEqualTo: teacherUid)
             .get());
+        addDocs(await _firestore
+            .collection('week_bookings')
+            .where('rosterTeacherId', isEqualTo: teacherUid)
+            .get());
       }
       final list = byId.values.toList();
       list.sort((a, b) => b.date.compareTo(a.date));
@@ -2778,6 +2817,17 @@ class EnrollmentService {
     } catch (e) {
       print('강사 수업 이력 조회 오류: $e');
       return [];
+    }
+  }
+
+  /// 이미 넣은 주니어 시간을 수강 문서에 적어, 운영자 화면에서도 회차 날짜가 보이게 한다.
+  static Future<void> publishFixedSessionPlans(String teacherUid) async {
+    try {
+      final callable = FirebaseFunctions.instanceFor(region: 'asia-northeast3')
+          .httpsCallable('publishFixedSessionPlans');
+      await callable.call({'teacherUid': teacherUid});
+    } catch (e) {
+      print('고정 수업 일정 공개 생략: $e');
     }
   }
 
@@ -3139,6 +3189,24 @@ class EnrollmentService {
       }
     }
 
+    DocumentReference<Map<String, dynamic>>? enrollmentRef;
+    var rosterTeacherId = '';
+    try {
+      final enrollmentDocs = await _firestore
+          .collection('enrollments')
+          .where('userId', isEqualTo: userId)
+          .get();
+      for (final doc in enrollmentDocs.docs) {
+        if (doc.data()['courseId']?.toString() != courseId) continue;
+        enrollmentRef = doc.reference;
+        rosterTeacherId = doc.data()['teacherId']?.toString() ?? '';
+        break;
+      }
+    } catch (e) {
+      print('수강 배정 조회 오류: $e');
+    }
+    if (rosterTeacherId.isEmpty) rosterTeacherId = teacherUid;
+
     final bookingRefs = [
       for (var i = 0; i < lessons.length; i++)
         _firestore.collection('week_bookings').doc(),
@@ -3197,21 +3265,23 @@ class EnrollmentService {
             'nativeTeacherUid': teacherUid,
             'assignedTeacherUid': teacherUid,
             'assignedTeacherName': teacher.name,
+            'rosterTeacherId': rosterTeacherId,
             'isSubstitute': false,
             'fixedSchedule': true,
             'sessionId': sessionId,
             'createdAt': FieldValue.serverTimestamp(),
           });
-          transaction.set(
-            occRefs[i],
-            TeacherScheduleService.occupiedPayload(
+          transaction.set(occRefs[i], {
+            ...TeacherScheduleService.occupiedPayload(
               teacherUid: teacherUid,
               date: lesson.date,
               time: lesson.time,
               bookingId: bookingId,
               userId: userId,
             ),
-          );
+            'courseId': course.id,
+            if (isJuniorCourse(course.id)) 'junior': true,
+          });
           transaction.set(
             _firestore.collection('online_sessions').doc(sessionId),
             {
@@ -3237,6 +3307,26 @@ class EnrollmentService {
               'createdAt': FieldValue.serverTimestamp(),
             },
           );
+        }
+        if (enrollmentRef != null) {
+          final enrollmentSnap = await transaction.get(enrollmentRef);
+          final existingTeacher =
+              enrollmentSnap.data()?['teacherId']?.toString() ?? '';
+          transaction.update(enrollmentRef, {
+            'sessionPlan': [
+              for (var i = 0; i < lessons.length; i++)
+                {
+                  'weekNumber': i + 1,
+                  'date': Timestamp.fromDate(dateOnly(lessons[i].date)),
+                  'time': lessons[i].time,
+                },
+            ],
+            'nativeTeacherId': teacher.id,
+            'nativeTeacherName': teacher.name,
+            'nativeTeacherUid': teacherUid,
+            if (existingTeacher.isEmpty) 'teacherId': teacherUid,
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
         }
       });
       return null;
@@ -4248,6 +4338,7 @@ class WeekBooking {
   final String confirmedBy;
   final bool fixedSchedule;
   final String orderId;
+  final String rosterTeacherId;
 
   WeekBooking({
     required this.id,
@@ -4275,7 +4366,12 @@ class WeekBooking {
     this.confirmedBy = '',
     this.fixedSchedule = false,
     this.orderId = '',
+    this.rosterTeacherId = '',
   });
+
+  bool get isJunior => EnrollmentService.isJuniorCourse(courseId);
+
+  int get lessonMinutes => EnrollmentService.lessonMinutesForCourse(courseId);
 
   bool get isPending => status == 'pending';
   bool get isConfirmed => status == 'confirmed';
@@ -4341,6 +4437,7 @@ class WeekBooking {
       confirmedAt: toDateTime(data['confirmedAt']),
       confirmedBy: data['confirmedBy']?.toString() ?? '',
       fixedSchedule: data['fixedSchedule'] == true,
+      rosterTeacherId: data['rosterTeacherId']?.toString() ?? '',
       orderId: data['orderId']?.toString() ?? '',
     );
   }
@@ -4557,6 +4654,31 @@ class OnlineLesson {
   }
 }
 
+class FixedSession {
+  final int weekNumber;
+  final DateTime date;
+  final String time;
+
+  const FixedSession({
+    required this.weekNumber,
+    required this.date,
+    required this.time,
+  });
+
+  static FixedSession? fromMap(dynamic raw) {
+    if (raw is! Map) return null;
+    final weekNumber = EnrollmentService._intValue(raw['weekNumber']);
+    final time = raw['time']?.toString() ?? '';
+    final dateRaw = raw['date'];
+    if (weekNumber <= 0 || dateRaw is! Timestamp || time.isEmpty) return null;
+    return FixedSession(
+      weekNumber: weekNumber,
+      date: EnrollmentService.dateOnly(dateRaw.toDate()),
+      time: time,
+    );
+  }
+}
+
 class EnrollmentRecord {
   final String id;
   final String userId;
@@ -4579,6 +4701,7 @@ class EnrollmentRecord {
   final DateTime? lastSessionAt;
   final int adminUnlockedThrough;
   final String plan;
+  final List<FixedSession> sessionPlan;
 
   EnrollmentRecord({
     required this.id,
@@ -4602,7 +4725,15 @@ class EnrollmentRecord {
     this.lastSessionAt,
     this.adminUnlockedThrough = 0,
     this.plan = OnlinePlan.bundle,
+    this.sessionPlan = const [],
   });
+
+  FixedSession? sessionAt(int weekNumber) {
+    for (final session in sessionPlan) {
+      if (session.weekNumber == weekNumber) return session;
+    }
+    return null;
+  }
 
   OnlineCourse? get course => OnlineCourse.findById(courseId);
 
@@ -4655,6 +4786,15 @@ class EnrollmentRecord {
     final plan = OnlineCourse.findById(courseId)?.fixedSpeakingPrice == true
         ? OnlinePlan.speaking
         : storedPlan;
+    final sessionPlan = <FixedSession>[];
+    final rawPlan = data['sessionPlan'];
+    if (rawPlan is List) {
+      for (final item in rawPlan) {
+        final session = FixedSession.fromMap(item);
+        if (session != null) sessionPlan.add(session);
+      }
+      sessionPlan.sort((a, b) => a.weekNumber.compareTo(b.weekNumber));
+    }
 
     return EnrollmentRecord(
       id: id,
@@ -4684,6 +4824,7 @@ class EnrollmentRecord {
       adminUnlockedThrough:
           EnrollmentService._intValue(data['adminUnlockedThrough']),
       plan: plan,
+      sessionPlan: sessionPlan,
     );
   }
 }

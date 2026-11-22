@@ -600,6 +600,109 @@ exports.syncCardPaidStudents = functions
     return { ok: true, updated };
   });
 
+/// 이미 확정된 주니어·재원생 시간을 수강 문서에 옮겨, 운영자 화면에서 회차 날짜가 보이게 한다.
+exports.publishFixedSessionPlans = functions
+  .region("asia-northeast3")
+  .https.onCall(async (data, context) => {
+    const role = await staffRole(context);
+    if (!role) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "강사 또는 메인 관리자만 수업 일정을 맞출 수 있습니다."
+      );
+    }
+    const requested = String((data && data.teacherUid) || "").trim();
+    if (role === "teacher" && requested && requested !== context.auth.uid) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "본인 수업만 맞출 수 있습니다."
+      );
+    }
+    const db = admin.firestore();
+    const teacherUid = role === "teacher" ? context.auth.uid : requested;
+    const byId = new Map();
+    async function addEnrollmentQuery(query) {
+      const snap = await query.get();
+      snap.docs.forEach((doc) => byId.set(doc.id, doc));
+    }
+    if (!teacherUid) {
+      await addEnrollmentQuery(db.collection("enrollments"));
+    } else {
+      await addEnrollmentQuery(
+        db.collection("enrollments").where("teacherId", "==", teacherUid)
+      );
+      await addEnrollmentQuery(
+        db.collection("enrollments").where("nativeTeacherUid", "==", teacherUid)
+      );
+    }
+
+    let batch = db.batch();
+    let writes = 0;
+    async function flush() {
+      if (writes === 0) return;
+      await batch.commit();
+      batch = db.batch();
+      writes = 0;
+    }
+
+    for (const doc of byId.values()) {
+      const enrollment = doc.data() || {};
+      const courseId = String(enrollment.courseId || "");
+      const userId = String(enrollment.userId || "");
+      if (!userId || !courseId) continue;
+      if (courseId.indexOf("junior_") !== 0 && courseId !== "enrolled_free_talk") {
+        continue;
+      }
+      const bookings = await db
+        .collection("week_bookings")
+        .where("userId", "==", userId)
+        .where("courseId", "==", courseId)
+        .get();
+      const plan = [];
+      const rosterTeacherId = String(enrollment.teacherId || teacherUid || "");
+      let classTeacherUid = String(enrollment.nativeTeacherUid || "");
+      let classTeacherName = String(enrollment.nativeTeacherName || "");
+      let classTeacherId = String(enrollment.nativeTeacherId || "");
+      bookings.docs.forEach((booking) => {
+        const item = booking.data() || {};
+        if (item.fixedSchedule !== true) return;
+        if (item.status === "cancelled" || item.status === "rejected") return;
+        const weekNumber = Number(item.weekNumber || 0);
+        if (!weekNumber || !item.date || !item.time) return;
+        plan.push({
+          weekNumber,
+          date: item.date,
+          time: String(item.time),
+        });
+        if (!classTeacherUid) {
+          classTeacherUid = String(item.teacherId || item.nativeTeacherUid || "");
+          classTeacherName = String(item.nativeTeacherName || "");
+          classTeacherId = String(item.nativeTeacherId || "");
+        }
+        if (rosterTeacherId && item.rosterTeacherId !== rosterTeacherId) {
+          batch.update(booking.ref, { rosterTeacherId });
+          writes += 1;
+        }
+      });
+      plan.sort((a, b) => a.weekNumber - b.weekNumber);
+      if (plan.length === 0) continue;
+      const patch = {
+        sessionPlan: plan,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+      if (classTeacherUid) {
+        patch.nativeTeacherUid = classTeacherUid;
+        if (classTeacherName) patch.nativeTeacherName = classTeacherName;
+        if (classTeacherId) patch.nativeTeacherId = classTeacherId;
+      }
+      batch.update(doc.ref, patch);
+      writes += 1;
+      if (writes >= 400) await flush();
+    }
+    await flush();
+    return { ok: true };
+  });
+
 async function assertOwner(context, deniedMessage) {
   if (!context.auth) {
     throw new functions.https.HttpsError(

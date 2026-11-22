@@ -807,6 +807,7 @@ const Map<String, String> enTranslations = {
   "주 1회 · 20분 · 4회": "Once a week · 20 minutes · 4 classes",
   "{p0} · 화상 {p1}회 · {p2}": "{p0} · {p1} live classes · {p2}",
   "수업 시간 정하기": "Set the class time",
+  "주니어 30분": "Junior 30 min",
   "이 수강생의 매주 수업 요일과 시간을 정합니다. 다음 해당 요일부터 전체 회차만큼 들어갑니다.": "Set this student's weekday and time. Classes are placed from the next matching day through every session.",
   "선택할 선생님이 없습니다.": "No teacher to choose.",
   "선생님": "Teacher",

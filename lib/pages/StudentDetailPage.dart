@@ -58,6 +58,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
     };
     final isOwner = await AuthService.isAdmin();
     final staffUid = await AuthService.currentStaffUid();
+    await EnrollmentService.publishFixedSessionPlans(isOwner ? '' : staffUid);
     final enrollments = uid.isEmpty
         ? <EnrollmentRecord>[]
         : await EnrollmentService.listEnrollments(

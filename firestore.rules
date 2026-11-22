@@ -313,7 +313,8 @@ service cloud.firestore {
         || (isLoggedIn() && resource.data.userId == request.auth.uid)
         || (isTeacher() && (
              resource.data.teacherId == request.auth.uid
-             || resource.data.nativeTeacherUid == request.auth.uid));
+             || resource.data.nativeTeacherUid == request.auth.uid
+             || resource.data.rosterTeacherId == request.auth.uid));
 
       allow create: if (isLoggedIn()
           && request.resource.data.userId == request.auth.uid

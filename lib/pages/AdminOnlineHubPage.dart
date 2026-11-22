@@ -342,10 +342,12 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
     List<EnrollmentRecord> enrollments;
 
     if (_isOwner && !widget.mineAndCoteachOnly) {
+      await EnrollmentService.publishFixedSessionPlans('');
       members = await AuthService.listMembers();
       enrollments = await EnrollmentService.listEnrollments();
     } else {
       final uid = _staffUid ?? await AuthService.getStaffUid() ?? '';
+      await EnrollmentService.publishFixedSessionPlans(uid);
       members = await _membersForTeacher(uid);
       enrollments = await EnrollmentService.listEnrollments(teacherUid: uid);
     }

@@ -49,6 +49,7 @@ class TeacherScheduleService {
 
     final closedKeys = <String>{};
     final occupiedKeys = <String>{};
+    final juniorKeys = <String>{};
     final routineKeys = <String>{};
     final exceptionKeys = <String>{};
     final notes = <String, String>{};
@@ -125,8 +126,14 @@ class TeacherScheduleService {
           .where('teacherId', isEqualTo: teacherUid)
           .get();
       for (final doc in occupied.docs) {
-        final key = doc.data()['slotKey']?.toString() ?? '';
-        if (key.isNotEmpty) occupiedKeys.add(key);
+        final data = doc.data();
+        final key = data['slotKey']?.toString() ?? '';
+        if (key.isEmpty) continue;
+        occupiedKeys.add(key);
+        final courseId = data['courseId']?.toString() ?? '';
+        if (data['junior'] == true || courseId.startsWith('junior_')) {
+          juniorKeys.add(key);
+        }
       }
     } catch (e) {
       print('예약된 스케줄 조회 오류: $e');
@@ -136,6 +143,7 @@ class TeacherScheduleService {
       teacherUid: teacherUid,
       closedKeys: closedKeys,
       occupiedKeys: occupiedKeys,
+      juniorKeys: juniorKeys,
       routineKeys: routineKeys,
       exceptionKeys: exceptionKeys,
       notes: notes,
@@ -365,6 +373,7 @@ class TeacherAvailability {
   final String teacherUid;
   final Set<String> closedKeys;
   final Set<String> occupiedKeys;
+  final Set<String> juniorKeys;
   final Set<String> routineKeys;
   final Set<String> exceptionKeys;
   final Map<String, String> notes;
@@ -374,12 +383,14 @@ class TeacherAvailability {
     required this.teacherUid,
     Set<String>? closedKeys,
     Set<String>? occupiedKeys,
+    Set<String>? juniorKeys,
     Set<String>? routineKeys,
     Set<String>? exceptionKeys,
     Map<String, String>? notes,
     TeacherClassBands? classBands,
   })  : closedKeys = closedKeys ?? {},
         occupiedKeys = occupiedKeys ?? {},
+        juniorKeys = juniorKeys ?? {},
         routineKeys = routineKeys ?? {},
         exceptionKeys = exceptionKeys ?? {},
         notes = notes ?? {},
@@ -406,6 +417,9 @@ class TeacherAvailability {
 
   bool isOccupied(DateTime date, String time) =>
       occupiedKeys.contains(TeacherScheduleService.slotKey(date, time));
+
+  bool isJunior(DateTime date, String time) =>
+      juniorKeys.contains(TeacherScheduleService.slotKey(date, time));
 
   List<String> openTimes(DateTime date, List<String> remaining) {
     return remaining

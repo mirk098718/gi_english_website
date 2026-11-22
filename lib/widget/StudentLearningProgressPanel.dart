@@ -15,6 +15,7 @@ class StudentLearningProgressPanel extends StatefulWidget {
   final Map<String, List<StudentWeekProgress>> progressByEnrollment;
   final int? onlyWeekNumber;
   final bool dense;
+  final List<WeekBooking> bookings;
 
   const StudentLearningProgressPanel({
     Key? key,
@@ -22,6 +23,7 @@ class StudentLearningProgressPanel extends StatefulWidget {
     required this.progressByEnrollment,
     this.onlyWeekNumber,
     this.dense = false,
+    this.bookings = const [],
   }) : super(key: key);
 
   @override
@@ -149,11 +151,7 @@ class _StudentLearningProgressPanelState
             ),
           )
         else
-          ...weeks.map((week) => _weekBlock(
-                week,
-                enrollment.userId,
-                enrollment.completedSessions,
-              )),
+          ...weeks.map((week) => _weekBlock(week, enrollment)),
       ],
     );
   }
@@ -169,14 +167,33 @@ class _StudentLearningProgressPanelState
     return week.readyToBook;
   }
 
-  Widget _weekBlock(StudentWeekProgress week, String userId, int completedSessions) {
+  String _when(EnrollmentRecord enrollment, StudentWeekProgress week) {
+    for (final booking in widget.bookings) {
+      if (booking.userId != enrollment.userId ||
+          booking.courseId != enrollment.courseId ||
+          booking.weekNumber != week.weekNumber) {
+        continue;
+      }
+      if (booking.isCancelled || booking.status == 'rejected') continue;
+      return '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)}';
+    }
+    final session = enrollment.sessionAt(week.weekNumber);
+    if (session == null) return '';
+    return '${EnrollmentService.formatBookingDate(session.date)} ${EnrollmentService.formatBookingTime(session.time)}';
+  }
+
+  Widget _weekBlock(StudentWeekProgress week, EnrollmentRecord enrollment) {
     final problems = week.problemLinks.isEmpty
         ?  [WeekProblemLink(title: tr(context, '등록된 문제 없음'), url: '')]
         : week.problemLinks;
-    final done = _markedComplete(week, completedSessions);
+    final done = _markedComplete(week, enrollment.completedSessions);
+    final userId = enrollment.userId;
+    final when = _when(enrollment, week);
     final heading = [
       if (week.weekNumber > 0) tf(context, '{p0}회차', {'p0': week.weekNumber}),
-      if (week.weekTitle.isNotEmpty) week.weekTitle,
+      if (when.isNotEmpty) when,
+      if (when.isEmpty && !week.tracksAssignment && week.weekTitle.isNotEmpty)
+        week.weekTitle,
       if (done) tr(context, "수강완료"),
     ].join(' · ');
 
@@ -213,7 +230,7 @@ class _StudentLearningProgressPanelState
           collapsedShape: const Border(),
           title: Text(
             heading,
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontFamily: "NotoSansKR",

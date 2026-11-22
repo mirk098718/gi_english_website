@@ -200,6 +200,7 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     final uid = widget.teacherUid.isNotEmpty
         ? widget.teacherUid
         : await AuthService.currentStaffUid();
+    await EnrollmentService.publishFixedSessionPlans(uid);
     final availability = widget.schoolOverview
         ? TeacherAvailability(teacherUid: uid)
         : await TeacherScheduleService.load(uid);
@@ -272,19 +273,22 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     if (widget.schoolOverview || widget.showAllBookings) return true;
     if (_teacherUid.isEmpty) return false;
     return booking.teacherId == _teacherUid ||
-        booking.nativeTeacherUid == _teacherUid;
+        booking.nativeTeacherUid == _teacherUid ||
+        booking.rosterTeacherId == _teacherUid;
   }
 
-  bool _isSlotPast(DateTime date, String time) {
+  bool _isSlotPast(DateTime date, String time, {int minutes = 0}) {
     final at = EnrollmentService.bookingDateTime(date, time);
     if (at == null) return false;
-    return DateTime.now()
-        .isAfter(at.add(Duration(minutes: EnrollmentService.lessonMinutes)));
+    final length =
+        minutes > 0 ? minutes : EnrollmentService.lessonMinutes;
+    return DateTime.now().isAfter(at.add(Duration(minutes: length)));
   }
 
   bool _isBookingSettled(WeekBooking booking) {
     if (booking.status == 'rejected') return true;
-    return booking.isConfirmed && _isSlotPast(booking.date, booking.time);
+    return booking.isConfirmed &&
+        _isSlotPast(booking.date, booking.time, minutes: booking.lessonMinutes);
   }
 
   WeekBooking? _bookingAt(DateTime date, String time) {
@@ -827,18 +831,68 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   List<DateTime> get _days =>
       List.generate(7, (i) => _weekStart.add(Duration(days: i)));
 
+  bool _dayHasClass(DateTime day) {
+    final date = EnrollmentService.dateOnly(day);
+    final prefix = '${TeacherScheduleService.dateKey(date)}_';
+    for (final key in _availability.occupiedKeys) {
+      if (key.startsWith(prefix)) return true;
+    }
+    for (final booking in _bookings) {
+      if (!_belongsOnMyCalendar(booking)) continue;
+      if (booking.isCancelled || booking.status == 'rejected') continue;
+      if (EnrollmentService.dateOnly(booking.date) == date) return true;
+    }
+    return false;
+  }
+
+  Set<String> _classTimesOn(DateTime day) {
+    final date = EnrollmentService.dateOnly(day);
+    final prefix = '${TeacherScheduleService.dateKey(date)}_';
+    final times = <String>{};
+    for (final key in _availability.occupiedKeys) {
+      if (!key.startsWith(prefix)) continue;
+      final time = key.substring(prefix.length);
+      if (time.contains(':')) times.add(time);
+    }
+    for (final booking in _bookings) {
+      if (!_belongsOnMyCalendar(booking)) continue;
+      if (booking.isCancelled || booking.status == 'rejected') continue;
+      if (EnrollmentService.dateOnly(booking.date) != date) continue;
+      if (booking.time.trim().isNotEmpty) times.add(booking.time.trim());
+    }
+    return times;
+  }
+
   List<DateTime> get _visibleDays {
     if (widget.schoolOverview || !_bands.active) return _days;
-    return _days.where((day) => _bands.days.contains(day.weekday)).toList();
+    final days = _days
+        .where((day) =>
+            _bands.days.contains(day.weekday) || _dayHasClass(day))
+        .toList();
+    return days.isEmpty ? _days : days;
   }
 
   List<String> get _visibleSlots {
-    if (widget.schoolOverview || !_bands.active) {
-      return EnrollmentService.bookingTimeSlots;
+    final extra = <String>{};
+    for (final day in _days) {
+      if (!_visibleDays.any((item) =>
+          EnrollmentService.dateOnly(item) ==
+          EnrollmentService.dateOnly(day))) {
+        continue;
+      }
+      extra.addAll(_classTimesOn(day));
     }
-    return EnrollmentService.bookingTimeSlots
-        .where((time) => _bands.periods.contains(TeacherClassBands.periodOf(time)))
+    if (widget.schoolOverview || !_bands.active) {
+      final all = {...EnrollmentService.bookingTimeSlots, ...extra}.toList()
+        ..sort();
+      return all;
+    }
+    final slots = EnrollmentService.bookingTimeSlots
+        .where((time) =>
+            _bands.periods.contains(TeacherClassBands.periodOf(time)) ||
+            extra.contains(time))
         .toList();
+    return slots;
   }
 
   String _historyLabel(WeekBooking booking) {
@@ -1071,6 +1125,8 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
             tr(context, '예약 대기')),
         _legend(Palette.primary.withValues(alpha: 0.12), Palette.primary,
             tr(context, widget.teacherUid.isEmpty ? '내 수강생 확정' : '담당 수강생 확정')),
+        _legend(const Color(0xFFFFF1E6), const Color(0xFFEA7A1A),
+            tr(context, '주니어 30분')),
         _legend(Palette.accent.withValues(alpha: 0.16), Palette.accent,
             tr(context, '타 수강생')),
         _legend(Palette.grey200, Palette.grey400, tr(context, '완료 · 취소')),
@@ -1734,7 +1790,14 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     final closed = _availability.isClosed(date, time);
     final routine = _availability.isRoutine(date, time);
     final exception = _availability.isException(date, time);
-    final slotPast = _isSlotPast(date, time);
+    final slotPast = _isSlotPast(
+      date,
+      time,
+      minutes: booking?.lessonMinutes ??
+          (_availability.isJunior(date, time)
+              ? EnrollmentService.juniorLessonMinutes
+              : 0),
+    );
     final pastEmpty = slotPast && !closed && !occupied;
     Color fill = Palette.white;
     Color border = Palette.grey300;
@@ -1763,6 +1826,11 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       border = Palette.grey300;
       textColor = Palette.grey500;
       label = '';
+    } else if (booking != null && booking.isJunior) {
+      fill = const Color(0xFFFFF1E6);
+      border = const Color(0xFFEA7A1A);
+      textColor = const Color(0xFFC2410C);
+      label = booking.calendarLabel;
     } else if (booking != null) {
       final guest = booking.isGuestFor(_teacherUid);
       fill = guest
@@ -1771,6 +1839,11 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       border = guest ? Palette.accent : Palette.primary;
       textColor = guest ? Palette.accent : Palette.primaryDark;
       label = booking.calendarLabel;
+    } else if (occupied && _availability.isJunior(date, time)) {
+      fill = const Color(0xFFFFF1E6);
+      border = const Color(0xFFEA7A1A);
+      textColor = const Color(0xFFC2410C);
+      label = tr(context, '주니어 30분');
     } else if (occupied) {
       fill = Palette.primary.withValues(alpha: 0.12);
       border = Palette.primary;
@@ -1866,7 +1939,9 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   _OverviewKind? _overviewKindOf(WeekBooking booking) {
     if (booking.status == 'rejected') return _OverviewKind.cancelled;
     if (booking.isPending) return _OverviewKind.pending;
-    if (booking.isConfirmed && _isSlotPast(booking.date, booking.time)) {
+    if (booking.isConfirmed &&
+        _isSlotPast(booking.date, booking.time,
+            minutes: booking.lessonMinutes)) {
       return _OverviewKind.completed;
     }
     if (booking.isConfirmed) return _OverviewKind.confirmed;
