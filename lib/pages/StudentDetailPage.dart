@@ -7,6 +7,7 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PaymentService.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/widget/AdminContentWidth.dart';
+import 'package:gi_english_website/widget/AdminFixedScheduleDialog.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
@@ -33,6 +34,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
   List<PaymentOrder> _payments = [];
   String _teacherName = '';
   bool _loading = true;
+  bool _isOwner = false;
 
   String get _uid => _member['uid']?.toString() ?? '';
 
@@ -75,6 +77,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
       _enrollments = enrollments;
       _learning = learning;
       _payments = payments;
+      _isOwner = isOwner;
       _loading = false;
     });
   }
@@ -364,6 +367,13 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                 child: Text(tr(context, "배정 변경"),
                     style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
               ),
+              if (_isOwner && record.course?.fixedSpeakingPrice == true)
+                OutlinedButton.icon(
+                  onPressed: () => _offerFixedSchedule(record),
+                  icon: const Icon(Icons.schedule, size: 16),
+                  label: Text(tr(context, "수업 시간 정하기"),
+                      style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
+                ),
               TextButton(
                 onPressed: () => _cancelEnrollment(record),
                 child: Text(record.isActive ? tr(context, "배정 취소") : tr(context, "배정 복구"),
@@ -422,6 +432,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
     }
     OnlineCourse selectedCourse = OnlineCourse.all.first;
     final sessionsController = TextEditingController(text: '8');
+    var assignedTotal = 0;
     final saved = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
@@ -445,7 +456,12 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                       .toList(),
                   onChanged: (value) {
                     if (value != null) {
-                      setDialogState(() => selectedCourse = value);
+                      setDialogState(() {
+                        selectedCourse = value;
+                        if (value.fixedSpeakingPrice) {
+                          sessionsController.text = '${value.defaultSessions}';
+                        }
+                      });
                     }
                   },
                 ),
@@ -469,6 +485,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
             ElevatedButton(
               onPressed: () async {
                 final total = int.tryParse(sessionsController.text.trim()) ?? 0;
+                assignedTotal = total;
                 final error = await EnrollmentService.assignCourseByEmail(
                   email: email,
                   courseId: selectedCourse.id,
@@ -492,8 +509,60 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
     sessionsController.dispose();
     if (saved == true) {
       _toast(tr(context, '수업이 배정되었습니다.'));
+      if (selectedCourse.fixedSpeakingPrice && _isOwner) {
+        final timed = await _openFixedSchedule(
+          userId: _uid,
+          email: email,
+          memberName: AuthService.profileDisplayName(_member),
+          phone: _member['phone']?.toString() ?? '',
+          preferredTeacherUid: _member['teacherId']?.toString() ?? '',
+          course: selectedCourse,
+          totalSessions: assignedTotal,
+        );
+        if (timed) _toast(tr(context, '수업 시간을 넣었습니다.'));
+      }
       await _load();
     }
+  }
+
+  Future<void> _offerFixedSchedule(EnrollmentRecord record) async {
+    final course = record.course;
+    if (course == null) return;
+    final timed = await _openFixedSchedule(
+      userId: record.userId,
+      email: record.email,
+      memberName: record.memberName,
+      phone: _member['phone']?.toString() ?? '',
+      preferredTeacherUid: record.nativeTeacherUid.isNotEmpty
+          ? record.nativeTeacherUid
+          : (_member['teacherId']?.toString() ?? ''),
+      course: course,
+      totalSessions: record.totalSessions,
+    );
+    if (!mounted || !timed) return;
+    _toast(tr(context, '수업 시간을 넣었습니다.'));
+    await _load();
+  }
+
+  Future<bool> _openFixedSchedule({
+    required String userId,
+    required String email,
+    required String memberName,
+    required String phone,
+    required String preferredTeacherUid,
+    required OnlineCourse course,
+    required int totalSessions,
+  }) {
+    return AdminFixedScheduleDialog.open(
+      context,
+      userId: userId,
+      email: email,
+      memberName: memberName,
+      phone: phone,
+      preferredTeacherUid: preferredTeacherUid,
+      course: course,
+      totalSessions: totalSessions,
+    );
   }
 
   Future<void> _showEditDialog(EnrollmentRecord record) async {

@@ -3063,6 +3063,191 @@ class EnrollmentService {
     }
   }
 
+  /// 결제 없이 배정된 주니어·재원생 화상의 매주 시간을 메인 관리자가 넣는다.
+  ///
+  /// 선생님의 수업 가능 시간과 상관없이 요일과 시각을 고른다.
+  /// 그 시각에 이미 다른 수업이 있으면 넣지 않는다.
+  static Future<String?> placeAdminFixedSchedule({
+    required String userId,
+    required String email,
+    required String memberName,
+    required String phone,
+    required String courseId,
+    required int totalSessions,
+    required OnlineNativeTeacher teacher,
+    required List<WeeklySlot> slots,
+  }) async {
+    if (!await AuthService.isAdmin()) {
+      return '메인 관리자만 수업 시간을 정할 수 있습니다.';
+    }
+    if (userId.isEmpty) return '회원 정보가 올바르지 않습니다.';
+    final course = OnlineCourse.findById(courseId);
+    if (course == null || !course.fixedSpeakingPrice) {
+      return '고정 시간을 정하는 수업이 아닙니다.';
+    }
+    final shape = FixedWeeklySchedule.shapeFor(course);
+    if (shape == null) return '이 과정의 매주 횟수를 알 수 없습니다.';
+    if (totalSessions <= 0 || totalSessions % shape.slotsPerWeek != 0) {
+      return '전체 회차는 주 ${shape.slotsPerWeek}회의 배수여야 합니다.';
+    }
+    final weeks = totalSessions ~/ shape.slotsPerWeek;
+    if (slots.length != shape.slotsPerWeek ||
+        !FixedWeeklySchedule.sameClockTime(slots)) {
+      return '요일을 ${shape.slotsPerWeek}개 고르고, 같은 시간을 정해 주세요.';
+    }
+    if (!TeacherClassBands.timeSlots.contains(slots.first.time)) {
+      return '선택할 수 없는 시간입니다.';
+    }
+    final teacherUid = await TeacherScheduleService.resolveTeacherUid(
+      nativeTeacherUid: teacher.accountUid,
+      nativeTeacherId: teacher.id,
+    );
+    if (teacherUid.isEmpty) return '선택한 강사 계정으로 예약할 수 없습니다.';
+
+    await sweepExpiredFixedHolds(teacherUid);
+
+    try {
+      final existing = await _firestore
+          .collection('week_bookings')
+          .where('userId', isEqualTo: userId)
+          .where('courseId', isEqualTo: courseId)
+          .get();
+      for (final doc in existing.docs) {
+        final status = doc.data()['status']?.toString() ?? '';
+        if (status == 'pending' || status == 'confirmed') {
+          return '이미 수업 시간이 있습니다.';
+        }
+      }
+    } catch (e) {
+      print('기존 고정 시간 확인 오류: $e');
+      return '기존 수업 시간을 확인하지 못했습니다.';
+    }
+
+    final now = DateTime.now();
+    final availability = await TeacherScheduleService.load(teacherUid);
+    final lessons = FixedWeeklySchedule.lessons(
+      slots: slots,
+      weeks: weeks,
+      now: now,
+    );
+    if (lessons.length != totalSessions) {
+      return '수업 시간을 만들지 못했습니다. 요일과 시간을 다시 선택해 주세요.';
+    }
+    for (final lesson in lessons) {
+      if (availability.isOccupied(lesson.date, lesson.time)) {
+        return '${formatBookingDate(lesson.date)} ${formatBookingTime(lesson.time)}은 이미 예약되어 있습니다.';
+      }
+    }
+
+    final bookingRefs = [
+      for (var i = 0; i < lessons.length; i++)
+        _firestore.collection('week_bookings').doc(),
+    ];
+    final occRefs = [
+      for (final lesson in lessons)
+        TeacherScheduleService.occupiedRef(
+          teacherUid,
+          lesson.date,
+          lesson.time,
+        ),
+    ];
+    final normalizedPhone =
+        PhoneUtil.isValid(phone) ? PhoneUtil.normalize(phone) : '';
+
+    try {
+      await _firestore.runTransaction((transaction) async {
+        final occSnaps = <DocumentSnapshot<Map<String, dynamic>>>[];
+        for (final ref in occRefs) {
+          occSnaps.add(await transaction.get(ref));
+        }
+        for (var i = 0; i < lessons.length; i++) {
+          if (occSnaps[i].exists) {
+            final lesson = lessons[i];
+            throw StateError(
+              '${formatBookingDate(lesson.date)} ${formatBookingTime(lesson.time)}은 이미 예약되어 있습니다.',
+            );
+          }
+        }
+        for (var i = 0; i < lessons.length; i++) {
+          final lesson = lessons[i];
+          final number = i + 1;
+          final scheduled = bookingDateTime(lesson.date, lesson.time);
+          final bookingId = bookingRefs[i].id;
+          final sessionId = 'booking_$bookingId';
+          transaction.set(bookingRefs[i], {
+            'userId': userId,
+            'memberName': memberName,
+            'email': email.trim(),
+            if (normalizedPhone.isNotEmpty) 'phone': normalizedPhone,
+            'courseId': course.id,
+            'weekId': 'native_speaking_session_$number',
+            'weekNumber': number,
+            'weekTitle': '$number회 회화',
+            'date': Timestamp.fromDate(dateOnly(lesson.date)),
+            'time': lesson.time,
+            'dateKey': TeacherScheduleService.dateKey(lesson.date),
+            if (scheduled != null)
+              'scheduledAt': Timestamp.fromDate(scheduled),
+            'status': 'confirmed',
+            'confirmedAt': FieldValue.serverTimestamp(),
+            'confirmedBy': '관리자',
+            'teacherId': teacherUid,
+            'nativeTeacherId': teacher.id,
+            'nativeTeacherName': teacher.name,
+            'nativeTeacherUid': teacherUid,
+            'assignedTeacherUid': teacherUid,
+            'assignedTeacherName': teacher.name,
+            'isSubstitute': false,
+            'fixedSchedule': true,
+            'sessionId': sessionId,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+          transaction.set(
+            occRefs[i],
+            TeacherScheduleService.occupiedPayload(
+              teacherUid: teacherUid,
+              date: lesson.date,
+              time: lesson.time,
+              bookingId: bookingId,
+              userId: userId,
+            ),
+          );
+          transaction.set(
+            _firestore.collection('online_sessions').doc(sessionId),
+            {
+              'courseId': course.id,
+              'title': [
+                if (memberName.trim().isNotEmpty) memberName.trim(),
+                '$number회차',
+                '화상수업',
+              ].join(' · '),
+              'order': number,
+              'meetingUrl': meetingUrlForBooking(
+                courseId: course.id,
+                bookingId: bookingId,
+              ),
+              'isLive': false,
+              if (scheduled != null)
+                'scheduledAt': Timestamp.fromDate(scheduled),
+              'bookingId': bookingId,
+              'userId': userId,
+              'teacherId': teacherUid,
+              'memberName': memberName,
+              'weekNumber': number,
+              'createdAt': FieldValue.serverTimestamp(),
+            },
+          );
+        }
+      });
+      return null;
+    } on StateError catch (e) {
+      return e.message;
+    } catch (e) {
+      print('관리자 고정 시간 반영 오류: $e');
+      return '수업 시간을 넣지 못했습니다. 다시 선택해 주세요.';
+    }
+  }
+
   /// 하루 전 변경은 그 회차만 옮긴다.
   /// 고정 시각이 아니어도 되고, 그 선생님 스케줄에 남은 시간이면 요일과 시각을 가리지 않는다.
   /// 대체 시간을 고르지 않으면 취소되지 않는다.

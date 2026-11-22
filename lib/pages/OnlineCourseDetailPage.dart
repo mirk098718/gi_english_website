@@ -1488,7 +1488,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             padding: EdgeInsets.only(top: 4),
             child: Text(
               [
-                week.title,
+                if (!widget.course.fixedSpeakingPrice) week.title,
                 if (booking != null)
                   '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)}',
                 if (total > 0) '체크 $done/$total',
@@ -1911,8 +1911,12 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                 )
               else
                 Text(
-                  tr(context,
-                      "화상수업을 마치면 이 자리에서 강사 별점을 남길 수 있습니다. 평가를 마치면 다음 회차가 열립니다."),
+                  tr(
+                    context,
+                    widget.course.fixedSpeakingPrice
+                        ? "화상수업을 마치면 이 자리에서 강사 별점을 남길 수 있습니다."
+                        : "화상수업을 마치면 이 자리에서 강사 별점을 남길 수 있습니다. 평가를 마치면 다음 회차가 열립니다.",
+                  ),
                   style: TextStyle(
                     fontFamily: "NotoSansKR",
                     fontSize: 13,
@@ -2025,10 +2029,11 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                         color: Palette.secondaryDark,
                       ),
                     ),
-                    TeacherClassTimeLine(
-                      bands: availability.classBands,
-                      closedRoutines: availability.routineKeys,
-                    ),
+                    if (!fixed)
+                      TeacherClassTimeLine(
+                        bands: availability.classBands,
+                        closedRoutines: availability.routineKeys,
+                      ),
                     if (otherTeacher) ...[
                       SizedBox(height: 2),
                       Text(

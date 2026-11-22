@@ -1732,6 +1732,11 @@ class AuthService {
     }
   }
 
+  /// 메인 관리자가 수업 시간을 넣을 때 고르는 활성 원어민.
+  static Future<List<OnlineNativeTeacher>> activeNativeTeachers() {
+    return _teachersFromStore();
+  }
+
   static Future<List<OnlineNativeTeacher>> selectableNativeTeachers({
     TeacherPickKind? kind,
   }) async {

@@ -49,6 +49,11 @@ function expiresAtFromStart(start, totalSessions) {
   return addDays(startOfKstDay(start), total * DEADLINE_WEEKS_PER_SESSION * 7);
 }
 
+function skipsStudentRatingGate(courseId) {
+  const id = String(courseId || "");
+  return id.indexOf("junior_") === 0 || id === "enrolled_free_talk";
+}
+
 function enrollmentPlan(payment) {
   const courseId = payment && payment.courseId ? String(payment.courseId) : "";
   if (courseId === SPEAKING_COURSE_ID) return SPEAKING_PLAN;
@@ -1557,6 +1562,9 @@ async function creditEnrollmentFromRating(rating, ratingId) {
 function ratingReminderText(rating) {
   const weekNumber = Number((rating && rating.weekNumber) || 0);
   const week = weekNumber > 0 ? `${weekNumber}회차` : "화상수업";
+  if (skipsStudentRatingGate(rating && rating.courseId)) {
+    return `${week} 강사 평가를 아직 하지 않았습니다. 사이트에서 별점을 남겨 주세요.`;
+  }
   return `${week} 강사 평가를 아직 하지 않았습니다. 사이트에서 별점 평가를 마치면 다음 회차가 열립니다.`;
 }
 
@@ -1609,10 +1617,13 @@ async function notifyRatingOpened(bookingId) {
   const weekNumber = Number(rating.weekNumber || 0);
   const week = weekNumber > 0 ? `${weekNumber}회차` : "화상수업";
   const teacher = String(rating.teacherName || "").trim() || "강사";
+  const opensNext = !skipsStudentRatingGate(rating.courseId);
   await writeNotification({
     userId,
     title: "수업 평가 요청",
-    body: `${week} 수업이 끝났습니다. ${teacher} 선생님 수업에 별점을 남겨 주세요. 평가를 마치면 다음 회차가 열립니다.`,
+    body: opensNext
+      ? `${week} 수업이 끝났습니다. ${teacher} 선생님 수업에 별점을 남겨 주세요. 평가를 마치면 다음 회차가 열립니다.`
+      : `${week} 수업이 끝났습니다. ${teacher} 선생님 수업에 별점을 남겨 주세요.`,
     type: "lesson_rating",
     bookingId,
   });
@@ -1655,6 +1666,42 @@ exports.onOnlineSessionUpdated = functions
       session: after,
       status: "pending",
     });
+    const booking = await loadBookingData(bookingId);
+    const courseId = String(after.courseId || booking.courseId || "");
+    if (skipsStudentRatingGate(courseId)) {
+      const ratingSnap = await admin
+        .firestore()
+        .collection("lesson_ratings")
+        .doc(bookingId)
+        .get();
+      const rating = ratingSnap.exists ? ratingSnap.data() || {} : {};
+      const result = await creditEnrollmentFromRating(
+        Object.assign({}, rating, {
+          courseId,
+          bookingId,
+          sessionId,
+          userId: String(rating.userId || after.userId || booking.userId || ""),
+          weekNumber: Number(rating.weekNumber || after.weekNumber || booking.weekNumber || 0),
+        }),
+        bookingId
+      );
+      if (result.credited && result.userId) {
+        const opened =
+          result.nextCompleted < result.totalSessions
+            ? result.nextCompleted + 1
+            : 0;
+        const label = result.weekNumber || result.nextCompleted;
+        await writeNotification({
+          userId: result.userId,
+          title: "화상수업 이수",
+          body: opened
+            ? `${label}회차 수업이 끝났습니다. ${opened}회차가 열렸습니다.`
+            : `${label}회차 수업이 끝났습니다. 전 회차를 모두 이수했습니다.`,
+          type: "session_completed",
+          bookingId,
+        });
+      }
+    }
     await notifyRatingOpened(bookingId);
     return null;
   });

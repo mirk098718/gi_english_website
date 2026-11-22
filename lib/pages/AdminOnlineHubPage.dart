@@ -26,6 +26,7 @@ import 'package:gi_english_website/pages/AdminPaymentTab.dart';
 import 'package:gi_english_website/pages/StudentDetailPage.dart';
 import 'package:gi_english_website/pages/TeacherRosterPage.dart';
 import 'package:gi_english_website/util/JitsiJoin.dart';
+import 'package:gi_english_website/widget/AdminFixedScheduleDialog.dart';
 import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
 import 'package:gi_english_website/widget/AdminContentWidth.dart';
 import 'package:gi_english_website/widget/AdminTalkReportsTab.dart';
@@ -238,6 +239,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
     }
 
     final totalSessions = int.tryParse(sessionsController.text.trim()) ?? 0;
+    final course = _selectedCourse!;
 
     setState(() {
       _saving = true;
@@ -249,7 +251,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
 
     final error = await EnrollmentService.assignCourseByEmail(
       email: email,
-      courseId: _selectedCourse!.id,
+      courseId: course.id,
       totalSessions: totalSessions,
       allowedMemberIds: allowedIds,
     );
@@ -266,7 +268,69 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
 
     _toast(tr(context, '수강이 배정되었습니다.'));
     emailController.clear();
+    if (course.fixedSpeakingPrice && _isOwner) {
+      final member = await AuthService.findMemberByEmail(email);
+      if (mounted && member != null) {
+        final timed = await _openFixedSchedule(
+          userId: member['uid']?.toString() ?? '',
+          email: email,
+          memberName: AuthService.profileDisplayName(member),
+          phone: member['phone']?.toString() ?? '',
+          preferredTeacherUid: member['teacherId']?.toString() ?? '',
+          course: course,
+          totalSessions: totalSessions,
+        );
+        if (timed && mounted) _toast(tr(context, '수업 시간을 넣었습니다.'));
+      }
+    }
     await _refresh();
+  }
+
+  Future<void> _offerFixedSchedule(EnrollmentRecord record) async {
+    final course = record.course;
+    if (course == null || !_isOwner) return;
+    Map<String, dynamic>? member;
+    for (final item in _members) {
+      if (item['uid']?.toString() == record.userId) {
+        member = item;
+        break;
+      }
+    }
+    final timed = await _openFixedSchedule(
+      userId: record.userId,
+      email: record.email,
+      memberName: record.memberName,
+      phone: member?['phone']?.toString() ?? '',
+      preferredTeacherUid: record.nativeTeacherUid.isNotEmpty
+          ? record.nativeTeacherUid
+          : (member?['teacherId']?.toString() ?? ''),
+      course: course,
+      totalSessions: record.totalSessions,
+    );
+    if (!mounted || !timed) return;
+    _toast(tr(context, '수업 시간을 넣었습니다.'));
+    await _refresh();
+  }
+
+  Future<bool> _openFixedSchedule({
+    required String userId,
+    required String email,
+    required String memberName,
+    required String phone,
+    required String preferredTeacherUid,
+    required OnlineCourse course,
+    required int totalSessions,
+  }) {
+    return AdminFixedScheduleDialog.open(
+      context,
+      userId: userId,
+      email: email,
+      memberName: memberName,
+      phone: phone,
+      preferredTeacherUid: preferredTeacherUid,
+      course: course,
+      totalSessions: totalSessions,
+    );
   }
 
   Future<void> _refresh() async {
@@ -413,6 +477,9 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   onChanged: (value) {
                     setState(() {
                       _selectedCourse = value;
+                      if (value != null && value.fixedSpeakingPrice) {
+                        sessionsController.text = '${value.defaultSessions}';
+                      }
                     });
                   },
                 ),
@@ -714,6 +781,13 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                     foregroundColor: Palette.white,
                   ),
                 ),
+              if (_isOwner && record.course?.fixedSpeakingPrice == true)
+                OutlinedButton.icon(
+                  onPressed: () => _offerFixedSchedule(record),
+                  icon: Icon(Icons.schedule, size: 16),
+                  label: Text(tr(context, '수업 시간 정하기'),
+                      style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
+                ),
               ElevatedButton.icon(
                 onPressed: record.isActive &&
                         sessionsConfigured &&
@@ -781,6 +855,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
   Future<void> _showAssignDialog(String email) async {
     OnlineCourse selectedCourse = OnlineCourse.all.first;
     final sessionsController = TextEditingController(text: '8');
+    var assignedTotal = 0;
 
     final saved = await showDialog<bool>(
       context: context,
@@ -805,7 +880,12 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                       .toList(),
                   onChanged: (value) {
                     if (value != null) {
-                      setDialogState(() => selectedCourse = value);
+                      setDialogState(() {
+                        selectedCourse = value;
+                        if (value.fixedSpeakingPrice) {
+                          sessionsController.text = '${value.defaultSessions}';
+                        }
+                      });
                     }
                   },
                 ),
@@ -829,6 +909,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
             ElevatedButton(
               onPressed: () async {
                 final total = int.tryParse(sessionsController.text.trim()) ?? 0;
+                assignedTotal = total;
                 final error = await EnrollmentService.assignCourseByEmail(
                   email: email,
                   courseId: selectedCourse.id,
@@ -858,6 +939,21 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
 
     if (saved == true) {
       _toast(tr(context, '수업이 배정되었습니다.'));
+      if (selectedCourse.fixedSpeakingPrice && _isOwner) {
+        final member = await AuthService.findMemberByEmail(email);
+        if (mounted && member != null) {
+          final timed = await _openFixedSchedule(
+            userId: member['uid']?.toString() ?? '',
+            email: email,
+            memberName: AuthService.profileDisplayName(member),
+            phone: member['phone']?.toString() ?? '',
+            preferredTeacherUid: member['teacherId']?.toString() ?? '',
+            course: selectedCourse,
+            totalSessions: assignedTotal,
+          );
+          if (timed && mounted) _toast(tr(context, '수업 시간을 넣었습니다.'));
+        }
+      }
       await _refresh();
     }
   }

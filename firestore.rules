@@ -290,6 +290,23 @@ service cloud.firestore {
       allow create, update, delete: if isStaff();
     }
 
+    // 결제 없이 배정한 주니어·재원생 화상의 매주 시간. 메인 관리자만 확정으로 넣는다.
+    function ownerCreatesConfirmedFixedBooking() {
+      return isOwner()
+        && request.resource.data.fixedSchedule == true
+        && request.resource.data.status == 'confirmed'
+        && request.resource.data.userId is string
+        && request.resource.data.userId.size() > 0
+        && request.resource.data.courseId is string
+        && request.resource.data.teacherId is string
+        && request.resource.data.teacherId.size() > 0
+        && request.resource.data.time is string
+        && request.resource.data.time.matches('^[0-9]{2}:[0-9]{2}$')
+        && request.resource.data.weekNumber is int
+        && request.resource.data.weekNumber > 0
+        && request.resource.data.confirmedBy == '관리자';
+    }
+
     // 주차별 원어민 수업 예약: 본인 신청, 담당 원어민 강사/메인 관리자 확인
     match /week_bookings/{bookingId} {
       allow read: if isOwner()
@@ -301,7 +318,8 @@ service cloud.firestore {
       allow create: if (isLoggedIn()
           && request.resource.data.userId == request.auth.uid
           && request.resource.data.status == 'pending')
-        || studentCreatesFixedReplacement(bookingId);
+        || studentCreatesFixedReplacement(bookingId)
+        || ownerCreatesConfirmedFixedBooking();
 
       allow update: if isOwner()
         || (isTeacher() && (
