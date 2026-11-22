@@ -1,7 +1,12 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:gi_english_website/util/NoticeImages.dart';
+import 'package:gi_english_website/util/notice_image_prepare.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/TeacherClassBands.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
@@ -542,6 +547,8 @@ class EnrollmentService {
   ];
 
   static const int maxAssignmentPhotos = 8;
+  static const String assignmentPhotoPrefix = 'assignment-photo:';
+  static final Map<String, Uint8List> _assignmentPhotoBytes = {};
 
   static List<WeekChecklistItem> checklistForVideo(String videoUrl) {
     if (videoUrl.trim().isEmpty) return problemOnlyChecklist;
@@ -2230,32 +2237,131 @@ class EnrollmentService {
     if (currentUrls.length >= maxAssignmentPhotos) {
       return '사진은 회차마다 $maxAssignmentPhotos장까지 올릴 수 있습니다.';
     }
-    if (bytes.isEmpty || bytes.length > 4 * 1024 * 1024) {
-      return '4MB 이하의 사진을 올려 주세요.';
+    final name = fileName.trim().isEmpty ? 'photo.jpg' : fileName.trim();
+    final reason = NoticeImages.rejectionReason(
+      fileName: name,
+      byteLength: bytes.length,
+    );
+    if (reason != null) return reason;
+    // 웹 Storage 업로드는 끝나지 않고 도는 경우가 있어, 줄인 사진을 Firestore에 둔다.
+    PreparedNoticeImage prepared;
+    try {
+      prepared = await prepareNoticeImage(Uint8List.fromList(bytes), name);
+    } catch (e) {
+      final text = e.toString().replaceFirst('Exception: ', '');
+      return text.isEmpty ? '사진을 줄이지 못했습니다.' : text;
+    }
+    if (prepared.bytes.length > NoticeImages.maxStoredBytes) {
+      return '사진을 줄여도 용량이 큽니다. 더 작은 사진으로 다시 올려 주세요.';
     }
     try {
-      final safeName = fileName.replaceAll(RegExp(r'[^\w\.\-]'), '_');
-      final path =
-          'assignment_photos/${user.uid}/${enrollment.id}/${week.id}/${DateTime.now().millisecondsSinceEpoch}_$safeName';
-      final ref = _storage.ref().child(path);
-      final lower = safeName.toLowerCase();
-      final type = lower.endsWith('.png')
-          ? 'image/png'
-          : lower.endsWith('.webp')
-              ? 'image/webp'
-              : 'image/jpeg';
-      await ref.putData(bytes, SettableMetadata(contentType: type));
-      final url = await ref.getDownloadURL();
+      final doc = _firestore
+          .collection('enrollments')
+          .doc(enrollment.id)
+          .collection('assignment_photos')
+          .doc();
+      final dataUrl =
+          'data:${prepared.mimeType};base64,${base64Encode(prepared.bytes)}';
+      await doc.set({
+        'weekId': week.id,
+        'dataUrl': dataUrl,
+        'mimeType': prepared.mimeType,
+        'createdAt': FieldValue.serverTimestamp(),
+      }).timeout(const Duration(seconds: 20));
+      final ref = assignmentPhotoRef(enrollment.id, doc.id);
+      _assignmentPhotoBytes[ref] = prepared.bytes;
       return saveAssignmentPhotos(
         enrollmentId: enrollment.id,
         weekId: week.id,
-        photoUrls: [...currentUrls, url],
+        photoUrls: [...currentUrls, ref],
         week: week,
       );
+    } on TimeoutException {
+      return '사진 저장 시간이 초과되었습니다. 다시 시도해 주세요.';
     } catch (e) {
       print('과제 사진 업로드 오류: $e');
       return '과제 사진을 올리지 못했습니다.';
     }
+  }
+
+  static String assignmentPhotoRef(String enrollmentId, String photoId) =>
+      '$assignmentPhotoPrefix$enrollmentId/$photoId';
+
+  static ({String enrollmentId, String photoId})? parseAssignmentPhotoRef(
+    String ref,
+  ) {
+    if (!ref.startsWith(assignmentPhotoPrefix)) return null;
+    final rest = ref.substring(assignmentPhotoPrefix.length);
+    final slash = rest.indexOf('/');
+    if (slash <= 0 || slash >= rest.length - 1) return null;
+    return (
+      enrollmentId: rest.substring(0, slash),
+      photoId: rest.substring(slash + 1),
+    );
+  }
+
+  static Future<Uint8List?> assignmentPhotoBytes(String ref) async {
+    final cached = _assignmentPhotoBytes[ref];
+    if (cached != null) return cached;
+    final parsed = parseAssignmentPhotoRef(ref);
+    if (parsed == null) return null;
+    try {
+      final doc = await _firestore
+          .collection('enrollments')
+          .doc(parsed.enrollmentId)
+          .collection('assignment_photos')
+          .doc(parsed.photoId)
+          .get()
+          .timeout(const Duration(seconds: 15));
+      final dataUrl = doc.data()?['dataUrl']?.toString() ?? '';
+      final bytes = _decodeDataUrl(dataUrl);
+      if (bytes != null) _assignmentPhotoBytes[ref] = bytes;
+      return bytes;
+    } catch (e) {
+      print('과제 사진 읽기 오류: $e');
+      return null;
+    }
+  }
+
+  static Uint8List? _decodeDataUrl(String dataUrl) {
+    final comma = dataUrl.indexOf(',');
+    if (!dataUrl.startsWith('data:image') || comma < 0) return null;
+    try {
+      return base64Decode(dataUrl.substring(comma + 1));
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<String?> removeAssignmentPhoto({
+    required String enrollmentId,
+    required String weekId,
+    required String url,
+    required List<String> currentUrls,
+    OnlineWeek? week,
+  }) async {
+    final next = List<String>.from(currentUrls)..remove(url);
+    final error = await saveAssignmentPhotos(
+      enrollmentId: enrollmentId,
+      weekId: weekId,
+      photoUrls: next,
+      week: week,
+    );
+    if (error != null) return error;
+    final parsed = parseAssignmentPhotoRef(url);
+    if (parsed == null) return null;
+    try {
+      await _firestore
+          .collection('enrollments')
+          .doc(parsed.enrollmentId)
+          .collection('assignment_photos')
+          .doc(parsed.photoId)
+          .delete();
+      _assignmentPhotoBytes.remove(url);
+    } catch (e) {
+      print('과제 사진 삭제 오류: $e');
+    }
+    return null;
   }
 
   /// 강사가 회차를 열 때 과제 체크와 사진을 읽는다.

@@ -341,12 +341,11 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
   Future<String?> _removeAssignmentPhoto(OnlineWeek week, String url) async {
     final enrollment = _enrollment;
     if (enrollment == null) return '결제 후 사진을 지울 수 있습니다.';
-    final next = List<String>.from(_assignmentPhotos[week.id] ?? const [])
-      ..remove(url);
-    final error = await EnrollmentService.saveAssignmentPhotos(
+    final error = await EnrollmentService.removeAssignmentPhoto(
       enrollmentId: enrollment.id,
       weekId: week.id,
-      photoUrls: next,
+      url: url,
+      currentUrls: List<String>.from(_assignmentPhotos[week.id] ?? const []),
       week: week,
     );
     if (error == null) await _refreshAssignmentPhotos(enrollment.id);

@@ -251,6 +251,19 @@ service cloud.firestore {
 
         allow delete: if isOwner();
       }
+
+      match /assignment_photos/{photoId} {
+        allow read: if isOwner()
+          || (isLoggedIn()
+            && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId == request.auth.uid)
+          || (isTeacher() && (
+              get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.teacherId == request.auth.uid
+              || get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.nativeTeacherUid == request.auth.uid));
+
+        allow create, delete: if isOwner()
+          || (isLoggedIn()
+            && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId == request.auth.uid);
+      }
     }
 
     // 주간 학습(인강·문제·체크리스트): 로그인 회원 읽기, 쓰기는 메인 관리자만

@@ -1,5 +1,7 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -53,11 +55,34 @@ class _AssignmentWorkSectionState extends State<AssignmentWorkSection> {
     }
     final bytes = shot.bytes;
     if (bytes == null) return;
-    setState(() => _busy = true);
-    final uploadError = await widget.onUpload(bytes, 'camera.jpg');
-    if (!mounted) return;
-    setState(() => _busy = false);
-    if (uploadError != null) _toast(uploadError);
+    await _send(bytes, 'camera.jpg');
+  }
+
+  Future<void> _pickGallery() async {
+    if (!widget.enabled || _busy) return;
+    if (widget.photoUrls.length >= EnrollmentService.maxAssignmentPhotos) {
+      _toast('사진은 회차마다 ${EnrollmentService.maxAssignmentPhotos}장까지 올릴 수 있습니다.');
+      return;
+    }
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: const ['jpg', 'jpeg', 'png', 'webp', 'gif'],
+        allowMultiple: false,
+        withData: true,
+      );
+      if (result == null || result.files.isEmpty) return;
+      final file = result.files.single;
+      final bytes = file.bytes;
+      if (bytes == null || bytes.isEmpty) {
+        _toast('사진을 읽지 못했습니다. JPG 또는 PNG로 다시 시도해 주세요.');
+        return;
+      }
+      await _send(Uint8List.fromList(bytes), file.name);
+    } catch (_) {
+      if (!mounted) return;
+      _toast('사진을 열지 못했습니다.');
+    }
   }
 
   Future<void> _pickFile(ImageSource source) async {
@@ -75,17 +100,22 @@ class _AssignmentWorkSectionState extends State<AssignmentWorkSection> {
       if (file == null) return;
       final bytes = await file.readAsBytes();
       if (!mounted) return;
-      setState(() => _busy = true);
-      final error = await widget.onUpload(bytes, file.name);
-      if (!mounted) return;
-      setState(() => _busy = false);
-      if (error != null) _toast(error);
+      await _send(bytes, file.name);
     } catch (_) {
       if (!mounted) return;
-      setState(() => _busy = false);
-      _toast(source == ImageSource.camera
-          ? '카메라를 열지 못했습니다. 브라우저에서 카메라 권한을 허용해 주세요.'
-          : '사진을 열지 못했습니다.');
+      _toast('카메라를 열지 못했습니다. 브라우저에서 카메라 권한을 허용해 주세요.');
+    }
+  }
+
+  Future<void> _send(Uint8List bytes, String fileName) async {
+    if (!mounted) return;
+    setState(() => _busy = true);
+    try {
+      final error = await widget.onUpload(bytes, fileName);
+      if (!mounted) return;
+      if (error != null) _toast(error);
+    } finally {
+      if (mounted) setState(() => _busy = false);
     }
   }
 
@@ -162,9 +192,7 @@ class _AssignmentWorkSectionState extends State<AssignmentWorkSection> {
                   style: TextStyle(fontFamily: 'NotoSansKR', fontSize: 12)),
             ),
             OutlinedButton.icon(
-              onPressed: widget.enabled && !_busy
-                  ? () => _pickFile(ImageSource.gallery)
-                  : null,
+              onPressed: widget.enabled && !_busy ? _pickGallery : null,
               icon: Icon(Icons.image_outlined, size: 18),
               label: Text(tr(context, '사진 올리기'),
                   style: TextStyle(fontFamily: 'NotoSansKR', fontSize: 12)),
@@ -189,23 +217,7 @@ class _AssignmentWorkSectionState extends State<AssignmentWorkSection> {
               for (final url in widget.photoUrls)
                 Stack(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        url,
-                        width: 96,
-                        height: 96,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          width: 96,
-                          height: 96,
-                          color: Palette.grey100,
-                          alignment: Alignment.center,
-                          child: Icon(Icons.broken_image_outlined,
-                              color: Palette.grey500),
-                        ),
-                      ),
-                    ),
+                    AssignmentPhotoThumb(url: url),
                     Positioned(
                       top: 2,
                       right: 2,
@@ -299,27 +311,72 @@ class AssignmentStatusView extends StatelessWidget {
             runSpacing: 8,
             children: [
               for (final url in photoUrls)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    url,
-                    width: 96,
-                    height: 96,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      width: 96,
-                      height: 96,
-                      color: Palette.grey100,
-                      alignment: Alignment.center,
-                      child: Icon(Icons.broken_image_outlined,
-                          color: Palette.grey500),
-                    ),
-                  ),
-                ),
+                AssignmentPhotoThumb(url: url),
             ],
           ),
         ],
       ],
+    );
+  }
+}
+
+class AssignmentPhotoThumb extends StatelessWidget {
+  final String url;
+
+  const AssignmentPhotoThumb({Key? key, required this.url}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    if (url.startsWith('http://') ||
+        url.startsWith('https://') ||
+        url.startsWith('data:image')) {
+      return _frame(OnlineNativeTeacher.imageProviderOf(url));
+    }
+    return FutureBuilder<Uint8List?>(
+      future: EnrollmentService.assignmentPhotoBytes(url),
+      builder: (context, snapshot) {
+        final bytes = snapshot.data;
+        if (bytes == null || bytes.isEmpty) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return _frame(null, waiting: true);
+          }
+          return _frame(null);
+        }
+        return _frame(MemoryImage(bytes));
+      },
+    );
+  }
+
+  Widget _frame(ImageProvider? provider, {bool waiting = false}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: SizedBox(
+        width: 96,
+        height: 96,
+        child: provider == null
+            ? ColoredBox(
+                color: Palette.grey100,
+                child: Center(
+                  child: waiting
+                      ? SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Icon(Icons.broken_image_outlined, color: Palette.grey500),
+                ),
+              )
+            : Image(
+                image: provider,
+                width: 96,
+                height: 96,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => ColoredBox(
+                  color: Palette.grey100,
+                  child: Icon(Icons.broken_image_outlined, color: Palette.grey500),
+                ),
+              ),
+      ),
     );
   }
 }
