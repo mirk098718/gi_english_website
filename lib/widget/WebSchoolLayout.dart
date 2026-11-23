@@ -165,7 +165,7 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
           InkWell(
             onTap: () {
               _closeMenu();
-              SiteNav.goHome(context);
+              SiteNav.goLogo(context);
             },
             child: SizedBox(
               height: 36,
@@ -398,6 +398,13 @@ class _WebSchoolLayoutState extends State<WebSchoolLayout> {
           onTap: () {
             _closeMenu();
             SiteNav.openPlacement(context);
+          },
+        ),
+        _panelChip(
+          label: '주니어 레벨테스트',
+          onTap: () {
+            _closeMenu();
+            SiteNav.openJuniorLevelTest(context);
           },
         ),
       ],

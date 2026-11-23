@@ -12,7 +12,9 @@ import 'package:gi_english_website/pages/SchoolCurriculumMiddleSchoolPage.dart';
 import 'package:gi_english_website/pages/SchoolGalleryPage.dart';
 import 'package:gi_english_website/pages/SchoolMapPage.dart';
 import 'package:gi_english_website/pages/SchoolNZPage.dart';
+import 'package:gi_english_website/pages/JuniorLevelTestPage.dart';
 import 'package:gi_english_website/pages/SchoolLetsTalkPage.dart';
+import 'package:gi_english_website/pages/SchoolMainPage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineClassroomPage.dart';
 import 'package:gi_english_website/pages/SchoolOnlineCurriculumPage.dart';
 import 'package:gi_english_website/pages/SchoolProgramPage.dart';
@@ -67,6 +69,15 @@ class SiteNav {
     MenuUtil.push(context, const SchoolAboutPage());
   }
 
+  /// 로그인 상태의 좌측 상단 로고. 온라인 메인으로 간다.
+  static void goLogo(BuildContext context) {
+    if (isMemberLoggedIn) {
+      MenuUtil.push(context, const SchoolMainPage());
+      return;
+    }
+    goHome(context);
+  }
+
   static void goCourses(BuildContext context, {String? courseId}) {
     MenuUtil.push(
       context,
@@ -114,6 +125,11 @@ class SiteNav {
         builder: (context) => WorkingAdminLoginPage(category: 'general'),
       ),
     );
+  }
+
+  static void openJuniorLevelTest(BuildContext context) {
+    if (!isMemberLoggedIn) return;
+    MenuUtil.push(context, const JuniorLevelTestPage());
   }
 
   static void openPlacement(BuildContext context) {

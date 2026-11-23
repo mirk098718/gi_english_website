@@ -19,6 +19,7 @@ import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
 import 'package:gi_english_website/widget/TeacherMonthLessonSummary.dart';
 import 'package:gi_english_website/widget/LessonRatingPromptHost.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
+import 'package:gi_english_website/widget/SiteLogoButton.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/widget/ProfileEditDialog.dart';
 
@@ -48,6 +49,8 @@ class TeacherRosterPage extends StatelessWidget {
       return themed(Scaffold(
         backgroundColor: Palette.white,
         appBar: AppBar(
+          leading: SiteLogo.staffLeading(context),
+          leadingWidth: SiteLogo.staffLeadingWidth(context),
           title: Text(tr(context, "강사 프로필 · 담당 회원"),
               style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Palette.navy,
@@ -65,6 +68,8 @@ class TeacherRosterPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Palette.white,
         appBar: AppBar(
+          leading: SiteLogo.staffLeading(context),
+          leadingWidth: SiteLogo.staffLeadingWidth(context),
           title: Text(name, style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Palette.navy,
           foregroundColor: Palette.white,

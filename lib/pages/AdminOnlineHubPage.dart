@@ -33,6 +33,7 @@ import 'package:gi_english_website/widget/AdminContentWidth.dart';
 import 'package:gi_english_website/widget/AdminTalkReportsTab.dart';
 import 'package:gi_english_website/widget/TeacherRatingBoard.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
+import 'package:gi_english_website/widget/SiteLogoButton.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/util/ProfilePhotoPicker.dart';
 
@@ -127,6 +128,8 @@ class _AdminOnlineHubPageState extends State<AdminOnlineHubPage>
 
     return _shell(Scaffold(
       appBar: AppBar(
+        leading: SiteLogo.staffLeading(context),
+        leadingWidth: SiteLogo.staffLeadingWidth(context),
         title: Text(
           isOwner ? tr(context, '온라인 프로그램 관리'): tr(context, '수업 관리'),
           style: TextStyle(fontFamily: "NotoSansKR"),

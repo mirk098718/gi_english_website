@@ -192,7 +192,7 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
       child: Row(
         children: [
           InkWell(
-            onTap: () => _go(() => SiteNav.goHome(context)),
+            onTap: () => _go(() => SiteNav.goLogo(context)),
             child: SizedBox(
               height: 32,
               child: GleamMark(height: 32),
@@ -355,6 +355,10 @@ class _MobileSchoolLayoutState extends State<MobileSchoolLayout> {
             _menuRow(
               '레벨테스트',
               () => _go(() => SiteNav.openPlacement(context)),
+            ),
+            _menuRow(
+              '주니어 레벨테스트',
+              () => _go(() => SiteNav.openJuniorLevelTest(context)),
             ),
           ],
         ),

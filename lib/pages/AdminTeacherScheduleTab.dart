@@ -23,6 +23,7 @@ import 'package:gi_english_website/widget/TeacherMonthLessonSummary.dart';
 import 'package:gi_english_website/pages/StudentDetailPage.dart';
 import 'package:gi_english_website/widget/AdminContentWidth.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
+import 'package:gi_english_website/widget/SiteLogoButton.dart';
 
 /// 스케줄만 따로 보는 전체 화면. `/schedule` 또는 허브의 ‘새 화면으로 열기’.
 class AdminTeacherSchedulePage extends StatefulWidget {
@@ -107,6 +108,8 @@ class _AdminTeacherSchedulePageState extends State<AdminTeacherSchedulePage> {
     if (!_authorized) {
       return Scaffold(
         appBar: AppBar(
+          leading: SiteLogo.staffLeading(context),
+          leadingWidth: SiteLogo.staffLeadingWidth(context),
           title: Text(tr(context, '내 스케줄'), style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Palette.navy,
           foregroundColor: Palette.white,
@@ -121,6 +124,14 @@ class _AdminTeacherSchedulePageState extends State<AdminTeacherSchedulePage> {
     }
     return Scaffold(
       backgroundColor: Palette.white,
+      appBar: AppBar(
+        leading: SiteLogo.staffLeading(context),
+        leadingWidth: SiteLogo.staffLeadingWidth(context),
+        title: Text(tr(context, '내 스케줄'),
+            style: TextStyle(fontFamily: "NotoSansKR")),
+        backgroundColor: Palette.navy,
+        foregroundColor: Palette.white,
+      ),
       body: SafeArea(
         child: AdminContentWidth(
           child: AdminTeacherScheduleTab(

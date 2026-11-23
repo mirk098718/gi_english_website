@@ -10,6 +10,7 @@ import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/widget/AdminContentWidth.dart';
 import 'package:gi_english_website/widget/AdminFixedScheduleDialog.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
+import 'package:gi_english_website/widget/SiteLogoButton.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
 
@@ -109,6 +110,8 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
       child: Scaffold(
         backgroundColor: Palette.white,
         appBar: AppBar(
+          leading: SiteLogo.staffLeading(context),
+          leadingWidth: SiteLogo.staffLeadingWidth(context),
           title: Text(name.isEmpty ? tr(context, "수강생 정보") : name,
               style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Palette.navy,
