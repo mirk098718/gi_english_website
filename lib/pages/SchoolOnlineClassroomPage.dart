@@ -655,6 +655,9 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
     );
   }
 
+  static const Color _juniorBorder = Color(0xFFEA7A1A);
+  static const Color _glimmerBorder = Palette.darkTeal;
+
   Widget courseCard(EnrollmentRecord enrollment) {
     final course = enrollment.course;
     if (course == null) return SizedBox.shrink();
@@ -662,6 +665,8 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
     final sessionsConfigured = enrollment.totalSessions > 0;
     final allDone = sessionsConfigured && enrollment.remainingSessions <= 0;
     final expired = EnrollmentService.isEnrollmentExpired(enrollment);
+    final isJunior = EnrollmentService.isJuniorCourse(course.id);
+    final borderColor = isJunior ? _juniorBorder : _glimmerBorder;
 
     return Column(
       children: [
@@ -672,11 +677,11 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
       child: Container(
         width: double.maxFinite,
         margin: EdgeInsets.only(bottom: 14),
-        padding: EdgeInsets.all(20),
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: Palette.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Palette.grey200),
+          border: Border.all(color: borderColor, width: 2),
           boxShadow: [
             BoxShadow(
               color: Palette.grey200.withValues(alpha: 0.6),
@@ -685,7 +690,26 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
             ),
           ],
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              width: double.maxFinite,
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              color: borderColor.withValues(alpha: 0.1),
+              child: Text(
+                tr(context, isJunior ? '글리머 주니어' : '글리머 온라인'),
+                style: TextStyle(
+                  fontFamily: 'NotoSansKR',
+                  fontWeight: FontWeight.w800,
+                  fontSize: 12,
+                  color: borderColor,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _courseLeading(enrollment, course),
@@ -795,6 +819,9 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
               ),
             ),
             Icon(Icons.chevron_right, color: Palette.grey400),
+          ],
+              ),
+            ),
           ],
         ),
       ),

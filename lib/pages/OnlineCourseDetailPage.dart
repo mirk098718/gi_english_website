@@ -30,6 +30,7 @@ import 'package:gi_english_website/widget/QuizResultSummary.dart';
 import 'package:gi_english_website/widget/MainTeacherChange.dart';
 import 'package:gi_english_website/widget/StudentJoinButton.dart';
 import 'package:gi_english_website/widget/TeacherClassTimeLine.dart';
+import 'package:gi_english_website/widget/AcademyLmsLinks.dart';
 import 'package:gi_english_website/widget/AssignmentWorkSection.dart';
 import 'package:gi_english_website/widget/LessonMaterialPanel.dart';
 import 'package:gi_english_website/widget/YoutubeLessonPlayer.dart';
@@ -1273,6 +1274,24 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
               ),
           ],
         ),
+        if (EnrollmentService.isJuniorCourse(widget.course.id)) ...[
+          SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              onPressed: () => UrlUtil.open(AcademyLmsLinks.trophy9HomeUrl),
+              icon: Icon(Icons.open_in_new, size: 18),
+              label: Text(
+                tr(context, '온라인 학습 바로가기'),
+                style: TextStyle(fontFamily: 'NotoSansKR'),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Palette.darkTeal,
+                side: BorderSide(color: Palette.darkTeal),
+              ),
+            ),
+          ),
+        ],
         SizedBox(height: 8),
         Text(
           _enrollment == null
@@ -1535,6 +1554,10 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                 if (booking != null)
                   '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)}',
                 if (total > 0) '체크 $done/$total',
+                if (_materialsForWeek(week).isNotEmpty)
+                  tf(context, '강사 자료 {p0}', {
+                    'p0': _materialsForWeek(week).length,
+                  }),
               ].where((e) => e.isNotEmpty).join(' · '),
               style: TextStyle(
                 fontFamily: "NotoSansKR",

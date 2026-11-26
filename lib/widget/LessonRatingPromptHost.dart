@@ -65,6 +65,7 @@ class _LessonRatingPromptHostState extends State<LessonRatingPromptHost> {
     LessonRating? next;
     for (final item in pending) {
       if (_snoozed.contains(item.id)) continue;
+      if (item.isRated || !item.canStudentRate) continue;
       next = item;
       break;
     }
@@ -76,12 +77,13 @@ class _LessonRatingPromptHostState extends State<LessonRatingPromptHost> {
         _dialogOpen = false;
         return;
       }
-      final saved = await LessonRatingService.showPrompt(
+      await LessonRatingService.showPrompt(
         context: context,
         rating: rating,
       );
+      // 제출·나중에 모두 다시 안 띄운다. 스트림 지연으로 같은 창이 반복 열리지 않게.
+      _snoozed.add(rating.id);
       _dialogOpen = false;
-      if (saved != true) _snoozed.add(rating.id);
     });
   }
 

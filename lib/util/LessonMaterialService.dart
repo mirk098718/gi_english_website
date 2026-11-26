@@ -67,12 +67,24 @@ class LessonMaterialService {
   ) async {
     if (enrollmentId.isEmpty) return [];
     try {
-      final snapshot = await _firestore
-          .collection(_collection)
-          .where('enrollmentId', isEqualTo: enrollmentId)
-          .get();
+      // 수강생 규칙은 userId 기준이라 enrollmentId만으로 조회하면 permission-denied 가 난다.
+      final uid = AuthService.currentUser?.uid ?? '';
+      final staff = await AuthService.isStaff();
+      final QuerySnapshot<Map<String, dynamic>> snapshot;
+      if (!staff && uid.isNotEmpty) {
+        snapshot = await _firestore
+            .collection(_collection)
+            .where('userId', isEqualTo: uid)
+            .get();
+      } else {
+        snapshot = await _firestore
+            .collection(_collection)
+            .where('enrollmentId', isEqualTo: enrollmentId)
+            .get();
+      }
       final list = snapshot.docs
           .map((doc) => _fromDoc(doc.id, doc.data()))
+          .where((item) => item.enrollmentId == enrollmentId)
           .toList();
       list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return list;

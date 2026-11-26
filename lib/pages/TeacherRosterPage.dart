@@ -950,8 +950,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     );
   }
 
-  /// 수강생 카드에는 예약된 회차를 모두 보여 준다.
-  /// (스케줄 탭의 ‘가까운 1건만’ 규칙과 달리, 회차 첨부·피드백을 위해 전부 연다.)
+  /// 다가오는 미완료 수업을 위에 두고, 각 회차는 기본 닫힘(열었다 닫았다).
   List<Widget> _lessonSections(List<WeekBooking> lessons) {
     final open = <WeekBooking>[];
     final finished = <WeekBooking>[];
@@ -966,16 +965,34 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     open.sort(EnrollmentService.compareBookingStart);
     finished.sort((a, b) => EnrollmentService.compareBookingStart(b, a));
     return [
-      ...open.map(_lessonRow),
+      if (open.isNotEmpty) ...[
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 6),
+            child: Text(
+              tf(context, '다가오는 수업 {p0}', {'p0': open.length}),
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontWeight: FontWeight.w800,
+                fontSize: 13,
+                color: Palette.darkTeal,
+              ),
+            ),
+          ),
+        ),
+        ...open.map(_lessonRow),
+      ],
       if (finished.isNotEmpty)
         Theme(
           data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
           child: ExpansionTile(
-            initiallyExpanded: true,
+            initiallyExpanded: false,
             tilePadding: EdgeInsets.zero,
             title: Text(
               tf(context, '완료된 수업 {p0}', {'p0': finished.length}),
-              style: TextStyle(fontFamily: "NotoSansKR", fontWeight: FontWeight.w700),
+              style: TextStyle(
+                  fontFamily: "NotoSansKR", fontWeight: FontWeight.w700),
             ),
             children: finished
                 .map((booking) => _lessonRow(booking, archive: true))
@@ -1006,11 +1023,18 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       enrollment: enrollment,
     );
     final canAttach = enrollment != null;
+    final title = [
+      if (booking.weekNumber > 0)
+        tf(context, '{p0}회차', {'p0': booking.weekNumber}),
+      if (course != null) course.title,
+    ].join(' · ');
+    final subtitle =
+        '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)} · ${booking.statusLabel}'
+        '${live ? tr(context, ' · 수업 중') : ended ? tr(context, ' · 수업 종료') : ''}';
 
     return Container(
       width: double.maxFinite,
       margin: EdgeInsets.only(bottom: 8),
-      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Palette.grey50,
         borderRadius: BorderRadius.circular(10),
@@ -1018,141 +1042,153 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
             color: live ? Palette.success : Palette.grey200,
             width: live ? 1.5 : 1),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            [
-              if (booking.weekNumber > 0) tf(context, '{p0}회차', {'p0': booking.weekNumber}),
-              if (course != null) course.title,
-            ].join(' · '),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          initiallyExpanded: false,
+          tilePadding: EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+          childrenPadding: EdgeInsets.fromLTRB(12, 0, 12, 12),
+          title: Text(
+            title,
             style: TextStyle(
-                fontFamily: "NotoSansKR",
-                fontSize: 13,
-                fontWeight: FontWeight.w700),
+              fontFamily: "NotoSansKR",
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
           ),
-          SizedBox(height: 4),
-          Text(
-            '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)} · ${booking.statusLabel}' '${live ? tr(context, ' · 수업 중'): ended ? tr(context, ' · 수업 종료'): ''}',
+          subtitle: Text(
+            subtitle,
             style: TextStyle(
-                fontFamily: "NotoSansKR", fontSize: 12, color: Palette.grey600),
+              fontFamily: "NotoSansKR",
+              fontSize: 12,
+              color: Palette.grey600,
+            ),
           ),
-          SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: written
-                      ? Palette.secondary.withValues(alpha: 0.12)
-                      : Palette.grey200,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  written ? tr(context, "피드백 작성됨") : tr(context, "피드백 미작성"),
-                  style: TextStyle(
-                    fontFamily: "NotoSansKR",
-                    fontSize: 11,
-                    color: written ? Palette.secondaryDark : Palette.grey600,
+          children: [
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: written
+                        ? Palette.secondary.withValues(alpha: 0.12)
+                        : Palette.grey200,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    written ? tr(context, "피드백 작성됨") : tr(context, "피드백 미작성"),
+                    style: TextStyle(
+                      fontFamily: "NotoSansKR",
+                      fontSize: 11,
+                      color:
+                          written ? Palette.secondaryDark : Palette.grey600,
+                    ),
                   ),
                 ),
+                LessonRatingStatusChip(rating: rating),
+                if (canHost)
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Palette.darkTeal,
+                      foregroundColor: Palette.white,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    onPressed: _busy ? null : () => _enterAsHost(booking),
+                    icon: Icon(Icons.videocam, size: 16),
+                    label: Text(tr(context, "호스트로 입장"),
+                        style:
+                            TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
+                  ),
+                if (canEnd && !ended)
+                  OutlinedButton.icon(
+                    onPressed: _busy ? null : () => _endClass(booking),
+                    icon: Icon(Icons.stop_circle, size: 16),
+                    label: Text(tr(context, "수업 종료"),
+                        style:
+                            TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
+                  ),
+                TextButton(
+                  onPressed: () => _openFeedback(booking),
+                  child: Text(
+                    written
+                        ? (_canWrite
+                            ? tr(context, '피드백 확인 · 수정')
+                            : tr(context, '피드백 확인'))
+                        : (_canWrite
+                            ? tr(context, '피드백 작성')
+                            : tr(context, '확인')),
+                    style: TextStyle(
+                        fontFamily: "NotoSansKR",
+                        color: Palette.secondaryDark),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+            if (!canAttach)
+              Text(
+                tr(context, '이 학생의 수강 기록을 찾지 못해 아직 파일을 보낼 수 없습니다.'),
+                style: TextStyle(
+                  fontFamily: 'NotoSansKR',
+                  fontSize: 12,
+                  color: Palette.grey600,
+                ),
+              )
+            else
+              LessonMaterialTeacherPanel(
+                materials: materials,
+                enabled: _canWrite,
+                busy: _busy,
+                onUpload: (bytes, fileName) async {
+                  setState(() => _busy = true);
+                  final error = await LessonMaterialService.upload(
+                    enrollment: enrollment,
+                    weekId: weekId,
+                    weekNumber: booking.weekNumber,
+                    bookingId: booking.id,
+                    teacherId: _teacherUid,
+                    bytes: bytes,
+                    fileName: fileName,
+                    teacherName: _writerName,
+                    courseTitle: course?.title ?? booking.courseId,
+                    currentForWeek: materials,
+                  );
+                  if (!mounted) return error;
+                  _materials = await LessonMaterialService.listForTeacher(
+                    _teacherUid,
+                  );
+                  setState(() => _busy = false);
+                  return error;
+                },
+                onDelete: (item) async {
+                  setState(() => _busy = true);
+                  final error = await LessonMaterialService.remove(
+                    materialId: item.id,
+                    teacherId: _teacherUid,
+                  );
+                  if (!mounted) return error;
+                  _materials.removeWhere((m) => m.id == item.id);
+                  setState(() => _busy = false);
+                  return error;
+                },
               ),
-              LessonRatingStatusChip(rating: rating),
-              if (canHost)
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.darkTeal,
-                    foregroundColor: Palette.white,
-                    visualDensity: VisualDensity.compact,
-                  ),
-                  onPressed: _busy ? null : () => _enterAsHost(booking),
-                  icon: Icon(Icons.videocam, size: 16),
-                  label: Text(tr(context, "호스트로 입장"),
-                      style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
-                ),
-              if (canEnd && !ended)
-                OutlinedButton.icon(
-                  onPressed: _busy ? null : () => _endClass(booking),
-                  icon: Icon(Icons.stop_circle, size: 16),
-                  label: Text(tr(context, "수업 종료"),
-                      style: TextStyle(fontFamily: "NotoSansKR", fontSize: 12)),
-                ),
-              TextButton(
-                onPressed: () => _openFeedback(booking),
-                child: Text(
-                  written
-                      ? (_canWrite ? tr(context, '피드백 확인 · 수정'): tr(context, '피드백 확인'))
-                      : (_canWrite ? tr(context, '피드백 작성'): tr(context, '확인')),
-                  style: TextStyle(
-                      fontFamily: "NotoSansKR", color: Palette.secondaryDark),
+            if (rating != null && rating.review.trim().isNotEmpty) ...[
+              SizedBox(height: 8),
+              Text(
+                rating.review.trim(),
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 13,
+                  height: 1.45,
+                  color: Palette.grey800,
                 ),
               ),
             ],
-          ),
-          SizedBox(height: 10),
-          if (!canAttach)
-            Text(
-              tr(context, '이 학생의 수강 기록을 찾지 못해 아직 파일을 보낼 수 없습니다.'),
-              style: TextStyle(
-                fontFamily: 'NotoSansKR',
-                fontSize: 12,
-                color: Palette.grey600,
-              ),
-            )
-          else
-            LessonMaterialTeacherPanel(
-              materials: materials,
-              enabled: _canWrite,
-              busy: _busy,
-              onUpload: (bytes, fileName) async {
-                setState(() => _busy = true);
-                final error = await LessonMaterialService.upload(
-                  enrollment: enrollment,
-                  weekId: weekId,
-                  weekNumber: booking.weekNumber,
-                  bookingId: booking.id,
-                  teacherId: _teacherUid,
-                  bytes: bytes,
-                  fileName: fileName,
-                  teacherName: _writerName,
-                  courseTitle: course?.title ?? booking.courseId,
-                  currentForWeek: materials,
-                );
-                if (!mounted) return error;
-                _materials = await LessonMaterialService.listForTeacher(
-                  _teacherUid,
-                );
-                setState(() => _busy = false);
-                return error;
-              },
-              onDelete: (item) async {
-                setState(() => _busy = true);
-                final error = await LessonMaterialService.remove(
-                  materialId: item.id,
-                  teacherId: _teacherUid,
-                );
-                if (!mounted) return error;
-                _materials.removeWhere((m) => m.id == item.id);
-                setState(() => _busy = false);
-                return error;
-              },
-            ),
-          if (rating != null && rating.review.trim().isNotEmpty) ...[
-            SizedBox(height: 8),
-            Text(
-              rating.review.trim(),
-              style: TextStyle(
-                fontFamily: "NotoSansKR",
-                fontSize: 13,
-                height: 1.45,
-                color: Palette.grey800,
-              ),
-            ),
           ],
-        ],
+        ),
       ),
     );
   }

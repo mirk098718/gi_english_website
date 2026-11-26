@@ -478,7 +478,7 @@ class _LessonRatingDialogState extends State<LessonRatingDialog> {
     _settled = true;
     await LessonRatingService.markDismissed(widget.rating);
     if (!mounted) return;
-    Navigator.pop(context, false);
+    Navigator.of(context, rootNavigator: true).pop(false);
   }
 
   Future<void> _save() async {
@@ -500,7 +500,7 @@ class _LessonRatingDialogState extends State<LessonRatingDialog> {
       return;
     }
     _settled = true;
-    Navigator.pop(context, true);
+    Navigator.of(context, rootNavigator: true).pop(true);
   }
 
   @override
