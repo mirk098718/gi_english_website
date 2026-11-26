@@ -21,6 +21,8 @@ import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/widget/ProfileEditDialog.dart';
 import 'package:gi_english_website/util/LessonMaterialService.dart';
 import 'package:gi_english_website/util/TeacherStudentNoteService.dart';
+import 'package:gi_english_website/util/UrlIUtil.dart';
+import 'package:gi_english_website/widget/AcademyLmsLinks.dart';
 import 'package:gi_english_website/widget/LessonMaterialPanel.dart';
 import 'package:gi_english_website/widget/TeacherStudentNoteField.dart';
 
@@ -760,6 +762,31 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     }).toList();
   }
 
+  static const Color _juniorBorder = Color(0xFFEA7A1A);
+  static const Color _glimmerBorder = Palette.darkTeal;
+
+  /// 글리머 주니어 수강이면 junior, 그 외 온라인 수강이면 glimmer, 없으면 null.
+  String? _programKindFor(String memberId, List<WeekBooking> lessons) {
+    final records =
+        _enrollments.where((item) => item.userId == memberId && item.isActive);
+    final hasJunior = records.any(
+          (item) => EnrollmentService.isJuniorCourse(item.courseId),
+        ) ||
+        lessons.any((item) => item.isJunior);
+    if (hasJunior) return 'junior';
+    final hasGlimmer = records.any(
+          (item) =>
+              !EnrollmentService.isJuniorCourse(item.courseId) &&
+              item.courseId != OnlineCourse.enrolledFreeTalk.id,
+        ) ||
+        lessons.any((item) =>
+            !item.isJunior &&
+            item.courseId != OnlineCourse.enrolledFreeTalk.id &&
+            item.courseId.isNotEmpty);
+    if (hasGlimmer) return 'glimmer';
+    return null;
+  }
+
   Widget _memberCard(Map<String, dynamic> member, {bool guest = false}) {
     final memberId = member['uid']?.toString() ?? '';
     final name = AuthService.profileDisplayName(member, fallback: '');
@@ -772,117 +799,185 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
         return a.date.compareTo(b.date);
       });
     final note = (_studentNotes[memberId] ?? '').trim();
+    final kind = _programKindFor(memberId, lessons);
+    final isJunior = kind == 'junior';
+    final borderColor = isJunior
+        ? _juniorBorder
+        : kind == 'glimmer'
+            ? _glimmerBorder
+            : Palette.grey200;
     return Card(
       margin: EdgeInsets.only(bottom: 12),
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: borderColor, width: isJunior || kind == 'glimmer' ? 2 : 1),
+      ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          childrenPadding: EdgeInsets.fromLTRB(16, 0, 16, 16),
-          leading: SizedBox(
-            width: 72,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                guest
-                    ? Container(
-                        width: 40,
-                        height: 40,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: Palette.accent.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          tr(context, "타"),
-                          style: TextStyle(
-                            fontFamily: "NotoSansKR",
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: Palette.accent,
-                          ),
-                        ),
-                      )
-                    : ProfileAvatar.fromData(member, size: 40, fallback: name),
-                if (note.isNotEmpty) ...[
-                  SizedBox(height: 6),
-                  Text(
-                    note,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: "NotoSansKR",
-                      fontSize: 10,
-                      height: 1.35,
-                      color: Palette.grey700,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          title: Text(
-            name.isEmpty ? email : name,
-            style:
-                TextStyle(fontFamily: "NotoSansKR", fontWeight: FontWeight.w700),
-          ),
-          subtitle: Text(
-            [
-              if (guest && assignedTeacherName.isNotEmpty)
-                tf(context, '담당 {p0}', {'p0': assignedTeacherName}),
-              tf(context, '화상수업 {p0}건', {'p0': lessons.length}),
-            ].join(' · '),
-            style: TextStyle(
-                fontFamily: "NotoSansKR", fontSize: 12, color: Palette.grey600),
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (_teacherUid.isNotEmpty)
-              TeacherStudentNoteField(
-                teacherId: _teacherUid,
-                studentId: memberId,
-                initialNote: note,
-                enabled: _canWrite,
-                onSaved: (value) {
-                  setState(() {
-                    _studentNotes[memberId] = value;
-                  });
-                },
-              ),
-            if (_teacherUid.isNotEmpty) SizedBox(height: 12),
-            if (TeacherBookingBoard.from(lessons).isEmpty)
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  tr(context, "아직 화상수업 이력이 없습니다."),
-                  style: TextStyle(
-                      fontFamily: "NotoSansKR",
-                      fontSize: 13,
-                      color: Palette.grey500),
+            if (isJunior)
+              Container(
+                width: double.maxFinite,
+                padding: EdgeInsets.fromLTRB(14, 10, 10, 10),
+                color: _juniorBorder.withValues(alpha: 0.1),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        tr(context, '글리머 주니어'),
+                        style: TextStyle(
+                          fontFamily: 'NotoSansKR',
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13,
+                          color: _juniorBorder,
+                        ),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () =>
+                          UrlUtil.open(AcademyLmsLinks.trophy9ClassRecordUrl),
+                      icon: Icon(Icons.open_in_new, size: 16, color: _juniorBorder),
+                      label: Text(
+                        tr(context, 'Trophy9 기록'),
+                        style: TextStyle(
+                          fontFamily: 'NotoSansKR',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: _juniorBorder,
+                        ),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
+                  ],
                 ),
               )
-            else
-              ..._lessonSections(lessons),
+            else if (kind == 'glimmer')
+              Container(
+                width: double.maxFinite,
+                padding: EdgeInsets.fromLTRB(14, 8, 14, 8),
+                color: _glimmerBorder.withValues(alpha: 0.08),
+                child: Text(
+                  tr(context, '글리머 온라인'),
+                  style: TextStyle(
+                    fontFamily: 'NotoSansKR',
+                    fontWeight: FontWeight.w800,
+                    fontSize: 12,
+                    color: _glimmerBorder,
+                  ),
+                ),
+              ),
+            ExpansionTile(
+              tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              childrenPadding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+              leading: guest
+                  ? Container(
+                      width: 40,
+                      height: 40,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Palette.accent.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        tr(context, "타"),
+                        style: TextStyle(
+                          fontFamily: "NotoSansKR",
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Palette.accent,
+                        ),
+                      ),
+                    )
+                  : ProfileAvatar.fromData(member, size: 40, fallback: name),
+              title: Text(
+                name.isEmpty ? email : name,
+                style: TextStyle(
+                    fontFamily: "NotoSansKR", fontWeight: FontWeight.w700),
+              ),
+              subtitle: Text(
+                [
+                  if (guest && assignedTeacherName.isNotEmpty)
+                    tf(context, '담당 {p0}', {'p0': assignedTeacherName}),
+                  tf(context, '화상수업 {p0}건', {'p0': lessons.length}),
+                  if (note.isNotEmpty) note,
+                ].join(' · '),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    fontFamily: "NotoSansKR",
+                    fontSize: 12,
+                    color: Palette.grey600),
+              ),
+              children: [
+                if (_teacherUid.isNotEmpty)
+                  TeacherStudentNoteField(
+                    teacherId: _teacherUid,
+                    studentId: memberId,
+                    initialNote: note,
+                    enabled: _canWrite,
+                    onSaved: (value) {
+                      setState(() {
+                        _studentNotes[memberId] = value;
+                      });
+                    },
+                  ),
+                if (_teacherUid.isNotEmpty) SizedBox(height: 12),
+                if (lessons.every(
+                    (b) => b.isCancelled || b.status == 'rejected'))
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      tr(context, "아직 화상수업 이력이 없습니다."),
+                      style: TextStyle(
+                          fontFamily: "NotoSansKR",
+                          fontSize: 13,
+                          color: Palette.grey500),
+                    ),
+                  )
+                else
+                  ..._lessonSections(lessons),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
 
+  /// 수강생 카드에는 예약된 회차를 모두 보여 준다.
+  /// (스케줄 탭의 ‘가까운 1건만’ 규칙과 달리, 회차 첨부·피드백을 위해 전부 연다.)
   List<Widget> _lessonSections(List<WeekBooking> lessons) {
-    final board = TeacherBookingBoard.from(lessons);
+    final open = <WeekBooking>[];
+    final finished = <WeekBooking>[];
+    for (final booking in lessons) {
+      if (booking.isCancelled || booking.status == 'rejected') continue;
+      if (EnrollmentService.bookingHasEnded(booking)) {
+        finished.add(booking);
+      } else {
+        open.add(booking);
+      }
+    }
+    open.sort(EnrollmentService.compareBookingStart);
+    finished.sort((a, b) => EnrollmentService.compareBookingStart(b, a));
     return [
-      ...board.upcoming.map(_lessonRow),
-      if (board.finished.isNotEmpty)
+      ...open.map(_lessonRow),
+      if (finished.isNotEmpty)
         Theme(
           data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
           child: ExpansionTile(
+            initiallyExpanded: true,
             tilePadding: EdgeInsets.zero,
             title: Text(
-              tf(context, '완료된 수업 {p0}', {'p0': board.finished.length}),
+              tf(context, '완료된 수업 {p0}', {'p0': finished.length}),
               style: TextStyle(fontFamily: "NotoSansKR", fontWeight: FontWeight.w700),
             ),
-            children: board.finished
+            children: finished
                 .map((booking) => _lessonRow(booking, archive: true))
                 .toList(),
           ),

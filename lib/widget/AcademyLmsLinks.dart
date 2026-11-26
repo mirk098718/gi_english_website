@@ -30,6 +30,10 @@ class AcademyLmsLinks extends StatelessWidget {
       'https://www.trophy9.com/account/account.do?stdcmd=sign&url=%2Fdefault%2Edo%3F';
   static const String _eleUrl = trophy9Url;
 
+  /// 글리머 주니어 출석·학습 기록. Trophy9 로그인 후 볼 수 있다.
+  static const String trophy9ClassRecordUrl =
+      'https://lms.trophy9.com/report/?vcmd=clasrcrd&culmId=TROPHY9';
+
   @override
   Widget build(BuildContext context) {
     final fill = centered;

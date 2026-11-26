@@ -3,7 +3,7 @@ import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/TeacherStudentNoteService.dart';
 
-/// 강사가 학생마다 남기는 간단 정보.
+/// 강사가 학생마다 남기는 간단 메모.
 class TeacherStudentNoteField extends StatefulWidget {
   final String teacherId;
   final String studentId;
@@ -27,11 +27,13 @@ class TeacherStudentNoteField extends StatefulWidget {
 class _TeacherStudentNoteFieldState extends State<TeacherStudentNoteField> {
   late final TextEditingController _controller;
   bool _saving = false;
+  late bool _editing;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.initialNote);
+    _editing = widget.initialNote.trim().isEmpty;
   }
 
   @override
@@ -40,6 +42,11 @@ class _TeacherStudentNoteFieldState extends State<TeacherStudentNoteField> {
     if (oldWidget.initialNote != widget.initialNote &&
         _controller.text != widget.initialNote) {
       _controller.text = widget.initialNote;
+    }
+    if (!_editing &&
+        oldWidget.initialNote != widget.initialNote &&
+        widget.initialNote.trim().isEmpty) {
+      _editing = true;
     }
   }
 
@@ -68,7 +75,9 @@ class _TeacherStudentNoteFieldState extends State<TeacherStudentNoteField> {
       );
       return;
     }
-    widget.onSaved?.call(_controller.text.trim());
+    final saved = _controller.text.trim();
+    setState(() => _editing = saved.isEmpty);
+    widget.onSaved?.call(saved);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -85,16 +94,77 @@ class _TeacherStudentNoteFieldState extends State<TeacherStudentNoteField> {
     if (!widget.enabled) {
       final text = widget.initialNote.trim();
       if (text.isEmpty) return SizedBox.shrink();
-      return Text(
-        text,
-        style: TextStyle(
-          fontFamily: 'NotoSansKR',
-          fontSize: 12,
-          height: 1.45,
-          color: Palette.grey700,
-        ),
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            tr(context, '간단 메모'),
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+              color: Palette.grey800,
+            ),
+          ),
+          SizedBox(height: 6),
+          Text(
+            text,
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontSize: 12,
+              height: 1.45,
+              color: Palette.grey700,
+            ),
+          ),
+        ],
       );
     }
+
+    final saved = widget.initialNote.trim();
+    if (!_editing && saved.isNotEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            tr(context, '간단 메모'),
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+              color: Palette.grey800,
+            ),
+          ),
+          SizedBox(height: 6),
+          Text(
+            saved,
+            style: TextStyle(
+              fontFamily: 'NotoSansKR',
+              fontSize: 13,
+              height: 1.45,
+              color: Palette.grey800,
+            ),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () => setState(() {
+                _editing = true;
+                _controller.text = saved;
+              }),
+              child: Text(
+                tr(context, '메모 수정'),
+                style: TextStyle(
+                  fontFamily: 'NotoSansKR',
+                  fontSize: 12,
+                  color: Palette.secondaryDark,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
