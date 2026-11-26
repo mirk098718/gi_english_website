@@ -333,6 +333,28 @@ service cloud.firestore {
       allow delete: if isOwner();
     }
 
+    // 담당 강사가 학생마다 남기는 메모. 본인만 쓰고, 메인 관리자는 전부 읽기.
+    match /teacher_student_notes/{noteId} {
+      allow read: if isOwner()
+        || (isStaff()
+          && resource.data.teacherId == request.auth.uid);
+      allow create, update: if isStaff()
+        && request.resource.data.teacherId == request.auth.uid;
+      allow delete: if isOwner()
+        || (isStaff() && resource.data.teacherId == request.auth.uid);
+    }
+
+    // 강사가 회차별로 보내는 PDF·이미지. 수강생은 본인 수강만 읽기.
+    match /lesson_materials/{materialId} {
+      allow read: if isOwner()
+        || (isLoggedIn() && resource.data.userId == request.auth.uid)
+        || (isStaff() && resource.data.teacherId == request.auth.uid);
+      allow create: if isStaff()
+        && request.resource.data.teacherId == request.auth.uid;
+      allow delete: if isOwner()
+        || (isStaff() && resource.data.teacherId == request.auth.uid);
+    }
+
     // 회차별 화상수업 피드백. 스태프 작성/수정, 해당 수강생 읽기.
     match /lesson_feedbacks/{feedbackId} {
       // 없는 문서 get도 스태프는 통과해야 저장 전 조회가 가능함

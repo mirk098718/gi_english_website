@@ -22,6 +22,10 @@ import 'package:gi_english_website/widget/NotificationBellButton.dart';
 import 'package:gi_english_website/widget/SiteLogoButton.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/widget/ProfileEditDialog.dart';
+import 'package:gi_english_website/util/LessonMaterialService.dart';
+import 'package:gi_english_website/util/TeacherStudentNoteService.dart';
+import 'package:gi_english_website/widget/LessonMaterialPanel.dart';
+import 'package:gi_english_website/widget/TeacherStudentNoteField.dart';
 
 /// 강사 프로필 · 담당 회원 · 화상수업 입장/종료 · 피드백.
 /// 강사 관리에서 열면 스케줄과 한달 이력 탭이 함께 보인다.
@@ -124,6 +128,8 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
   List<OnlineSession> _sessions = [];
   List<EnrollmentRecord> _enrollments = [];
   Map<String, List<StudentWeekProgress>> _learning = {};
+  Map<String, String> _studentNotes = {};
+  List<LessonMaterial> _materials = [];
   bool _loading = true;
   String _staffUid = '';
   bool _isOwner = false;
@@ -192,6 +198,8 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     final enrollments = await EnrollmentService.listEnrollments(
         teacherUid: teacherUid);
     final learning = await EnrollmentService.learningByEnrollment(enrollments);
+    final notes = await TeacherStudentNoteService.notesForTeacher(teacherUid);
+    final materials = await LessonMaterialService.listForTeacher(teacherUid);
     if (!mounted) return;
     setState(() {
       _teacher = teacher;
@@ -207,6 +215,8 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       _sessions = sessions;
       _enrollments = enrollments;
       _learning = learning;
+      _studentNotes = notes;
+      _materials = materials;
       _staffUid = staffUid;
       _isOwner = isOwner;
       _writerName = writerName;
@@ -714,6 +724,27 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     );
   }
 
+  EnrollmentRecord? _enrollmentFor(WeekBooking booking) {
+    for (final record in _enrollments) {
+      if (record.userId == booking.userId &&
+          record.courseId == booking.courseId) {
+        return record;
+      }
+    }
+    return null;
+  }
+
+  List<LessonMaterial> _materialsForWeek({
+    required EnrollmentRecord? enrollment,
+    required String weekId,
+  }) {
+    if (enrollment == null) return const [];
+    return _materials
+        .where((item) =>
+            item.enrollmentId == enrollment.id && item.weekId == weekId)
+        .toList();
+  }
+
   String _levelLabel(
     Map<String, dynamic> member,
     List<EnrollmentRecord> records,
@@ -741,6 +772,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     final records =
         _enrollments.where((item) => item.userId == memberId).toList();
     final hasPlan = records.any((item) => item.sessionPlan.isNotEmpty);
+    final note = (_studentNotes[memberId] ?? '').trim();
     return Card(
       margin: EdgeInsets.only(bottom: 12),
       child: Theme(
@@ -748,24 +780,49 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
         child: ExpansionTile(
           tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           childrenPadding: EdgeInsets.fromLTRB(16, 0, 16, 16),
-          leading: guest
-              ? Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Palette.accent.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    tr(context, "타"),
+          leading: SizedBox(
+            width: 72,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                guest
+                    ? Container(
+                        width: 40,
+                        height: 40,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Palette.accent.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          tr(context, "타"),
+                          style: TextStyle(
+                            fontFamily: "NotoSansKR",
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: Palette.accent,
+                          ),
+                        ),
+                      )
+                    : ProfileAvatar.fromData(member, size: 40, fallback: name),
+                if (note.isNotEmpty) ...[
+                  SizedBox(height: 6),
+                  Text(
+                    note,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: "NotoSansKR",
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: Palette.accent,
+                      fontSize: 10,
+                      height: 1.35,
+                      color: Palette.grey700,
                     ),
                   ),
-                )
-              : ProfileAvatar.fromData(member, size: 40, fallback: name),
+                ],
+              ],
+            ),
+          ),
           title: Text(
             name.isEmpty ? email : name,
             style:
@@ -784,6 +841,19 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                 fontFamily: "NotoSansKR", fontSize: 12, color: Palette.grey600),
           ),
           children: [
+            if (_teacherUid.isNotEmpty)
+              TeacherStudentNoteField(
+                teacherId: _teacherUid,
+                studentId: memberId,
+                initialNote: note,
+                enabled: _canWrite,
+                onSaved: (value) {
+                  setState(() {
+                    _studentNotes[memberId] = value;
+                  });
+                },
+              ),
+            if (_teacherUid.isNotEmpty) SizedBox(height: 12),
             Align(
               alignment: Alignment.centerLeft,
               child: TextButton.icon(
@@ -871,6 +941,13 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
         _canWrite &&
         booking.isConfirmed &&
         (live || (session?.isLive == true) || !ended);
+    final enrollment = _enrollmentFor(booking);
+    final weekId =
+        booking.weekId.trim().isNotEmpty ? booking.weekId.trim() : '';
+    final materials = _materialsForWeek(
+      enrollment: enrollment,
+      weekId: weekId,
+    );
 
     return Container(
       width: double.maxFinite,
@@ -957,6 +1034,46 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
               ),
             ],
           ),
+          if (enrollment != null && weekId.isNotEmpty) ...[
+            SizedBox(height: 10),
+            LessonMaterialTeacherPanel(
+              materials: materials,
+              enabled: _canWrite,
+              busy: _busy,
+              onUpload: (bytes, fileName) async {
+                setState(() => _busy = true);
+                final error = await LessonMaterialService.upload(
+                  enrollment: enrollment,
+                  weekId: weekId,
+                  weekNumber: booking.weekNumber,
+                  bookingId: booking.id,
+                  teacherId: _teacherUid,
+                  bytes: bytes,
+                  fileName: fileName,
+                  teacherName: _writerName,
+                  courseTitle: course?.title ?? booking.courseId,
+                  currentForWeek: materials,
+                );
+                if (!mounted) return error;
+                _materials = await LessonMaterialService.listForTeacher(
+                  _teacherUid,
+                );
+                setState(() => _busy = false);
+                return error;
+              },
+              onDelete: (item) async {
+                setState(() => _busy = true);
+                final error = await LessonMaterialService.remove(
+                  materialId: item.id,
+                  teacherId: _teacherUid,
+                );
+                if (!mounted) return error;
+                _materials.removeWhere((m) => m.id == item.id);
+                setState(() => _busy = false);
+                return error;
+              },
+            ),
+          ],
           if (rating != null && rating.review.trim().isNotEmpty) ...[
             SizedBox(height: 8),
             Text(

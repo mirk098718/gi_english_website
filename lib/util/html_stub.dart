@@ -115,6 +115,14 @@ class FileUploadInputElement extends _Element {
   FileList? files;
 }
 
+class AnchorElement {
+  AnchorElement({String? href});
+  String href = '';
+  String download = '';
+  String target = '';
+  void click() {}
+}
+
 class FileReader {
   Object? result;
   final HtmlStream<Event> onLoadEnd = const HtmlStream();

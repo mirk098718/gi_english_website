@@ -60,6 +60,73 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
   static const String _heroAsset = 'assets/hero-online-gleam.jpg';
   static const Color _heroBg = Color(0xFFF6F6F1);
 
+  /// 이미지에 박혀 있던 Gleam·태그라인을 덮고 Gleamer만 보이게 한다.
+  Widget _heroBrandZone({
+    required bool compact,
+    required double zoneWidth,
+  }) {
+    final logoHeight = compact ? 36.0 : 82.0;
+    final zoneHeight = compact ? 88.0 : 168.0;
+    final coverWidth = compact ? zoneWidth * 0.72 : zoneWidth * 0.5;
+
+    return IgnorePointer(
+      child: SizedBox(
+        width: coverWidth,
+        height: zoneHeight,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerRight,
+                    end: Alignment.centerLeft,
+                    colors: [
+                      _heroBg,
+                      _heroBg,
+                      _heroBg.withValues(alpha: 0.92),
+                      _heroBg.withValues(alpha: 0),
+                    ],
+                    stops: const [0.0, 0.58, 0.84, 1.0],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: compact ? 8 : 22,
+              right: compact ? 8 : 20,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Image.asset(
+                    'assets/gleamer-logo.png',
+                    height: logoHeight,
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
+                    isAntiAlias: true,
+                  ),
+                  SizedBox(height: compact ? 4 : 6),
+                  Text(
+                    'ENGLISH THAT SHINES',
+                    style: TextStyle(
+                      fontFamily: 'NotoSansKR',
+                      fontSize: compact ? 9 : 12,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: compact ? 1.2 : 1.8,
+                      color: Palette.navy,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget mainImage() {
     final screen = MediaQuery.sizeOf(context);
     final heroHeight = (screen.height - 72).clamp(520.0, 720.0);
@@ -93,6 +160,14 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
               ),
             ),
           ),
+          Positioned(
+            top: 0,
+            right: 0,
+            child: _heroBrandZone(
+              compact: false,
+              zoneWidth: screen.width,
+            ),
+          ),
           Padding(
             padding: EdgeInsets.fromLTRB(56, 40, 32, 40),
             child: Align(
@@ -119,14 +194,31 @@ class _SchoolMainPageState extends State<SchoolMainPage> {
             padding: EdgeInsets.fromLTRB(24, 28, 24, 8),
             child: _heroCopy(compact: true),
           ),
-          AspectRatio(
-            aspectRatio: 16 / 9,
-            child: Image.asset(
-              _heroAsset,
-              fit: BoxFit.cover,
-              alignment: Alignment(0.55, 0),
-              filterQuality: FilterQuality.high,
-            ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return AspectRatio(
+                aspectRatio: 16 / 9,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      _heroAsset,
+                      fit: BoxFit.cover,
+                      alignment: Alignment(0.55, 0),
+                      filterQuality: FilterQuality.high,
+                    ),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: _heroBrandZone(
+                        compact: true,
+                        zoneWidth: constraints.maxWidth,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         ],
       ),

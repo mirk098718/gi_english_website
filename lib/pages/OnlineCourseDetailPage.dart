@@ -12,6 +12,7 @@ import 'package:gi_english_website/util/AuthService.dart';
 import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/FixedWeeklySchedule.dart';
 import 'package:gi_english_website/util/LessonFeedbackService.dart';
+import 'package:gi_english_website/util/LessonMaterialService.dart';
 import 'package:gi_english_website/util/LessonRatingService.dart';
 import 'package:gi_english_website/util/TeacherScheduleService.dart';
 import 'package:gi_english_website/util/MyWidget.dart';
@@ -30,6 +31,7 @@ import 'package:gi_english_website/widget/MainTeacherChange.dart';
 import 'package:gi_english_website/widget/StudentJoinButton.dart';
 import 'package:gi_english_website/widget/TeacherClassTimeLine.dart';
 import 'package:gi_english_website/widget/AssignmentWorkSection.dart';
+import 'package:gi_english_website/widget/LessonMaterialPanel.dart';
 import 'package:gi_english_website/widget/YoutubeLessonPlayer.dart';
 
 import '../util/WidgetUtil.dart';
@@ -52,6 +54,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
   EnrollmentRecord? _enrollment;
   Map<String, List<String>> _weekProgress = {};
   Map<String, List<String>> _assignmentPhotos = {};
+  Map<String, List<LessonMaterial>> _teacherMaterials = {};
   Map<String, QuizResult> _quizResults = {};
   List<WeekBooking> _bookings = [];
   List<LessonFeedback> _feedbacks = [];
@@ -173,6 +176,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     TeacherAvailability availability = TeacherAvailability(teacherUid: '');
     final uid = AuthService.currentUser?.uid ?? '';
     Map<String, QuizResult> quizResults = {};
+    Map<String, List<LessonMaterial>> teacherMaterials = {};
     if (uid.isNotEmpty) {
       final quizIds = <String>{};
       for (final week in weeks) {
@@ -199,6 +203,8 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       };
       bookings =
           await EnrollmentService.myWeekBookings(courseId: widget.course.id);
+      teacherMaterials =
+          await LessonMaterialService.byWeekForEnrollment(enrollment.id);
       feedbacks = await LessonFeedbackService.listForStudent(
           courseId: widget.course.id);
       ratings = await LessonRatingService.listMine();
@@ -220,6 +226,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       _enrollment = enrollment;
       _weekProgress = progress;
       _assignmentPhotos = photos;
+      _teacherMaterials = teacherMaterials;
       _quizResults = quizResults;
       _bookings = bookings;
       _feedbacks = feedbacks;
@@ -1516,6 +1523,12 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             ),
           ),
           children: [
+            if ((_teacherMaterials[week.id] ?? const []).isNotEmpty) ...[
+              LessonMaterialStudentPanel(
+                materials: _teacherMaterials[week.id] ?? const [],
+              ),
+              SizedBox(height: 12),
+            ],
             if (widget.course.fixedSpeakingPrice) ...[
               AssignmentWorkSection(
                 checkedIds: checked,
