@@ -18,7 +18,8 @@ import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/util/TeacherPayroll.dart';
 import 'package:gi_english_website/util/TeacherScheduleService.dart';
 import 'package:gi_english_website/util/JitsiJoin.dart';
-import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
+import 'package:gi_english_website/util/LessonMaterialService.dart';
+import 'package:gi_english_website/widget/LessonMaterialPanel.dart';
 import 'package:gi_english_website/widget/TeacherMonthLessonSummary.dart';
 import 'package:gi_english_website/pages/StudentDetailPage.dart';
 import 'package:gi_english_website/widget/AdminContentWidth.dart';
@@ -184,12 +185,14 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
   List<LessonRating> _ratings = [];
   List<TeacherSettlement> _settlements = [];
   List<EnrollmentRecord> _enrollments = [];
-  Map<String, List<StudentWeekProgress>> _learning = {};
+  List<LessonMaterial> _materials = [];
   List<AppNotification> _notifications = [];
   DateTime _weekStart = EnrollmentService.weekStart(DateTime.now());
   bool _loading = true;
   bool _saving = false;
+  bool _materialBusy = false;
   String _teacherUid = '';
+  String _writerName = '';
   String _staffPhone = '';
   int _lessonFeeWon = EnrollmentService.lessonPayWon;
   DateTime? _selectAnchorDate;
@@ -245,8 +248,9 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         _ratings = ratings;
         _settlements = settlements;
         _enrollments = [];
-        _learning = {};
+        _materials = [];
         _staffPhone = '';
+        _writerName = '';
         _lessonFeeWon = lessonFeeWon;
         _notifications = [];
         _loading = false;
@@ -257,12 +261,15 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
         ? await AuthService.staffProfile(widget.teacherUid)
         : await AuthService.currentStaffProfile();
     final lessonFeeWon = EnrollmentService.lessonFeeWonOf(profile);
+    final writerName = await AuthService.getAdminName();
     final notifications = widget.teacherUid.isNotEmpty
         ? <AppNotification>[]
         : await NotificationService.listMine();
     final enrollments =
         await EnrollmentService.listEnrollments(teacherUid: uid);
-    final learning = await EnrollmentService.learningByEnrollment(enrollments);
+    final materials = uid.isEmpty
+        ? <LessonMaterial>[]
+        : await LessonMaterialService.listForTeacher(uid);
     if (!mounted) return;
     setState(() {
       _teacherUid = uid;
@@ -272,12 +279,54 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       _ratings = ratings;
       _settlements = settlements;
       _enrollments = enrollments;
-      _learning = learning;
+      _materials = materials;
       _staffPhone = profile?['phone']?.toString() ?? '';
+      _writerName = (profile?['name']?.toString() ?? '').trim().isNotEmpty
+          ? profile!['name'].toString().trim()
+          : writerName;
       _lessonFeeWon = lessonFeeWon;
       _notifications = notifications.where((item) => !item.read).toList();
       _loading = false;
     });
+  }
+
+  EnrollmentRecord? _enrollmentFor(WeekBooking booking) {
+    for (final record in _enrollments) {
+      if (record.userId == booking.userId &&
+          record.courseId == booking.courseId) {
+        return record;
+      }
+    }
+    return null;
+  }
+
+  String _weekIdFor(WeekBooking booking) {
+    final raw = booking.weekId.trim();
+    if (raw.isNotEmpty) return raw;
+    if (booking.courseId.isNotEmpty && booking.weekNumber > 0) {
+      return EnrollmentService.defaultWeekId(
+        booking.courseId,
+        booking.weekNumber,
+      );
+    }
+    return 'booking_${booking.id}';
+  }
+
+  List<LessonMaterial> _materialsForBooking(WeekBooking booking) {
+    final enrollment = _enrollmentFor(booking);
+    if (enrollment == null) {
+      return _materials.where((item) => item.bookingId == booking.id).toList();
+    }
+    final weekId = _weekIdFor(booking);
+    return _materials.where((item) {
+      if (item.enrollmentId != enrollment.id) return false;
+      if (item.bookingId == booking.id) return true;
+      if (item.weekId == weekId) return true;
+      if (booking.weekNumber > 0 && item.weekNumber == booking.weekNumber) {
+        return true;
+      }
+      return false;
+    }).toList();
   }
 
   bool _belongsOnMyCalendar(WeekBooking booking) {
@@ -2386,15 +2435,58 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
               ),
             ],
             SizedBox(height: 10),
-            StudentLearningProgressPanel(
-              enrollments: _enrollments
-                  .where((item) =>
-                      item.userId == booking.userId &&
-                      item.courseId == booking.courseId)
-                  .toList(),
-              progressByEnrollment: _learning,
-              onlyWeekNumber: booking.weekNumber,
-              dense: true,
+            Builder(
+              builder: (context) {
+                final enrollment = _enrollmentFor(booking);
+                final materials = _materialsForBooking(booking);
+                if (enrollment == null) {
+                  return Text(
+                    tr(context, '이 학생의 수강 기록을 찾지 못해 아직 파일을 보낼 수 없습니다.'),
+                    style: TextStyle(
+                      fontFamily: 'NotoSansKR',
+                      fontSize: 12,
+                      color: Palette.grey600,
+                    ),
+                  );
+                }
+                return LessonMaterialTeacherPanel(
+                  materials: materials,
+                  enabled: !widget.schoolOverview && _teacherUid.isNotEmpty,
+                  busy: _materialBusy,
+                  onUpload: (bytes, fileName) async {
+                    setState(() => _materialBusy = true);
+                    final error = await LessonMaterialService.upload(
+                      enrollment: enrollment,
+                      weekId: _weekIdFor(booking),
+                      weekNumber: booking.weekNumber,
+                      bookingId: booking.id,
+                      teacherId: _teacherUid,
+                      bytes: bytes,
+                      fileName: fileName,
+                      teacherName: _writerName,
+                      courseTitle: course?.title ?? booking.courseId,
+                      currentForWeek: materials,
+                    );
+                    if (!mounted) return error;
+                    _materials = await LessonMaterialService.listForTeacher(
+                      _teacherUid,
+                    );
+                    setState(() => _materialBusy = false);
+                    return error;
+                  },
+                  onDelete: (item) async {
+                    setState(() => _materialBusy = true);
+                    final error = await LessonMaterialService.remove(
+                      materialId: item.id,
+                      teacherId: _teacherUid,
+                    );
+                    if (!mounted) return error;
+                    _materials.removeWhere((m) => m.id == item.id);
+                    setState(() => _materialBusy = false);
+                    return error;
+                  },
+                );
+              },
             ),
             if (!archive && booking.isPending) ...[
               SizedBox(height: 12),

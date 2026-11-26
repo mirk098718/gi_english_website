@@ -280,6 +280,27 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
   List<String> _checkedIds(String weekId) =>
       List<String>.from(_weekProgress[weekId] ?? const []);
 
+  List<LessonMaterial> _materialsForWeek(OnlineWeek week) {
+    final seen = <String>{};
+    final out = <LessonMaterial>[];
+    void addAll(Iterable<LessonMaterial>? items) {
+      if (items == null) return;
+      for (final item in items) {
+        if (seen.add(item.id)) out.add(item);
+      }
+    }
+
+    addAll(_teacherMaterials[week.id]);
+    addAll(_teacherMaterials[
+        EnrollmentService.defaultWeekId(widget.course.id, week.weekNumber)]);
+    addAll(_teacherMaterials['week_${week.weekNumber}']);
+    for (final entry in _teacherMaterials.values) {
+      addAll(entry.where((item) =>
+          item.weekNumber == week.weekNumber || item.weekId == week.id));
+    }
+    return out;
+  }
+
   Future<void> _toggleChecklist(OnlineWeek week, String itemId, bool checked) async {
     final enrollment = _enrollment;
     if (enrollment == null || _savingChecklist) return;
@@ -1523,9 +1544,9 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             ),
           ),
           children: [
-            if ((_teacherMaterials[week.id] ?? const []).isNotEmpty) ...[
+            if (_materialsForWeek(week).isNotEmpty) ...[
               LessonMaterialStudentPanel(
-                materials: _teacherMaterials[week.id] ?? const [],
+                materials: _materialsForWeek(week),
               ),
               SizedBox(height: 12),
             ],

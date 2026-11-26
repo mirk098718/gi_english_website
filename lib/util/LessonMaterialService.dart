@@ -45,7 +45,8 @@ class LessonMaterialService {
   static const String _collection = 'lesson_materials';
   static const String refPrefix = 'teacher-material:';
   static const int maxFilesPerWeek = 6;
-  static const int maxPdfBytes = 900 * 1024;
+  // Firestore 문서 1MiB 한도. base64·필드 여유를 두고 PDF는 700KB까지.
+  static const int maxPdfBytes = 700 * 1024;
 
   static String refFor(String enrollmentId, String materialId) =>
       '$refPrefix$enrollmentId/$materialId';
@@ -151,7 +152,7 @@ class LessonMaterialService {
     if (ext == 'pdf') {
       if (bytes.isEmpty) return '파일이 비어 있습니다.';
       if (bytes.length > maxPdfBytes) {
-        return 'PDF는 900KB 이하만 보낼 수 있습니다.';
+        return 'PDF는 700KB 이하만 보낼 수 있습니다.';
       }
       return null;
     }

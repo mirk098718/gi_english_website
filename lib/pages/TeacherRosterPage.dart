@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:gi_english_website/class/JuniorLevel.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/class/OnlineCourse.dart';
 import 'package:gi_english_website/class/OnlineNativeTeacher.dart';
@@ -13,9 +12,7 @@ import 'package:gi_english_website/util/Palette.dart';
 import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/util/JitsiJoin.dart';
 import 'package:gi_english_website/pages/AdminTeacherScheduleTab.dart';
-import 'package:gi_english_website/pages/StudentDetailPage.dart';
 import 'package:gi_english_website/widget/AdminContentWidth.dart';
-import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
 import 'package:gi_english_website/widget/TeacherMonthLessonSummary.dart';
 import 'package:gi_english_website/widget/LessonRatingPromptHost.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
@@ -127,7 +124,6 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
   List<LessonRating> _ratings = [];
   List<OnlineSession> _sessions = [];
   List<EnrollmentRecord> _enrollments = [];
-  Map<String, List<StudentWeekProgress>> _learning = {};
   Map<String, String> _studentNotes = {};
   List<LessonMaterial> _materials = [];
   bool _loading = true;
@@ -196,8 +192,8 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     final feedbacks = await LessonFeedbackService.listForTeacher(teacherUid);
     final ratings = await LessonRatingService.listForTeacher(teacherUid);
     final enrollments = await EnrollmentService.listEnrollments(
-        teacherUid: teacherUid);
-    final learning = await EnrollmentService.learningByEnrollment(enrollments);
+      teacherUid: teacherUid,
+    );
     final notes = await TeacherStudentNoteService.notesForTeacher(teacherUid);
     final materials = await LessonMaterialService.listForTeacher(teacherUid);
     if (!mounted) return;
@@ -214,7 +210,6 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       _ratings = ratings;
       _sessions = sessions;
       _enrollments = enrollments;
-      _learning = learning;
       _studentNotes = notes;
       _materials = materials;
       _staffUid = staffUid;
@@ -734,28 +729,35 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     return null;
   }
 
-  List<LessonMaterial> _materialsForWeek({
-    required EnrollmentRecord? enrollment,
-    required String weekId,
-  }) {
-    if (enrollment == null) return const [];
-    return _materials
-        .where((item) =>
-            item.enrollmentId == enrollment.id && item.weekId == weekId)
-        .toList();
+  String _weekIdFor(WeekBooking booking) {
+    final raw = booking.weekId.trim();
+    if (raw.isNotEmpty) return raw;
+    if (booking.courseId.isNotEmpty && booking.weekNumber > 0) {
+      return EnrollmentService.defaultWeekId(
+        booking.courseId,
+        booking.weekNumber,
+      );
+    }
+    return 'booking_${booking.id}';
   }
 
-  String _levelLabel(
-    Map<String, dynamic> member,
-    List<EnrollmentRecord> records,
-  ) {
-    final fromMember = JuniorLevel.fromMap(member);
-    if (fromMember != null) return fromMember.label;
-    for (final record in records) {
-      final level = record.juniorLevelInfo;
-      if (level != null) return level.label;
+  List<LessonMaterial> _materialsForBooking({
+    required WeekBooking booking,
+    required EnrollmentRecord? enrollment,
+  }) {
+    if (enrollment == null) {
+      return _materials.where((item) => item.bookingId == booking.id).toList();
     }
-    return '';
+    final weekId = _weekIdFor(booking);
+    return _materials.where((item) {
+      if (item.enrollmentId != enrollment.id) return false;
+      if (item.bookingId == booking.id) return true;
+      if (item.weekId == weekId) return true;
+      if (booking.weekNumber > 0 && item.weekNumber == booking.weekNumber) {
+        return true;
+      }
+      return false;
+    }).toList();
   }
 
   Widget _memberCard(Map<String, dynamic> member, {bool guest = false}) {
@@ -769,9 +771,6 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
         if (byWeek != 0) return byWeek;
         return a.date.compareTo(b.date);
       });
-    final records =
-        _enrollments.where((item) => item.userId == memberId).toList();
-    final hasPlan = records.any((item) => item.sessionPlan.isNotEmpty);
     final note = (_studentNotes[memberId] ?? '').trim();
     return Card(
       margin: EdgeInsets.only(bottom: 12),
@@ -830,9 +829,6 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
           ),
           subtitle: Text(
             [
-              if (email.isNotEmpty) email,
-              if (_levelLabel(member, records).isNotEmpty)
-                tf(context, '현재 레벨 {p0}', {'p0': _levelLabel(member, records)}),
               if (guest && assignedTeacherName.isNotEmpty)
                 tf(context, '담당 {p0}', {'p0': assignedTeacherName}),
               tf(context, '화상수업 {p0}건', {'p0': lessons.length}),
@@ -854,40 +850,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                 },
               ),
             if (_teacherUid.isNotEmpty) SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton.icon(
-                onPressed: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => StudentDetailPage(
-                        member: member,
-                        teacherName: guest
-                            ? assignedTeacherName
-                            : AuthService.memberTeacherName(member),
-                      ),
-                    ),
-                  );
-                  if (!mounted) return;
-                  await _load();
-                },
-                icon: Icon(Icons.person_outline, size: 18),
-                label: Text(tr(context, "회원 상세 · 결제"),
-                    style: TextStyle(fontFamily: "NotoSansKR")),
-              ),
-            ),
-            SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: StudentLearningProgressPanel(
-                enrollments: records,
-                progressByEnrollment: _learning,
-                bookings: lessons,
-              ),
-            ),
-            SizedBox(height: 16),
-            if (TeacherBookingBoard.from(lessons).isEmpty && !hasPlan)
+            if (TeacherBookingBoard.from(lessons).isEmpty)
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -942,12 +905,12 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
         booking.isConfirmed &&
         (live || (session?.isLive == true) || !ended);
     final enrollment = _enrollmentFor(booking);
-    final weekId =
-        booking.weekId.trim().isNotEmpty ? booking.weekId.trim() : '';
-    final materials = _materialsForWeek(
+    final weekId = _weekIdFor(booking);
+    final materials = _materialsForBooking(
+      booking: booking,
       enrollment: enrollment,
-      weekId: weekId,
     );
+    final canAttach = enrollment != null;
 
     return Container(
       width: double.maxFinite,
@@ -1034,8 +997,17 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
               ),
             ],
           ),
-          if (enrollment != null && weekId.isNotEmpty) ...[
-            SizedBox(height: 10),
+          SizedBox(height: 10),
+          if (!canAttach)
+            Text(
+              tr(context, '이 학생의 수강 기록을 찾지 못해 아직 파일을 보낼 수 없습니다.'),
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontSize: 12,
+                color: Palette.grey600,
+              ),
+            )
+          else
             LessonMaterialTeacherPanel(
               materials: materials,
               enabled: _canWrite,
@@ -1073,7 +1045,6 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
                 return error;
               },
             ),
-          ],
           if (rating != null && rating.review.trim().isNotEmpty) ...[
             SizedBox(height: 8),
             Text(

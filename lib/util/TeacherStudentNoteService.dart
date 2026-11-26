@@ -50,7 +50,7 @@ class TeacherStudentNoteService {
       return null;
     } catch (e) {
       print('강사 학생 메모 저장 오류: $e');
-      return '학생 정보를 저장하지 못했습니다.';
+      return '간단 메모를 저장하지 못했습니다.';
     }
   }
 }

@@ -72,7 +72,7 @@ class _TeacherStudentNoteFieldState extends State<TeacherStudentNoteField> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          tr(context, '학생 정보를 저장했습니다.'),
+          tr(context, '간단 메모를 저장했습니다.'),
           style: TextStyle(fontFamily: 'NotoSansKR'),
         ),
         backgroundColor: Palette.success,
@@ -99,7 +99,7 @@ class _TeacherStudentNoteFieldState extends State<TeacherStudentNoteField> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          tr(context, '학생 정보'),
+          tr(context, '간단 메모'),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontWeight: FontWeight.w700,
@@ -113,7 +113,7 @@ class _TeacherStudentNoteFieldState extends State<TeacherStudentNoteField> {
           maxLines: 3,
           style: TextStyle(fontFamily: 'NotoSansKR', fontSize: 13),
           decoration: InputDecoration(
-            hintText: tr(context, '레벨·성향·주의할 점 등 간단히 적어 두세요.'),
+            hintText: tr(context, '성향·주의할 점 등 직접 적어 두세요.'),
             hintStyle: TextStyle(fontFamily: 'NotoSansKR', fontSize: 12),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             contentPadding: EdgeInsets.all(12),
@@ -129,7 +129,7 @@ class _TeacherStudentNoteFieldState extends State<TeacherStudentNoteField> {
               visualDensity: VisualDensity.compact,
             ),
             child: Text(
-              tr(context, '학생 정보 저장'),
+              tr(context, '메모 저장'),
               style: TextStyle(fontFamily: 'NotoSansKR', fontSize: 12),
             ),
           ),
