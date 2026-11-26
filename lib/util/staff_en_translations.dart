@@ -41,6 +41,7 @@ const Map<String, String> staffEnTranslations = {
   "파일을 열지 못했습니다.": "Could not open the file.",
   "웹에서 파일을 열어 주세요.": "Open the file in the web browser.",
   "이 학생의 수강 기록을 찾지 못해 아직 파일을 보낼 수 없습니다.": "This student's enrollment was not found, so files cannot be sent yet.",
+  "PDF는 700KB 이하만 보낼 수 있습니다.": "PDFs must be 700KB or smaller.",
   "신고 목록을 불러오지 못했어요.": "The report list could not be loaded.",
   "Let's Talk 신고가 아직 없습니다.": "No Let's Talk reports yet.",
   "자동 필터": "Auto filter",

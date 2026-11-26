@@ -36,6 +36,7 @@ const Map<String, String> enTranslations = {
   "파일을 열지 못했습니다.": "Could not open the file.",
   "웹에서 파일을 열어 주세요.": "Open the file in the web browser.",
   "이 학생의 수강 기록을 찾지 못해 아직 파일을 보낼 수 없습니다.": "This student's enrollment was not found, so files cannot be sent yet.",
+  "PDF는 700KB 이하만 보낼 수 있습니다.": "PDFs must be 700KB or smaller.",
   "초등부 또는 중등부 레벨테스트를 보거나, 알고 있는 레벨 1~6을 직접 고르세요. 고른 레벨은 강사와 매니저에게 보입니다.": "Take the elementary or middle school level test, or choose level 1–6 yourself. Teachers and managers can see the level you choose.",
   "프로그램 선택의 내 레벨에 이 결과가 들어갑니다. 원하면 직접 고칠 수 있습니다.": "This result fills My level on the program page. You can change it yourself.",
   "{p0}문항 중 {p1}문항을 맞혀 {p2}입니다.": "You got {p1} of {p0} right. Your level is {p2}.",
