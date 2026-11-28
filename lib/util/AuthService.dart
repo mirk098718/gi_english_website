@@ -719,7 +719,14 @@ class AuthService {
       final fromUid = (data['teacherId'] ?? data['nativeTeacherUid'] ?? '')
           .toString()
           .trim();
-      if (fromUid.isEmpty || fromUid == toUid) continue;
+      final fromName = (data['nativeTeacherName'] ??
+              data['assignedTeacherName'] ??
+              '')
+          .toString()
+          .trim();
+      // uid·이름 둘 다 메인 강사와 같으면 건드리지 않는다.
+      if (fromUid == toUid && fromName == toName) continue;
+      if (fromUid.isEmpty && fromName.isEmpty) continue;
 
       DateTime? day;
       final dateRaw = data['date'];
@@ -739,35 +746,37 @@ class AuthService {
         if (courseId.startsWith('junior_')) return 30;
         return 20;
       })();
-      // 수업 시각이 완전히 지난 회차만 남긴다. 시작 전·당일 미리 종료한 회차는 옮긴다.
       final classEnd = start.add(Duration(minutes: lessonMinutes));
-      if (!classEnd.isAfter(now)) continue;
+      // 수업 시각이 완전히 지난 회차는 점유만 옮기지 않고, 표시 강사 이름은 맞춘다.
+      final classStillOpen = classEnd.isAfter(now);
 
       DocumentSnapshot<Map<String, dynamic>>? ratingSnap;
       try {
         ratingSnap =
             await _firestore.collection('lesson_ratings').doc(doc.id).get();
-        if (ratingSnap.exists &&
-            ratingSnap.data()?['status']?.toString() == 'rated') {
-          continue;
-        }
       } catch (_) {}
+
+      // 별점이 끝나도 예약 카드 강사 이름은 메인 강사에 맞춘다.
+      // (이전이 rated면 통째로 건너뛰어 Mia가 남는 문제가 있었다.)
 
       final y = day.year.toString().padLeft(4, '0');
       final m = day.month.toString().padLeft(2, '0');
       final d = day.day.toString().padLeft(2, '0');
       final dateKey = '$y-$m-$d';
       final targetOccId = '${toUid}_${dateKey}_${time.replaceAll(':', '')}';
-      try {
-        final taken = await _firestore
-            .collection('teacher_occupied_slots')
-            .doc(targetOccId)
-            .get();
-        if (taken.exists) {
-          final other = taken.data()?['bookingId']?.toString() ?? '';
-          if (other.isNotEmpty && other != doc.id) continue;
-        }
-      } catch (_) {}
+      var slotFree = true;
+      if (classStillOpen && fromUid != toUid) {
+        try {
+          final taken = await _firestore
+              .collection('teacher_occupied_slots')
+              .doc(targetOccId)
+              .get();
+          if (taken.exists) {
+            final other = taken.data()?['bookingId']?.toString() ?? '';
+            if (other.isNotEmpty && other != doc.id) slotFree = false;
+          }
+        } catch (_) {}
+      }
 
       final patch = <String, dynamic>{
         'teacherId': toUid,
@@ -782,13 +791,15 @@ class AuthService {
       };
       try {
         await doc.reference.update(patch);
-        await _moveOccupiedSlot(
-          data: data,
-          fromUid: fromUid,
-          toUid: toUid,
-          bookingId: doc.id,
-          userId: uid,
-        );
+        if (classStillOpen && slotFree && fromUid.isNotEmpty && fromUid != toUid) {
+          await _moveOccupiedSlot(
+            data: data,
+            fromUid: fromUid,
+            toUid: toUid,
+            bookingId: doc.id,
+            userId: uid,
+          );
+        }
         // 아직 안 낸 별점 문서의 강사도 메인 강사에 맞춘다.
         if (ratingSnap != null && ratingSnap.exists) {
           final status = ratingSnap.data()?['status']?.toString() ?? '';

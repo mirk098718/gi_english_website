@@ -1284,7 +1284,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
         Row(
           children: [
             Text(
-              tr(context, _speakingOnly ? "회화 예약" : "회차 학습"),
+              tr(context, _speakingOnly ? "화상수업 예약" : "회차 학습"),
               style: TextStyle(
                 fontFamily: "Jalnan",
                 fontSize: 15,
@@ -1512,7 +1512,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       final weeks = FixedWeeklySchedule.shapeFor(widget.course)?.weeks ?? 4;
       return tf(
         context,
-        '결제할 때 정한 매주 시간이 {p0}주 동안 선생님 스케줄에 들어 있습니다. 수업 하루 전까지 대체 시간을 고르면 그 회차만 옮기고, 대체 시간을 고르지 않으면 취소되지 않습니다.',
+        '결제할 때 정한 매주 시간이 {p0}주 동안 선생님 스케줄에 들어 있습니다. 수업 하루 전까지 대체 시간을 고르면 그 회차만 옮길 수 있습니다.',
         {'p0': weeks},
       );
     }
@@ -1571,7 +1571,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
 
   String _lockedWeekCopy(OnlineWeek week, bool fixedWeek) {
     const schedule =
-        '이 회차 시간은 결제할 때 정해져 있습니다. 하루 전까지는 선생님이 되는 빈 시간 중 아무 시간이나 골라 그 회차만 옮기고, 고르지 않으면 취소되지 않습니다.';
+        '이 회차 시간은 결제할 때 정해져 있습니다. 하루 전까지는 선생님이 되는 빈 시간 중 아무 시간이나 골라 그 회차만 옮길 수 있습니다.';
     if (!fixedWeek) return _lockMessage(week);
     if (!EnrollmentService.requiresStudentRating(widget.course.id)) {
       return tr(context, schedule);
