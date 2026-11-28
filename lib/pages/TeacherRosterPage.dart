@@ -1009,9 +1009,24 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     WeekBooking? focus;
     for (final booking in open) {
       final session = _sessionFor(booking);
-      if (session?.isLiveNow == true || session?.isLive == true) {
+      if (session?.isLiveNow == true) {
         focus = booking;
         break;
+      }
+    }
+    // 종료 후 별점 대기 회차를 이번 수업에 둔다.
+    if (focus == null) {
+      for (final booking in open) {
+        final rating = LessonRatingService.forBooking(_ratings, booking.id);
+        if (EnrollmentService.bookingAwaitingStudentRating(
+          booking,
+          session: _sessionFor(booking),
+          rated: rating?.isRated == true,
+          canStudentRate: rating?.canStudentRate == true,
+        )) {
+          focus = booking;
+          break;
+        }
       }
     }
     focus ??= open.isEmpty ? null : open.first;

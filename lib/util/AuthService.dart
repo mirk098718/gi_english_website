@@ -635,8 +635,58 @@ class AuthService {
     }
   }
 
-  /// 이미 메인 강사를 바꾼 뒤에도, 시작 전 예약을 담당 강사에 맞춘다.
-  /// 대체(코티처) 예약·종료된 수업·별점이 열린 회차는 건드리지 않는다.
+  /// 회원 문서의 메인 강사를 수강·예약에 맞춘다.
+  /// 화면에는 Agnes인데 예약만 Mia로 남은 경우를 고친다.
+  static Future<void> syncMainTeacherAssignments({String? userId}) async {
+    final uid = (userId ?? currentUser?.uid ?? '').trim();
+    if (uid.isEmpty) return;
+    try {
+      final member = await _firestore.collection('members').doc(uid).get();
+      final data = member.data() ?? {};
+      final toUid = (data['nativeTeacherUid'] ?? data['teacherId'] ?? '')
+          .toString()
+          .trim();
+      final toProfile = (data['nativeTeacherId'] ?? '').toString().trim();
+      final toName = (data['nativeTeacherName'] ?? '').toString().trim();
+      if (toUid.isEmpty || toProfile.isEmpty || toName.isEmpty) return;
+
+      final fields = <String, dynamic>{
+        'teacherId': toUid,
+        'nativeTeacherId': toProfile,
+        'nativeTeacherName': toName,
+        'nativeTeacherUid': toUid,
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+      final enrollments = await _firestore
+          .collection('enrollments')
+          .where('userId', isEqualTo: uid)
+          .get();
+      for (final doc in enrollments.docs) {
+        final plan = doc.data()['plan']?.toString() ?? '';
+        if (plan == 'lecture') continue;
+        final current =
+            (doc.data()['nativeTeacherUid'] ?? doc.data()['teacherId'] ?? '')
+                .toString()
+                .trim();
+        if (current == toUid &&
+            (doc.data()['nativeTeacherName']?.toString() ?? '') == toName) {
+          continue;
+        }
+        await doc.reference.set(fields, SetOptions(merge: true));
+      }
+      await retargetUpcomingBookingsToMainTeacher(
+        teacherUid: toUid,
+        profileId: toProfile,
+        teacherName: toName,
+        userId: uid,
+      );
+    } catch (e) {
+      print('메인 강사 동기화 오류: $e');
+    }
+  }
+
+  /// 이미 메인 강사를 바꾼 뒤에도, 아직 수업이 안 끝난 예약을 담당 강사에 맞춘다.
+  /// 대체(코티처) 예약·별점까지 끝난 회차는 건드리지 않는다.
   static Future<void> retargetUpcomingBookingsToMainTeacher({
     required String teacherUid,
     required String profileId,
@@ -684,25 +734,22 @@ class AuthService {
       if (hour == null) continue;
       final minute = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
       final start = DateTime(day.year, day.month, day.day, hour, minute);
-      if (!start.isAfter(now)) continue;
+      final lessonMinutes = (() {
+        final courseId = data['courseId']?.toString() ?? '';
+        if (courseId.startsWith('junior_')) return 30;
+        return 20;
+      })();
+      // 수업 시각이 완전히 지난 회차만 남긴다. 시작 전·당일 미리 종료한 회차는 옮긴다.
+      final classEnd = start.add(Duration(minutes: lessonMinutes));
+      if (!classEnd.isAfter(now)) continue;
 
-      // 이미 종료된 회차·별점 게이트가 열린 회차는 원래 강사 평가를 유지한다.
-      final sessionId = 'booking_${doc.id}';
+      DocumentSnapshot<Map<String, dynamic>>? ratingSnap;
       try {
-        final session =
-            await _firestore.collection('online_sessions').doc(sessionId).get();
-        if (session.exists && session.data()?['endedAt'] != null) continue;
-      } catch (_) {}
-      try {
-        final rating =
+        ratingSnap =
             await _firestore.collection('lesson_ratings').doc(doc.id).get();
-        if (rating.exists) {
-          final status = rating.data()?['status']?.toString() ?? '';
-          if (status == 'pending' ||
-              status == 'awaiting_feedback' ||
-              status == 'rated') {
-            continue;
-          }
+        if (ratingSnap.exists &&
+            ratingSnap.data()?['status']?.toString() == 'rated') {
+          continue;
         }
       } catch (_) {}
 
@@ -742,6 +789,18 @@ class AuthService {
           bookingId: doc.id,
           userId: uid,
         );
+        // 아직 안 낸 별점 문서의 강사도 메인 강사에 맞춘다.
+        if (ratingSnap != null && ratingSnap.exists) {
+          final status = ratingSnap.data()?['status']?.toString() ?? '';
+          if (status == 'pending' || status == 'awaiting_feedback') {
+            await ratingSnap.reference.update({
+              'teacherId': toUid,
+              'teacherName': toName,
+              'rosterTeacherId': toUid,
+              'updatedAt': FieldValue.serverTimestamp(),
+            });
+          }
+        }
       } catch (e) {
         print('메인 강사 예약 이전 오류(${doc.id}): $e');
       }

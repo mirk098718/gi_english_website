@@ -87,6 +87,7 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
 
   Future<void> _loadMyCourses() async {
     await AuthService.selectableNativeTeachers();
+    await AuthService.syncMainTeacherAssignments();
     final enrollments = await EnrollmentService.myEnrollments();
     final member = await AuthService.currentMemberDoc();
     final notifications = await NotificationService.listMine();

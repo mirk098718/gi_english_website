@@ -414,9 +414,18 @@ class LessonRatingService {
       try {
         await ref.update(payload);
       } on FirebaseException catch (e) {
-        // 예전 문서에 필드가 비어 update가 막히면 merge set으로 한 번 더.
         if (e.code != 'not-found') rethrow;
         await ref.set(payload, SetOptions(merge: true));
+      }
+      // 저장이 실제로 rated가 됐는지 확인한다.
+      final saved = await ref.get();
+      final data = saved.data() ?? {};
+      final status = data['status']?.toString() ?? '';
+      final savedStars = _intValue(data['stars']);
+      if (status != LessonRating.statusRated ||
+          savedStars < LessonRating.minStars ||
+          savedStars > LessonRating.maxStars) {
+        return '수업 평가가 저장되지 않았습니다. 다시 시도해 주세요.';
       }
       return null;
     } on FirebaseException catch (e) {

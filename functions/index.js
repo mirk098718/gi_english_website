@@ -1554,15 +1554,20 @@ async function ensureLessonRating({ bookingId, sessionId, session, status, extra
 }
 
 async function creditEnrollmentFromRating(rating, ratingId) {
-  const userId = String((rating && rating.userId) || "");
-  const courseId = String((rating && rating.courseId) || "");
   const bookingId = String((rating && rating.bookingId) || ratingId || "");
+  const booking = await loadBookingData(bookingId);
+  const userId = String((rating && rating.userId) || booking.userId || "");
+  const courseId = String((rating && rating.courseId) || booking.courseId || "");
   const sessionId = String(
     (rating && rating.sessionId) || (bookingId ? sessionIdForBooking(bookingId) : "")
   );
   if (!userId || !courseId || !sessionId) {
     console.log("평가 이수 건너뜀: userId/courseId/sessionId 없음", ratingId);
     return { credited: false };
+  }
+  // 별점 문서에 회차가 비면 예약 문서에서 채운다.
+  if (!Number((rating && rating.weekNumber) || 0) && Number(booking.weekNumber || 0) > 0) {
+    rating = Object.assign({}, rating || {}, { weekNumber: Number(booking.weekNumber) });
   }
 
   const db = admin.firestore();
@@ -1632,7 +1637,27 @@ async function creditEnrollmentFromRating(rating, ratingId) {
       return;
     }
 
-    const next = current + 1;
+    // 회차 번호가 있으면 그 회차까지 이수로 맞춘다.
+    // (+1만 하면 4회차만 평가했을 때 진도가 1로 남아 화면이 그대로다.)
+    const weekTarget = weekNumber > 0 ? weekNumber : current + 1;
+    const next = Math.min(Math.max(current, weekTarget), total);
+    if (next <= current) {
+      if (sessionSnap.exists) {
+        tx.update(sessionRef, {
+          sessionCredited: true,
+          creditedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+      tx.set(
+        ratingRef,
+        {
+          sessionCredited: true,
+          creditedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+      return;
+    }
     nextCompleted = next;
     credited = true;
     tx.update(enrollmentRef, {
@@ -1984,11 +2009,13 @@ exports.onLessonRatingWritten = functions
     const before = change.before.exists ? change.before.data() || {} : {};
     const ratingId = context.params.ratingId;
 
-    const becameRated =
-      after.status === "rated" && before.status !== "rated";
-    if (becameRated) {
+    // 방금 rated가 됐거나, 예전에 rated인데 이수가 안 잡힌 문서를 보정한다.
+    const needsCredit =
+      after.status === "rated" && after.sessionCredited !== true;
+    if (needsCredit) {
+      const becameRated = before.status !== "rated";
       const result = await creditEnrollmentFromRating(after, ratingId);
-      if (result.credited) {
+      if (becameRated && result.credited) {
         const opened =
           result.nextCompleted < result.totalSessions
             ? result.nextCompleted + 1
@@ -2037,7 +2064,21 @@ exports.sendRatingReminders = functions
       const ok = await sendRatingReminder(data, doc.id, { reason: "scheduled" });
       if (ok) sent += 1;
     }
-    console.log("수업 평가 재알림", { pending: snap.size, sent });
+
+    // 별점은 있는데 이수 횟수가 안 오른 문서를 보정한다.
+    const ratedSnap = await admin
+      .firestore()
+      .collection("lesson_ratings")
+      .where("status", "==", "rated")
+      .get();
+    let repaired = 0;
+    for (const doc of ratedSnap.docs) {
+      const data = doc.data() || {};
+      if (data.sessionCredited === true) continue;
+      const result = await creditEnrollmentFromRating(data, doc.id);
+      if (result.credited) repaired += 1;
+    }
+    console.log("수업 평가 재알림", { pending: snap.size, sent, repaired });
     return null;
   });
 

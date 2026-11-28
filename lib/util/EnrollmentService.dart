@@ -2791,7 +2791,8 @@ class EnrollmentService {
       session != null && (session.isFinished || session.isStale);
 
   /// 수업 종료 처리가 끝난 예약.
-  /// 별점 필수 과정(주니어·재원생): 강사가 종료한 뒤 수강생 별점까지 있어야 끝.
+  /// 별점 필수 과정(주니어·재원생): 수강생 별점이 있으면 완료.
+  /// (강사가 수업일 전에 종료해도 별점만 끝나면 수강완료로 본다.)
   /// 강사 피드백은 선택. 그 외 과정은 세션 종료 또는 수업 시각 경과.
   static bool bookingIsClosed(
     WeekBooking booking, {
@@ -2803,11 +2804,25 @@ class EnrollmentService {
     if (!booking.isConfirmed) return false;
     final endedBySession = sessionHasEnded(session);
     if (requiresStudentRating(booking.courseId)) {
-      if (!rated) return false;
-      return endedBySession || bookingHasEnded(booking, now: now);
+      // 별점이 끝이면 완료. 미래 회차를 미리 종료한 뒤에도 수강완료칸으로 간다.
+      return rated;
     }
     if (endedBySession) return true;
     return bookingHasEnded(booking, now: now);
+  }
+
+  /// 강사가 종료했거나 별점 창이 열린 상태. 수강생 화면의 '진행 중' 대신 쓴다.
+  static bool bookingAwaitingStudentRating(
+    WeekBooking booking, {
+    OnlineSession? session,
+    bool rated = false,
+    bool canStudentRate = false,
+  }) {
+    if (!requiresStudentRating(booking.courseId)) return false;
+    if (!booking.isConfirmed) return false;
+    if (rated) return false;
+    if (canStudentRate) return true;
+    return sessionHasEnded(session);
   }
 
   static bool canStudentChangeBooking(WeekBooking booking, {DateTime? now}) {

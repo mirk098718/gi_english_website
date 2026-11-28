@@ -113,13 +113,22 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     final uid = AuthService.currentUser?.uid ?? '';
     if (uid.isEmpty) return;
     _ratingSub = LessonRatingService.watchMine(userId: uid).listen((ratings) {
-      if (!mounted) return;
-      setState(() {
-        _ratings = ratings
-            .where((rating) =>
-                rating.courseId.isEmpty || rating.courseId == widget.course.id)
-            .toList();
-      });
+      if (!mounted || token != _ratingBind) return;
+      final next = ratings
+          .where((rating) =>
+              rating.courseId.isEmpty || rating.courseId == widget.course.id)
+          .toList();
+      final pendingIds = _ratings
+          .where((item) => item.canStudentRate)
+          .map((item) => item.id)
+          .toSet();
+      final newlyRated = next.any(
+          (item) => item.isRated && pendingIds.contains(item.id));
+      setState(() => _ratings = next);
+      // 별점이 방금 끝나면 이수 횟수·수강완료 칸을 맞추려고 수강 문서를 다시 읽는다.
+      if (newlyRated) {
+        _loadData();
+      }
     }, onError: (_) {});
   }
 
@@ -156,8 +165,15 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       widget.course.id,
       userId: AuthService.currentUser?.uid,
     );
-    final enrollment =
+    var enrollment =
         await EnrollmentService.myEnrollmentForCourse(widget.course.id);
+    // 회원 메인 강사 ↔ 수강·예약 문서가 어긋난 경우를 맞춘다.
+    if (enrollment != null) {
+      await AuthService.syncMainTeacherAssignments();
+      enrollment =
+          await EnrollmentService.myEnrollmentForCourse(widget.course.id) ??
+              enrollment;
+    }
     final speaking = widget.course.isSpeakingProduct ||
         enrollment?.plan == OnlinePlan.speaking;
     final weeks = speaking
@@ -202,17 +218,6 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       photos = {
         for (final entry in records.entries) entry.key: entry.value.photoUrls,
       };
-      // 메인 강사만 바뀌고 예약 문서가 예전 강사로 남은 경우를 맞춘다.
-      final mainUid = enrollment.nativeTeacherUid.trim();
-      if (mainUid.isNotEmpty &&
-          enrollment.nativeTeacherId.trim().isNotEmpty &&
-          enrollment.nativeTeacherName.trim().isNotEmpty) {
-        await AuthService.retargetUpcomingBookingsToMainTeacher(
-          teacherUid: mainUid,
-          profileId: enrollment.nativeTeacherId,
-          teacherName: enrollment.nativeTeacherName,
-        );
-      }
       bookings =
           await EnrollmentService.myWeekBookings(courseId: widget.course.id);
       teacherMaterials =
@@ -1386,16 +1391,41 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     );
   }
 
+  bool _weekIsCompleted(OnlineWeek week) {
+    final enrollment = _enrollment;
+    if (enrollment != null &&
+        week.weekNumber > 0 &&
+        week.weekNumber <= enrollment.completedSessions) {
+      return true;
+    }
+    final booking = _bookingFor(week.id);
+    if (booking == null) return false;
+    final rating = _ratingForWeek(week);
+    return EnrollmentService.bookingIsClosed(
+      booking,
+      session: _sessionForBooking(booking),
+      rated: rating?.isRated == true,
+    );
+  }
+
+  bool _weekAwaitingRating(OnlineWeek week) {
+    final booking = _bookingFor(week.id);
+    if (booking == null) return false;
+    final rating = _ratingForWeek(week);
+    return EnrollmentService.bookingAwaitingStudentRating(
+      booking,
+      session: _sessionForBooking(booking),
+      rated: rating?.isRated == true,
+      canStudentRate: rating?.canStudentRate == true,
+    );
+  }
+
   /// 주니어·재원생: 이번 수업 1개만 위에 두고, 이후·수강완료는 접는다.
   List<Widget> _fixedSpeakingWeekSections() {
-    final enrollment = _enrollment;
     final finished = <OnlineWeek>[];
     final open = <OnlineWeek>[];
     for (final week in _weeks) {
-      final completed = enrollment != null &&
-          week.weekNumber > 0 &&
-          week.weekNumber <= enrollment.completedSessions;
-      if (completed) {
+      if (_weekIsCompleted(week)) {
         finished.add(week);
       } else {
         open.add(week);
@@ -1588,10 +1618,8 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
         (!_lectureOnly &&
             enrollment != null &&
             week.weekNumber == _currentSessionNumber);
-    final completed = archive ||
-        (!_lectureOnly &&
-            enrollment != null &&
-            week.weekNumber <= enrollment.completedSessions);
+    final completed = archive || _weekIsCompleted(week);
+    final awaitingRating = !completed && _weekAwaitingRating(week);
     final booking = _bookingFor(week.id);
     final fixedWeek =
         widget.course.fixedSpeakingPrice || (booking?.fixedSchedule ?? false);
@@ -1606,7 +1634,8 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       if (week.weekNumber > 0) '${week.weekNumber}회차',
       if (when.isNotEmpty) when,
       if (completed) tr(context, '수강완료'),
-      if (!completed && isCurrent) tr(context, '진행 중'),
+      if (!completed && awaitingRating) tr(context, '평가 대기'),
+      if (!completed && !awaitingRating && isCurrent) tr(context, '진행 중'),
     ].join(' · ');
 
     return Container(
