@@ -4517,7 +4517,8 @@ class TeacherBookingBoard {
       final next = nextByStudent[key];
       if (fixed) {
         // 주니어 순차 잠금 임시 해제: 가까운 1건만이 아니라 열린 회차를 모두 보여 준다.
-        if (booking.isJunior && !juniorSequentialLockEnabled) {
+        if (booking.isJunior &&
+            !EnrollmentService.juniorSequentialLockEnabled) {
           upcoming.add(booking);
           continue;
         }
