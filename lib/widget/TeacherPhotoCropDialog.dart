@@ -8,6 +8,7 @@ import 'package:gi_english_website/util/html_stub.dart'
     if (dart.library.html) 'dart:html' as html;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gi_english_website/util/AppLanguage.dart';
 import 'package:gi_english_website/util/Palette.dart';
@@ -19,8 +20,11 @@ class TeacherPhotoCropDialog extends StatefulWidget {
       : super(key: key);
 
   static Future<Uint8List?> show(BuildContext context, Uint8List bytes) {
+    // 강사 등록/수정 다이얼로그 위에서 열리므로 rootNavigator를 쓴다.
+    // 안 쓰면 웹에서 슬라이더 포인터가 아래 다이얼로그에 먹히는 경우가 있다.
     return showDialog<Uint8List>(
       context: context,
+      useRootNavigator: true,
       barrierDismissible: false,
       builder: (_) => TeacherPhotoCropDialog(bytes: bytes),
     );
@@ -32,6 +36,8 @@ class TeacherPhotoCropDialog extends StatefulWidget {
 
 class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
   static const double _frame = 280;
+  static const double _minZoom = 1.0;
+  static const double _maxZoom = 5.0;
   double _imgW = 0;
   double _imgH = 0;
   double _containScale = 1;
@@ -55,7 +61,8 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
       final size = await _decodeSize(widget.bytes);
       if (!mounted) return;
       if (size.width <= 0 || size.height <= 0) {
-        setState(() => _loadError = tr(context, '사진을 읽지 못했습니다. JPG 또는 PNG로 올려 주세요.'));
+        setState(() =>
+            _loadError = tr(context, '사진을 읽지 못했습니다. JPG 또는 PNG로 올려 주세요.'));
         return;
       }
       setState(() {
@@ -66,7 +73,8 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
       });
     } catch (_) {
       if (!mounted) return;
-      setState(() => _loadError = tr(context, '사진을 읽지 못했습니다. JPG 또는 PNG로 올려 주세요.'));
+      setState(() =>
+          _loadError = tr(context, '사진을 읽지 못했습니다. JPG 또는 PNG로 올려 주세요.'));
     }
   }
 
@@ -90,7 +98,7 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
 
   void _resetContain() {
     _containScale = math.min(_frame / _imgW, _frame / _imgH);
-    _userZoom = 1;
+    _userZoom = _minZoom;
     _offset = Offset(
       (_frame - _imgW * _scale) / 2,
       (_frame - _imgH * _scale) / 2,
@@ -103,11 +111,15 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
       (focal.dx - _offset.dx) / _scale,
       (focal.dy - _offset.dy) / _scale,
     );
-    _userZoom = zoom.clamp(1.0, 5.0);
+    _userZoom = zoom.clamp(_minZoom, _maxZoom);
     _offset = Offset(
       focal.dx - imagePoint.dx * _scale,
       focal.dy - imagePoint.dy * _scale,
     );
+  }
+
+  void _nudgeZoom(double delta) {
+    setState(() => _setZoom(_userZoom + delta));
   }
 
   Future<void> _confirm() async {
@@ -125,7 +137,8 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
       if (!mounted) return;
       setState(() {
         _saving = false;
-        _saveError = tr(context, '사진을 자르지 못했습니다. 위치를 다시 맞춘 뒤 시도해 주세요.');
+        _saveError =
+            tr(context, '사진을 자르지 못했습니다. 위치를 다시 맞춘 뒤 시도해 주세요.');
       });
       return;
     }
@@ -133,7 +146,7 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
     FocusManager.instance.primaryFocus?.unfocus();
     await Future<void>.delayed(Duration.zero);
     if (!mounted) return;
-    Navigator.of(context).pop(cropped);
+    Navigator.of(context, rootNavigator: true).pop(cropped);
   }
 
   Future<Uint8List> _exportJpeg() async {
@@ -191,155 +204,216 @@ class _TeacherPhotoCropDialogState extends State<TeacherPhotoCropDialog> {
     return data.buffer.asUint8List();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: Palette.white,
-      surfaceTintColor: Palette.white,
-      title: Text(tr(context, "사진 위치 조정"), style: TextStyle(fontFamily: "Jalnan")),
-      content: SizedBox(
-        width: 360,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              tr(context, "처음에는 사진 전체가 보입니다. 얼굴을 원 안으로 끌어오고, 슬라이더로 확대하세요."),
-              style: TextStyle(
-                fontFamily: "NotoSansKR",
-                fontSize: 13,
-                color: Palette.grey600,
-                height: 1.45,
-              ),
-            ),
-            SizedBox(height: 16),
-            if (_loadError != null)
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 40),
-                child: Text(_loadError!,
-                    style: TextStyle(
-                        fontFamily: "NotoSansKR", color: Palette.danger)),
-              )
-            else if (!_ready)
-              SizedBox(
+  Widget _preview() {
+    return Listener(
+      onPointerSignal: (event) {
+        if (!_ready || event is! PointerScrollEvent) return;
+        final next = _userZoom - event.scrollDelta.dy * 0.005;
+        setState(() => _setZoom(next));
+      },
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onPanUpdate: (details) {
+          setState(() => _offset += details.delta);
+        },
+        child: SizedBox(
+          width: _frame,
+          height: _frame,
+          child: Stack(
+            children: [
+              Container(
+                width: _frame,
                 height: _frame,
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else
-              GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onPanUpdate: (details) {
-                  setState(() => _offset += details.delta);
-                },
+                color: Palette.grey100,
+              ),
+              ClipOval(
                 child: SizedBox(
                   width: _frame,
                   height: _frame,
                   child: Stack(
+                    clipBehavior: Clip.hardEdge,
                     children: [
-                      Container(
-                        width: _frame,
-                        height: _frame,
-                        color: Palette.grey100,
-                      ),
-                      ClipOval(
-                        child: SizedBox(
-                          width: _frame,
-                          height: _frame,
-                          child: Stack(
-                            clipBehavior: Clip.hardEdge,
-                            children: [
-                              Positioned(
-                                left: _offset.dx,
-                                top: _offset.dy,
-                                width: _imgW * _scale,
-                                height: _imgH * _scale,
-                                child: Image.memory(
-                                  widget.bytes,
-                                  fit: BoxFit.fill,
-                                  gaplessPlayback: true,
-                                  filterQuality: FilterQuality.high,
-                                ),
-                              ),
-                            ],
+                      Positioned(
+                        left: _offset.dx,
+                        top: _offset.dy,
+                        width: _imgW * _scale,
+                        height: _imgH * _scale,
+                        child: Image.memory(
+                          widget.bytes,
+                          key: ValueKey(
+                            'crop-${_userZoom.toStringAsFixed(3)}-'
+                            '${_offset.dx.toStringAsFixed(1)}-'
+                            '${_offset.dy.toStringAsFixed(1)}',
                           ),
-                        ),
-                      ),
-                      IgnorePointer(
-                        child: Container(
-                          width: _frame,
-                          height: _frame,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border:
-                                Border.all(color: Palette.darkTeal, width: 3),
-                          ),
+                          fit: BoxFit.fill,
+                          gaplessPlayback: true,
+                          filterQuality: FilterQuality.high,
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-            SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.zoom_out, size: 18, color: Palette.grey500),
-                Expanded(
-                  child: SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      showValueIndicator: ShowValueIndicator.never,
-                    ),
-                    child: Slider(
-                      value: _userZoom,
-                      min: 1.0,
-                      max: 5.0,
-                      activeColor: Palette.darkTeal,
-                      onChanged: !_ready
-                          ? null
-                          : (value) => setState(() => _setZoom(value)),
-                    ),
+              IgnorePointer(
+                child: Container(
+                  width: _frame,
+                  height: _frame,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Palette.darkTeal, width: 3),
                   ),
                 ),
-                Icon(Icons.zoom_in, size: 18, color: Palette.grey500),
-              ],
-            ),
-            if (_saveError != null)
-              Padding(
-                padding: EdgeInsets.only(bottom: 8),
-                child: Text(
-                  _saveError!,
-                  style: TextStyle(
-                      fontFamily: "NotoSansKR", color: Palette.danger),
-                ),
               ),
-            TextButton(
-              onPressed: !_ready ? null : () => setState(_resetContain),
-              child: Text(tr(context, "사진 전체 보기"),
-                  style: TextStyle(
-                      fontFamily: "NotoSansKR", color: Palette.darkTeal)),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: _saving ? null : () => Navigator.pop(context),
-          child: Text(tr(context, "취소"), style: TextStyle(fontFamily: "NotoSansKR")),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Palette.secondaryDark,
-            foregroundColor: Palette.white,
+    );
+  }
+
+  Widget _zoomControls() {
+    return Material(
+      type: MaterialType.transparency,
+      child: Row(
+        children: [
+          IconButton(
+            tooltip: tr(context, '축소'),
+            onPressed: !_ready ? null : () => _nudgeZoom(-0.25),
+            icon: Icon(Icons.zoom_out, color: Palette.grey600),
           ),
-          onPressed: (_saving || !_ready) ? null : _confirm,
-          child: _saving
-              ? SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2, color: Palette.white),
+          Expanded(
+            child: SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                trackHeight: 4,
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
+                overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
+                showValueIndicator: ShowValueIndicator.never,
+              ),
+              child: Slider(
+                value: _userZoom.clamp(_minZoom, _maxZoom),
+                min: _minZoom,
+                max: _maxZoom,
+                divisions: 40,
+                activeColor: Palette.darkTeal,
+                inactiveColor: Palette.grey300,
+                onChanged: !_ready
+                    ? null
+                    : (value) {
+                        setState(() => _setZoom(value));
+                      },
+              ),
+            ),
+          ),
+          IconButton(
+            tooltip: tr(context, '확대'),
+            onPressed: !_ready ? null : () => _nudgeZoom(0.25),
+            icon: Icon(Icons.zoom_in, color: Palette.grey600),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Palette.white,
+      surfaceTintColor: Palette.white,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  tr(context, "사진 위치 조정"),
+                  style: TextStyle(fontFamily: "Jalnan", fontSize: 18),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                tr(context, "처음에는 사진 전체가 보입니다. 얼굴을 원 안으로 끌어오고, 슬라이더로 확대하세요."),
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 13,
+                  color: Palette.grey600,
+                  height: 1.45,
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (_loadError != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 40),
+                  child: Text(
+                    _loadError!,
+                    style: TextStyle(
+                        fontFamily: "NotoSansKR", color: Palette.danger),
+                  ),
                 )
-              : Text(tr(context, "이 구도로 사용"), style: TextStyle(fontFamily: "Jalnan")),
+              else if (!_ready)
+                SizedBox(
+                  height: _frame,
+                  child: const Center(child: CircularProgressIndicator()),
+                )
+              else
+                _preview(),
+              const SizedBox(height: 4),
+              _zoomControls(),
+              if (_saveError != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    _saveError!,
+                    style: TextStyle(
+                        fontFamily: "NotoSansKR", color: Palette.danger),
+                  ),
+                ),
+              TextButton(
+                onPressed: !_ready ? null : () => setState(_resetContain),
+                child: Text(
+                  tr(context, "사진 전체 보기"),
+                  style: TextStyle(
+                      fontFamily: "NotoSansKR", color: Palette.darkTeal),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: _saving
+                        ? null
+                        : () => Navigator.of(context, rootNavigator: true).pop(),
+                    child: Text(tr(context, "취소"),
+                        style: TextStyle(fontFamily: "NotoSansKR")),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Palette.secondaryDark,
+                      foregroundColor: Palette.white,
+                    ),
+                    onPressed: (_saving || !_ready) ? null : _confirm,
+                    child: _saving
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Palette.white),
+                          )
+                        : Text(tr(context, "이 구도로 사용"),
+                            style: TextStyle(fontFamily: "Jalnan")),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ],
+      ),
     );
   }
 }

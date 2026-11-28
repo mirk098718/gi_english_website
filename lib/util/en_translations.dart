@@ -308,6 +308,8 @@ const Map<String, String> enTranslations = {
   "사진 다시 선택": "Choose another photo",
   "사진 위치 조정": "Adjust the photo",
   "사진 전체 보기": "See the full photo",
+  "축소": "Zoom out",
+  "확대": "Zoom in",
   "상담/오시는 길": "Consultation / Find us",
   "운영System": "Our System",
   "이 구도로 사용": "Use this crop",
