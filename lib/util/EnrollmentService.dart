@@ -1224,16 +1224,28 @@ class EnrollmentService {
   ///
   /// Flutter Web에서는 map에 `null`을 넣으면 Firestore 쓰기가 실패하므로
   /// 종료 시각 초기화는 [FieldValue.delete]를 쓴다.
+  ///
+  /// [courseId]/[meetingUrl] 등을 넘기면, 세션 문서가 없거나 비어 있어도
+  /// 수강생 watchSessions·입장 버튼이 바로 열리도록 채운다.
   static Future<String?> setSessionLive({
     required String sessionId,
     required bool isLive,
     String hostName = '',
+    String courseId = '',
+    String bookingId = '',
+    String userId = '',
+    String teacherId = '',
+    String meetingUrl = '',
+    String memberName = '',
+    int weekNumber = 0,
   }) async {
     if (sessionId.trim().isEmpty) {
       return '수업 회차 정보가 없습니다. 새로고침 후 다시 시도해주세요.';
     }
     try {
       final ref = _firestore.collection('online_sessions').doc(sessionId);
+      final existing = await ref.get();
+      final existingData = existing.data() ?? <String, dynamic>{};
       final payload = <String, dynamic>{
         'isLive': isLive,
         'hostName': hostName,
@@ -1243,12 +1255,54 @@ class EnrollmentService {
         payload['startedAt'] = FieldValue.serverTimestamp();
         // null 대신 delete — 웹에서 "수업 상태 변경에 실패"의 흔한 원인
         payload['endedAt'] = FieldValue.delete();
+
+        final resolvedCourseId = courseId.trim().isNotEmpty
+            ? courseId.trim()
+            : (existingData['courseId']?.toString() ?? '');
+        final resolvedBookingId = bookingId.trim().isNotEmpty
+            ? bookingId.trim()
+            : (existingData['bookingId']?.toString() ?? '');
+        final resolvedMeetingUrl = meetingUrl.trim().isNotEmpty
+            ? meetingUrl.trim()
+            : (existingData['meetingUrl']?.toString() ?? '').trim().isNotEmpty
+                ? (existingData['meetingUrl']?.toString() ?? '').trim()
+                : (resolvedCourseId.isNotEmpty && resolvedBookingId.isNotEmpty
+                    ? meetingUrlForBooking(
+                        courseId: resolvedCourseId,
+                        bookingId: resolvedBookingId,
+                      )
+                    : '');
+        if (resolvedCourseId.isNotEmpty) payload['courseId'] = resolvedCourseId;
+        if (resolvedBookingId.isNotEmpty) {
+          payload['bookingId'] = resolvedBookingId;
+        }
+        if (resolvedMeetingUrl.isNotEmpty) {
+          payload['meetingUrl'] = resolvedMeetingUrl;
+        }
+        if (userId.trim().isNotEmpty) payload['userId'] = userId.trim();
+        if (teacherId.trim().isNotEmpty) {
+          payload['teacherId'] = teacherId.trim();
+        }
+        if (memberName.trim().isNotEmpty) {
+          payload['memberName'] = memberName.trim();
+        }
+        if (weekNumber > 0) {
+          payload['weekNumber'] = weekNumber;
+          payload['order'] = weekNumber;
+        }
+        if (!existing.exists &&
+            (existingData['title']?.toString() ?? '').trim().isEmpty) {
+          final titleParts = <String>[];
+          if (memberName.trim().isNotEmpty) titleParts.add(memberName.trim());
+          if (weekNumber > 0) titleParts.add('$weekNumber회차');
+          titleParts.add('화상수업');
+          payload['title'] = titleParts.join(' · ');
+        }
       } else {
         payload['endedAt'] = FieldValue.serverTimestamp();
       }
 
       // update는 문서가 없으면 실패하므로, 없으면 merge set으로 보정
-      final existing = await ref.get();
       if (existing.exists) {
         await ref.update(payload);
       } else {
@@ -1981,6 +2035,11 @@ class EnrollmentService {
   ) {
     if (sessionNumber <= 0) return false;
     if (enrollment.plan == OnlinePlan.lecture) return true;
+    // 주니어 순차 잠금 임시 해제: 배정된 회차까지 모두 연다.
+    if (!juniorSequentialLockEnabled && isJuniorCourse(enrollment.courseId)) {
+      if (enrollment.totalSessions <= 0) return true;
+      return sessionNumber <= enrollment.totalSessions;
+    }
     return sessionNumber <= unlockedSessionNumber(enrollment);
   }
 
@@ -2536,6 +2595,9 @@ class EnrollmentService {
 
   static bool isJuniorCourse(String courseId) =>
       courseId.startsWith('junior_');
+
+  /// 일시적으로 주니어 회차 순차 잠금을 끈다. 다시 켤 때 true로 돌린다.
+  static const bool juniorSequentialLockEnabled = false;
 
   /// 주니어·재원생 화상은 수강생 별점이 있어야 수강 완료와 강사 수당이 확정된다.
   static bool requiresStudentRating(String courseId) =>
@@ -4454,6 +4516,11 @@ class TeacherBookingBoard {
       final key = '${booking.userId}|${booking.courseId}';
       final next = nextByStudent[key];
       if (fixed) {
+        // 주니어 순차 잠금 임시 해제: 가까운 1건만이 아니라 열린 회차를 모두 보여 준다.
+        if (booking.isJunior && !juniorSequentialLockEnabled) {
+          upcoming.add(booking);
+          continue;
+        }
         if (next != null && next.id == booking.id) upcoming.add(booking);
         continue;
       }

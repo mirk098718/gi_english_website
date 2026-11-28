@@ -314,6 +314,15 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       sessionId: _sessionIdFor(booking),
       isLive: true,
       hostName: _writerName,
+      courseId: booking.courseId,
+      bookingId: booking.id,
+      userId: booking.userId,
+      teacherId: booking.teacherId.isNotEmpty
+          ? booking.teacherId
+          : booking.nativeTeacherUid,
+      meetingUrl: openUrl,
+      memberName: booking.memberName,
+      weekNumber: booking.weekNumber,
     );
     if (!mounted) return;
     setState(() => _busy = false);

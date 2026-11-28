@@ -749,7 +749,12 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     if (!booking.isConfirmed) return false;
     final session = _sessionForBooking(booking);
     if (session == null) return false;
-    return session.canStudentJoin;
+    // meetingUrl이 비어 있어도 예약 기준 URL로 입장할 수 있다.
+    if (session.cancelled || session.isFinished || session.isStale) {
+      return false;
+    }
+    if (!session.isLiveNow) return false;
+    return _joinUrlForBooking(booking).trim().isNotEmpty;
   }
 
   bool _showLockedJoin(WeekBooking booking) {
@@ -1590,7 +1595,10 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
               if (fixedWeek) ...[
                 weekBookingSection(
                   week,
-                  allowJoin: !EnrollmentService.requiresStudentRating(widget.course.id),
+                  // 주니어 순차 잠금이 꺼져 있으면 잠긴 회차에서도 입장 가능.
+                  allowJoin: !EnrollmentService.requiresStudentRating(
+                          widget.course.id) ||
+                      !EnrollmentService.juniorSequentialLockEnabled,
                 ),
                 SizedBox(height: 12),
               ],
@@ -1604,7 +1612,8 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
                 ),
               ),
               if (!fixedWeek ||
-                  !EnrollmentService.requiresStudentRating(widget.course.id))
+                  !EnrollmentService.requiresStudentRating(widget.course.id) ||
+                  !EnrollmentService.juniorSequentialLockEnabled)
                 ..._sessionsForWeek(week).map(sessionTile),
             ] else if (_speakingOnly) ...[
               if (_enrollment == null)

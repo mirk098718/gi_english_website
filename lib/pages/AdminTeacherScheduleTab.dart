@@ -411,6 +411,15 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
       sessionId: sessionId,
       isLive: true,
       hostName: hostName,
+      courseId: booking.courseId,
+      bookingId: booking.id,
+      userId: booking.userId,
+      teacherId: booking.teacherId.isNotEmpty
+          ? booking.teacherId
+          : booking.nativeTeacherUid,
+      meetingUrl: url,
+      memberName: booking.memberName,
+      weekNumber: booking.weekNumber,
     );
   }
 
