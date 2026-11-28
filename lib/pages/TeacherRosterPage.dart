@@ -1080,6 +1080,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     final feedback = LessonFeedbackService.forBooking(_feedbacks, booking.id);
     final rating = LessonRatingService.forBooking(_ratings, booking.id);
     final written = feedback != null && feedback.hasContent;
+    final course = OnlineCourse.findById(booking.courseId);
     final session = _sessionFor(booking);
     final live = session?.isLiveNow == true;
     final ended = EnrollmentService.sessionHasEnded(session);
