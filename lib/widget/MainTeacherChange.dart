@@ -97,7 +97,7 @@ class MainTeacherChange {
             style: TextStyle(fontFamily: 'Jalnan', fontSize: 16)),
         content: Text(
           tr(context,
-              '이 선생님을 메인 강사로 고정할까요?\n앞으로 새 예약은 이 선생님 일정으로 열립니다. 이미 예약된 수업은 예약한 선생님 그대로 진행됩니다.'),
+              '이 선생님을 메인 강사로 고정할까요?\n앞으로 새 예약과 아직 시작 전인 예약이 이 선생님으로 바뀝니다. 이미 끝난 수업·별점 평가 중인 회차·다른 선생님으로 잡아 둔 대체 예약은 그대로입니다.'),
           style: TextStyle(
             fontFamily: 'NotoSansKR',
             fontSize: 14,

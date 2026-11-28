@@ -202,6 +202,17 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       photos = {
         for (final entry in records.entries) entry.key: entry.value.photoUrls,
       };
+      // 메인 강사만 바뀌고 예약 문서가 예전 강사로 남은 경우를 맞춘다.
+      final mainUid = enrollment.nativeTeacherUid.trim();
+      if (mainUid.isNotEmpty &&
+          enrollment.nativeTeacherId.trim().isNotEmpty &&
+          enrollment.nativeTeacherName.trim().isNotEmpty) {
+        await AuthService.retargetUpcomingBookingsToMainTeacher(
+          teacherUid: mainUid,
+          profileId: enrollment.nativeTeacherId,
+          teacherName: enrollment.nativeTeacherName,
+        );
+      }
       bookings =
           await EnrollmentService.myWeekBookings(courseId: widget.course.id);
       teacherMaterials =

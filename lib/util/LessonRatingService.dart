@@ -399,14 +399,25 @@ class LessonRatingService {
       return '로그인이 만료되었습니다. 다시 로그인해 주세요.';
     }
     if (rating.id.isEmpty) return '수업 정보가 없습니다.';
+    if (!rating.canStudentRate) {
+      return '이미 제출된 평가이거나 아직 열리지 않은 평가입니다.';
+    }
+    final payload = <String, dynamic>{
+      'stars': stars,
+      'review': review.trim(),
+      'status': LessonRating.statusRated,
+      'ratedAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
     try {
-      await _firestore.collection(collection).doc(rating.id).set({
-        'stars': stars,
-        'review': review.trim(),
-        'status': LessonRating.statusRated,
-        'ratedAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      final ref = _firestore.collection(collection).doc(rating.id);
+      try {
+        await ref.update(payload);
+      } on FirebaseException catch (e) {
+        // 예전 문서에 필드가 비어 update가 막히면 merge set으로 한 번 더.
+        if (e.code != 'not-found') rethrow;
+        await ref.set(payload, SetOptions(merge: true));
+      }
       return null;
     } on FirebaseException catch (e) {
       print('수업 평가 저장 오류: ${e.code} ${e.message}');
@@ -424,10 +435,10 @@ class LessonRatingService {
     if (rating.id.isEmpty || !rating.canStudentRate) return;
     if (rating.dismissedAt != null) return;
     try {
-      await _firestore.collection(collection).doc(rating.id).set({
+      await _firestore.collection(collection).doc(rating.id).update({
         'dismissedAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      });
     } catch (e) {
       print('수업 평가 닫기 기록 오류: $e');
     }
@@ -514,13 +525,17 @@ class _LessonRatingDialogState extends State<LessonRatingDialog> {
   }
 
   Future<void> _later() async {
+    if (_settled || _saving) return;
     _settled = true;
-    await LessonRatingService.markDismissed(widget.rating);
-    if (!mounted) return;
-    Navigator.of(context, rootNavigator: true).pop(false);
+    if (mounted) {
+      Navigator.of(context, rootNavigator: true).pop(false);
+    }
+    // 닫기를 막지 않는다. dismiss 기록 실패해도 창은 이미 닫힌다.
+    LessonRatingService.markDismissed(widget.rating);
   }
 
   Future<void> _save() async {
+    if (_saving || _settled) return;
     setState(() => _saving = true);
     final error = await LessonRatingService.submit(
       rating: widget.rating,
@@ -528,9 +543,10 @@ class _LessonRatingDialogState extends State<LessonRatingDialog> {
       review: _review.text,
     );
     if (!mounted) return;
-    setState(() => _saving = false);
     if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      setState(() => _saving = false);
+      final messenger = ScaffoldMessenger.maybeOf(context);
+      messenger?.showSnackBar(
         SnackBar(
           content: Text(error, style: TextStyle(fontFamily: "NotoSansKR")),
           backgroundColor: Palette.danger,

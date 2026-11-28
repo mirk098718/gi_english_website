@@ -592,7 +592,7 @@ class AuthService {
   }
 
   /// 수강생이 메인 원어민 강사를 바꾼다.
-  /// 회원 문서와 화상수업이 있는 수강만 갱신한다. 이미 잡은 예약은 그대로 둔다.
+  /// 회원·수강 문서를 갱신하고, 아직 시작 전인 본인 예약도 새 강사로 옮긴다.
   static Future<String?> setMyMainTeacher(OnlineNativeTeacher teacher) async {
     final user = currentUser;
     if (user == null) return '로그인이 필요합니다.';
@@ -623,10 +623,128 @@ class AuthService {
         if (plan == 'lecture') continue;
         await doc.reference.set(fields, SetOptions(merge: true));
       }
+      await retargetUpcomingBookingsToMainTeacher(
+        teacherUid: uid,
+        profileId: profileId,
+        teacherName: name,
+      );
       return null;
     } catch (e) {
       print('메인 강사 변경 오류: $e');
       return '메인 강사를 바꾸지 못했습니다.';
+    }
+  }
+
+  /// 이미 메인 강사를 바꾼 뒤에도, 시작 전 예약을 담당 강사에 맞춘다.
+  /// 대체(코티처) 예약·종료된 수업·별점이 열린 회차는 건드리지 않는다.
+  static Future<void> retargetUpcomingBookingsToMainTeacher({
+    required String teacherUid,
+    required String profileId,
+    required String teacherName,
+    String? userId,
+  }) async {
+    final uid = (userId ?? currentUser?.uid ?? '').trim();
+    final toUid = teacherUid.trim();
+    final toProfile = profileId.trim();
+    final toName = teacherName.trim();
+    if (uid.isEmpty || toUid.isEmpty || toProfile.isEmpty || toName.isEmpty) {
+      return;
+    }
+    final now = DateTime.now();
+    QuerySnapshot<Map<String, dynamic>> snap;
+    try {
+      snap = await _firestore
+          .collection('week_bookings')
+          .where('userId', isEqualTo: uid)
+          .where('status', whereIn: ['pending', 'confirmed'])
+          .get();
+    } catch (e) {
+      print('메인 강사 예약 조회 오류: $e');
+      return;
+    }
+
+    for (final doc in snap.docs) {
+      final data = doc.data();
+      if (data['isSubstitute'] == true) continue;
+      final fromUid = (data['teacherId'] ?? data['nativeTeacherUid'] ?? '')
+          .toString()
+          .trim();
+      if (fromUid.isEmpty || fromUid == toUid) continue;
+
+      DateTime? day;
+      final dateRaw = data['date'];
+      if (dateRaw is Timestamp) {
+        final local = dateRaw.toDate();
+        day = DateTime(local.year, local.month, local.day);
+      }
+      final time = data['time']?.toString() ?? '';
+      if (day == null || time.isEmpty) continue;
+      final parts = time.trim().split(':');
+      final hour = int.tryParse(parts.isNotEmpty ? parts[0] : '');
+      if (hour == null) continue;
+      final minute = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+      final start = DateTime(day.year, day.month, day.day, hour, minute);
+      if (!start.isAfter(now)) continue;
+
+      // 이미 종료된 회차·별점 게이트가 열린 회차는 원래 강사 평가를 유지한다.
+      final sessionId = 'booking_${doc.id}';
+      try {
+        final session =
+            await _firestore.collection('online_sessions').doc(sessionId).get();
+        if (session.exists && session.data()?['endedAt'] != null) continue;
+      } catch (_) {}
+      try {
+        final rating =
+            await _firestore.collection('lesson_ratings').doc(doc.id).get();
+        if (rating.exists) {
+          final status = rating.data()?['status']?.toString() ?? '';
+          if (status == 'pending' ||
+              status == 'awaiting_feedback' ||
+              status == 'rated') {
+            continue;
+          }
+        }
+      } catch (_) {}
+
+      final y = day.year.toString().padLeft(4, '0');
+      final m = day.month.toString().padLeft(2, '0');
+      final d = day.day.toString().padLeft(2, '0');
+      final dateKey = '$y-$m-$d';
+      final targetOccId = '${toUid}_${dateKey}_${time.replaceAll(':', '')}';
+      try {
+        final taken = await _firestore
+            .collection('teacher_occupied_slots')
+            .doc(targetOccId)
+            .get();
+        if (taken.exists) {
+          final other = taken.data()?['bookingId']?.toString() ?? '';
+          if (other.isNotEmpty && other != doc.id) continue;
+        }
+      } catch (_) {}
+
+      final patch = <String, dynamic>{
+        'teacherId': toUid,
+        'nativeTeacherId': toProfile,
+        'nativeTeacherName': toName,
+        'nativeTeacherUid': toUid,
+        'assignedTeacherUid': toUid,
+        'assignedTeacherName': toName,
+        'rosterTeacherId': toUid,
+        'isSubstitute': false,
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+      try {
+        await doc.reference.update(patch);
+        await _moveOccupiedSlot(
+          data: data,
+          fromUid: fromUid,
+          toUid: toUid,
+          bookingId: doc.id,
+          userId: uid,
+        );
+      } catch (e) {
+        print('메인 강사 예약 이전 오류(${doc.id}): $e');
+      }
     }
   }
 
@@ -1065,6 +1183,7 @@ class AuthService {
     required String fromUid,
     required String toUid,
     required String bookingId,
+    String userId = '',
   }) async {
     final time = data['time']?.toString() ?? '';
     final dateRaw = data['date'];
@@ -1095,6 +1214,7 @@ class AuthService {
       'time': time,
       'slotKey': '${dateKey}_$time',
       'bookingId': bookingId,
+      if (userId.isNotEmpty) 'userId': userId,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }

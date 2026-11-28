@@ -68,6 +68,36 @@ service cloud.firestore {
         && (!('fixedSchedule' in resource.data) || resource.data.fixedSchedule != true);
     }
 
+    // 메인 강사 변경 시, 아직 시작 전인 본인 예약을 새 담당 강사로 옮긴다.
+    // 대체(코티처) 예약은 그대로 둔다.
+    function studentRetargetsOwnFutureBooking() {
+      return isLoggedIn()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == resource.data.userId
+        && resource.data.status in ['pending', 'confirmed']
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.weekId == resource.data.weekId
+        && request.resource.data.courseId == resource.data.courseId
+        && request.resource.data.date == resource.data.date
+        && request.resource.data.time == resource.data.time
+        && (!('isSubstitute' in resource.data) || resource.data.isSubstitute != true)
+        && request.resource.data.isSubstitute != true
+        && resource.data.date is timestamp
+        && resource.data.time is string
+        && resource.data.time.matches('^[0-9]{2}:[0-9]{2}$')
+        && request.time < bookingClock(resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['teacherId', 'nativeTeacherId', 'nativeTeacherName',
+                      'nativeTeacherUid', 'assignedTeacherUid',
+                      'assignedTeacherName', 'rosterTeacherId',
+                      'isSubstitute', 'updatedAt'])
+        && request.resource.data.teacherId is string
+        && request.resource.data.teacherId.size() > 0
+        && request.resource.data.teacherId == request.resource.data.nativeTeacherUid
+        && request.resource.data.teacherId == request.resource.data.assignedTeacherUid
+        && activeStaffAccount(request.resource.data.teacherId);
+    }
+
     function replacedFixedBooking(bookingId) {
       return getAfter(/databases/$(database)/documents/week_bookings/$(bookingId)).data;
     }
@@ -341,6 +371,7 @@ service cloud.firestore {
              resource.data.teacherId == request.auth.uid
              || resource.data.nativeTeacherUid == request.auth.uid))
         || studentCancelsOwnBooking()
+        || studentRetargetsOwnFutureBooking()
         || studentReplacesFixedBooking(bookingId)
         || studentReleasesUnpaidFixedHold();
 
@@ -734,18 +765,17 @@ service cloud.firestore {
         || (
           isStaff()
           && request.resource.data.userId == resource.data.userId
-          && request.resource.data.teacherId == resource.data.teacherId
           && request.resource.data.bookingId == resource.data.bookingId
           && resource.data.status != 'rated'
           && request.resource.data.status in ['awaiting_feedback', 'pending']
           && request.resource.data.stars == resource.data.stars
         )
         || (
+          // 수강생 별점·나중에. teacherId/bookingId 일치 검사는
+          // affectedKeys가 그 필드를 못 바꾸게 하므로 생략한다.
           isLoggedIn()
           && resource.data.userId == request.auth.uid
           && request.resource.data.userId == resource.data.userId
-          && request.resource.data.teacherId == resource.data.teacherId
-          && request.resource.data.bookingId == resource.data.bookingId
           && resource.data.status in ['pending', 'awaiting_feedback']
           && (
             (
@@ -762,6 +792,18 @@ service cloud.firestore {
                   .hasOnly(['stars', 'review', 'status', 'ratedAt', 'updatedAt', 'dismissedAt'])
             )
           )
+        )
+        || (
+          // 메인 강사 변경으로 아직 안 끝난 평가 문서의 강사만 맞춘다.
+          isLoggedIn()
+          && resource.data.userId == request.auth.uid
+          && request.resource.data.userId == resource.data.userId
+          && request.resource.data.bookingId == resource.data.bookingId
+          && resource.data.status in ['pending', 'awaiting_feedback']
+          && request.resource.data.status == resource.data.status
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['teacherId', 'teacherName', 'rosterTeacherId', 'updatedAt'])
+          && activeStaffAccount(request.resource.data.teacherId)
         );
 
       allow delete: if isOwner();

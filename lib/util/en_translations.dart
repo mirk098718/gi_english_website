@@ -669,7 +669,7 @@ const Map<String, String> enTranslations = {
   "이 강사를 메인 강사로 고정": "Keep this teacher as my main teacher",
   "메인 강사로 고정": "Keep as main teacher",
   "앞으로 새 예약은 이 선생님 일정으로 열립니다.": "New bookings open on this teacher's schedule.",
-  "이 선생님을 메인 강사로 고정할까요?\n앞으로 새 예약은 이 선생님 일정으로 열립니다. 이미 예약된 수업은 예약한 선생님 그대로 진행됩니다.": "Keep this teacher as your main teacher?\nNew bookings open on this teacher's schedule. Classes you already booked stay with the teacher you booked.",
+  "이 선생님을 메인 강사로 고정할까요?\n앞으로 새 예약과 아직 시작 전인 예약이 이 선생님으로 바뀝니다. 이미 끝난 수업·별점 평가 중인 회차·다른 선생님으로 잡아 둔 대체 예약은 그대로입니다.": "Keep this teacher as your main teacher?\nNew bookings and classes that have not started yet move to this teacher. Finished classes, classes waiting for a star rating, and substitute bookings stay as they are.",
   "지금은 메인 강사로 고를 수 있는 선생님이 없습니다.": "No teacher is available to set as your main teacher right now.",
   "이 강사로는 메인 강사를 바꿀 수 없습니다.": "This teacher cannot be set as your main teacher.",
   "메인 강사를 바꿨습니다.": "Your main teacher was changed.",

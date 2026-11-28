@@ -1387,7 +1387,15 @@ class EnrollmentService {
               booking['teacherId'] ??
               booking['nativeTeacherUid'] ??
               '')
-          .toString();
+          .toString()
+          .trim();
+      final resolvedUserId =
+          (data['userId'] ?? booking['userId'] ?? '').toString().trim();
+      // 수강생 uid가 비면 별점 제출 규칙(userId == auth.uid)이 막힌다.
+      if (resolvedUserId.isEmpty) {
+        print('수업 평가 게이트 생성 건너뜀: userId 없음 ($bookingId)');
+        return;
+      }
       await ref.set({
         'bookingId': bookingId,
         'teacherId': resolvedTeacherId,
@@ -1401,7 +1409,7 @@ class EnrollmentService {
                 booking['assignedTeacherName'] ??
                 '')
             .toString(),
-        'userId': (data['userId'] ?? booking['userId'] ?? '').toString(),
+        'userId': resolvedUserId,
         'memberName':
             (data['memberName'] ?? booking['memberName'] ?? '').toString(),
         'email': booking['email']?.toString() ?? '',
