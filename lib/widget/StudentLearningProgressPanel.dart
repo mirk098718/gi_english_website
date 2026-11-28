@@ -10,6 +10,7 @@ import 'package:gi_english_website/widget/AssignmentWorkSection.dart';
 import 'package:gi_english_website/widget/QuizResultSummary.dart';
 
 /// 강사/관리자가 수강생 카드에서 보는 회차별 인강·문제 체크와 최근 퀴즈 결과.
+/// 상단에는 진행/다음 회차 1개만 두고, 수강완료·이후 수업은 접어 둔다.
 class StudentLearningProgressPanel extends StatefulWidget {
   final List<EnrollmentRecord> enrollments;
   final Map<String, List<StudentWeekProgress>> progressByEnrollment;
@@ -116,6 +117,20 @@ class _StudentLearningProgressPanelState
         .toList();
     final title = course?.title ?? enrollment.courseId;
 
+    final finished = <StudentWeekProgress>[];
+    final open = <StudentWeekProgress>[];
+    for (final week in weeks) {
+      if (_markedComplete(week, enrollment.completedSessions)) {
+        finished.add(week);
+      } else {
+        open.add(week);
+      }
+    }
+    open.sort((a, b) => a.weekNumber.compareTo(b.weekNumber));
+    finished.sort((a, b) => b.weekNumber.compareTo(a.weekNumber));
+    final focus = open.isEmpty ? null : open.first;
+    final later = open.length <= 1 ? const <StudentWeekProgress>[] : open.sublist(1);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -150,9 +165,68 @@ class _StudentLearningProgressPanelState
               color: Palette.grey500,
             ),
           )
-        else
-          ...weeks.map((week) => _weekBlock(week, enrollment)),
+        else ...[
+          if (focus != null) ...[
+            _sectionLabel(tr(context, '이번 수업'), Palette.darkTeal),
+            _weekBlock(focus, enrollment, featured: true),
+          ],
+          if (later.isNotEmpty)
+            _collapsedGroup(
+              title: tf(context, '이후 수업 {p0}', {'p0': later.length}),
+              children: later
+                  .map((week) => _weekBlock(week, enrollment))
+                  .toList(),
+            ),
+          if (finished.isNotEmpty)
+            _collapsedGroup(
+              title: tf(context, '수강완료 {p0}', {'p0': finished.length}),
+              children: finished
+                  .map((week) => _weekBlock(week, enrollment))
+                  .toList(),
+            ),
+        ],
       ],
+    );
+  }
+
+  Widget _sectionLabel(String text, Color color) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: 6),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontWeight: FontWeight.w800,
+            fontSize: 13,
+            color: color,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _collapsedGroup({
+    required String title,
+    required List<Widget> children,
+  }) {
+    return Theme(
+      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      child: ExpansionTile(
+        initiallyExpanded: false,
+        tilePadding: EdgeInsets.zero,
+        childrenPadding: EdgeInsets.only(bottom: 4),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontFamily: "NotoSansKR",
+            fontWeight: FontWeight.w700,
+            fontSize: 13,
+          ),
+        ),
+        children: children,
+      ),
     );
   }
 
@@ -182,7 +256,11 @@ class _StudentLearningProgressPanelState
     return '${EnrollmentService.formatBookingDate(session.date)} ${EnrollmentService.formatBookingTime(session.time)}';
   }
 
-  Widget _weekBlock(StudentWeekProgress week, EnrollmentRecord enrollment) {
+  Widget _weekBlock(
+    StudentWeekProgress week,
+    EnrollmentRecord enrollment, {
+    bool featured = false,
+  }) {
     final problems = week.problemLinks.isEmpty
         ?  [WeekProblemLink(title: tr(context, '등록된 문제 없음'), url: '')]
         : week.problemLinks;
@@ -201,19 +279,24 @@ class _StudentLearningProgressPanelState
       width: double.maxFinite,
       margin: EdgeInsets.only(bottom: widget.dense ? 6 : 8),
       decoration: BoxDecoration(
-        color: Palette.grey50,
+        color: featured
+            ? Palette.white
+            : (done ? Palette.success.withValues(alpha: 0.06) : Palette.grey50),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: done
-              ? Palette.success.withValues(alpha: 0.45)
-              : Palette.grey200,
+          color: featured
+              ? Palette.darkTeal
+              : done
+                  ? Palette.success.withValues(alpha: 0.45)
+                  : Palette.grey200,
+          width: featured ? 1.5 : 1,
         ),
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
           key: ValueKey('week-${week.weekId}'),
-          initiallyExpanded: false,
+          initiallyExpanded: featured,
           minTileHeight: widget.dense ? 40 : 44,
           tilePadding: EdgeInsets.symmetric(horizontal: widget.dense ? 10 : 12),
           childrenPadding: EdgeInsets.fromLTRB(

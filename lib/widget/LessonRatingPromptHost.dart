@@ -102,19 +102,38 @@ class LessonRatingStatusChip extends StatelessWidget {
       return _chip('평가 없음', Palette.grey200, Palette.grey600);
     }
     if (rating!.isRated) {
-      return Row(
+      final review = rating!.review.trim();
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          LessonStarView(stars: rating!.stars, size: 14),
-          SizedBox(width: 4),
-          Text(
-            rating!.starsLabel,
-            style: TextStyle(
-              fontFamily: "NotoSansKR",
-              fontSize: 11,
-              color: Palette.grey700,
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              LessonStarView(stars: rating!.stars, size: 14),
+              SizedBox(width: 4),
+              Text(
+                rating!.starsLabel,
+                style: TextStyle(
+                  fontFamily: "NotoSansKR",
+                  fontSize: 11,
+                  color: Palette.grey700,
+                ),
+              ),
+            ],
           ),
+          if (review.isNotEmpty) ...[
+            SizedBox(height: 4),
+            Text(
+              review,
+              style: TextStyle(
+                fontFamily: "NotoSansKR",
+                fontSize: 11,
+                height: 1.35,
+                color: Palette.grey700,
+              ),
+            ),
+          ],
         ],
       );
     }

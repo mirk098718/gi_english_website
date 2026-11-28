@@ -191,8 +191,15 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
         };
       });
     }
-    final feedbacks = await LessonFeedbackService.listForTeacher(teacherUid);
-    final ratings = await LessonRatingService.listForTeacher(teacherUid);
+    final bookingIds = bookings.map((b) => b.id);
+    final feedbacks = LessonFeedbackService.mergeById([
+      ...await LessonFeedbackService.listForTeacher(teacherUid),
+      ...await LessonFeedbackService.listForBookingIds(bookingIds),
+    ]);
+    final ratings = LessonRatingService.mergeById([
+      ...await LessonRatingService.listForTeacher(teacherUid),
+      ...await LessonRatingService.listForBookingIds(bookingIds),
+    ]);
     final enrollments = await EnrollmentService.listEnrollments(
       teacherUid: teacherUid,
     );
@@ -341,7 +348,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       builder: (dialogContext) => AlertDialog(
         title: Text(tr(context, "수업 종료"), style: TextStyle(fontFamily: "Jalnan")),
         content: Text(
-          tr(context, "이 회차 화상수업을 종료할까요?\n종료하면 수강생에게 바로 별점 평가가 요청됩니다. 피드백도 이어서 작성해 주세요. 별점 평가가 끝나야 정산에 포함됩니다."),
+          tr(context, "이 회차 화상수업을 종료할까요?\n종료하면 수강생에게 바로 별점 평가가 요청됩니다. 피드백은 이어서 작성해도 되고, 나중에 남겨도 됩니다. 별점 평가가 끝나야 수업이 종료 처리되고 정산에 포함됩니다."),
           style: TextStyle(fontFamily: "NotoSansKR", height: 1.5),
         ),
         actions: [
@@ -361,6 +368,16 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       sessionId: _sessionIdFor(booking),
       isLive: false,
       hostName: _writerName,
+      courseId: booking.courseId,
+      bookingId: booking.id,
+      userId: booking.userId,
+      teacherId: _teacherUid.isNotEmpty
+          ? _teacherUid
+          : (booking.teacherId.isNotEmpty
+              ? booking.teacherId
+              : booking.nativeTeacherUid),
+      memberName: booking.memberName,
+      weekNumber: booking.weekNumber,
     );
     if (!mounted) return;
     setState(() => _busy = false);
@@ -368,7 +385,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       _toast(error, error: true);
       return;
     }
-    _toast(tr(context, '수업을 종료했습니다. 피드백을 작성해 주세요.'));
+    _toast(tr(context, '수업을 종료했습니다. 피드백은 선택 사항입니다.'));
     await _openFeedback(booking, afterClass: true);
   }
 
@@ -396,7 +413,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
           ),
           SizedBox(height: 8),
           Text(
-            tr(context, "담당 회원의 화상수업 입장·종료와 회차별 피드백을 여기서 진행합니다. 수업을 종료하면 수강생에게 바로 별점 평가가 요청되고, 이어서 피드백을 작성합니다."),
+            tr(context, "담당 회원의 화상수업 입장·종료와 회차별 피드백을 여기서 진행합니다. 수업을 종료하면 수강생에게 바로 별점 평가가 요청됩니다. 피드백은 선택이며, 별점이 끝나면 종료로 표시됩니다."),
             style: TextStyle(
                 fontFamily: "NotoSansKR", fontSize: 13, color: Palette.grey600),
           ),
@@ -959,13 +976,28 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     );
   }
 
-  /// 다가오는 미완료 수업을 위에 두고, 각 회차는 기본 닫힘(열었다 닫았다).
+  bool _bookingCompleted(WeekBooking booking) {
+    final rating = LessonRatingService.forBooking(_ratings, booking.id);
+    if (EnrollmentService.bookingIsClosed(
+      booking,
+      session: _sessionFor(booking),
+      rated: rating?.isRated == true,
+    )) {
+      return true;
+    }
+    final enrollment = _enrollmentFor(booking);
+    return enrollment != null &&
+        booking.weekNumber > 0 &&
+        enrollment.completedSessions >= booking.weekNumber;
+  }
+
+  /// 상단에는 이번/다음 수업 1개만, 이후·수강완료는 접어 둔다.
   List<Widget> _lessonSections(List<WeekBooking> lessons) {
     final open = <WeekBooking>[];
     final finished = <WeekBooking>[];
     for (final booking in lessons) {
       if (booking.isCancelled || booking.status == 'rejected') continue;
-      if (EnrollmentService.bookingHasEnded(booking)) {
+      if (_bookingCompleted(booking)) {
         finished.add(booking);
       } else {
         open.add(booking);
@@ -973,14 +1005,29 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     }
     open.sort(EnrollmentService.compareBookingStart);
     finished.sort((a, b) => EnrollmentService.compareBookingStart(b, a));
+
+    WeekBooking? focus;
+    for (final booking in open) {
+      final session = _sessionFor(booking);
+      if (session?.isLiveNow == true || session?.isLive == true) {
+        focus = booking;
+        break;
+      }
+    }
+    focus ??= open.isEmpty ? null : open.first;
+    final later = <WeekBooking>[
+      for (final booking in open)
+        if (focus == null || booking.id != focus.id) booking,
+    ];
+
     return [
-      if (open.isNotEmpty) ...[
+      if (focus != null) ...[
         Align(
           alignment: Alignment.centerLeft,
           child: Padding(
             padding: EdgeInsets.only(bottom: 6),
             child: Text(
-              tf(context, '다가오는 수업 {p0}', {'p0': open.length}),
+              tr(context, '이번 수업'),
               style: TextStyle(
                 fontFamily: 'NotoSansKR',
                 fontWeight: FontWeight.w800,
@@ -990,8 +1037,22 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
             ),
           ),
         ),
-        ...open.map(_lessonRow),
+        _lessonRow(focus, featured: true),
       ],
+      if (later.isNotEmpty)
+        Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            initiallyExpanded: false,
+            tilePadding: EdgeInsets.zero,
+            title: Text(
+              tf(context, '이후 수업 {p0}', {'p0': later.length}),
+              style: TextStyle(
+                  fontFamily: "NotoSansKR", fontWeight: FontWeight.w700),
+            ),
+            children: later.map((booking) => _lessonRow(booking)).toList(),
+          ),
+        ),
       if (finished.isNotEmpty)
         Theme(
           data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -999,7 +1060,7 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
             initiallyExpanded: false,
             tilePadding: EdgeInsets.zero,
             title: Text(
-              tf(context, '완료된 수업 {p0}', {'p0': finished.length}),
+              tf(context, '수강완료 {p0}', {'p0': finished.length}),
               style: TextStyle(
                   fontFamily: "NotoSansKR", fontWeight: FontWeight.w700),
             ),
@@ -1011,19 +1072,24 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
     ];
   }
 
-  Widget _lessonRow(WeekBooking booking, {bool archive = false}) {
+  Widget _lessonRow(
+    WeekBooking booking, {
+    bool archive = false,
+    bool featured = false,
+  }) {
     final feedback = LessonFeedbackService.forBooking(_feedbacks, booking.id);
     final rating = LessonRatingService.forBooking(_ratings, booking.id);
     final written = feedback != null && feedback.hasContent;
-    final course = OnlineCourse.findById(booking.courseId);
     final session = _sessionFor(booking);
     final live = session?.isLiveNow == true;
-    final ended = session?.isFinished == true || session?.isStale == true;
+    final ended = EnrollmentService.sessionHasEnded(session);
+    final closed = _bookingCompleted(booking);
     final canHost =
-        !archive && _canWrite && booking.isConfirmed && !ended;
+        !archive && _canWrite && booking.isConfirmed && !ended && !closed;
     final canEnd = !archive &&
         _canWrite &&
         booking.isConfirmed &&
+        !closed &&
         (live || (session?.isLive == true) || !ended);
     final enrollment = _enrollmentFor(booking);
     final weekId = _weekIdFor(booking);
@@ -1032,45 +1098,58 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
       enrollment: enrollment,
     );
     final canAttach = enrollment != null;
-    final title = [
+    final when =
+        '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)}';
+    final statusBit = live
+        ? tr(context, '수업 중')
+        : closed
+            ? tr(context, '수강완료')
+            : ended
+                ? tr(context, '평가 대기')
+                : booking.isPending
+                    ? booking.statusLabel
+                    : '';
+    final heading = [
       if (booking.weekNumber > 0)
         tf(context, '{p0}회차', {'p0': booking.weekNumber}),
-      if (course != null) course.title,
+      when,
+      if (statusBit.isNotEmpty) statusBit,
     ].join(' · ');
-    final subtitle =
-        '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)} · ${booking.statusLabel}'
-        '${live ? tr(context, ' · 수업 중') : ended ? tr(context, ' · 수업 종료') : ''}';
 
     return Container(
       width: double.maxFinite,
       margin: EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Palette.grey50,
+        color: featured
+            ? Palette.white
+            : (closed
+                ? Palette.success.withValues(alpha: 0.06)
+                : Palette.grey50),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-            color: live ? Palette.success : Palette.grey200,
-            width: live ? 1.5 : 1),
+          color: live || featured
+              ? Palette.darkTeal
+              : closed
+                  ? Palette.success.withValues(alpha: 0.45)
+                  : Palette.grey200,
+          width: live || featured ? 1.5 : 1,
+        ),
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          initiallyExpanded: false,
+          initiallyExpanded: featured,
           tilePadding: EdgeInsets.symmetric(horizontal: 12, vertical: 2),
           childrenPadding: EdgeInsets.fromLTRB(12, 0, 12, 12),
           title: Text(
-            title,
+            heading,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontFamily: "NotoSansKR",
               fontSize: 13,
               fontWeight: FontWeight.w700,
-            ),
-          ),
-          subtitle: Text(
-            subtitle,
-            style: TextStyle(
-              fontFamily: "NotoSansKR",
-              fontSize: 12,
-              color: Palette.grey600,
+              color: closed ? Palette.success : Palette.black,
             ),
           ),
           children: [

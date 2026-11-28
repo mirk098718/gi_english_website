@@ -219,7 +219,21 @@ service cloud.firestore {
           && resource.data.userId == request.auth.uid
           && request.resource.data.userId == resource.data.userId
           && request.resource.data.courseId == resource.data.courseId
-          && mainTeacherFieldsOnly());
+          && mainTeacherFieldsOnly())
+        // 인강+화상: 체크리스트 완료 시 다음 회차 개방 표시만 올린다.
+        || (isLoggedIn()
+          && resource.data.userId == request.auth.uid
+          && request.resource.data.userId == resource.data.userId
+          && request.resource.data.courseId == resource.data.courseId
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['checklistUnlockedThrough', 'updatedAt'])
+          && request.resource.data.checklistUnlockedThrough is int
+          && request.resource.data.checklistUnlockedThrough > 0
+          && request.resource.data.checklistUnlockedThrough
+              <= resource.data.totalSessions
+          && (!('checklistUnlockedThrough' in resource.data)
+              || request.resource.data.checklistUnlockedThrough
+                  >= resource.data.checklistUnlockedThrough));
 
       allow delete: if isOwner();
 
@@ -702,7 +716,12 @@ service cloud.firestore {
     match /lesson_ratings/{ratingId} {
       allow read: if isOwner()
         || (isLoggedIn() && resource.data.userId == request.auth.uid)
-        || (isTeacher() && resource.data.teacherId == request.auth.uid);
+        || (isTeacher() && resource.data.teacherId == request.auth.uid)
+        || (isTeacher()
+          && 'rosterTeacherId' in resource.data
+          && resource.data.rosterTeacherId == request.auth.uid)
+        // 주니어 등 teacherId와 담당 강사 uid가 다를 때도 담당/원어민 강사가 볼 수 있다.
+        || (isTeacher() && isAssignedTeacher(resource.data.userId));
 
       allow create: if isStaff()
         && request.resource.data.userId is string

@@ -205,8 +205,12 @@ class _TeacherMonthHistoryPanelState extends State<TeacherMonthHistoryPanel> {
     setState(() => _loading = true);
     final bookings =
         await EnrollmentService.weekBookingsForTeacher(widget.teacherUid);
-    final ratings =
-        await LessonRatingService.listForTeacher(widget.teacherUid);
+    final ratings = LessonRatingService.mergeById([
+      ...await LessonRatingService.listForTeacher(widget.teacherUid),
+      ...await LessonRatingService.listForBookingIds(
+        bookings.map((b) => b.id),
+      ),
+    ]);
     final profile = await AuthService.staffProfile(widget.teacherUid);
     final settlements =
         await AuthService.listLessonSettlementsFor(widget.teacherUid);

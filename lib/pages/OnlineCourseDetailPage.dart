@@ -323,6 +323,7 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
       weekId: week.id,
       checkedItemIds: next,
       week: week,
+      enrollment: enrollment,
     );
     if (!mounted) return;
     setState(() {
@@ -336,6 +337,17 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
         ),
       );
       await _loadData();
+      return;
+    }
+    // 체크리스트로 다음 회차가 열렸으면 수강 정보를 다시 읽어 잠금을 푼다.
+    if (EnrollmentService.checklistOpensNextLesson(enrollment) &&
+        EnrollmentService.isWeekReadyToBook(week, next)) {
+      final refreshed =
+          await EnrollmentService.myEnrollmentForCourse(widget.course.id);
+      if (!mounted) return;
+      if (refreshed != null) {
+        setState(() => _enrollment = refreshed);
+      }
     }
   }
 
@@ -1350,6 +1362,8 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
               ),
             ),
           )
+        else if (widget.course.fixedSpeakingPrice)
+          ..._fixedSpeakingWeekSections()
         else
           Column(
             children: [
@@ -1359,6 +1373,80 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
           ),
       ],
     );
+  }
+
+  /// 주니어·재원생: 이번 수업 1개만 위에 두고, 이후·수강완료는 접는다.
+  List<Widget> _fixedSpeakingWeekSections() {
+    final enrollment = _enrollment;
+    final finished = <OnlineWeek>[];
+    final open = <OnlineWeek>[];
+    for (final week in _weeks) {
+      final completed = enrollment != null &&
+          week.weekNumber > 0 &&
+          week.weekNumber <= enrollment.completedSessions;
+      if (completed) {
+        finished.add(week);
+      } else {
+        open.add(week);
+      }
+    }
+    open.sort((a, b) => a.weekNumber.compareTo(b.weekNumber));
+    finished.sort((a, b) => b.weekNumber.compareTo(a.weekNumber));
+    final focus = open.isEmpty ? null : open.first;
+    final later =
+        open.length <= 1 ? const <OnlineWeek>[] : open.sublist(1);
+
+    return [
+      if (focus != null) ...[
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 6),
+            child: Text(
+              tr(context, '이번 수업'),
+              style: TextStyle(
+                fontFamily: 'NotoSansKR',
+                fontWeight: FontWeight.w800,
+                fontSize: 13,
+                color: Palette.darkTeal,
+              ),
+            ),
+          ),
+        ),
+        weekTile(focus, featured: true),
+      ],
+      if (later.isNotEmpty)
+        Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            initiallyExpanded: false,
+            tilePadding: EdgeInsets.zero,
+            title: Text(
+              tf(context, '이후 수업 {p0}', {'p0': later.length}),
+              style: TextStyle(
+                  fontFamily: "NotoSansKR", fontWeight: FontWeight.w700),
+            ),
+            children: later.map((week) => weekTile(week)).toList(),
+          ),
+        ),
+      if (finished.isNotEmpty)
+        Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            initiallyExpanded: false,
+            tilePadding: EdgeInsets.zero,
+            title: Text(
+              tf(context, '수강완료 {p0}', {'p0': finished.length}),
+              style: TextStyle(
+                  fontFamily: "NotoSansKR", fontWeight: FontWeight.w700),
+            ),
+            children: finished
+                .map((week) => weekTile(week, archive: true))
+                .toList(),
+          ),
+        ),
+      ..._unmatchedSessions().map(sessionTile),
+    ];
   }
 
   String _enrollmentDeadlineCopy() {
@@ -1410,7 +1498,13 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     if (EnrollmentService.isEnrollmentExpired(enrollment)) {
       return '수강 기한이 지났습니다. 목록에 만료로 남아 있으며, 연장 결제 후 이어서 예약할 수 있습니다.';
     }
-    return "지금 열린 수업은 $current회차입니다. 강사 피드백과 별점 평가가 끝나야 다음 회차가 열립니다. "
+    if (EnrollmentService.checklistOpensNextLesson(enrollment)) {
+      return "지금 열린 수업은 $current회차입니다. 인강·문제풀이 체크를 마치면 화상 예약과 다음 회차 학습이 열립니다. "
+          "화상은 신청해 두고 다음 회차 인강·퀴즈를 이어서 해도 됩니다. "
+          "$deadline"
+          "${done > 0 ? ' 이수 $done/${enrollment.totalSessions}회.' : ''}";
+    }
+    return "지금 열린 수업은 $current회차입니다. 별점 평가가 끝나야 다음 회차가 열립니다. "
         "$deadline 영상이 있는 회차는 인강과 문제풀이를, 영상이 없는 회차는 문제풀이만 체크하면 예약이 열립니다."
         "${done > 0 ? ' 이수 $done/${enrollment.totalSessions}회.' : ''}";
   }
@@ -1445,6 +1539,14 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
   }
 
   String _lockMessage(OnlineWeek week) {
+    final enrollment = _enrollment;
+    if (enrollment != null &&
+        EnrollmentService.checklistOpensNextLesson(enrollment)) {
+      final previous = week.weekNumber - 1;
+      return previous > 0
+          ? '${previous}회차 인강·문제풀이 체크를 마치면 이 회차가 열립니다.'
+          : '이전 회차 체크리스트를 마치면 이 회차가 열립니다.';
+    }
     final previous = week.weekNumber - 1;
     if (previous > 0) {
       LessonRating? pending;
@@ -1459,20 +1561,26 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
             '하루가 지나도 평가가 없으면 관리자가 다음 회차를 열 수 있습니다.';
       }
     }
-    return '이전 회차의 강사 피드백과 별점 평가가 끝나야 이 회차가 열립니다. '
-        '한쪽이 하루 넘게 멈추면 관리자만 다음 회차를 열 수 있습니다.';
+    return '이전 회차 별점 평가가 끝나야 이 회차가 열립니다. '
+        '하루 넘게 멈추면 관리자만 다음 회차를 열 수 있습니다.';
   }
 
-  Widget weekTile(OnlineWeek week) {
+  Widget weekTile(
+    OnlineWeek week, {
+    bool featured = false,
+    bool archive = false,
+  }) {
     final enrollment = _enrollment;
     final unlocked = enrollment == null ||
-        EnrollmentService.isSessionUnlocked(enrollment, week.weekNumber);
-    final isCurrent = !_lectureOnly &&
-        enrollment != null &&
-        week.weekNumber == _currentSessionNumber;
-    final completed = !_lectureOnly &&
-        enrollment != null &&
-        week.weekNumber <= enrollment.completedSessions;
+        EnrollmentService.isLessonUnlocked(enrollment, week.weekNumber);
+    final isCurrent = featured ||
+        (!_lectureOnly &&
+            enrollment != null &&
+            week.weekNumber == _currentSessionNumber);
+    final completed = archive ||
+        (!_lectureOnly &&
+            enrollment != null &&
+            week.weekNumber <= enrollment.completedSessions);
     final booking = _bookingFor(week.id);
     final fixedWeek =
         widget.course.fixedSpeakingPrice || (booking?.fixedSchedule ?? false);
@@ -1480,26 +1588,57 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
     final visibleItems = EnrollmentService.requiredChecklistItems(week);
     final done = visibleItems.where((item) => checked.contains(item.id)).length;
     final total = visibleItems.length;
+    final when = booking == null
+        ? ''
+        : '${EnrollmentService.formatBookingDate(booking.date)} ${EnrollmentService.formatBookingTime(booking.time)}';
+    final fixedHeading = [
+      if (week.weekNumber > 0) '${week.weekNumber}회차',
+      if (when.isNotEmpty) when,
+      if (completed) tr(context, '수강완료'),
+      if (!completed && isCurrent) tr(context, '진행 중'),
+    ].join(' · ');
 
     return Container(
       margin: EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: unlocked ? Palette.white : Palette.grey50,
+        color: featured
+            ? Palette.white
+            : completed
+                ? Palette.success.withValues(alpha: 0.06)
+                : (unlocked ? Palette.white : Palette.grey50),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isCurrent ? widget.course.accentColor : Palette.grey200,
-          width: isCurrent ? 2 : 1,
+          color: featured || isCurrent
+              ? widget.course.accentColor
+              : completed
+                  ? Palette.success.withValues(alpha: 0.45)
+                  : Palette.grey200,
+          width: featured || isCurrent ? 2 : 1,
         ),
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          initiallyExpanded: isCurrent,
+          initiallyExpanded: featured || isCurrent,
           tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           childrenPadding: EdgeInsets.fromLTRB(16, 0, 16, 16),
           expandedAlignment: Alignment.centerLeft,
           expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
-          title: Row(
+          title: widget.course.fixedSpeakingPrice
+              ? Text(
+                  fixedHeading,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: "NotoSansKR",
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: completed
+                        ? Palette.success
+                        : (unlocked ? Palette.black : Palette.grey500),
+                  ),
+                )
+              : Row(
             children: [
               Text(
                 '${week.weekNumber}회차',
@@ -1551,7 +1690,9 @@ class _OnlineCourseDetailPageState extends State<OnlineCourseDetailPage>
               ],
             ],
           ),
-          subtitle: Padding(
+          subtitle: widget.course.fixedSpeakingPrice
+              ? null
+              : Padding(
             padding: EdgeInsets.only(top: 4),
             child: Text(
               [

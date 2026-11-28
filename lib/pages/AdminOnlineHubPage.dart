@@ -785,6 +785,11 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
           StudentLearningProgressPanel(
             enrollments: [record],
             progressByEnrollment: _learning,
+            bookings: _gateBookings
+                .where((item) =>
+                    item.userId == record.userId &&
+                    item.courseId == record.courseId)
+                .toList(),
             dense: true,
           ),
           SizedBox(height: 12),

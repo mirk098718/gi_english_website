@@ -227,7 +227,12 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
               );
     final ratings = uid.isEmpty
         ? <LessonRating>[]
-        : await LessonRatingService.listForTeacher(uid);
+        : LessonRatingService.mergeById([
+            ...await LessonRatingService.listForTeacher(uid),
+            ...await LessonRatingService.listForBookingIds(
+              bookings.map((b) => b.id),
+            ),
+          ]);
     final settlements = uid.isEmpty || widget.schoolOverview
         ? <TeacherSettlement>[]
         : await AuthService.listLessonSettlementsFor(uid);
@@ -1110,68 +1115,177 @@ class _AdminTeacherScheduleTabState extends State<AdminTeacherScheduleTab> {
     );
   }
 
+  DateTime get _thisWeekStart =>
+      EnrollmentService.weekStart(DateTime.now());
+
+  int get _weekOffsetFromToday {
+    final diff = EnrollmentService.dateOnly(_weekStart)
+        .difference(EnrollmentService.dateOnly(_thisWeekStart))
+        .inDays;
+    return (diff / 7).round();
+  }
+
+  String get _weekRelativeLabel {
+    final offset = _weekOffsetFromToday;
+    if (offset == 0) return tr(context, '이번 주');
+    if (offset == 1) return tr(context, '다음 주');
+    if (offset == -1) return tr(context, '지난 주');
+    if (offset > 1) return tf(context, '{p0}주 후', {'p0': offset});
+    return tf(context, '{p0}주 전', {'p0': -offset});
+  }
+
+  void _shiftWeek(int weeks) {
+    setState(() {
+      _weekStart = EnrollmentService.weekStart(
+        _weekStart.add(Duration(days: 7 * weeks)),
+      );
+    });
+  }
+
+  void _goToThisWeek() {
+    setState(() {
+      _weekStart = _thisWeekStart;
+    });
+  }
+
+  Future<void> _pickWeek() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _weekStart,
+      firstDate: DateTime(2020, 1, 1),
+      lastDate: DateTime(2035, 12, 31),
+      helpText: tr(context, '볼 주를 고르세요'),
+      cancelText: tr(context, '취소'),
+      confirmText: tr(context, '이동'),
+    );
+    if (picked == null || !mounted) return;
+    setState(() {
+      _weekStart = EnrollmentService.weekStart(picked);
+    });
+  }
+
   Widget _weekBar({bool compact = false}) {
-    return Row(
+    final density = compact ? VisualDensity.compact : null;
+    final range =
+        '${EnrollmentService.formatBookingDate(_weekStart)} ~ ${EnrollmentService.formatBookingDate(_days.last)}';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        IconButton(
-          tooltip: tr(context, '이전 주'),
-          visualDensity: compact ? VisualDensity.compact : null,
-          onPressed: () {
-            setState(() {
-              _weekStart = _weekStart.subtract(Duration(days: 7));
-            });
-          },
-          icon: Icon(Icons.chevron_left),
-        ),
-        Expanded(
-          child: Text(
-            '${EnrollmentService.formatBookingDate(_weekStart)} ~ '
-            '${EnrollmentService.formatBookingDate(_days.last)}',
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-                fontFamily: "NotoSansKR", fontSize: compact ? 12 : 13),
-          ),
-        ),
-        IconButton(
-          tooltip: tr(context, '다음 주'),
-          visualDensity: compact ? VisualDensity.compact : null,
-          onPressed: () {
-            setState(() {
-              _weekStart = _weekStart.add(Duration(days: 7));
-            });
-          },
-          icon: Icon(Icons.chevron_right),
-        ),
-        if (compact) ...[
-          Container(
-            width: 6,
-            height: 6,
-            decoration: BoxDecoration(
-              color: Palette.danger,
-              shape: BoxShape.circle,
+        Row(
+          children: [
+            IconButton(
+              tooltip: tr(context, '이전 주'),
+              visualDensity: density,
+              onPressed: () => _shiftWeek(-1),
+              icon: Icon(Icons.chevron_left),
             ),
-          ),
-          SizedBox(width: 4),
-          Text(tr(context, '개인'),
-              style: TextStyle(
-                  fontFamily: "NotoSansKR",
-                  fontSize: 11,
-                  color: Palette.grey600)),
-          const NotificationBellButton(),
-          IconButton(
-            tooltip: tr(context, '새로고침'),
-            visualDensity: VisualDensity.compact,
-            onPressed: _loading ? null : _refresh,
-            icon: Icon(Icons.refresh, size: 18),
-          ),
-        ] else
-          OutlinedButton.icon(
-            onPressed: _loading ? null : _refresh,
-            icon: Icon(Icons.refresh, size: 18),
-            label: Text(tr(context, '새로고침'), style: TextStyle(fontFamily: "NotoSansKR")),
-          ),
+            IconButton(
+              tooltip: tr(context, '4주 전'),
+              visualDensity: density,
+              onPressed: () => _shiftWeek(-4),
+              icon: Icon(Icons.keyboard_double_arrow_left),
+            ),
+            Expanded(
+              child: InkWell(
+                onTap: _pickWeek,
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: compact ? 4 : 6),
+                  child: Column(
+                    children: [
+                      Text(
+                        _weekRelativeLabel,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'NotoSansKR',
+                          fontSize: compact ? 12 : 13,
+                          fontWeight: FontWeight.w800,
+                          color: Palette.darkTeal,
+                        ),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        range,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: 'NotoSansKR',
+                          fontSize: compact ? 11 : 12,
+                          color: Palette.grey700,
+                        ),
+                      ),
+                      Text(
+                        tr(context, '날짜를 눌러 다른 주로 이동'),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'NotoSansKR',
+                          fontSize: 10,
+                          color: Palette.grey500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            IconButton(
+              tooltip: tr(context, '4주 후'),
+              visualDensity: density,
+              onPressed: () => _shiftWeek(4),
+              icon: Icon(Icons.keyboard_double_arrow_right),
+            ),
+            IconButton(
+              tooltip: tr(context, '다음 주'),
+              visualDensity: density,
+              onPressed: () => _shiftWeek(1),
+              icon: Icon(Icons.chevron_right),
+            ),
+          ],
+        ),
+        SizedBox(height: compact ? 2 : 4),
+        Row(
+          children: [
+            if (_weekOffsetFromToday != 0)
+              TextButton(
+                onPressed: _goToThisWeek,
+                child: Text(
+                  tr(context, '이번 주로'),
+                  style: TextStyle(fontFamily: 'NotoSansKR', fontSize: 12),
+                ),
+              ),
+            Spacer(),
+            if (compact) ...[
+              Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: Palette.danger,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              SizedBox(width: 4),
+              Text(tr(context, '개인'),
+                  style: TextStyle(
+                      fontFamily: "NotoSansKR",
+                      fontSize: 11,
+                      color: Palette.grey600)),
+              const NotificationBellButton(),
+              IconButton(
+                tooltip: tr(context, '새로고침'),
+                visualDensity: VisualDensity.compact,
+                onPressed: _loading ? null : _refresh,
+                icon: Icon(Icons.refresh, size: 18),
+              ),
+            ] else
+              OutlinedButton.icon(
+                onPressed: _loading ? null : _refresh,
+                icon: Icon(Icons.refresh, size: 18),
+                label: Text(tr(context, '새로고침'),
+                    style: TextStyle(fontFamily: "NotoSansKR")),
+              ),
+          ],
+        ),
       ],
     );
   }

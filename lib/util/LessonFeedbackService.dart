@@ -128,6 +128,32 @@ class LessonFeedbackService {
     }
   }
 
+  /// 예약 id로 피드백을 직접 읽는다. teacherId가 달라도 담당 강사 화면에 붙인다.
+  static Future<List<LessonFeedback>> listForBookingIds(
+    Iterable<String> bookingIds,
+  ) async {
+    final ids = bookingIds
+        .map((id) => id.trim())
+        .where((id) => id.isNotEmpty)
+        .toSet()
+        .toList();
+    if (ids.isEmpty) return [];
+    final list = <LessonFeedback>[];
+    for (final id in ids) {
+      try {
+        final snap = await _firestore.collection(_collection).doc(id).get();
+        if (!snap.exists) continue;
+        final data = snap.data();
+        if (data == null) continue;
+        list.add(LessonFeedback.fromMap(snap.id, data));
+      } catch (e) {
+        print('예약 피드백 조회 오류: $id $e');
+      }
+    }
+    list.sort((a, b) => b.date.compareTo(a.date));
+    return list;
+  }
+
   static Future<List<LessonFeedback>> listForStudent({
     String? courseId,
   }) async {
@@ -168,6 +194,18 @@ class LessonFeedbackService {
       if (item.bookingId == bookingId || item.id == bookingId) return item;
     }
     return null;
+  }
+
+  /// teacherId 쿼리 결과와 예약 id 조회 결과를 id 기준으로 합친다.
+  static List<LessonFeedback> mergeById(Iterable<LessonFeedback> parts) {
+    final map = <String, LessonFeedback>{};
+    for (final item in parts) {
+      if (item.id.isEmpty) continue;
+      map[item.id] = item;
+    }
+    final list = map.values.toList();
+    list.sort((a, b) => b.date.compareTo(a.date));
+    return list;
   }
 
   static LessonFeedback? forWeek(
@@ -307,6 +345,7 @@ class LessonFeedbackService {
   }) async {
     final saved = await showDialog<bool>(
       context: context,
+      useRootNavigator: true,
       barrierDismissible: false,
       builder: (_) => LessonFeedbackDialog(
         booking: booking,
@@ -374,7 +413,7 @@ class _LessonFeedbackDialogState extends State<LessonFeedbackDialog> {
       );
       return;
     }
-    Navigator.pop(context, true);
+    Navigator.of(context, rootNavigator: true).pop(true);
   }
 
   @override
@@ -461,7 +500,9 @@ class _LessonFeedbackDialogState extends State<LessonFeedbackDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: _saving ? null : () => Navigator.pop(context, false),
+          onPressed: _saving
+              ? null
+              : () => Navigator.of(context, rootNavigator: true).pop(false),
           child: Text(tr(context, "닫기")),
         ),
         if (widget.canWrite)

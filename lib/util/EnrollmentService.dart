@@ -1300,6 +1300,30 @@ class EnrollmentService {
         }
       } else {
         payload['endedAt'] = FieldValue.serverTimestamp();
+        // 종료 시에도 비어 있으면 채워 별점 게이트·강사 조회가 빠지지 않게 한다.
+        if (teacherId.trim().isNotEmpty &&
+            (existingData['teacherId']?.toString() ?? '').trim().isEmpty) {
+          payload['teacherId'] = teacherId.trim();
+        }
+        if (bookingId.trim().isNotEmpty &&
+            (existingData['bookingId']?.toString() ?? '').trim().isEmpty) {
+          payload['bookingId'] = bookingId.trim();
+        }
+        if (userId.trim().isNotEmpty &&
+            (existingData['userId']?.toString() ?? '').trim().isEmpty) {
+          payload['userId'] = userId.trim();
+        }
+        if (courseId.trim().isNotEmpty &&
+            (existingData['courseId']?.toString() ?? '').trim().isEmpty) {
+          payload['courseId'] = courseId.trim();
+        }
+        if (memberName.trim().isNotEmpty &&
+            (existingData['memberName']?.toString() ?? '').trim().isEmpty) {
+          payload['memberName'] = memberName.trim();
+        }
+        if (weekNumber > 0 && _intValue(existingData['weekNumber']) <= 0) {
+          payload['weekNumber'] = weekNumber;
+        }
       }
 
       // update는 문서가 없으면 실패하므로, 없으면 merge set으로 보정
@@ -1309,7 +1333,7 @@ class EnrollmentService {
         await ref.set(payload, SetOptions(merge: true));
       }
 
-      // 종료 시 정산·다음 회차는 강사 피드백+학생 별점이 끝난 뒤에 반영한다.
+      // 종료 시 정산·다음 회차는 학생 별점이 끝난 뒤에 반영한다. 강사 피드백은 선택.
       if (!isLive) {
         final data = (await ref.get()).data() ?? existing.data() ?? {};
         await _openPayGateAfterSessionEnd(
@@ -1358,12 +1382,19 @@ class EnrollmentService {
         booking = snap.data() ?? {};
       } catch (_) {}
 
+      final resolvedTeacherId = (data['teacherId'] ??
+              booking['rosterTeacherId'] ??
+              booking['teacherId'] ??
+              booking['nativeTeacherUid'] ??
+              '')
+          .toString();
       await ref.set({
         'bookingId': bookingId,
-        'teacherId': (data['teacherId'] ??
+        'teacherId': resolvedTeacherId,
+        // 담당 강사 uid와 수업 teacherId가 달라도 조회·권한에 쓴다.
+        'rosterTeacherId': (booking['rosterTeacherId'] ??
                 booking['teacherId'] ??
-                booking['nativeTeacherUid'] ??
-                '')
+                resolvedTeacherId)
             .toString(),
         'teacherName': (data['hostName'] ??
                 booking['nativeTeacherName'] ??
@@ -1932,6 +1963,7 @@ class EnrollmentService {
   }
 
   /// 지금 열려 있는 회차. 이수한 다음 회차.
+  /// 인강+화상은 체크리스트만 끝나도 다음 회차 인강·퀴즈가 열린다.
   /// 관리자가 정체된 회차 다음을 연 경우에는 그 회차까지 연다.
   static int unlockedSessionNumber(EnrollmentRecord enrollment) {
     if (enrollment.totalSessions > 0 &&
@@ -1939,11 +1971,22 @@ class EnrollmentService {
       return enrollment.totalSessions;
     }
     var next = enrollment.completedSessions + 1;
+    // 체크리스트로 연 회차: N회 체크 완료 → N+1회 개방.
+    final fromChecklist = enrollment.checklistUnlockedThrough + 1;
+    if (fromChecklist > next) next = fromChecklist;
     if (enrollment.adminUnlockedThrough > next) {
       next = enrollment.adminUnlockedThrough;
     }
     if (enrollment.totalSessions <= 0) return next;
     return next.clamp(1, enrollment.totalSessions);
+  }
+
+  /// 인강+퀴즈+화상(일반 글리머). 주니어·재원생 화상은 별점 게이트를 유지한다.
+  static bool checklistOpensNextLesson(EnrollmentRecord enrollment) {
+    if (enrollment.plan != OnlinePlan.bundle) return false;
+    if (isJuniorCourse(enrollment.courseId)) return false;
+    if (requiresStudentRating(enrollment.courseId)) return false;
+    return true;
   }
 
   /// 연장 결제가 더하는 기한. 남은 기한과 오늘 중 늦은 날부터 추가 회차만큼 잇는다.
@@ -2042,6 +2085,13 @@ class EnrollmentService {
     }
     return sessionNumber <= unlockedSessionNumber(enrollment);
   }
+
+  /// 회차 타일 잠금. [isSessionUnlocked]와 같다.
+  static bool isLessonUnlocked(
+    EnrollmentRecord enrollment,
+    int sessionNumber,
+  ) =>
+      isSessionUnlocked(enrollment, sessionNumber);
 
   static bool isEnrollmentExpired(
     EnrollmentRecord enrollment, {
@@ -2233,6 +2283,7 @@ class EnrollmentService {
     required String weekId,
     required List<String> checkedItemIds,
     OnlineWeek? week,
+    EnrollmentRecord? enrollment,
   }) async {
     try {
       final payload = <String, dynamic>{
@@ -2247,12 +2298,33 @@ class EnrollmentService {
             .map((link) => {'title': link.title, 'url': link.url})
             .toList();
       }
-      await _firestore
-          .collection('enrollments')
-          .doc(enrollmentId)
+      final enrollmentRef =
+          _firestore.collection('enrollments').doc(enrollmentId);
+      await enrollmentRef
           .collection('week_progress')
           .doc(weekId)
           .set(payload, SetOptions(merge: true));
+
+      // 인강+화상: 이번 회차 체크가 끝나면 다음 회차 인강·퀴즈를 바로 연다.
+      final record = enrollment;
+      if (record != null &&
+          week != null &&
+          week.weekNumber > 0 &&
+          checklistOpensNextLesson(record) &&
+          isWeekReadyToBook(week, checkedItemIds) &&
+          week.weekNumber > record.checklistUnlockedThrough) {
+        final cap = record.totalSessions > 0
+            ? record.totalSessions
+            : week.weekNumber;
+        final through =
+            week.weekNumber > cap ? cap : week.weekNumber;
+        if (through > record.checklistUnlockedThrough) {
+          await enrollmentRef.set({
+            'checklistUnlockedThrough': through,
+            'updatedAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
+        }
+      }
       return null;
     } catch (e) {
       print('체크리스트 저장 오류: $e');
@@ -2707,6 +2779,29 @@ class EnrollmentService {
     return clock.isAfter(start.add(Duration(minutes: booking.lessonMinutes)));
   }
 
+  static bool sessionHasEnded(OnlineSession? session) =>
+      session != null && (session.isFinished || session.isStale);
+
+  /// 수업 종료 처리가 끝난 예약.
+  /// 별점 필수 과정(주니어·재원생): 강사가 종료한 뒤 수강생 별점까지 있어야 끝.
+  /// 강사 피드백은 선택. 그 외 과정은 세션 종료 또는 수업 시각 경과.
+  static bool bookingIsClosed(
+    WeekBooking booking, {
+    OnlineSession? session,
+    bool rated = false,
+    DateTime? now,
+  }) {
+    if (booking.status == 'rejected' || booking.isCancelled) return true;
+    if (!booking.isConfirmed) return false;
+    final endedBySession = sessionHasEnded(session);
+    if (requiresStudentRating(booking.courseId)) {
+      if (!rated) return false;
+      return endedBySession || bookingHasEnded(booking, now: now);
+    }
+    if (endedBySession) return true;
+    return bookingHasEnded(booking, now: now);
+  }
+
   static bool canStudentChangeBooking(WeekBooking booking, {DateTime? now}) {
     if (booking.status != 'pending' && booking.status != 'confirmed') {
       return false;
@@ -2813,13 +2908,12 @@ class EnrollmentService {
     }).toList();
   }
 
-  static Future<List<WeekBooking>> myAllWeekBookings() async {
-    final user = AuthService.currentUser;
-    if (user == null) return [];
+  static Future<List<WeekBooking>> weekBookingsForUser(String userId) async {
+    if (userId.isEmpty) return [];
     try {
       final snapshot = await _firestore
           .collection('week_bookings')
-          .where('userId', isEqualTo: user.uid)
+          .where('userId', isEqualTo: userId)
           .get();
       final list = snapshot.docs
           .map((doc) => WeekBooking.fromMap(doc.id, doc.data()))
@@ -2827,9 +2921,15 @@ class EnrollmentService {
       list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return list;
     } catch (e) {
-      print('내 예약 전체 조회 오류: $e');
+      print('회원 예약 조회 오류: $e');
       return [];
     }
+  }
+
+  static Future<List<WeekBooking>> myAllWeekBookings() async {
+    final user = AuthService.currentUser;
+    if (user == null) return [];
+    return weekBookingsForUser(user.uid);
   }
 
   static Future<List<WeekBooking>> myWeekBookings({
@@ -3670,7 +3770,9 @@ class EnrollmentService {
       return '남은 화상수업 횟수가 없습니다.';
     }
     if (!isSessionUnlocked(enrollment, week.weekNumber)) {
-      return '이전 회차 화상수업을 마치면 이 회차를 예약할 수 있습니다.';
+      return checklistOpensNextLesson(enrollment)
+          ? '이전 회차 인강·문제풀이 체크를 마치면 이 회차를 예약할 수 있습니다.'
+          : '이전 회차 화상수업을 마치면 이 회차를 예약할 수 있습니다.';
     }
     final checked = (await weekProgress(enrollment.id))[week.id] ?? const [];
     if (!isWeekReadyToBook(week, checked)) {
@@ -4515,13 +4617,8 @@ class TeacherBookingBoard {
       final fixed = booking.fixedSchedule || booking.isJunior;
       final key = '${booking.userId}|${booking.courseId}';
       final next = nextByStudent[key];
+      // 고정·주니어는 진행/다음 1건만 상단에 두고, 나머지는 완료·이후로 묶는다.
       if (fixed) {
-        // 주니어 순차 잠금 임시 해제: 가까운 1건만이 아니라 열린 회차를 모두 보여 준다.
-        if (booking.isJunior &&
-            !EnrollmentService.juniorSequentialLockEnabled) {
-          upcoming.add(booking);
-          continue;
-        }
         if (next != null && next.id == booking.id) upcoming.add(booking);
         continue;
       }
@@ -4920,6 +5017,8 @@ class EnrollmentRecord {
   final DateTime? createdAt;
   final DateTime? lastSessionAt;
   final int adminUnlockedThrough;
+  /// 체크리스트를 마친 마지막 회차. 인강+화상에서 다음 회차 개방용.
+  final int checklistUnlockedThrough;
   final String plan;
   final List<FixedSession> sessionPlan;
   final int juniorLevel;
@@ -4946,6 +5045,7 @@ class EnrollmentRecord {
     this.createdAt,
     this.lastSessionAt,
     this.adminUnlockedThrough = 0,
+    this.checklistUnlockedThrough = 0,
     this.plan = OnlinePlan.bundle,
     this.sessionPlan = const [],
     this.juniorLevel = 0,
@@ -5052,6 +5152,8 @@ class EnrollmentRecord {
       lastSessionAt: lastSessionAt,
       adminUnlockedThrough:
           EnrollmentService._intValue(data['adminUnlockedThrough']),
+      checklistUnlockedThrough:
+          EnrollmentService._intValue(data['checklistUnlockedThrough']),
       plan: plan,
       sessionPlan: sessionPlan,
       juniorLevel: EnrollmentService._intValue(data['juniorLevel']),

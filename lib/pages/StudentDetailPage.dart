@@ -33,6 +33,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
   late Map<String, dynamic> _member;
   List<EnrollmentRecord> _enrollments = [];
   Map<String, List<StudentWeekProgress>> _learning = {};
+  List<WeekBooking> _bookings = [];
   List<PaymentOrder> _payments = [];
   String _teacherName = '';
   bool _loading = true;
@@ -71,6 +72,9 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
             teacherUid: isOwner ? null : staffUid,
           );
     final learning = await EnrollmentService.learningByEnrollment(enrollments);
+    final bookings = uid.isEmpty
+        ? <WeekBooking>[]
+        : await EnrollmentService.weekBookingsForUser(uid);
     final payments =
         uid.isEmpty ? <PaymentOrder>[] : await PaymentService.paymentsForUser(uid);
     if (!mounted) return;
@@ -87,6 +91,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
           .ifEmpty(_teacherName);
       _enrollments = enrollments;
       _learning = learning;
+      _bookings = bookings;
       _payments = payments;
       _isOwner = isOwner;
       _loading = false;
@@ -463,6 +468,11 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
           StudentLearningProgressPanel(
             enrollments: [record],
             progressByEnrollment: _learning,
+            bookings: _bookings
+                .where((item) =>
+                    item.userId == record.userId &&
+                    item.courseId == record.courseId)
+                .toList(),
             dense: true,
           ),
           const SizedBox(height: 12),

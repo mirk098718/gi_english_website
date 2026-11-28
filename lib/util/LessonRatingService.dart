@@ -260,6 +260,32 @@ class LessonRatingService {
     }
   }
 
+  /// 예약 id로 평가 문서를 직접 읽는다. teacherId가 달라도 담당 강사가 볼 수 있다.
+  static Future<List<LessonRating>> listForBookingIds(
+    Iterable<String> bookingIds,
+  ) async {
+    final ids = bookingIds
+        .map((id) => id.trim())
+        .where((id) => id.isNotEmpty)
+        .toSet()
+        .toList();
+    if (ids.isEmpty) return [];
+    final list = <LessonRating>[];
+    for (final id in ids) {
+      try {
+        final snap = await _firestore.collection(collection).doc(id).get();
+        if (!snap.exists) continue;
+        final data = snap.data();
+        if (data == null) continue;
+        list.add(LessonRating.fromMap(snap.id, data));
+      } catch (e) {
+        print('예약 평가 조회 오류: $id $e');
+      }
+    }
+    list.sort((a, b) => b.date.compareTo(a.date));
+    return list;
+  }
+
   static Future<List<LessonRating>> listAll() async {
     try {
       final snapshot = await _firestore.collection(collection).get();
@@ -413,10 +439,23 @@ class LessonRatingService {
   }) async {
     final saved = await showDialog<bool>(
       context: context,
+      useRootNavigator: true,
       barrierDismissible: false,
       builder: (_) => LessonRatingDialog(rating: rating),
     );
     return saved == true;
+  }
+
+  /// teacherId 쿼리 결과와 예약 id 조회 결과를 id 기준으로 합친다.
+  static List<LessonRating> mergeById(Iterable<LessonRating> parts) {
+    final map = <String, LessonRating>{};
+    for (final item in parts) {
+      if (item.id.isEmpty) continue;
+      map[item.id] = item;
+    }
+    final list = map.values.toList();
+    list.sort((a, b) => b.date.compareTo(a.date));
+    return list;
   }
 }
 

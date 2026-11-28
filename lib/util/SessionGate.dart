@@ -4,8 +4,8 @@ import 'package:gi_english_website/util/EnrollmentService.dart';
 import 'package:gi_english_website/util/LessonFeedbackService.dart';
 import 'package:gi_english_website/util/LessonRatingService.dart';
 
-/// 다음 회차는 강사 피드백과 학생 별점이 끝나야 열린다.
-/// 한쪽이 이 시간 넘게 멈추면 관리자만 다음 회차를 열 수 있다.
+/// 다음 회차는 학생 별점이 끝나야 열린다. 강사 피드백은 선택이다.
+/// 별점 요청이 이 시간 넘게 멈추면 관리자만 다음 회차를 열 수 있다.
 class SessionGateHold {
   final int sessionNumber;
   final bool waitingOnTeacher;
@@ -50,21 +50,9 @@ class SessionGate {
     final start = EnrollmentService.bookingDateTime(booking.date, booking.time);
     if (start == null) return null;
     final classEnd = start.add(
-      Duration(minutes: EnrollmentService.lessonMinutes),
+      Duration(minutes: booking.lessonMinutes),
     );
     final clock = now ?? DateTime.now();
-
-    LessonFeedback? feedback;
-    for (final item in feedbacks) {
-      if (!item.hasContent) continue;
-      final sameBooking = item.bookingId.isNotEmpty &&
-          (item.bookingId == booking.id);
-      final sameWeek = item.weekNumber == frontier &&
-          (item.bookingId.isEmpty || item.bookingId == booking.id);
-      if (!sameBooking && !sameWeek) continue;
-      feedback = item;
-      break;
-    }
 
     LessonRating? rating;
     for (final item in ratings) {
@@ -73,28 +61,29 @@ class SessionGate {
         break;
       }
     }
-    if (rating != null && rating.isRated && feedback != null) return null;
+    // 별점이 끝나면 다음 회차 게이트를 연다. 강사 피드백은 보지 않는다.
+    if (rating != null && rating.isRated) return null;
 
-    if (feedback == null) {
-      final due = classEnd.add(stallAfter);
+    if (rating != null && rating.canStudentRate) {
+      final anchor = rating.createdAt;
+      final due = anchor.add(stallAfter);
       if (clock.isBefore(due)) return null;
       return SessionGateHold(
         sessionNumber: frontier,
-        waitingOnTeacher: true,
-        waitingOnStudent: false,
-        stalledSince: classEnd,
+        waitingOnTeacher: false,
+        waitingOnStudent: true,
+        stalledSince: anchor,
       );
     }
 
-    if (rating != null && rating.isRated) return null;
-    final anchor = feedback.updatedAt ?? feedback.createdAt;
-    final due = anchor.add(stallAfter);
+    // 별점 문서가 아직 없으면 강사가 수업 종료로 게이트를 열기 전이다.
+    final due = classEnd.add(stallAfter);
     if (clock.isBefore(due)) return null;
     return SessionGateHold(
       sessionNumber: frontier,
-      waitingOnTeacher: false,
-      waitingOnStudent: true,
-      stalledSince: anchor,
+      waitingOnTeacher: true,
+      waitingOnStudent: false,
+      stalledSince: classEnd,
     );
   }
 
@@ -143,7 +132,7 @@ class SessionGate {
         feedbacks: feedbacks,
       );
       if (stalled == null || !stalled.stalled) {
-        return '강사 피드백이나 학생 별점이 하루 이상 멈추지 않았습니다.';
+        return '수업 종료나 학생 별점이 하루 이상 멈추지 않았습니다.';
       }
       final next = stalled.sessionNumber + 1;
       if (record.totalSessions > 0 && next > record.totalSessions) {
