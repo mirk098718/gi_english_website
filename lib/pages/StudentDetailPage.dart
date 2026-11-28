@@ -544,7 +544,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
       _toast(tr(context, '이메일 없는 회원은 수동 배정할 수 없습니다.'), error: true);
       return;
     }
-    OnlineCourse selectedCourse = OnlineCourse.all.first;
+    OnlineCourse selectedCourse = OnlineCourse.catalog.first;
     final sessionsController = TextEditingController(text: '8');
     var assignedTotal = 0;
     final saved = await showDialog<bool>(
@@ -559,13 +559,15 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
               children: [
                 DropdownButtonFormField<OnlineCourse>(
                   initialValue: selectedCourse,
+                  isExpanded: true,
                   decoration:  InputDecoration(
                       labelText: tr(context, '과정'), border: OutlineInputBorder()),
-                  items: OnlineCourse.all
+                  items: OnlineCourse.catalog
                       .map((course) => DropdownMenuItem(
                             value: course,
-                            child: Text(course.title,
-                                style: TextStyle(fontFamily: "NotoSansKR")),
+                            child: Text(course.assignMenuLabel,
+                                style: TextStyle(fontFamily: "NotoSansKR"),
+                                overflow: TextOverflow.ellipsis),
                           ))
                       .toList(),
                   onChanged: (value) {
@@ -680,7 +682,7 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
   }
 
   Future<void> _showEditDialog(EnrollmentRecord record) async {
-    OnlineCourse selectedCourse = record.course ?? OnlineCourse.all.first;
+    OnlineCourse selectedCourse = record.course ?? OnlineCourse.catalog.first;
     final sessionsController = TextEditingController(
         text: record.totalSessions > 0 ? '${record.totalSessions}' : '8');
     final saved = await showDialog<bool>(
@@ -695,13 +697,15 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
               children: [
                 DropdownButtonFormField<OnlineCourse>(
                   initialValue: selectedCourse,
+                  isExpanded: true,
                   decoration:  InputDecoration(
                       labelText: tr(context, '과정'), border: OutlineInputBorder()),
-                  items: OnlineCourse.all
+                  items: OnlineCourse.catalog
                       .map((course) => DropdownMenuItem(
                             value: course,
-                            child: Text(course.title,
-                                style: TextStyle(fontFamily: "NotoSansKR")),
+                            child: Text(course.assignMenuLabel,
+                                style: TextStyle(fontFamily: "NotoSansKR"),
+                                overflow: TextOverflow.ellipsis),
                           ))
                       .toList(),
                   onChanged: (value) {

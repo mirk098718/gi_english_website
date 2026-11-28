@@ -213,6 +213,16 @@ class OnlineCourse {
   static List<OnlineCourse> get catalog =>
       [...all, speaking, ...juniorCourses, enrolledFreeTalk];
 
+  bool get isJuniorCourse => id.startsWith('junior_');
+
+  /// 관리자 수업 배정 드롭다운 라벨. 주니어는 상품명이 같아 부제로 구분한다.
+  String get assignMenuLabel {
+    if (isJuniorCourse) return '글리머 주니어 · $subtitle';
+    if (id == enrolledFreeTalk.id) return '$title · $subtitle';
+    if (id == speaking.id) return title;
+    return '$order. $title ($subtitle)';
+  }
+
   bool get isSpeakingProduct => id == speaking.id || fixedSpeakingPrice;
 
   /// 2번 묶음 설명의 마지막 줄. 1번 인강 설명에는 넣지 않는다.

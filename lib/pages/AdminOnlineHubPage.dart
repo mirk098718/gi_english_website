@@ -475,9 +475,10 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                   items: OnlineCourse.catalog
                       .map((c) => DropdownMenuItem(
                             value: c,
-                            child: Text('${c.order}. ${c.title} (${c.subtitle})',
+                            child: Text(c.assignMenuLabel,
                                 style: TextStyle(
-                                    fontFamily: "NotoSansKR", fontSize: 13)),
+                                    fontFamily: "NotoSansKR", fontSize: 13),
+                                overflow: TextOverflow.ellipsis),
                           ))
                       .toList(),
                   onChanged: (value) {
@@ -874,7 +875,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
   }
 
   Future<void> _showAssignDialog(String email) async {
-    OnlineCourse selectedCourse = OnlineCourse.all.first;
+    OnlineCourse selectedCourse = OnlineCourse.catalog.first;
     final sessionsController = TextEditingController(text: '8');
     var assignedTotal = 0;
 
@@ -890,13 +891,15 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
               children: [
                 DropdownButtonFormField<OnlineCourse>(
                   initialValue: selectedCourse,
+                  isExpanded: true,
                   decoration: InputDecoration(
                       labelText: tr(context, '과정'), border: OutlineInputBorder()),
                   items: OnlineCourse.catalog
                       .map((course) => DropdownMenuItem(
                             value: course,
-                            child: Text(course.title,
-                                style: TextStyle(fontFamily: "NotoSansKR")),
+                            child: Text(course.assignMenuLabel,
+                                style: TextStyle(fontFamily: "NotoSansKR"),
+                                overflow: TextOverflow.ellipsis),
                           ))
                       .toList(),
                   onChanged: (value) {
@@ -980,7 +983,7 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
   }
 
   Future<void> _showEditDialog(EnrollmentRecord record) async {
-    OnlineCourse selectedCourse = record.course ?? OnlineCourse.all.first;
+    OnlineCourse selectedCourse = record.course ?? OnlineCourse.catalog.first;
     final sessionsController = TextEditingController(
         text: record.plan == OnlinePlan.lecture
             ? '0'
@@ -998,13 +1001,15 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
               children: [
                 DropdownButtonFormField<OnlineCourse>(
                   initialValue: selectedCourse,
+                  isExpanded: true,
                   decoration: InputDecoration(
                       labelText: tr(context, '과정'), border: OutlineInputBorder()),
                   items: OnlineCourse.catalog
                       .map((course) => DropdownMenuItem(
                             value: course,
-                            child: Text(course.title,
-                                style: TextStyle(fontFamily: "NotoSansKR")),
+                            child: Text(course.assignMenuLabel,
+                                style: TextStyle(fontFamily: "NotoSansKR"),
+                                overflow: TextOverflow.ellipsis),
                           ))
                       .toList(),
                   onChanged: (value) {
