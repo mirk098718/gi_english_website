@@ -33,6 +33,7 @@ import 'package:gi_english_website/widget/AdminContentWidth.dart';
 import 'package:gi_english_website/widget/AdminTalkReportsTab.dart';
 import 'package:gi_english_website/widget/TeacherRatingBoard.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
+import 'package:gi_english_website/widget/PackageHistorySection.dart';
 import 'package:gi_english_website/widget/SiteLogoButton.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/util/ProfilePhotoPicker.dart';
@@ -709,8 +710,19 @@ class _AdminEnrollmentTabState extends State<AdminEnrollmentTab> {
                         fontFamily: "NotoSansKR", color: Palette.grey500)),
               ),
             )
-          else
-            ...records.map(_enrollmentTile),
+          else ...[
+            ...EnrollmentService.activePackages(records)
+                .map(_enrollmentTile),
+            ...records
+                .where((item) => !item.isActive)
+                .map(_enrollmentTile),
+            Padding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: PackageHistoryFolder(
+                records: EnrollmentService.finishedPackages(records),
+              ),
+            ),
+          ],
         ],
       ),
     );

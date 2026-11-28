@@ -29,10 +29,13 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
   final nicknameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
+  final guardianNameController = TextEditingController();
+  final guardianPhoneController = TextEditingController();
   final passwordController = TextEditingController();
   final passwordConfirmController = TextEditingController();
   Uint8List? _photo;
   bool _isLoading = false;
+  bool _isMinor = false;
 
   @override
   void dispose() {
@@ -40,6 +43,8 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
     nicknameController.dispose();
     emailController.dispose();
     phoneController.dispose();
+    guardianNameController.dispose();
+    guardianPhoneController.dispose();
     passwordController.dispose();
     passwordConfirmController.dispose();
     super.dispose();
@@ -82,11 +87,13 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
     final nickname = nicknameController.text.trim();
     final email = emailController.text.trim();
     final phone = phoneController.text.trim();
+    final guardianName = guardianNameController.text.trim();
+    final guardianPhone = guardianPhoneController.text.trim();
     final password = passwordController.text;
     final passwordConfirm = passwordConfirmController.text;
 
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
-      _showMessage('이름, 이메일, 비밀번호는 필수입니다.', isError: true);
+      _showMessage('수강생 이름, 이메일(ID), 비밀번호는 필수입니다.', isError: true);
       return;
     }
     final nicknameError = AuthService.validateNickname(nickname);
@@ -98,6 +105,17 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
     if (phoneError != null) {
       _showMessage(phoneError, isError: true);
       return;
+    }
+    if (_isMinor) {
+      if (guardianName.isEmpty) {
+        _showMessage('미성년자 가입은 보호자 이름을 입력해 주세요.', isError: true);
+        return;
+      }
+      final guardianPhoneError = PhoneUtil.validate(guardianPhone);
+      if (guardianPhoneError != null) {
+        _showMessage('보호자 $guardianPhoneError', isError: true);
+        return;
+      }
     }
     if (password.length < 6) {
       _showMessage('비밀번호는 6자 이상으로 입력해주세요.', isError: true);
@@ -118,6 +136,9 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
       name: name,
       nickname: nickname,
       phone: phone,
+      isMinor: _isMinor,
+      guardianName: guardianName,
+      guardianPhone: guardianPhone,
       photoBytes: _photo,
       photoFileName: _photo == null ? null : 'photo.jpg',
     );
@@ -143,6 +164,20 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
         content: Text(message, style: TextStyle(fontFamily: "NotoSansKR")),
         backgroundColor: isError ? Palette.danger : Palette.success,
       ),
+    );
+  }
+
+  Widget _field(String hint, TextEditingController controller,
+      {bool obscureText = false,
+      bool autofocus = false,
+      TextInputType? keyboardType}) {
+    return MyWidget.roundEdgeTextField(
+      tr(context, hint),
+      controller,
+      obscureText: obscureText,
+      autofocus: autofocus,
+      dense: true,
+      keyboardType: keyboardType,
     );
   }
 
@@ -183,7 +218,7 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    tr(context, "가입 후 관리자 수강 배정이 완료되면 내 강의실에서 프로그램을 이용하실 수 있습니다. 로그인은 이메일을 쓰고, 수업에서는 닉네임과 프로필 사진이 보입니다. 휴대폰 번호는 화상수업 예약이 확정되면 알림 문자를 보내는 데 사용합니다."),
+                    tr(context, "가입 후 관리자 수강 배정이 완료되면 내 강의실에서 프로그램을 이용하실 수 있습니다. 로그인은 이메일을 ID로 쓰고, 수업에서는 닉네임과 프로필 사진이 보입니다. 휴대폰 번호는 화상수업 예약이 확정되면 알림 문자를 보내는 데 사용합니다."),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: "NotoSansKR",
@@ -223,25 +258,70 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
                                 },
                           icon: Icon(Icons.photo_camera_outlined, size: 18),
                           label: Text(
-                            _photo == null ? tr(context, "프로필 사진 넣기") : tr(context, "사진 다시 선택"),
+                            _photo == null
+                                ? tr(context, "프로필 사진 넣기")
+                                : tr(context, "사진 다시 선택"),
                             style: TextStyle(fontFamily: "NotoSansKR"),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  MyWidget.roundEdgeTextField("이름", nameController,
-                      autofocus: true),
-                  MyWidget.roundEdgeTextField(
-                      "닉네임 (선택, 수업에서 보일 이름)", nicknameController),
-                  MyWidget.roundEdgeTextField("이메일", emailController),
-                  MyWidget.roundEdgeTextField("휴대폰 번호 (필수)", phoneController),
-                  MyWidget.roundEdgeTextField("비밀번호 (6자 이상)", passwordController,
+                  SizedBox(height: 8),
+                  _field("수강생 이름", nameController, autofocus: true),
+                  CheckboxListTile(
+                    value: _isMinor,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 4),
+                    dense: true,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    activeColor: Palette.darkTeal,
+                    title: Text(
+                      tr(context, "미성년자입니다"),
+                      style: TextStyle(
+                        fontFamily: "NotoSansKR",
+                        fontSize: 14,
+                        color: Palette.grey800,
+                      ),
+                    ),
+                    onChanged: _isLoading
+                        ? null
+                        : (value) {
+                            setState(() {
+                              _isMinor = value == true;
+                              if (!_isMinor) {
+                                guardianNameController.clear();
+                                guardianPhoneController.clear();
+                              }
+                            });
+                          },
+                  ),
+                  if (_isMinor) ...[
+                    _field("보호자 이름", guardianNameController),
+                    _field(
+                      "보호자 연락처",
+                      guardianPhoneController,
+                      keyboardType: TextInputType.phone,
+                    ),
+                  ],
+                  _field(
+                    "수강생 휴대폰 번호 (필수)",
+                    phoneController,
+                    keyboardType: TextInputType.phone,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: Divider(height: 1, color: Palette.grey300),
+                  ),
+                  _field("닉네임 (선택, 수업에서 보일 이름)", nicknameController),
+                  _field(
+                    "이메일 (로그인 ID)",
+                    emailController,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  _field("비밀번호 (6자 이상)", passwordController, obscureText: true),
+                  _field("비밀번호 확인", passwordConfirmController,
                       obscureText: true),
-                  MyWidget.roundEdgeTextField(
-                      "비밀번호 확인", passwordConfirmController,
-                      obscureText: true),
-                  SizedBox(height: 4),
+                  SizedBox(height: 8),
                   SizedBox(
                     height: 48,
                     child: ElevatedButton(
@@ -272,7 +352,7 @@ class _MemberRegisterPageState extends State<MemberRegisterPage> {
                             ),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 12),
                   TextButton(
                     onPressed: () {
                       MenuUtil.push(context, MemberLoginPage());

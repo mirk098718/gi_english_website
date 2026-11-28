@@ -20,6 +20,7 @@ import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/widget/MainTeacherChange.dart';
 import 'package:gi_english_website/widget/MobileSchoolLayout.dart';
 import 'package:gi_english_website/widget/OnlineProgramSideMenu.dart';
+import 'package:gi_english_website/widget/PackageHistorySection.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/widget/ProfileEditDialog.dart';
 import 'package:gi_english_website/widget/WebSchoolLayout.dart';
@@ -574,22 +575,49 @@ class _SchoolOnlineClassroomPageState extends State<SchoolOnlineClassroomPage> {
         else if (_myEnrollments.isEmpty)
           emptyCourseView()
         else
-          Column(
-            children: [
-              ..._myEnrollments.map(courseCard),
-              SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    MenuUtil.push(context, OnlineCheckoutPage());
-                  },
-                  icon: Icon(Icons.add_shopping_cart, size: 16),
-                  label: Text(tr(context, "다른 프로그램 결제하기"),
-                      style: TextStyle(fontFamily: "NotoSansKR")),
-                ),
-              ),
-            ],
+          Builder(
+            builder: (context) {
+              final active =
+                  EnrollmentService.activePackages(_myEnrollments);
+              final history =
+                  EnrollmentService.finishedPackages(_myEnrollments);
+              return Column(
+                children: [
+                  if (active.isEmpty && history.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 12),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          tr(context, '진행 중인 결제분이 없습니다. 끝난 기록은 아래 히스토리에 있습니다.'),
+                          style: TextStyle(
+                            fontFamily: 'NotoSansKR',
+                            fontSize: 13,
+                            color: Palette.grey600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ...active.map(courseCard),
+                  if (history.isNotEmpty) ...[
+                    SizedBox(height: 4),
+                    PackageHistoryFolder(records: history),
+                  ],
+                  SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        MenuUtil.push(context, OnlineCheckoutPage());
+                      },
+                      icon: Icon(Icons.add_shopping_cart, size: 16),
+                      label: Text(tr(context, "다른 프로그램 결제하기"),
+                          style: TextStyle(fontFamily: "NotoSansKR")),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
       ],
     );

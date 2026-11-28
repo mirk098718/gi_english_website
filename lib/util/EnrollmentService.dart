@@ -2683,6 +2683,28 @@ class EnrollmentService {
   static bool requiresStudentRating(String courseId) =>
       isJuniorCourse(courseId) || courseId == OnlineCourse.enrolledFreeTalk.id;
 
+  /// 한 결제분(배정된 전체 회차)을 모두 마친 수강.
+  /// 개별 회차가 아니라 totalSessions까지 이수한 패키지 단위다.
+  static bool isPackageFinished(EnrollmentRecord enrollment) {
+    if (!enrollment.isActive) return false;
+    if (enrollment.totalSessions <= 0) return false;
+    return enrollment.remainingSessions <= 0;
+  }
+
+  static List<EnrollmentRecord> activePackages(
+    Iterable<EnrollmentRecord> records,
+  ) {
+    return records
+        .where((item) => item.isActive && !isPackageFinished(item))
+        .toList();
+  }
+
+  static List<EnrollmentRecord> finishedPackages(
+    Iterable<EnrollmentRecord> records,
+  ) {
+    return records.where(isPackageFinished).toList();
+  }
+
   /// 수강생이 고르거나 레벨테스트로 받은 주니어 레벨을 회원 정보에 남긴다.
   /// 메인 관리자는 그 수강생의 주니어 배정에도 같은 레벨을 적는다.
   static Future<String?> saveJuniorLevel({

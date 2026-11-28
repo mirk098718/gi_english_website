@@ -16,6 +16,7 @@ import 'package:gi_english_website/widget/AdminContentWidth.dart';
 import 'package:gi_english_website/widget/TeacherMonthLessonSummary.dart';
 import 'package:gi_english_website/widget/LessonRatingPromptHost.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
+import 'package:gi_english_website/widget/PackageHistorySection.dart';
 import 'package:gi_english_website/widget/SiteLogoButton.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/widget/ProfileEditDialog.dart';
@@ -422,8 +423,15 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
             Text(tr(context, "아직 배정된 회원이 없습니다."),
                 style: TextStyle(
                     fontFamily: "NotoSansKR", color: Palette.grey500))
-          else
-            ..._members.map(_memberCard),
+          else ...[
+            ..._activeMembers().map(_memberCard),
+            PackageHistoryFolder(
+              records: _historyEnrollments(),
+              memberLabelOf: (record) => record.memberName.trim().isNotEmpty
+                  ? record.memberName
+                  : record.email,
+            ),
+          ],
           SizedBox(height: 28),
           Text(tr(context, "타 수강생"), style: TextStyle(fontFamily: "Jalnan", fontSize: 16)),
           SizedBox(height: 8),
@@ -790,6 +798,44 @@ class _TeacherRosterViewState extends State<TeacherRosterView> {
 
   static const Color _juniorBorder = Color(0xFFEA7A1A);
   static const Color _glimmerBorder = Palette.darkTeal;
+
+  List<EnrollmentRecord> _memberActiveEnrollments(String memberId) {
+    return _enrollments
+        .where((item) =>
+            item.userId == memberId &&
+            item.isActive &&
+            !EnrollmentService.isPackageFinished(item))
+        .toList();
+  }
+
+  bool _memberOnlyHistory(String memberId) {
+    final active = _memberActiveEnrollments(memberId);
+    if (active.isNotEmpty) return false;
+    final finished = _enrollments.where((item) =>
+        item.userId == memberId && EnrollmentService.isPackageFinished(item));
+    return finished.isNotEmpty;
+  }
+
+  List<Map<String, dynamic>> _activeMembers() {
+    return _members
+        .where((member) {
+          final id = member['uid']?.toString() ?? '';
+          if (id.isEmpty) return true;
+          return !_memberOnlyHistory(id);
+        })
+        .toList();
+  }
+
+  List<EnrollmentRecord> _historyEnrollments() {
+    final ids = <String>{
+      for (final member in _members)
+        if ((member['uid']?.toString() ?? '').isNotEmpty)
+          member['uid'].toString(),
+    };
+    return EnrollmentService.finishedPackages(
+      _enrollments.where((item) => ids.contains(item.userId)),
+    );
+  }
 
   /// 글리머 주니어 수강이면 junior, 그 외 온라인 수강이면 glimmer, 없으면 null.
   String? _programKindFor(String memberId, List<WeekBooking> lessons) {

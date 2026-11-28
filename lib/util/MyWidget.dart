@@ -200,19 +200,33 @@ class MyWidget {
 
   static Widget roundEdgeTextField(
       String hintText, TextEditingController controller,
-      {bool obscureText = false, bool autofocus = false}) {
+      {bool obscureText = false,
+      bool autofocus = false,
+      bool dense = false,
+      TextInputType? keyboardType}) {
     return Container(
-      margin: EdgeInsets.only(top: 20, bottom: 20),
-      padding: EdgeInsets.all(10),
+      margin: EdgeInsets.only(
+        top: dense ? 4 : 20,
+        bottom: dense ? 4 : 20,
+      ),
+      padding: EdgeInsets.symmetric(
+        vertical: dense ? 2 : 10,
+        horizontal: dense ? 0 : 10,
+      ),
       color: Colors.transparent,
       child: TextField(
         controller: controller,
         obscureText: obscureText,
         autofocus: autofocus,
+        keyboardType: keyboardType,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.white,
           hintText: hintText,
+          isDense: dense,
+          contentPadding: dense
+              ? EdgeInsets.symmetric(horizontal: 14, vertical: 14)
+              : null,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         ),
       ),

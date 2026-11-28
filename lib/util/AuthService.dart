@@ -136,6 +136,9 @@ class AuthService {
     required String name,
     String phone = '',
     String nickname = '',
+    bool isMinor = false,
+    String guardianName = '',
+    String guardianPhone = '',
     Uint8List? photoBytes,
     String? photoFileName,
   }) async {
@@ -143,6 +146,17 @@ class AuthService {
     if (phoneError != null) return phoneError;
     final nicknameError = validateNickname(nickname);
     if (nicknameError != null) return nicknameError;
+    final trimmedGuardianName = guardianName.trim();
+    final trimmedGuardianPhone = guardianPhone.trim();
+    if (isMinor) {
+      if (trimmedGuardianName.isEmpty) {
+        return '미성년자 가입은 보호자 이름을 입력해 주세요.';
+      }
+      final guardianPhoneError = PhoneUtil.validate(trimmedGuardianPhone);
+      if (guardianPhoneError != null) {
+        return '보호자 $guardianPhoneError';
+      }
+    }
     try {
       final result = await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -178,6 +192,10 @@ class AuthService {
         'nickname': trimmedNickname,
         'photoUrl': photoUrl,
         'phone': PhoneUtil.normalize(phone),
+        'isMinor': isMinor,
+        'guardianName': isMinor ? trimmedGuardianName : '',
+        'guardianPhone':
+            isMinor ? PhoneUtil.normalize(trimmedGuardianPhone) : '',
         'role': 'member',
         'isActive': true,
         'teacherId': '',

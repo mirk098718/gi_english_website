@@ -10,6 +10,7 @@ import 'package:gi_english_website/util/PhoneUtil.dart';
 import 'package:gi_english_website/widget/AdminContentWidth.dart';
 import 'package:gi_english_website/widget/AdminFixedScheduleDialog.dart';
 import 'package:gi_english_website/widget/NotificationBellButton.dart';
+import 'package:gi_english_website/widget/PackageHistorySection.dart';
 import 'package:gi_english_website/widget/SiteLogoButton.dart';
 import 'package:gi_english_website/widget/ProfileAvatar.dart';
 import 'package:gi_english_website/widget/StudentLearningProgressPanel.dart';
@@ -164,8 +165,17 @@ class _StudentDetailPageState extends State<StudentDetailPage> {
                       Text(tr(context, "배정된 수업이 없습니다."),
                           style: TextStyle(
                               fontFamily: "NotoSansKR", color: Palette.grey500))
-                    else
-                      ..._enrollments.map(_enrollmentCard),
+                    else ...[
+                      ...EnrollmentService.activePackages(_enrollments)
+                          .map(_enrollmentCard),
+                      ..._enrollments
+                          .where((item) => !item.isActive)
+                          .map(_enrollmentCard),
+                      PackageHistoryFolder(
+                        records:
+                            EnrollmentService.finishedPackages(_enrollments),
+                      ),
+                    ],
                     const SizedBox(height: 28),
                     _sectionTitle(tr(context, '결제 내역')),
                     const SizedBox(height: 8),
